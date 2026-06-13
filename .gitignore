@@ -1,0 +1,10 @@
+node_modules/
+.env
+.env.*
+.DS_Store
+*.sql
+*.dump
+*.sqlite
+*.sqlite3
+fcm.json
+dist/

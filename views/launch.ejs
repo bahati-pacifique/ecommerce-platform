@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>COCOCE — Coming Soon | Next-Gen Digital Electronics</title>
+  <link rel="icon" href="/favicon.ico" type="image/x-icon">
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link rel="stylesheet" href="https://unpkg.com/purecss@2.0.6/build/pure-min.css" integrity="sha384-Uu6IeWbM+gzNVXJcM9XV3SohHtmWE+3VGi496jvgX1jyvDTXfdK+rfZc8C1Aehk5" crossorigin="anonymous" origin="anonymous" />
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.11.0/axios.min.js" integrity="sha512-h9644v03pHqrIHThkvXhB2PJ8zf5E9IyVnrSfZg8Yj8k4RsO4zldcQc4Bi9iVLUCCsqNY0b4WXVV4UB+wbWENA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <link rel="icon" href="/favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" href="/styles/main.css">
+  <style>
+    @import url('https://googleapis.com');
+    @keyframes expandUnderline {
+      0% {
+        width: 0%;
+        opacity: 0;
+      }
+
+      100% {
+        width: 80%;
+        opacity: 1;
+      }
+    }
+
+    .animate-pulse-slow {
+      animation: pulseSlow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+
+    @keyframes pulseSlow {
+
+      0%,
+      100% {
+        opacity: 1;
+      }
+
+      50% {
+        opacity: 0.7;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <body class="bg-bg-soft text-gray-800 overflow-x-hidden">
+
+    <div class="relative bg-brand/5 border-b border-brand/10 text-center py-2.5 text-xs font-medium text-gray-600 backdrop-blur-sm mt-0">
+      <span class="inline-flex items-center gap-2"><i class="fa-solid fa-bullhorn text-xl text-brand"></i> <span class="text-brand font-semibold">COCOCE</span> is getting ready to redefine digital electronics </span>
+    </div>
+
+    <main class="relative min-h-screen flex flex-col justify-center items-center px-6 py-20 overflow-hidden">
+
+      <div class="absolute top-8 left-6 md:top-10 md:left-10 z-20">
+        <div class="relative">
+          <img src="/images/logos/cococe.png" alt="Logo-brand" class="max-w-[150px]">
+        </div>
+        <div class="h-0.5 w-12 bg-brand/60 mt-1 rounded-full"></div>
+      </div>
+
+      <div class="absolute inset-0 pointer-events-none overflow-hidden">
+        <div class="absolute top-20 left-[-10%] w-80 h-80 bg-brand/5 rounded-full blur-3xl animate-float"></div>
+        <div class="absolute bottom-20 right-[-5%] w-96 h-96 bg-brand/10 rounded-full blur-3xl animate-float" style="animation-delay: 2s;"></div>
+        <div class="absolute top-1/3 right-1/4 w-40 h-40 bg-brand-light rounded-full blur-2xl opacity-40"></div>
+        <div class="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-white to-transparent"></div>
+      </div>
+
+      <div class="max-w-7xl mt-8 mx-auto text-center relative z-10 animate-fade-in">
+        <div class="inline-flex items-center gap-2 bg-white shadow-sm border border-gray-200 rounded-full px-4 py-1.5 mb-8 backdrop-blur-sm">
+          <span class="relative flex h-2 w-2">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-2 w-2 bg-brand"></span>
+          </span>
+          <span class="text-sm font-medium text-gray-700">Launching soon · <i class="fa-solid fa-clock"></i></span>
+        </div>
+
+        <h2 class="text-4xl md:text-6xl font-bold tracking-tight text-gray-900 leading-tight max-w-3xl mx-auto">
+          The future of
+          <span class="bg-gradient-to-r from-brand to-brand-dark bg-clip-text text-transparent">digital electronics</span>
+          is almost here.
+        </h2>
+
+        <p class="text-gray-500 text-lg md:text-xl mt-6 max-w-2xl mx-auto leading-relaxed">
+          COCOCE is crafting next-gen gadgets, AI-driven wearables, and hyper-performance devices.
+          <span class="font-medium text-brand-dark">We're coming soon.</span> Be the first to experience the revolution.
+        </p>
+
+        <!-- Countdown Timer (Modern clean design) -->
+        <div class="mt-12 mb-12">
+          <div class="inline-flex flex-wrap justify-center gap-5 md:gap-8">
+            <!-- Days -->
+            <div class="flex flex-col items-center">
+              <div class="countdown-digit w-20 md:w-24 h-20 md:h-24 rounded-2xl bg-white/60 backdrop-blur-sm border border-gray-200 shadow-sm flex items-center justify-center">
+                <span id="days" class="text-3xl md:text-5xl font-bold text-brand-dark">00</span>
+              </div>
+              <span class="text-xs font-medium text-gray-500 uppercase tracking-wider mt-2">Days</span>
+            </div>
+            
+            <div class="flex flex-col items-center">
+              <div class="countdown-digit w-20 md:w-24 h-20 md:h-24 rounded-2xl bg-white/60 backdrop-blur-sm border border-gray-200 shadow-sm flex items-center justify-center">
+                <span id="hours" class="text-3xl md:text-5xl font-bold text-brand-dark">00</span>
+              </div>
+              <span class="text-xs font-medium text-gray-500 uppercase tracking-wider mt-2">Hours</span>
+            </div>
+            
+            <div class="flex flex-col items-center">
+              <div class="countdown-digit w-20 md:w-24 h-20 md:h-24 rounded-2xl bg-white/60 backdrop-blur-sm border border-gray-200 shadow-sm flex items-center justify-center">
+                <span id="minutes" class="text-3xl md:text-5xl font-bold text-brand-dark">00</span>
+              </div>
+              <span class="text-xs font-medium text-gray-500 uppercase tracking-wider mt-2">Minutes</span>
+            </div>
+            
+            <div class="flex flex-col items-center">
+              <div class="countdown-digit w-20 md:w-24 h-20 md:h-24 rounded-2xl bg-white/60 backdrop-blur-sm border border-gray-200 shadow-sm flex items-center justify-center">
+                <span id="seconds" class="text-3xl md:text-5xl font-bold text-brand">00</span>
+              </div>
+              <span class="text-xs font-medium text-gray-500 uppercase tracking-wider mt-2">Seconds</span>
+            </div>
+          </div>
+          <p class="text-sm text-gray-400 mt-6">Launch target: <span class="font-semibold text-brand">June 20, 2026</span> — stay tuned for surprises 🚀</p>
+        </div>
+
+        <div class="flex flex-wrap justify-center gap-5 md:gap-8 mt-8 text-center">
+          <div class="flex items-center gap-2 text-sm text-gray-500 bg-white/40 px-4 py-1.5 rounded-full border border-gray-100"><span class="text-brand text-lg"><i class="fa-solid fa-store"></i></span> Smart Digital Store</div>
+          <div class="flex items-center gap-2 text-sm text-gray-500 bg-white/40 px-4 py-1.5 rounded-full border border-gray-100"><span class="text-brand text-lg"><i class="fa-solid fa-magnifying-glass"></i></span> Easy find</div>
+          <div class="flex items-center gap-2 text-sm text-gray-500 bg-white/40 px-4 py-1.5 rounded-full border border-gray-100"><span class="text-brand text-lg"><i class="fa-solid fa-cart-plus"></i></span> Safe purchase</div>
+          <div class="flex items-center gap-2 text-sm text-gray-500 bg-white/40 px-4 py-1.5 rounded-full border border-gray-100"><span class="text-brand text-lg"><i class="fa-solid fa-truck-fast"></i></span> Fast access</div>
+        </div>
+      </div>
+
+      <div class="absolute bottom-8 left-0 right-0 text-center text-gray-400 text-xs flex justify-center gap-6 z-10">
+        <span class="hover:text-brand transition"><i class="fa-solid fa-user-shield"></i> 100% Privacy</span>
+        <span class="hover:text-brand transition"><i class="fa-solid fa-truck-fast"></i> Fast & Secure</span>
+        <span class="hover:text-brand transition"><i class="fa-solid fa-globe"></i> Global Launch</span>
+      </div>
+    </main>
+
+    <section class="py-20 bg-white border-t border-gray-100">
+      <div class="max-w-6xl mx-auto px-6 text-center">
+        <div class="inline-block mb-4">
+          <span class="text-brand text-sm font-semibold uppercase tracking-wider bg-brand-light px-3 py-1 rounded-full">Coming features</span>
+        </div>
+        <h2 class="text-3xl md:text-4xl font-bold text-gray-900">What we're building</h2>
+        <p class="text-gray-500 mt-3 max-w-2xl mx-auto">
+          A new era of intelligent electronics designed for creators, gamers, and innovators.
+          <br><b>A Better Way to Explore Digital Electronics</b>
+        </p>
+
+        <div class="grid md:grid-cols-3 gap-8 mt-14">
+          <div class="bg-bg-soft rounded-2xl p-6 border border-gray-100 transition hover:shadow-md hover:border-brand/20">
+            <div class="w-[100%] rounded-xl flex items-center justify-center mx-auto mb-4">
+              <img src="/images/showups/m4.png" alt="Showup img" class="max-w-[100px]">
+            </div>
+            <h3 class="text-xl font-semibold">Next-Gen Performance Laptops</h3>
+            <p class="text-gray-500 text-sm mt-2">
+                Advanced futuristic laptops
+            </p>
+          </div>
+          <div class="bg-bg-soft rounded-2xl p-6 border border-gray-100 transition hover:shadow-md hover:border-brand/20">
+            <div class="w-[100%] rounded-xl flex items-center justify-center mx-auto mb-4">
+              <img src="/images/showups/quest.png" alt="Showup img" class="max-w-[100px]">
+            </div>
+            <h3 class="text-xl font-semibold">Virtual Reality (VR) Technology</h3>
+            <p class="text-gray-500 text-sm mt-2">Shopping The quality original and trusted</p>
+          </div>
+          <div class="bg-bg-soft rounded-2xl p-6 border border-gray-100 transition hover:shadow-md hover:border-brand/20">
+            <div class="w-[100%] rounded-xl flex items-center justify-center mx-auto mb-4">
+              <img src="/images/showups/ps5.png" alt="Showup img" class="max-w-[100px]">
+            </div>
+            <h3 class="text-xl font-semibold">Game Consoles</h3>
+            <p class="text-gray-500 text-sm mt-2">Unimaginable advanced graphic consoles</p>
+          </div>
+          <div class="bg-bg-soft rounded-2xl p-6 border border-gray-100 transition hover:shadow-md hover:border-brand/20">
+            <div class="w-[100%] rounded-xl flex items-center justify-center mx-auto mb-4">
+              <img src="/images/showups/deskjet.png" alt="Showup img" class="max-w-[100px]">
+            </div>
+            <h3 class="text-xl font-semibold">DeskJet Printers</h3>
+            <p class="text-gray-500 text-sm mt-2"></p>
+          </div>
+          <div class="bg-bg-soft rounded-2xl p-6 border border-gray-100 transition hover:shadow-md hover:border-brand/20">
+            <div class="w-[100%] rounded-xl flex items-center justify-center mx-auto mb-4">
+              <img src="/images/showups/5g-router.png" alt="Showup img" class="max-w-[100px]">
+            </div>
+            <h3 class="text-xl font-semibold">5G DUAL Speed Router</h3>
+            <p class="text-gray-500 text-sm mt-2"></p>
+          </div>
+          <div class="bg-bg-soft rounded-2xl p-6 border border-gray-100 transition hover:shadow-md hover:border-brand/20">
+            <div class="w-[100%] rounded-xl flex items-center justify-center mx-auto mb-4">
+              <img src="/images/showups/ai-keyboard.png" alt="Showup img" class="max-w-[100px]">
+            </div>
+            <h3 class="text-xl font-semibold">AI Powered keyboards</h3>
+            <p class="text-gray-500 text-sm mt-2"></p>
+          </div>
+          <div class="col-span-full bg-bg-soft rounded-2xl p-6 border border-gray-100 transition hover:shadow-md hover:border-brand/20 flex flex-col">
+            <div class="w-[100%] rounded-xl flex items-center justify-center mx-auto mb-4">
+              <img src="/images/logos/cococe.png" alt="Cococe" class="max-h-[116px]">
+            </div>
+            <h3 class="text-xl font-semibold ms-auto"><i class="fa-solid fa-link "></i> www.cococe.rw</h3>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="py-16 bg-brand/5">
+        <div class="w-full flex flex-col items-end justify-end px-6 py-3">
+            <img src="/images/showups/banner-1.png" alt="banner" class="max-h-[48px]">
+            <h3 class="text-brand-dark font-['Brush_Script_MT',_cursive] text-xl md:text-4xl">Smart tech, right at your fingertips!</h3>
+        </div>
+      <div class="max-w-4xl mx-auto px-6 text-center">
+        <div class="bg-white rounded-3xl p-8 shadow-sm border border-brand/10">
+          <div class="flex flex-col items-center justify-center text-center">
+            <div class="relative inline-block">
+              <span class="text-5xl md:text-6xl animate-bounce inline-block">
+                <i class="fa-solid fa-globe text-brand"></i>
+              </span>
+            </div>
+
+            <div class="mt-4 overflow-hidden">
+              <div class="animate-pulse-slow">
+                <p class="text-sm md:text-base uppercase tracking-[0.2em] text-brand font-semibold">Stay tuned</p>
+              </div>
+
+              <div class="mt-2 relative">
+                <h3 class="text-2xl md:text-3xl font-bold bg-gradient-to-r from-brand via-brand-dark to-brand bg-clip-text text-transparent animate-pulse">
+                  www.cococe.rw
+                </h3>
+                <div class="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-0 h-0.5 bg-brand animate-[expandUnderline_1.5s_ease-out_forwards]"></div>
+              </div>
+
+              <div class="inline-flex items-center gap-1 mt-3">
+                <span class="h-2 w-2 bg-brand rounded-full animate-ping"></span>
+                <span class="text-xs text-gray-400 font-mono"> Launching soon </span>
+                <span class="h-2 w-2 bg-brand rounded-full animate-ping" style="animation-delay: 1s;"></span>
+              </div>
+            </div>
+
+            <div class="absolute inset-0 pointer-events-none overflow-hidden">
+              <div class="absolute -top-10 left-1/4 text-2xl animate-float opacity-30">⚡</div>
+              <div class="absolute bottom-0 right-1/4 text-xl animate-float opacity-20" style="animation-delay: 2s;">🚀</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer class="py-12 px-6 bg-white border-t border-gray-100">
+      <div class="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
+        <div class="flex items-center gap-3">
+          <span class="text-2xl font-black text-brand">COCOCE</span>
+          <span class="text-xs text-gray-400">© 2026 — Pre-launch</span>
+        </div>
+      </div>
+      <div class="max-w-6xl mx-auto text-center text-gray-400 text-xs mt-8">
+        We're gearing up to change the way you experience technology.
+      </div>
+    </footer>
+
+
+    <script>
+      const launchDate = new Date(2026, 5, 25, 0, 0, 0).getTime(); // month 5 = June, day 20
+
+      function updateCountdown() {
+        const now = new Date().getTime();
+        const distance = launchDate - now;
+
+        if (distance < 0) {
+          document.getElementById('days').innerText = '00';
+          document.getElementById('hours').innerText = '00';
+          document.getElementById('minutes').innerText = '00';
+          document.getElementById('seconds').innerText = '00';
+          const countdownContainer = document.querySelector('.countdown-digit').parentElement.parentElement;
+          if (countdownContainer && !document.querySelector('.launch-message')) {
+            const msg = document.createElement('div');
+            msg.className = 'text-brand font-bold text-lg mt-4 animate-pulse launch-message';
+            msg.innerText = 'COCOCE is LIVE! Experience the future of digital electronics.';
+            countdownContainer.parentElement.appendChild(msg);
+          }
+          return;
+        }
+
+        const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((distance % (86400000)) / (3600000));
+        const minutes = Math.floor((distance % 3600000) / 60000);
+        const seconds = Math.floor((distance % 60000) / 1000);
+
+        document.getElementById('days').innerText = days < 10 ? '0' + days : days;
+        document.getElementById('hours').innerText = hours < 10 ? '0' + hours : hours;
+        document.getElementById('minutes').innerText = minutes < 10 ? '0' + minutes : minutes;
+        document.getElementById('seconds').innerText = seconds < 10 ? '0' + seconds : seconds;
+      }
+
+      updateCountdown();
+      setInterval(updateCountdown, 1000);
+
+      const footerForm = document.getElementById('footerNotify');
+
+      function handleEmailSubmit(emailInput, event) {
+        event.preventDefault();
+        const email = emailInput.value.trim();
+        if (email && email.includes('@') && email.includes('.')) {
+          alert(`🎉 Thanks! ${email} is now on the COCOCE early access list. We'll notify you right at launch with exclusive 15% off.`);
+          emailInput.value = '';
+        } else {
+          alert('Please enter a valid email address to get notified.');
+        }
+      }
+
+      if (footerForm) {
+        const footerEmailField = document.getElementById('footerEmail');
+        footerForm.addEventListener('submit', (e) => handleEmailSubmit(footerEmailField, e));
+      }
+
+      const digits = document.querySelectorAll('.countdown-digit');
+      digits.forEach(d => {
+        d.addEventListener('mouseenter', () => {
+          d.style.borderColor = '#ED1B24';
+          d.style.transition = '0.2s';
+        });
+        d.addEventListener('mouseleave', () => {
+          d.style.borderColor = '#e5e7eb';
+        });
+      });
+    </script>
+  </body>
+</body>
+
+</html>

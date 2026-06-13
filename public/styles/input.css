@@ -1,0 +1,91 @@
+@import "tailwindcss";
+
+@theme {
+  --color-brand: #ED1B24;
+  --color-brand-dark: #C9171F;
+  --color-brand-light: #FEE2E3;
+  --color-brand-ultralight: #FFF5F5;
+  --color-bg-soft: #FDFDFC;
+  
+  --font-sans: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-fancy: "Playfair Display", serif;
+  
+  --animate-float: float 6s ease-in-out infinite;
+  --animate-pulse-slow: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  --animate-shimmer: shimmer 2.5s infinite linear;
+  --animate-fade-in: fadeIn 0.8s ease-out forwards;
+  --animate-slide-up: slideUp 0.7s ease-out forwards;
+  
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-12px); }
+  }
+  
+  @keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+  }
+  
+  @keyframes fadeIn {
+    0% { opacity: 0; }
+    100% { opacity: 1; }
+  }
+  
+  @keyframes slideUp {
+    0% { opacity: 0; transform: translateY(30px); }
+    100% { opacity: 1; transform: translateY(0); }
+  }
+}
+
+@layer components {
+  .glass-card-light {
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(237, 27, 36, 0.15);
+  }
+  
+  .countdown-digit {
+    background: rgba(0, 0, 0, 0.02);
+    backdrop-filter: blur(4px);
+    border: 1px solid rgba(237, 27, 36, 0.2);
+  }
+}
+
+@layer base {
+  body {
+    background: #FDFDFC;
+    font-family: "Inter", sans-serif;
+    color: #1f2937; /* gray-800 */
+  }
+  
+  button {
+    cursor: pointer;
+  }
+  
+  button:disabled {
+    cursor: not-allowed;
+    opacity: 0.7;
+  }
+}
+
+@layer utilities {
+  
+  ::-webkit-scrollbar {
+    width: 5px;
+  }
+  
+  ::-webkit-scrollbar-track {
+    background: #f1f1f1;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    background: #ED1B24;
+    border-radius: 10px;
+  }
+  
+  
+  html {
+    scroll-behavior: smooth;
+  }
+}
