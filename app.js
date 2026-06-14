@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const app = express();
 
@@ -20,8 +21,6 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
-
-require('dotenv').config();
 
 const allowedOrigins = [
   'https://cococe.onrender.com',
@@ -78,8 +77,13 @@ app.use(session({
   saveUninitialized: false,
   cookie: {
     httpOnly: true,
+    // secure: isProduction,
+    // sameSite: isProduction ? 'none' : 'lax',
+    
+    // Secure is true only in production (requires HTTPS)
     secure: isProduction,
-    sameSite: isProduction ? 'none' : 'lax',
+    // 'lax' works perfectly for standard apps on both HTTP and HTTPS
+    sameSite: 'lax',
     maxAge: 1000 * 60 * 60 * 24 * 7
   }
 }));
@@ -90,6 +94,7 @@ app.use(helmet({
   contentSecurityPolicy: {
     useDefaults: true,
     directives: {
+      "upgradeInsecureRequests": null,
       "script-src": [
         "'self'",
         "'unsafe-inline'",
