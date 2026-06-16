@@ -7,6 +7,33 @@
   <title>COCOCE — Coming Soon | Next-Gen Digital Electronics</title>
   <link rel="icon" href="/favicon.ico" type="image/x-icon">
 
+  <meta name="description" content="COCOCE Kigali Rwanda, Laptops, Desktops, Computer accessories, Smart tv, projectors, discover what you want about digital assets near you at Kigali">
+  <meta name="keywords" content="Laptops, Desktops, Memories, Storages, Servers, keyboards, Printers, Screens, Repair, Explore, Electronic, Digital, Kigali, Rwanda">
+  <meta name="author" content="COCOCE RW">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.2.1/axios.min.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@8/swiper-bundle.min.css">
+  <link rel="stylesheet" href="/src/css/main.css">
+  <link rel="stylesheet" href="/src/css/index.css">
+  <link rel="stylesheet" href="/styles/listing.css">
+  <link rel="stylesheet" href="/src/css/pannels.css">
+
+  <meta property="og:image" content="https://res.cloudinary.com/dfv97pfcq/image/upload/v1717404221/cococe/cococe/p6nxkogue1wlimtlaohz.png">
+  <meta property="og:url" content="https://cococe.onrender.com/products/">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Laptops, Printers, Accessories, Game consoles, Electronics, and much more, cococe, your wish our priority">
+  <meta property="og:description" content="COCOCE Kigali Rwanda, Laptops, Desktops, Computer accessories, Smart tv, projectors, discover what you want about digital assets near you at Kigali">
+  <meta property="og:logo" content="https://res.cloudinary.com/dfv97pfcq/image/upload/v1717404221/cococe/cococe/p6nxkogue1wlimtlaohz.png" />
+
+  <meta name="twitter:card" content="https://res.cloudinary.com/dfv97pfcq/image/upload/v1717404221/cococe/cococe/p6nxkogue1wlimtlaohz.png">
+  <meta property="twitter:domain" content="cococe.onrender.com">
+  <meta property="twitter:url" content="https://cococe.onrender.com/products/">
+  <meta name="twitter:title" content="Laptops, Printers, Accessories, Game consoles, Electronics, and much more, cococe, your wish our priority">
+  <meta name="twitter:description" content="COCOCE Kigali Rwanda, Laptops, Desktops, Computer accessories, Smart tv, projectors, discover what you want about digital assets near you at Kigali">
+
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
   <link rel="stylesheet" href="https://unpkg.com/purecss@2.0.6/build/pure-min.css" integrity="sha384-Uu6IeWbM+gzNVXJcM9XV3SohHtmWE+3VGi496jvgX1jyvDTXfdK+rfZc8C1Aehk5" crossorigin="anonymous" origin="anonymous" />
   <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
@@ -260,71 +287,7 @@
     </footer>
 
 
-    <script>
-      const launchDate = new Date(2026, 5, 25, 0, 0, 0).getTime(); // month 5 = June, day 20
-
-      function updateCountdown() {
-        const now = new Date().getTime();
-        const distance = launchDate - now;
-
-        if (distance < 0) {
-          document.getElementById('days').innerText = '00';
-          document.getElementById('hours').innerText = '00';
-          document.getElementById('minutes').innerText = '00';
-          document.getElementById('seconds').innerText = '00';
-          const countdownContainer = document.querySelector('.countdown-digit').parentElement.parentElement;
-          if (countdownContainer && !document.querySelector('.launch-message')) {
-            const msg = document.createElement('div');
-            msg.className = 'text-brand font-bold text-lg mt-4 animate-pulse launch-message';
-            msg.innerText = 'COCOCE is LIVE! Experience the future of digital electronics.';
-            countdownContainer.parentElement.appendChild(msg);
-          }
-          return;
-        }
-
-        const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-        const hours = Math.floor((distance % (86400000)) / (3600000));
-        const minutes = Math.floor((distance % 3600000) / 60000);
-        const seconds = Math.floor((distance % 60000) / 1000);
-
-        document.getElementById('days').innerText = days < 10 ? '0' + days : days;
-        document.getElementById('hours').innerText = hours < 10 ? '0' + hours : hours;
-        document.getElementById('minutes').innerText = minutes < 10 ? '0' + minutes : minutes;
-        document.getElementById('seconds').innerText = seconds < 10 ? '0' + seconds : seconds;
-      }
-
-      updateCountdown();
-      setInterval(updateCountdown, 1000);
-
-      const footerForm = document.getElementById('footerNotify');
-
-      function handleEmailSubmit(emailInput, event) {
-        event.preventDefault();
-        const email = emailInput.value.trim();
-        if (email && email.includes('@') && email.includes('.')) {
-          alert(`🎉 Thanks! ${email} is now on the COCOCE early access list. We'll notify you right at launch with exclusive 15% off.`);
-          emailInput.value = '';
-        } else {
-          alert('Please enter a valid email address to get notified.');
-        }
-      }
-
-      if (footerForm) {
-        const footerEmailField = document.getElementById('footerEmail');
-        footerForm.addEventListener('submit', (e) => handleEmailSubmit(footerEmailField, e));
-      }
-
-      const digits = document.querySelectorAll('.countdown-digit');
-      digits.forEach(d => {
-        d.addEventListener('mouseenter', () => {
-          d.style.borderColor = '#ED1B24';
-          d.style.transition = '0.2s';
-        });
-        d.addEventListener('mouseleave', () => {
-          d.style.borderColor = '#e5e7eb';
-        });
-      });
-    </script>
+    <script src="/scripts/l.js"></script>
   </body>
 </body>
 
