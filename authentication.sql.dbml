@@ -1,0 +1,69 @@
+CREATE TABLE "users" (
+  "id" UUID PRIMARY KEY DEFAULT (gen_random_uuid()),
+  "f_name" TEXT NOT NULL,
+  "l_name" TEXT NOT NULL,
+  "username" TEXT UNIQUE NOT NULL,
+  "email" TEXT UNIQUE,
+  "contact_address" TEXT,
+  "phone" "VARCHAR(155)",
+  "profile" JSONB,
+  "status" user_status NOT NULL,
+  "verified" BOOLEAN NOT NULL DEFAULT false,
+  "last_active" "TIMESTAMPTZ",
+  "created_at" "TIMESTAMPTZ" DEFAULT (now()),
+  "updated_at" "TIMESTAMPTZ" DEFAULT (now())
+);
+
+CREATE TABLE "user_credentials" (
+  "id" SERIAL PRIMARY KEY,
+  "user_id" UUID NOT NULL,
+  "password_hash" TEXT NOT NULL,
+  "authentication" "VARCHAR(50)",
+  "status" "VARCHAR(250)",
+  "created_at" "TIMESTAMPTZ" DEFAULT (now()),
+  "updated_at" "TIMESTAMPTZ" DEFAULT (now())
+);
+
+CREATE TABLE "account_types" (
+  "id" UUID PRIMARY KEY DEFAULT (gen_random_uuid()),
+  "title" "VARCHAR(50)" UNIQUE NOT NULL,
+  "description" TEXT,
+  "metadata" JSONB,
+  "created_by" UUID,
+  "created_at" "TIMESTAMPTZ" DEFAULT (now()),
+  "updated_at" "TIMESTAMPTZ" DEFAULT (now())
+);
+
+CREATE TABLE "accounts" (
+  "id" UUID PRIMARY KEY DEFAULT (gen_random_uuid()),
+  "title" TEXT UNIQUE NOT NULL,
+  "account_type_id" UUID NOT NULL,
+  "details" TEXT,
+  "status" account_status,
+  "created_at" "TIMESTAMPTZ" DEFAULT (now()),
+  "updated_at" "TIMESTAMPTZ" DEFAULT (now())
+);
+
+CREATE TABLE "user_accounts" (
+  "id" UUID PRIMARY KEY DEFAULT (gen_random_uuid()),
+  "user_id" UUID NOT NULL,
+  "account_id" UUID NOT NULL,
+  "role" user_roles NOT NULL DEFAULT 'low',
+  "joined_at" "TIMESTAMPTZ" DEFAULT (now()),
+  "valid_from" "TIMESTAMPTZ" DEFAULT (now()),
+  "valid_to" "TIMESTAMPTZ",
+  "status" user_account_status DEFAULT 'active',
+  "last_active" "TIMESTAMPTZ"
+);
+
+CREATE UNIQUE INDEX ON "user_accounts" ("user_id", "account_id");
+
+ALTER TABLE "accounts" ADD FOREIGN KEY ("account_type_id") REFERENCES "account_types" ("id") DEFERRABLE INITIALLY IMMEDIATE;
+
+ALTER TABLE "account_types" ADD FOREIGN KEY ("created_by") REFERENCES "users" ("id") DEFERRABLE INITIALLY IMMEDIATE;
+
+ALTER TABLE "user_credentials" ADD FOREIGN KEY ("user_id") REFERENCES "users" ("id") DEFERRABLE INITIALLY IMMEDIATE;
+
+ALTER TABLE "user_accounts" ADD FOREIGN KEY ("user_id") REFERENCES "users" ("id") DEFERRABLE INITIALLY IMMEDIATE;
+
+ALTER TABLE "user_accounts" ADD FOREIGN KEY ("account_id") REFERENCES "accounts" ("id") DEFERRABLE INITIALLY IMMEDIATE;

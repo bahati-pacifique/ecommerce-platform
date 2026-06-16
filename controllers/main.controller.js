@@ -5,7 +5,7 @@ function renderLaunchPage(req, res) {
 
     if (req.accepts('json')) {
         return res.json({
-            message: `COCOCE - W're comming soon`
+            message: `COCOCE - We're comming soon`
         })
     }
 }
