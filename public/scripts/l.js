@@ -1,4 +1,4 @@
-const launchDate = new Date(2026, 5, 25, 0, 0, 0).getTime(); // month 5 = June, day 20
+const launchDate = new Date(2026, 6, 15, 0, 0, 0).getTime(); // month 5 = June, day 20
 
 function updateCountdown() {
     const now = new Date().getTime();
