@@ -55,15 +55,15 @@ app.use(helmet(helmetConfig));
 
 app.use(session(sessionConfig));
 
-// app.use((req, res, next) => {
-//     const host = req.hostname;
+app.use((req, res, next) => {
+    const host = req.hostname;
 
-//     if (host === 'admin.cococe.rw') {
-//         return adminRouter(req, res, next);
-//     }
+    if (host === 'admin.cococe.rw') {
+        return adminRouter(req, res, next);
+    }
 
-//     next();
-// });
+    next();
+});
 
 app.use('/', mainRoutes);
 
