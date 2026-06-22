@@ -55,11 +55,30 @@ app.use(helmet(helmetConfig));
 
 app.use(session(sessionConfig));
 
+// app.use((req, res, next) => {
+//     const host = req.hostname;
+
+//     if (host === 'admin.cococe.rw') {
+//         return adminRouter(req, res, next);
+//     }
+
+//     next();
+// });
+
 app.use('/', mainRoutes);
+
+const isProduction = process.env.NODE_ENV === 'production';
+
+app.use('/admin', (req, res, next) => {
+    if ((req.hostname !== process.env.ADMIN_HOST) && isProduction) {
+        return res.status(404).send('Not Found');
+    }
+
+    next();
+})
 
 app.use(
     '/admin',
-    adminMiddleware,
     adminRoutes
 );
 
