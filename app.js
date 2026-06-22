@@ -59,7 +59,7 @@ app.use((req, res, next) => {
     const host = req.hostname;
 
     if (host === 'admin.cococe.rw') {
-        return adminRouter(req, res, next);
+        return adminRoutes(req, res, next);
     }
 
     next();
