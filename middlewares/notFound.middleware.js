@@ -10,7 +10,7 @@ module.exports = (req, res, next) => {
     if (type === 'json') {
         return res.status(404).json({
             success: false,
-            message: 'Page Not Found'
+            message: 'Not Found'
         });
     }
 

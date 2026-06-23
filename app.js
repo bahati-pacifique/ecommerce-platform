@@ -20,6 +20,7 @@ const vhost = require('vhost');
 
 const mainApp = require('./apps/main/main.app');
 const adminApp = require('./apps/admin/admin.app');
+const authApp = require('./apps/auth/auth.app');
 
 app.set('trust proxy', 1);
 
@@ -57,9 +58,11 @@ if (isProduction) {
 
     app.use(vhost('cococe.rw', mainApp));
     app.use(vhost('admin.cococe.rw', adminApp));
+    app.use(vhost('auth.cococe.rw', authApp));
 } else {
     app.use(vhost('localhost', mainApp));
     app.use(vhost('admin.localhost', adminApp));
+    app.use(vhost('auth.localhost', authApp));
 }
 
 if (!isProduction) {
