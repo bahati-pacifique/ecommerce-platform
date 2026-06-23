@@ -1,7 +1,5 @@
 function renderLaunchPage(req, res) {
 
-    console.log('**MainRoutes')
-
     if (req.accepts('html')) {
         return res.render('launch')
     }
