@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Upload Test</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 700px;
+            margin: 40px auto;
+            padding: 20px;
+        }
+
+        .card {
+            border: 1px solid #ddd;
+            padding: 20px;
+            border-radius: 8px;
+        }
+
+        input,
+        select,
+        button {
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+        }
+
+        img {
+            max-width: 300px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+
+        <h2>Storage Upload Test</h2>
+
+        <form
+            action="/upload"
+            method="POST"
+            enctype="multipart/form-data"
+        >
+
+            <label>Storage Type</label>
+
+            <select name="type">
+                <option value="images">Image</option>
+                <option value="catalogs">Catalog PDF</option>
+                <option value="manuals">Manual PDF</option>
+                <option value="banners">Banner</option>
+            </select>
+
+            <input
+                type="file"
+                name="file"
+                required
+            >
+
+            <button type="submit">
+                Upload
+            </button>
+
+        </form>
+
+    </div>
+
+</body>
+</html>

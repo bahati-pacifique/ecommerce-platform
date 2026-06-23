@@ -18,6 +18,8 @@ const uploadConfig = require('./config/upload.config');
 
 const vhost = require('vhost');
 
+const storage = require('./src/configs/storage.config');
+
 const mainApp = require('./apps/main/main.app');
 const adminApp = require('./apps/admin/admin.app');
 const authApp = require('./apps/auth/auth.app');
@@ -47,6 +49,15 @@ const isProduction = process.env.NODE_ENV === 'production';
 // app.use(vhost('admin.cococe.rw', adminApp));
 // app.use(vhost('localhost', mainApp));
 // app.use(vhost('admin.localhost', adminApp));
+
+app.use('/images', express.static(storage.images));
+app.use('/catalogs', express.static(storage.catalogs));
+app.use('/manuals', express.static(storage.manuals));
+app.use('/banners', express.static(storage.banners));
+app.use('/vids', express.static(storage.vids));
+app.use('/temps', express.static(storage.temp));
+app.use('/pubs', express.static(storage.pubs));
+app.use('/files', express.static(storage.files));
 
 if (isProduction) {
     app.use((req, res, next) => {
