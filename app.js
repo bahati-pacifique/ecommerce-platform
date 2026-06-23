@@ -16,20 +16,10 @@ const helmetConfig = require('./config/helmet.config');
 const sessionConfig = require('./config/session.config');
 const uploadConfig = require('./config/upload.config');
 
-const adminMiddleware =
-    require('./middlewares/admin.middleware');
+const vhost = require('vhost');
 
-const errorMiddleware =
-    require('./middlewares/error.middleware');
-
-const notFoundMiddleware =
-    require('./middlewares/notFound.middleware');
-
-const mainRoutes =
-    require('./routes/main.routes');
-
-const adminRoutes =
-    require('./routes/admin.routes');
+const mainApp = require('./apps/main/main.app');
+const adminApp = require('./apps/admin/admin.app');
 
 app.set('trust proxy', 1);
 
@@ -42,11 +32,6 @@ app.use(express.static(
     path.join(__dirname, 'public')
 ));
 
-app.set('view engine', 'ejs');
-app.set('views',
-    path.join(__dirname, 'views')
-);
-
 app.use(cors(corsConfig));
 
 app.use(cookieParser());
@@ -55,35 +40,27 @@ app.use(helmet(helmetConfig));
 
 app.use(session(sessionConfig));
 
-app.use((req, res, next) => {
-    const host = req.hostname;
-
-    if (host === 'admin.cococe.rw') {
-        return adminRoutes(req, res, next);
-    }
-
-    next();
-});
-
-app.use('/', mainRoutes);
-
 const isProduction = process.env.NODE_ENV === 'production';
 
-app.use('/admin', (req, res, next) => {
-    if ((req.hostname !== process.env.ADMIN_HOST) && isProduction) {
-        return res.status(404).send('Not Found');
-    }
+// app.use(vhost('cococe.rw', mainApp));
+// app.use(vhost('admin.cococe.rw', adminApp));
+// app.use(vhost('localhost', mainApp));
+// app.use(vhost('admin.localhost', adminApp));
 
-    next();
-})
+if (isProduction) {
+    app.use(vhost('cococe.rw', mainApp));
+    app.use(vhost('admin.cococe.rw', adminApp));
+} else {
+    app.use(vhost('localhost', mainApp));
+    app.use(vhost('admin.localhost', adminApp));
+}
 
-app.use(
-    '/admin',
-    adminRoutes
-);
-
-app.use(notFoundMiddleware);
-
-app.use(errorMiddleware);
+if (!isProduction) {
+    //For localhost exposure (certain routes) to public i.e Like when using ngrok for testing purpose
+    const mainRoutes = require('./apps/main/routes/main.routes');
+    app.use('/', mainRoutes)
+    const adminRoutes = require('./apps/admin/routes/admin.routes');
+    app.use('/admin', adminRoutes)
+}
 
 module.exports = app;

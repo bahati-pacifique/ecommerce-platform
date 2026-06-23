@@ -106,21 +106,18 @@
 
 <body class="w-screen h-screen bg-bg-soft text-gray-800 overflow-x-hidden flex items-center justify-center flex-col relative">
 
+  <i class="bi bi-shield-lock text-4xl text-brand/70 absolute top-8 left-8 hidden md:block"></i>
   <div class="absolute inset-0 pointer-events-none overflow-hidden">
     <div class="absolute top-[-10%] left-[-5%] w-96 h-96 bg-brand-light rounded-full blur-3xl opacity-30 animate-float"></div>
     <div class="absolute bottom-[-10%] right-[-5%] w-96 h-96 bg-brand-light rounded-full blur-3xl opacity-20 animate-float" style="animation-delay: 2s;"></div>
     <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-brand-ultralight rounded-full blur-3xl opacity-20"></div>
   </div>
 
-  <main class="w-full max-w-4xl mx-auto px-6 relative z-10 flex-1 flex items-center justify-center">
+  <main class="h-full w-full max-w-4xl mx-auto px-6 py-6 relative z-10 flex-1 flex items-center justify-center">
     <div class="text-center animate-fade-in">
       
-      <!-- Brand logo with badge -->
       <div class="relative inline-block mb-6">
         <img src="/images/logos/administration.png" alt="Logo-brand" class="max-w-[200px]">
-        <span class="absolute -top-3 -right-10 admin-badge text-brand text-[18px] font-bold px-2 py-0.5 rounded-full">
-          <i class="bi bi-shield font-bold text-lg"></i>
-        </span>
       </div>
       
       <div class="h-1 w-20 bg-brand/60 mx-auto mb-6 rounded-full"></div>
@@ -145,33 +142,9 @@
           </svg>
         </a>
       </div>
-      
-      <div class="flex flex-wrap justify-center gap-6 mt-10 animate-slide-up" style="animation-delay: 0.3s">
-        <div class="flex items-center gap-2 text-sm text-gray-500 bg-white/60 backdrop-blur-sm px-4 py-2 rounded-full border border-gray-100">
-          <i class="bi bi-grid-1x2 text-brand font-semibold"></i>
-          <span>Dashboard</span>
-        </div>
-        <div class="flex items-center gap-2 text-sm text-gray-500 bg-white/60 backdrop-blur-sm px-4 py-2 rounded-full border border-gray-100">
-          <i class="bi bi-wrench-adjustable-circle text-brand font-semibold"></i>
-          <span>Product Management</span>
-        </div>
-        <div class="flex items-center gap-2 text-sm text-gray-500 bg-white/60 backdrop-blur-sm px-4 py-2 rounded-full border border-gray-100">
-          <i class="bi bi-wrench-adjustable-circle text-brand font-semibold"></i>
-          <span>Category Management</span>
-        </div>
-        <div class="flex items-center gap-2 text-sm text-gray-500 bg-white/60 backdrop-blur-sm px-4 py-2 rounded-full border border-gray-100">
-          <i class="bi bi-receipt text-brand font-semibold"></i>
-          <span>Inventory Management</span>
-        </div>
-        <div class="flex items-center gap-2 text-sm">
-          <span class="text-gray-500">And much more</span>
-          <i class="bi bi-plus-lg text-brand font-bold text-lg"></i>
-        </div>
-      </div>
     </div>
   </main>
 
-  <!-- Footer -->
   <footer class="w-full mt-auto py-4 px-6 border-t border-gray-100 relative z-10">
     <div class="w-full md:max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
       <div class="flex items-center gap-3">
@@ -189,22 +162,6 @@
       Terms of Service apply · Secure access only
     </div>
   </footer>
-
-  <!-- JavaScript for button interaction -->
-  <script>
-    document.getElementById('signinBtn').addEventListener('click', function(e) {
-      e.preventDefault();
-      alert('🔐 Redirecting to COCOCE Admin sign-in page...\n\n(Demo — full authentication coming soon.)');
-    });
-
-    // Footer links
-    document.querySelectorAll('.footer-links a, .mt-3 a').forEach(link => {
-      link.addEventListener('click', function(e) {
-        e.preventDefault();
-        alert(`📄 "${this.textContent}" page — coming soon.`);
-      });
-    });
-  </script>
 
 </body>
 
