@@ -48,6 +48,13 @@ const isProduction = process.env.NODE_ENV === 'production';
 // app.use(vhost('admin.localhost', adminApp));
 
 if (isProduction) {
+    app.use((req, res, next) => {
+        if (req.hostname === 'www.cococe.rw') {
+            return res.redirect(301, `https://cococe.rw${req.originalUrl}`);
+        }
+        next();
+    });
+
     app.use(vhost('cococe.rw', mainApp));
     app.use(vhost('admin.cococe.rw', adminApp));
 } else {
