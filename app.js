@@ -50,14 +50,15 @@ const isProduction = process.env.NODE_ENV === 'production';
 // app.use(vhost('localhost', mainApp));
 // app.use(vhost('admin.localhost', adminApp));
 
-app.use('/images', express.static(storage.images));
-app.use('/catalogs', express.static(storage.catalogs));
-app.use('/manuals', express.static(storage.manuals));
-app.use('/banners', express.static(storage.banners));
-app.use('/vids', express.static(storage.vids));
-app.use('/temps', express.static(storage.temp));
-app.use('/pubs', express.static(storage.pubs));
-app.use('/files', express.static(storage.files));
+// app.use('/images', express.static(storage.images));
+// app.use('/catalogs', express.static(storage.catalogs));
+// app.use('/manuals', express.static(storage.manuals));
+// app.use('/banners', express.static(storage.banners));
+// app.use('/vids', express.static(storage.vids));
+// app.use('/temps', express.static(storage.temp));
+// app.use('/pubs', express.static(storage.pubs));
+// app.use('/files', express.static(storage.files));
+//We switched to cdn
 
 if (isProduction) {
     app.use((req, res, next) => {

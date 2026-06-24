@@ -18,5 +18,8 @@ module.exports = {
     vids: '/var/www/cococe-storage/vids',
 
     //Generic file
-    files: '/var/www/cococe-storage/files'
+    files: '/var/www/cococe-storage/files',
+
+    //Public profile & portfolios images
+    profiles: '/var/www/cococe-storage/files'
 };
