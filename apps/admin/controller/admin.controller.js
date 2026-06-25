@@ -2,11 +2,7 @@ const mockService = require('../../../src/services/DBMockService');
 
 async function home(req, res) {
     try {
-        downloadImage()
-            .then((filePath) => {
-                console.log('Downloaded to:', filePath);
-            })
-            .catch(console.error);
+        
         await mockService.testConnection();
     } catch (error) {
         console.log(error);
@@ -19,34 +15,34 @@ const axios = require('axios');
 const fs = require('fs');
 const path = require('path');
 
-async function downloadImage() {
-    const url = 'https://res.cloudinary.com/dfv97pfcq/image/upload/v1717404221/cococe/cococe/p6nxkogue1wlimtlaohz.png';
+// async function downloadImage() {
+//     const url = 'https://res.cloudinary.com/dfv97pfcq/image/upload/v1717404221/cococe/cococe/p6nxkogue1wlimtlaohz.png';
 
-    const folder = '/var/www/cococe-storage/meta';
-    const fileName = 'image.png'; // or generate unique name
-    const filePath = path.join(folder, fileName);
+//     const folder = '/var/www/cococe-storage/meta';
+//     const fileName = 'image.png'; // or generate unique name
+//     const filePath = path.join(folder, fileName);
 
-    // ensure folder exists
-    fs.mkdirSync(folder, { recursive: true });
+//     // ensure folder exists
+//     fs.mkdirSync(folder, { recursive: true });
 
-    const response = await axios({
-        url,
-        method: 'GET',
-        responseType: 'stream'
-    });
+//     const response = await axios({
+//         url,
+//         method: 'GET',
+//         responseType: 'stream'
+//     });
 
-    const writer = fs.createWriteStream(filePath);
+//     const writer = fs.createWriteStream(filePath);
 
-    response.data.pipe(writer);
+//     response.data.pipe(writer);
 
-    return new Promise((resolve, reject) => {
-        writer.on('finish', () => {
-            resolve(filePath);
-        });
+//     return new Promise((resolve, reject) => {
+//         writer.on('finish', () => {
+//             resolve(filePath);
+//         });
 
-        writer.on('error', reject);
-    });
-}
+//         writer.on('error', reject);
+//     });
+// }
 
 // usage
 

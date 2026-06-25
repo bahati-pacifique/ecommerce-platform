@@ -8,6 +8,8 @@ class DBMock {
 
         const { rows } = await db.query('SELECT * FROM users');
 
+        console.log(rows)
+
         return rows || [];
 
     }
