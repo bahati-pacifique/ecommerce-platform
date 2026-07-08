@@ -12,6 +12,7 @@ function renderLaunchPage(req, res) {
 }
 
 const path = require('path');
+
 const storage = require('../src/configs/storage.config');
 
 const uploadProductImage = async (req, res) => {

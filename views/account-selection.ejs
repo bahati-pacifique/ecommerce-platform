@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>COCOCE — Account Selection</title>
+  <meta name="description" content="COCOCE — Admin portal, COCOCE Kigali Rwanda, Laptops, Desktops, Computer accessories, Smart tv, projectors, discover what you want about digital assets near you at Kigali">
+  <meta name="keywords" content="Laptops, Desktops, Memories, Storages, Servers, keyboards, Printers, Screens, Repair, Explore, Electronic, Digital, Kigali, Rwanda">
+  <meta name="author" content="COCOCE RW">
+
+  <meta property="og:image" content="https://cdn.cococe.rw/meta/cococe.png">
+  <meta property="og:url" content="https://www.cococe.rw">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Laptops, Printers, Accessories, Game consoles, Electronics, and much more, cococe, your wish our priority">
+  <meta property="og:description" content="COCOCE Kigali Rwanda, Laptops, Desktops, Computer accessories, Smart tv, projectors, discover what you want about digital assets near you at Kigali">
+  <meta property="og:logo" content="https://cdn.cococe.rw/meta/cococe.png" />
+
+  <meta name="twitter:card" content="https://cdn.cococe.rw/meta/cococe.png">
+  <meta property="twitter:domain" content="https://cococe.rw">
+  <meta property="twitter:url" content="https://cococe.rw">
+  <meta name="twitter:title" content="Laptops, Printers, Accessories, Game consoles, Electronics, and much more, cococe, your wish our priority">
+  <meta name="twitter:description" content="COCOCE Kigali Rwanda, Laptops, Desktops, Computer accessories, Smart tv, projectors, discover what you want about digital assets near you at Kigali">
+
+  <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.11.0/axios.min.js" integrity="sha512-h9644v03pHqrIHThkvXhB2PJ8zf5E9IyVnrSfZg8Yj8k4RsO4zldcQc4Bi9iVLUCCsqNY0b4WXVV4UB+wbWENA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+  <link rel="icon" href="/favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+
+  <link rel="stylesheet" href="/styles/components/notification.css">
+  <link rel="stylesheet" href="/styles/main.css">
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap');
+    @import url("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css");
+
+    body {
+      background: #FDFDFC;
+      font-family: 'Inter', sans-serif;
+      scroll-behavior: smooth;
+      overflow-x: hidden;
+    }
+
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 5px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: #f1f1f1;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #ED1B24;
+      border-radius: 10px;
+    }
+
+    /* Card slider container with extra padding for hover effects */
+    .card-slider-wrapper {
+      overflow: hidden;
+      border-radius: 16px;
+      padding: 8px 0;
+      /* Extra padding top and bottom for hover lift */
+    }
+
+    .card-slider {
+      display: flex;
+      transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+      will-change: transform;
+      padding: 4px 0;
+      /* Additional padding for hover lift */
+    }
+
+    .account-card {
+      flex: 0 0 100%;
+      max-width: 100%;
+      padding: 0 8px;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    @media (min-width: 768px) {
+      .account-card {
+        flex: 0 0 50%;
+        max-width: 50%;
+        padding: 0 10px;
+      }
+    }
+
+    @media (min-width: 1024px) {
+      .account-card {
+        flex: 0 0 33.333%;
+        max-width: 33.333%;
+        padding: 0 12px;
+      }
+    }
+
+    .account-card-inner {
+      background: white;
+      border-radius: 16px;
+      border: 1px solid #e5e7eb;
+      padding: 24px;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      height: 100%;
+      position: relative;
+      overflow: hidden;
+      min-height: 200px;
+      /* Ensure card content doesn't overflow */
+      display: flex;
+      flex-direction: column;
+    }
+
+    .account-card-inner:hover {
+      transform: translateY(-6px);
+      border-color: #ED1B24;
+      box-shadow: 0 12px 40px rgba(237, 27, 36, 0.12);
+    }
+
+    .account-card-inner.selected {
+      border-color: #ED1B24;
+      box-shadow: 0 8px 30px rgba(237, 27, 36, 0.15);
+      background: #FFF5F5;
+      transform: translateY(-4px);
+    }
+
+    .account-card-inner.selected::before {
+      content: '✓ Selected';
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      background: #ED1B24;
+      color: white;
+      font-size: 10px;
+      font-weight: 600;
+      padding: 4px 12px;
+      border-radius: 20px;
+      letter-spacing: 0.5px;
+    }
+
+    /* Ensure card content doesn't overflow */
+    .account-card-inner p {
+      flex: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+    }
+
+    /* Navigation dots */
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #d1d5db;
+      border: none;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      padding: 0;
+    }
+
+    .dot.active {
+      background: #ED1B24;
+      width: 28px;
+      border-radius: 5px;
+    }
+
+    .dot:hover:not(.active) {
+      background: #9ca3af;
+    }
+
+    /* Navigation arrows */
+    .nav-arrow {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: white;
+      border: 1px solid #e5e7eb;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      color: #4b5563;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    }
+
+    .nav-arrow:hover:not(:disabled) {
+      background: #ED1B24;
+      color: white;
+      border-color: #ED1B24;
+      box-shadow: 0 4px 16px rgba(237, 27, 36, 0.25);
+    }
+
+    .nav-arrow:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+    }
+
+    /* Badge styles */
+    .type-badge {
+      font-size: 10px;
+      font-weight: 600;
+      padding: 2px 10px;
+      border-radius: 20px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      background: #DBEAFE;
+      color: #1D4ED8;
+    }
+
+    .type-badge.admin {
+      background: #FEE2E3;
+      color: #ED1B24;
+    }
+
+    /* .type-badge.user {
+      
+    } */
+
+    .type-badge.guest {
+      background: #F3F4F6;
+      color: #6B7280;
+    }
+
+    .type-badge.developer {
+      background: #FCE7F3;
+      color: #BE185D;
+    }
+
+    /* Hide scrollbar */
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+
+    /* Fix for card overflow on hover */
+    .card-slider-wrapper {
+      overflow: hidden;
+      border-radius: 16px;
+      padding: 8px 4px;
+    }
+
+    /* Ensure slider container has enough space for hover lift */
+    .card-slider {
+      padding: 8px 0;
+    }
+
+    /* Account card container with extra bottom margin for hover */
+    .account-card {
+      padding-bottom: 4px;
+    }
+
+    /* Fix for mobile */
+    @media (max-width: 640px) {
+      .account-card-inner {
+        min-height: 180px;
+        padding: 20px;
+      }
+    }
+  </style>
+</head>
+
+<script>
+  const userAccounts = JSON.parse('<%- JSON.stringify(locals.accounts) %>');
+  console.log(userAccounts);
+</script>
+
+<body class="bg-bg-soft min-h-screen flex flex-col">
+
+  <nav class="px-4 md:px-10 py-4 border-b border-gray-100 bg-white/80 backdrop-blur-sm">
+    <div class="max-w-7xl mx-auto flex items-center justify-between">
+      <a href="/" class="relative inline-block group">
+        <img src="/images/logos/administration.png" alt="Logo-brand" class="max-h-[36px] md:max-h-[48px]">
+      </a>
+      <div class="flex items-center gap-1 text-sm text-gray-500">
+        <i class="bi bi-shield-fill-check font-bold text-2xl text-brand"></i>
+        <span class="text-black font-semibold hidden md:block">Account selection</span>
+      </div>
+    </div>
+  </nav>
+
+  <main class="flex-1 flex flex-col items-center justify-center px-4 py-8">
+    <div class="w-full max-w-6xl animate-fade-in <%-locals.accounts.length > 0 ? '' : 'hidden'%>">
+
+      <div class="text-center mb-8">
+        <h1 class="text-2xl md:text-3xl font-bold text-gray-900">Select Account</h1>
+        <p class="text-gray-500 text-sm mt-1">Select account to sign in with</p>
+      </div>
+
+      <div class="relative">
+        <div class="card-slider-wrapper">
+          <div id="cardSlider" class="card-slider no-scrollbar">
+          </div>
+        </div>
+
+        <button id="prevBtn" class="nav-arrow absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 md:-translate-x-6 z-10 hidden md:flex">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+          </svg>
+        </button>
+        <button id="nextBtn" class="nav-arrow absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 md:translate-x-6 z-10 hidden md:flex">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+          </svg>
+        </button>
+      </div>
+
+      <div id="dotsContainer" class="flex justify-center gap-2 mt-6"></div>
+
+      <div class="text-center mt-8">
+        <button id="continueBtn" class="px-8 py-3 bg-brand text-white rounded-xl font-semibold transition disabled:opacity-40 disabled:cursor-not-allowed hover:bg-brand-dark hover:shadow-lg hover:shadow-brand/20 transform hover:scale-105 disabled:hover:scale-100 disabled:hover:shadow-none" disabled>
+          <span class="flex items-center gap-3">
+            Continue <i class="bi bi-arrow-right"></i>
+          </span>
+        </button>
+        <p id="selectionHint" class="text-xs text-gray-500 mt-2">Select an account to continue</p>
+      </div>
+    </div>
+
+    <div class="bg-white max-w-[95%] md:max-w-[800px] md:min-w-[500px] px-3 md:px-8 py-3 flex flex-col items-center justify-center gap-3 border rounded-xl border-slate-300 text-xl <%-locals.accounts.length > 0 ? 'hidden' : ''%>">
+      <h3 class="text-6xl md:text-8xl text-brand">
+        <i class="bi bi-dash-circle-dotted"></i>
+      </h3>
+      <h3 class="text-xl md:text-3xl text-slate-600">
+        You do not have an active Account
+      </h3>
+      <a href="/" class="mt-3 primary-btn inline-flex items-center gap-3 px-3 py-2 md:px-8 md:py-3 rounded-2xl text-white font-semibold text-lg shadow-lg shadow-brand/20">
+        <span>Go Home</span>
+        <i class="bi bi-house font-bold"></i>
+      </a>
+      <p class="text-slate-500 mt-3 text-xs ml-auto">
+        Contact our support Team <a class="text-brand hover:underline" href="mailto:support@cococe.rw">here</a>
+      </p>
+    </div>
+  </main>
+
+
+
+  <footer class="py-4 px-6 bg-white border-t border-gray-100">
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-3">
+
+      <div class="flex gap-6 text-xs text-gray-400">
+        <a href="/privacy" class="hover:text-brand transition">Privacy</a>
+        <a href="/terms" class="hover:text-brand transition">Terms</a>
+        <a href="mailto:support@cococe.rw" class="hover:text-brand transition">Support</a>
+      </div>
+
+      <a href="/" class="flex items-center -gap-1 text-sm">
+        <img src="/images/logos/fav.png" alt="Cococe" class="max-h-[24px]">
+        <span class="font-bold">COCOCE</span>
+        <span class="text-gray-300 text-sm ml-[0.5rem] md:ml-[1rem]"> &copy; 2026</span>
+      </a>
+    </div>
+  </footer>
+
+  <script src="/scripts/components/notification.js"></script>
+
+  <script>
+    // Sample account data
+    // let accounts = [{
+    //     id: 'ACC-001',
+    //     title: 'Admin Dashboard',
+    //     type: 'admin',
+    //     description: 'Full access to all system settings, user management, and analytics.'
+    //   },
+    //   {
+    //     id: 'ACC-002',
+    //     title: 'Store Manager',
+    //     type: 'user',
+    //     description: 'Manage products, inventory, orders, and customer support tickets.'
+    //   },
+    //   {
+    //     id: 'ACC-003',
+    //     title: 'Analytics Viewer',
+    //     type: 'guest',
+    //     description: 'View-only access to sales reports, traffic data, and performance metrics.'
+    //   },
+    //   {
+    //     id: 'ACC-004',
+    //     title: 'Developer Portal',
+    //     type: 'developer',
+    //     description: 'Access API keys, webhooks, integration logs, and developer docs.'
+    //   },
+    //   {
+    //     id: 'ACC-005',
+    //     title: 'Marketing Console',
+    //     type: 'user',
+    //     description: 'Campaign management, email marketing, and social media tools.'
+    //   },
+    //   {
+    //     id: 'ACC-006',
+    //     title: 'Finance Reports',
+    //     type: 'guest',
+    //     description: 'View financial summaries, transaction history, and payout details.'
+    //   }
+    // ];
+
+    let accounts = userAccounts;
+
+    // State
+    let currentSlide = 0;
+    let selectedAccountId = null;
+    let cardsPerView = getCardsPerView();
+
+    // DOM elements
+    const slider = document.getElementById('cardSlider');
+    const dotsContainer = document.getElementById('dotsContainer');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const continueBtn = document.getElementById('continueBtn');
+    const selectionHint = document.getElementById('selectionHint');
+
+    // Get cards per view based on screen size
+    function getCardsPerView() {
+      if (window.innerWidth >= 1024) return 3;
+      if (window.innerWidth >= 768) return 2;
+      return 1;
+    }
+
+    function renderCards() {
+      slider.innerHTML = accounts.map(account => `
+        <div class="account-card" data-id="${account.id}">
+          <div class="account-card-inner ${selectedAccountId === account.id ? 'selected' : ''}">
+            <div class="flex items-start justify-between mb-3">
+              <div>
+                <h3 class="text-lg font-bold text-gray-900">${account.type}</h3>
+                <span class="type-badge ${account.code} capitalize">${account.code}</span>
+              </div>
+              <div class="text-xs text-gray-400 font-mono bg-gray-50 px-2 py-1 rounded flex-shrink-0 ml-2 uppercase">
+                ${account.id.length > 12 ? account.id.slice(0, 8) + '···' + account.id.slice(-4) : account.id}
+              </div>
+            </div>
+            <p class="text-sm text-gray-600 leading-relaxed flex-1">${account.description}</p>
+            <div class="mt-4 pt-3 border-t border-gray-100 flex items-center justify-between">
+              <span class="flex items-center gap-2 text-xs text-gray-400">
+                 Click to select <i class="bi bi-hand-index rotate-45 text-gray-700 font-semibold"></i> 
+              </span>
+              ${selectedAccountId === account.id ? '<span class="text-brand text-sm font-semibold">✓ Selected</span>' : ''}
+            </div>
+          </div>
+        </div>
+      `).join('');
+
+      document.querySelectorAll('.account-card').forEach(card => {
+        card.addEventListener('click', function() {
+          const id = this.dataset.id;
+          selectAccount(id);
+        });
+      });
+
+      updateSlider();
+    }
+
+    function selectAccount(id) {
+      selectedAccountId = id;
+
+      document.querySelectorAll('.account-card-inner').forEach(card => {
+        card.classList.remove('selected');
+        const cardId = card.closest('.account-card').dataset.id;
+        if (cardId === id) {
+          card.classList.add('selected');
+        }
+      });
+
+      continueBtn.disabled = false;
+      selectionHint.textContent = `Selected: ${accounts.find(a => a.id === id).title}`;
+      selectionHint.className = 'text-xs mt-3';
+    }
+
+    function updateSlider() {
+      const totalSlides = Math.ceil(accounts.length / cardsPerView);
+      const maxSlide = Math.max(0, totalSlides - 1);
+
+      if (currentSlide > maxSlide) currentSlide = maxSlide;
+      if (currentSlide < 0) currentSlide = 0;
+
+      const slideWidth = 100 / cardsPerView;
+      const offset = currentSlide * (slideWidth * cardsPerView);
+      slider.style.transform = `translateX(-${offset}%)`;
+
+      prevBtn.disabled = currentSlide === 0;
+      nextBtn.disabled = currentSlide >= maxSlide;
+
+      if (window.innerWidth < 768) {
+        prevBtn.classList.add('hidden');
+        nextBtn.classList.add('hidden');
+      } else {
+        prevBtn.classList.remove('hidden');
+        nextBtn.classList.remove('hidden');
+      }
+
+      updateDots(totalSlides);
+    }
+
+    function updateDots(totalSlides) {
+      dotsContainer.innerHTML = '';
+      for (let i = 0; i < totalSlides; i++) {
+        const dot = document.createElement('button');
+        dot.className = `dot ${i === currentSlide ? 'active' : ''}`;
+        dot.setAttribute('data-index', i);
+        dot.addEventListener('click', () => {
+          currentSlide = i;
+          updateSlider();
+        });
+        dotsContainer.appendChild(dot);
+      }
+    }
+
+    prevBtn.addEventListener('click', () => {
+      if (currentSlide > 0) {
+        currentSlide--;
+        updateSlider();
+      }
+    });
+
+    nextBtn.addEventListener('click', () => {
+      const totalSlides = Math.ceil(accounts.length / cardsPerView);
+      if (currentSlide < totalSlides - 1) {
+        currentSlide++;
+        updateSlider();
+      }
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowLeft') {
+        prevBtn.click();
+      } else if (e.key === 'ArrowRight') {
+        nextBtn.click();
+      } else if (e.key === 'Enter' && !continueBtn.disabled) {
+        continueBtn.click();
+      }
+    });
+
+    let resizeTimeout;
+    window.addEventListener('resize', () => {
+      clearTimeout(resizeTimeout);
+      resizeTimeout = setTimeout(() => {
+        const newCardsPerView = getCardsPerView();
+        if (newCardsPerView !== cardsPerView) {
+          cardsPerView = newCardsPerView;
+          renderCards();
+        } else {
+          updateSlider();
+        }
+      }, 200);
+    });
+
+    let touchStartX = 0;
+    let touchEndX = 0;
+
+    slider.addEventListener('touchstart', (e) => {
+      touchStartX = e.changedTouches[0].screenX;
+    }, {
+      passive: true
+    });
+
+    slider.addEventListener('touchend', (e) => {
+      touchEndX = e.changedTouches[0].screenX;
+      const diff = touchStartX - touchEndX;
+      if (Math.abs(diff) > 50) {
+        if (diff > 0) {
+          nextBtn.click();
+        } else {
+          prevBtn.click();
+        }
+      }
+    }, {
+      passive: true
+    });
+
+    async function handleContinue() {
+
+        if (!selectedAccountId) return;
+        
+        const accountSelected = accounts.filter(account=>account.id === selectedAccountId)[0];
+
+        if (!accountSelected) {
+          Notification.showNotification({
+            type: 'error',
+            message: 'Something went wrong. Please select account to continue'
+          });
+          return;
+        }
+        try {
+            continueBtn.disabled = true;
+            continueBtn.innerHTML = 'AUthorizing... <i class="fas fa-spinner fa-spin"></i>';
+
+            const response = await axios.post('/authenticate', {
+                accountId: accountSelected.id,
+                title: accountSelected.type
+            }, {
+                withCredentials: true
+            });
+
+            if (response.data?.success && response.data?.authenticated) {
+                window.location.href = (response.data?.redirectTo && !response.data.redirectTo.includes('/accounts')) ? response.data?.redirectTo : '/console';
+            } else {
+                window.location.href = '/';
+            }
+        } catch (error) {
+            console.log(error);
+            if (error.status === 401){
+              console.log(error.response?.data?.redirectTo)
+              return window.location.href = error.response?.data?.redirectTo || '/';
+            }
+            //window.location.href = '/';
+            Notification.showNotification({
+                type: 'error',
+                title: '',
+                message: error.response?.data?.message || 'Internal server error'
+            });
+        } finally {
+            continueBtn.innerHTML = `<span class="flex items-center gap-3">
+                                      Continue <i class="bi bi-arrow-right"></i>
+                                    </span>`;
+            continueBtn.disabled = !selectedAccountId;
+        }
+    }
+
+    $(document).ready(() => {
+      // Initialize
+      renderCards();
+
+      continueBtn.addEventListener('click', handleContinue);
+
+      
+    });
+  </script>
+
+</body>
+
+</html>

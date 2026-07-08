@@ -26,7 +26,8 @@ module.exports = {
                 "https://unpkg.com",
                 "https://fonts.googleapis.com",
                 "https://cdn.lineicons.com",
-                "https://cdn.quilljs.com"
+                "https://cdn.quilljs.com",
+                "https://cdn.jsdelivr.net"
             ],
 
             "font-src": [

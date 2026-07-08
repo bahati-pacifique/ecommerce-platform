@@ -1,15 +1,69 @@
 const mockService = require('../../../src/services/DBMockService');
 
+const { decodeAuthCookies } = require('../../../util/authTokens');
+const { clearAuthentication, acceptsHtml } = require('../../../util/helpers');
+const authServices = require('../../../src/services/auth.services');
+
 async function home(req, res) {
-    try {
-        
-        await mockService.testConnection();
-    } catch (error) {
-        console.log(error);
-    }
-    //Middleware check admin session
-    return res.render('index-admin', { message: '' });
+    // try {
+    //     await mockService.testConnection();
+    // } catch (error) {
+    //     console.log(error);
+    // }
+    const user = req.user;
+
+    const isProduction = process.env.NODE_ENV === 'production';
+
+    const auth_host = isProduction ? `https://auth.${process.env.DOMAIN}?r=https://admin.${process.env.DOMAIN}`
+        : `http://auth.${process.env.DOMAIN}:${process.env.PORT}?r=http://admin.${process.env.DOMAIN}:${process.env.PORT}`;
+
+    const dashboard_host = isProduction ? `https://admin.${process.env.DOMAIN}/dashboard`
+        : `http://admin.${process.env.DOMAIN}:${process.env.PORT}/dashboard`;
+
+
+    return res.render('index-admin', {
+        auth_host,
+        dashboard_host,
+        message: '',
+        user
+    });
 }
+
+async function renderLoginPage(req, res) {
+    res.render('auth', {})
+}
+
+async function renderAccountSelection(req, res) {
+    res.render('account-selection', {})
+}
+
+async function renderDashboard(req, res) {
+    const user = req.user || {};
+    res.render('dashboard', { user })
+}
+
+async function logout(req, res) {
+
+    const { accessToken } = decodeAuthCookies(req);
+
+    if (accessToken) {
+        const userAccount = accessToken.ac;
+        await authServices.logout(userAccount);
+    }
+
+    clearAuthentication(res);
+
+    if (acceptsHtml(req)) {
+        return res.redirect('/');
+    }
+
+    return res.json({
+        authenticated: false,
+        redirectTo: '/'
+    })
+
+}
+
 
 const axios = require('axios');
 const fs = require('fs');
@@ -46,6 +100,12 @@ const path = require('path');
 
 // usage
 
+
+
 module.exports = {
-    home
+    home,
+    renderDashboard,
+    renderLoginPage,
+    renderAccountSelection,
+    logout
 }

@@ -1,0 +1,1075 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>COCOCE — Admin Dashboard</title>
+  <!-- Tailwind CSS + Inter font -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Chart.js for charts -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js">
+  </script>
+  <!-- Custom config with brand primary #ED1B24 -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              DEFAULT: '#ED1B24',
+              dark: '#C9171F',
+              light: '#FEE2E3',
+              ultraLight: '#FFF5F5',
+            },
+            'bg-soft': '#FDFDFC',
+          },
+          fontFamily: {
+            'sans': ['Inter', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+          },
+          animation: {
+            'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+            'float': 'float 6s ease-in-out infinite',
+            'fade-in': 'fadeIn 0.6s ease-out forwards',
+            'slide-up': 'slideUp 0.5s ease-out forwards',
+            'slide-down': 'slideDown 0.3s ease-out forwards',
+          },
+          keyframes: {
+            float: {
+              '0%, 100%': { transform: 'translateY(0px)' },
+              '50%': { transform: 'translateY(-10px)' },
+            },
+            fadeIn: {
+              '0%': { opacity: '0' },
+              '100%': { opacity: '1' },
+            },
+            slideUp: {
+              '0%': { opacity: '0', transform: 'translateY(20px)' },
+              '100%': { opacity: '1', transform: 'translateY(0)' },
+            },
+            slideDown: {
+              '0%': { opacity: '0', transform: 'translateY(-10px)' },
+              '100%': { opacity: '1', transform: 'translateY(0)' },
+            },
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap');
+
+    body {
+      background: #FDFDFC;
+      font-family: 'Inter', sans-serif;
+      scroll-behavior: smooth;
+    }
+
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 5px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #f1f1f1;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #ED1B24;
+      border-radius: 10px;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      background: white;
+      border-right: 1px solid #e5e7eb;
+      height: 100vh;
+      position: sticky;
+      top: 0;
+      overflow-y: auto;
+      transition: all 0.3s ease;
+    }
+
+    .sidebar::-webkit-scrollbar {
+      width: 3px;
+    }
+    .sidebar::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .sidebar::-webkit-scrollbar-thumb {
+      background: #ED1B24;
+      border-radius: 10px;
+    }
+
+    /* Sidebar nav items */
+    .sidebar-link {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      border-radius: 12px;
+      color: #6B7280;
+      font-weight: 500;
+      font-size: 14px;
+      transition: all 0.2s ease;
+      cursor: pointer;
+      position: relative;
+      text-decoration: none;
+    }
+
+    .sidebar-link:hover {
+      background: #F9FAFB;
+      color: #1F2937;
+    }
+
+    .sidebar-link.active {
+      background: #FEE2E3;
+      color: #ED1B24;
+      font-weight: 600;
+      box-shadow: inset 3px 0 0 #ED1B24;
+    }
+
+    .sidebar-link.active::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 20%;
+      height: 60%;
+      width: 3px;
+      background: #ED1B24;
+      border-radius: 0 3px 3px 0;
+    }
+
+    .sidebar-link .icon {
+      font-size: 20px;
+      width: 28px;
+      text-align: center;
+      flex-shrink: 0;
+    }
+
+    .sidebar-link .badge {
+      margin-left: auto;
+      background: #ED1B24;
+      color: white;
+      font-size: 10px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 20px;
+      flex-shrink: 0;
+    }
+
+    .sidebar-link .badge.amber {
+      background: #F59E0B;
+    }
+
+    .sidebar-link .badge.green {
+      background: #22C55E;
+    }
+
+    /* Top bar */
+    .top-bar {
+      background: white;
+      border-bottom: 1px solid #e5e7eb;
+      padding: 12px 24px;
+      position: sticky;
+      top: 0;
+      z-index: 40;
+    }
+
+    .top-bar-btn {
+      transition: all 0.2s ease;
+      background: white;
+      border: 1px solid #e5e7eb;
+      padding: 8px 16px;
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: 500;
+      color: #4B5563;
+      cursor: pointer;
+    }
+
+    .top-bar-btn:hover {
+      background: #F9FAFB;
+      border-color: #D1D5DB;
+    }
+
+    /* Modal overlay */
+    .modal-overlay {
+      background: rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(8px);
+      animation: fadeIn 0.3s ease-out;
+    }
+
+    .modal-content {
+      animation: slideDown 0.3s ease-out;
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-20px) scale(0.95);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    /* Stat card hover */
+    .stat-card {
+      transition: all 0.3s ease;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.06);
+    }
+
+    /* Alert badges */
+    .alert-badge {
+      animation: pulse-slow 2s ease-in-out infinite;
+    }
+
+    /* Inventory item hover */
+    .inventory-item {
+      transition: all 0.2s ease;
+    }
+
+    .inventory-item:hover {
+      background: #f9fafb;
+      transform: translateX(4px);
+    }
+
+    /* Modal link items */
+    .modal-link-item {
+      transition: all 0.2s ease;
+    }
+
+    .modal-link-item:hover {
+      background: #FEE2E3;
+      transform: translateX(4px);
+    }
+
+    /* Chart container */
+    .chart-container {
+      position: relative;
+      height: 280px;
+    }
+
+    @media (max-width: 640px) {
+      .chart-container {
+        height: 220px;
+      }
+    }
+
+    /* Mobile sidebar overlay */
+    .sidebar-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.4);
+      z-index: 49;
+    }
+
+    .sidebar-overlay.active {
+      display: block;
+    }
+
+    @media (max-width: 1023px) {
+      .sidebar {
+        position: fixed;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        z-index: 50;
+        transform: translateX(-100%);
+        width: 280px;
+        transition: transform 0.3s ease;
+        box-shadow: 4px 0 20px rgba(0, 0, 0, 0.05);
+      }
+      .sidebar.mobile-open {
+        transform: translateX(0);
+      }
+      .sidebar-overlay.active {
+        display: block;
+      }
+    }
+
+    /* Hide scrollbar on mobile */
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+  </style>
+</head>
+
+<body class="bg-bg-soft">
+
+  <!-- Sidebar Overlay for mobile -->
+  <div id="sidebarOverlay" class="sidebar-overlay" onclick="closeMobileSidebar()"></div>
+
+  <div class="flex min-h-screen">
+
+    <!-- ========== SIDEBAR ========== -->
+    <aside id="sidebar" class="sidebar flex-shrink-0 w-64">
+      <div class="flex flex-col h-full">
+        <!-- Sidebar Brand -->
+        <div class="px-4 py-5 border-b border-gray-100 flex items-center gap-3">
+          <span class="text-2xl font-black tracking-tighter text-brand">COCOCE</span>
+          <span class="text-[10px] font-bold text-brand bg-brand-light px-2 py-0.5 rounded-full border border-brand/20">ADMIN</span>
+        </div>
+
+        <!-- Sidebar Navigation -->
+        <nav class="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
+          <!-- Home -->
+          <a href="#" class="sidebar-link active" data-tab="home">
+            <span class="icon">🏠</span>
+            <span>Dashboard</span>
+          </a>
+
+          <!-- Profile -->
+          <a href="#" class="sidebar-link" data-tab="profile">
+            <span class="icon">👤</span>
+            <span>Admin Profile</span>
+          </a>
+
+          <!-- Business -->
+          <a href="#" class="sidebar-link" data-tab="business">
+            <span class="icon">🏢</span>
+            <span>Business Profile</span>
+          </a>
+
+          <!-- Orders -->
+          <a href="#" class="sidebar-link" data-tab="orders">
+            <span class="icon">📦</span>
+            <span>Orders</span>
+            <span class="badge amber">48</span>
+          </a>
+
+          <!-- Inventory -->
+          <a href="#" class="sidebar-link" data-tab="inventory">
+            <span class="icon">📊</span>
+            <span>Inventory</span>
+            <span class="badge">23</span>
+          </a>
+
+          <!-- Customers -->
+          <a href="#" class="sidebar-link" data-tab="customers">
+            <span class="icon">👥</span>
+            <span>Customers</span>
+            <span class="badge green">+12</span>
+          </a>
+
+          <!-- Analytics -->
+          <a href="#" class="sidebar-link" data-tab="analytics">
+            <span class="icon">📈</span>
+            <span>Analytics</span>
+          </a>
+
+          <!-- Marketing -->
+          <a href="#" class="sidebar-link" data-tab="marketing">
+            <span class="icon">🎯</span>
+            <span>Marketing</span>
+          </a>
+
+          <!-- Settings -->
+          <a href="#" class="sidebar-link" data-tab="settings">
+            <span class="icon">⚙️</span>
+            <span>Settings</span>
+          </a>
+
+          <div class="border-t border-gray-100 my-3"></div>
+
+          <!-- Quick Actions (in sidebar) -->
+          <a href="#" class="sidebar-link" data-tab="quick-actions">
+            <span class="icon">⚡</span>
+            <span>Quick Actions</span>
+          </a>
+
+          <a href="#" class="sidebar-link" data-tab="help">
+            <span class="icon">❓</span>
+            <span>Help & Support</span>
+          </a>
+        </nav>
+
+        <!-- Sidebar Footer -->
+        <div class="px-4 py-4 border-t border-gray-100">
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-full bg-brand-light flex items-center justify-center text-brand font-bold text-sm">
+              A
+            </div>
+            <div>
+              <p class="text-sm font-medium text-gray-800">Admin</p>
+              <p class="text-xs text-gray-400">admin@cococe.com</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ========== MAIN CONTENT ========== -->
+    <div class="flex-1 min-w-0">
+
+      <!-- Top Bar -->
+      <header class="top-bar">
+        <div class="flex items-center justify-between">
+          <!-- Left: Mobile hamburger + breadcrumb -->
+          <div class="flex items-center gap-3">
+            <button id="mobileMenuBtn" class="lg:hidden p-2 rounded-lg hover:bg-gray-100 transition">
+              <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            </button>
+            <span class="text-sm font-medium text-gray-700 hidden sm:block">Dashboard / <span id="currentTabLabel" class="text-brand">Home</span></span>
+          </div>
+
+          <!-- Right: Top bar actions -->
+          <div class="flex items-center gap-2">
+            <button id="topBarModalTrigger" class="top-bar-btn flex items-center gap-2">
+              <span>☰</span>
+              <span class="hidden sm:inline">Quick Actions</span>
+              <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+            <button class="p-2 rounded-lg hover:bg-gray-100 transition relative">
+              <span class="text-xl">🔔</span>
+              <span class="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-brand rounded-full border-2 border-white"></span>
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <!-- Main Content Area -->
+      <main class="p-4 md:p-6 max-w-full">
+        
+        <!-- Tab Content: Home -->
+        <div id="tab-home" class="tab-content">
+          
+          <!-- Stats Grid -->
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+            <div class="stat-card bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
+              <div class="flex items-start justify-between">
+                <div>
+                  <p class="text-sm text-gray-500 font-medium">Total Sales</p>
+                  <p class="text-2xl font-bold text-gray-900 mt-1">$124,892</p>
+                  <p class="text-xs text-green-600 mt-1">↑ 12.5% from last month</p>
+                </div>
+                <div class="w-10 h-10 bg-brand-light rounded-xl flex items-center justify-center text-brand text-xl">💰</div>
+              </div>
+            </div>
+            
+            <div class="stat-card bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
+              <div class="flex items-start justify-between">
+                <div>
+                  <p class="text-sm text-gray-500 font-medium">Total Orders</p>
+                  <p class="text-2xl font-bold text-gray-900 mt-1">1,284</p>
+                  <p class="text-xs text-gray-500 mt-1">48 pending</p>
+                </div>
+                <div class="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center text-blue-500 text-xl">📦</div>
+              </div>
+            </div>
+            
+            <div class="stat-card bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
+              <div class="flex items-start justify-between">
+                <div>
+                  <p class="text-sm text-gray-500 font-medium">Inventory Items</p>
+                  <p class="text-2xl font-bold text-gray-900 mt-1">3,847</p>
+                  <p class="text-xs text-amber-600 mt-1">⚠️ 23 low stock</p>
+                </div>
+                <div class="w-10 h-10 bg-amber-50 rounded-xl flex items-center justify-center text-amber-500 text-xl">📊</div>
+              </div>
+            </div>
+            
+            <div class="stat-card bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
+              <div class="flex items-start justify-between">
+                <div>
+                  <p class="text-sm text-gray-500 font-medium">Total Stores</p>
+                  <p class="text-2xl font-bold text-gray-900 mt-1">12</p>
+                  <p class="text-xs text-gray-500 mt-1">8 active · 4 pending</p>
+                </div>
+                <div class="w-10 h-10 bg-purple-50 rounded-xl flex items-center justify-center text-purple-500 text-xl">🏪</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Charts Row -->
+          <div class="grid md:grid-cols-2 gap-6 mb-6">
+            <!-- Sales Chart -->
+            <div class="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
+              <div class="flex items-center justify-between mb-4">
+                <h3 class="text-sm font-semibold text-gray-700">Sales Overview</h3>
+                <span class="text-xs text-gray-400">Last 7 days</span>
+              </div>
+              <div class="chart-container">
+                <canvas id="salesChart"></canvas>
+              </div>
+            </div>
+            
+            <!-- Order Status Chart -->
+            <div class="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
+              <div class="flex items-center justify-between mb-4">
+                <h3 class="text-sm font-semibold text-gray-700">Order Status</h3>
+                <span class="text-xs text-gray-400">Current</span>
+              </div>
+              <div class="chart-container">
+                <canvas id="orderChart"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <!-- Alerts & Inventory Section -->
+          <div class="grid md:grid-cols-2 gap-6 mb-6">
+            <!-- Alerts -->
+            <div class="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
+              <h3 class="text-sm font-semibold text-gray-700 mb-4">⚠️ Alerts</h3>
+              <div class="space-y-3">
+                <div class="flex items-center gap-3 p-3 bg-red-50 rounded-xl border border-red-200">
+                  <span class="text-xl">🔴</span>
+                  <div class="flex-1">
+                    <p class="text-sm font-medium text-red-700">Low Stock Alert</p>
+                    <p class="text-xs text-red-600">5 items below minimum threshold</p>
+                  </div>
+                  <span class="text-xs font-semibold text-red-700">URGENT</span>
+                </div>
+                <div class="flex items-center gap-3 p-3 bg-amber-50 rounded-xl border border-amber-200">
+                  <span class="text-xl">🟡</span>
+                  <div class="flex-1">
+                    <p class="text-sm font-medium text-amber-700">Old Stock Warning</p>
+                    <p class="text-xs text-amber-600">12 items aging > 180 days</p>
+                  </div>
+                  <span class="text-xs font-semibold text-amber-700">ATTENTION</span>
+                </div>
+                <div class="flex items-center gap-3 p-3 bg-blue-50 rounded-xl border border-blue-200">
+                  <span class="text-xl">🔵</span>
+                  <div class="flex-1">
+                    <p class="text-sm font-medium text-blue-700">Expiring Stock</p>
+                    <p class="text-xs text-blue-600">8 items expiring in 30 days</p>
+                  </div>
+                  <span class="text-xs font-semibold text-blue-700">REVIEW</span>
+                </div>
+                <div class="flex items-center gap-3 p-3 bg-green-50 rounded-xl border border-green-200">
+                  <span class="text-xl">🟢</span>
+                  <div class="flex-1">
+                    <p class="text-sm font-medium text-green-700">Stock Restocked</p>
+                    <p class="text-xs text-green-600">34 items restocked this week</p>
+                  </div>
+                  <span class="text-xs font-semibold text-green-700">DONE</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Inventory by Category -->
+            <div class="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
+              <h3 class="text-sm font-semibold text-gray-700 mb-4">📦 Inventory by Category</h3>
+              <div class="space-y-3">
+                <div class="inventory-item flex items-center justify-between p-3 rounded-xl border border-gray-100">
+                  <div class="flex items-center gap-3">
+                    <span class="text-xl">💻</span>
+                    <div>
+                      <p class="text-sm font-medium text-gray-800">Laptops</p>
+                      <p class="text-xs text-gray-400">High-performance devices</p>
+                    </div>
+                  </div>
+                  <span class="text-sm font-bold text-gray-900">100</span>
+                </div>
+                <div class="inventory-item flex items-center justify-between p-3 rounded-xl border border-gray-100">
+                  <div class="flex items-center gap-3">
+                    <span class="text-xl">🖥️</span>
+                    <div>
+                      <p class="text-sm font-medium text-gray-800">Desktops</p>
+                      <p class="text-xs text-gray-400">Workstations & towers</p>
+                    </div>
+                  </div>
+                  <span class="text-sm font-bold text-gray-900">20</span>
+                </div>
+                <div class="inventory-item flex items-center justify-between p-3 rounded-xl border border-gray-100">
+                  <div class="flex items-center gap-3">
+                    <span class="text-xl">🎧</span>
+                    <div>
+                      <p class="text-sm font-medium text-gray-800">Accessories</p>
+                      <p class="text-xs text-gray-400">Peripherals & cables</p>
+                    </div>
+                  </div>
+                  <span class="text-sm font-bold text-gray-900">300</span>
+                </div>
+                <div class="inventory-item flex items-center justify-between p-3 rounded-xl border border-gray-100">
+                  <div class="flex items-center gap-3">
+                    <span class="text-xl">📱</span>
+                    <div>
+                      <p class="text-sm font-medium text-gray-800">Smartphones</p>
+                      <p class="text-xs text-gray-400">Mobile devices</p>
+                    </div>
+                  </div>
+                  <span class="text-sm font-bold text-gray-900">45</span>
+                </div>
+                <div class="inventory-item flex items-center justify-between p-3 rounded-xl border border-gray-100">
+                  <div class="flex items-center gap-3">
+                    <span class="text-xl">⌚</span>
+                    <div>
+                      <p class="text-sm font-medium text-gray-800">Wearables</p>
+                      <p class="text-xs text-gray-400">Smartwatches & fitness</p>
+                    </div>
+                  </div>
+                  <span class="text-sm font-bold text-gray-900">18</span>
+                </div>
+              </div>
+              <div class="mt-4 pt-3 border-t border-gray-100 flex justify-between text-xs text-gray-400">
+                <span>Total SKU: 483</span>
+                <span>Last updated: Today, 2:30 PM</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Store Info -->
+          <div class="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
+            <h3 class="text-sm font-semibold text-gray-700 mb-4">🏪 Store Overview</h3>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div class="text-center p-4 bg-gray-50 rounded-xl">
+                <p class="text-2xl font-bold text-gray-900">12</p>
+                <p class="text-xs text-gray-500">Total Stores</p>
+              </div>
+              <div class="text-center p-4 bg-green-50 rounded-xl">
+                <p class="text-2xl font-bold text-green-600">8</p>
+                <p class="text-xs text-gray-500">Active Stores</p>
+              </div>
+              <div class="text-center p-4 bg-amber-50 rounded-xl">
+                <p class="text-2xl font-bold text-amber-600">4</p>
+                <p class="text-xs text-gray-500">Pending Approval</p>
+              </div>
+              <div class="text-center p-4 bg-blue-50 rounded-xl">
+                <p class="text-2xl font-bold text-blue-600">24</p>
+                <p class="text-xs text-gray-500">Total Staff</p>
+              </div>
+            </div>
+            <div class="mt-4 pt-3 border-t border-gray-100 flex justify-between text-xs text-gray-400">
+              <span>Store Types: Retail (6) · Online (4) · Hybrid (2)</span>
+              <span>Last store added: Electronics Hub</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Other Tab Contents (Placeholders) -->
+        <div id="tab-profile" class="tab-content hidden">
+          <div class="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm text-center">
+            <div class="w-24 h-24 rounded-full bg-brand-light mx-auto flex items-center justify-center text-brand text-4xl font-bold mb-4">A</div>
+            <h3 class="text-xl font-bold text-gray-900">Admin Profile</h3>
+            <p class="text-gray-500 mt-2">Manage your account settings, security, and preferences.</p>
+            <p class="text-sm text-gray-400 mt-4">📧 admin@cococe.com · 🔐 2FA Enabled</p>
+          </div>
+        </div>
+
+        <div id="tab-business" class="tab-content hidden">
+          <div class="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm text-center">
+            <h3 class="text-xl font-bold text-gray-900">Business Profile</h3>
+            <p class="text-gray-500 mt-2">Manage your business details, branding, and store settings.</p>
+            <div class="mt-4 grid grid-cols-2 gap-4 max-w-md mx-auto text-left">
+              <div class="p-3 bg-gray-50 rounded-xl"><span class="text-xs text-gray-400">Name</span><p class="font-medium">COCOCE Inc.</p></div>
+              <div class="p-3 bg-gray-50 rounded-xl"><span class="text-xs text-gray-400">Tax ID</span><p class="font-medium">12-3456789</p></div>
+              <div class="p-3 bg-gray-50 rounded-xl"><span class="text-xs text-gray-400">Founded</span><p class="font-medium">2024</p></div>
+              <div class="p-3 bg-gray-50 rounded-xl"><span class="text-xs text-gray-400">Industry</span><p class="font-medium">Electronics</p></div>
+            </div>
+          </div>
+        </div>
+
+        <div id="tab-orders" class="tab-content hidden">
+          <div class="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm text-center">
+            <h3 class="text-xl font-bold text-gray-900">Orders Management</h3>
+            <p class="text-gray-500 mt-2">Track and manage all customer orders in one place.</p>
+            <div class="grid grid-cols-3 gap-4 max-w-lg mx-auto mt-4">
+              <div class="p-3 bg-gray-50 rounded-xl"><span class="text-xs text-gray-400">Pending</span><p class="text-xl font-bold text-amber-600">48</p></div>
+              <div class="p-3 bg-gray-50 rounded-xl"><span class="text-xs text-gray-400">Processing</span><p class="text-xl font-bold text-blue-600">124</p></div>
+              <div class="p-3 bg-gray-50 rounded-xl"><span class="text-xs text-gray-400">Completed</span><p class="text-xl font-bold text-green-600">1,112</p></div>
+            </div>
+          </div>
+        </div>
+
+        <div id="tab-inventory" class="tab-content hidden">
+          <div class="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm text-center">
+            <h3 class="text-xl font-bold text-gray-900">Inventory Management</h3>
+            <p class="text-gray-500 mt-2">Manage stock, categories, and product listings.</p>
+          </div>
+        </div>
+
+        <div id="tab-customers" class="tab-content hidden">
+          <div class="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm text-center">
+            <h3 class="text-xl font-bold text-gray-900">Customer Management</h3>
+            <p class="text-gray-500 mt-2">View and manage customer accounts, support tickets, and feedback.</p>
+          </div>
+        </div>
+
+        <!-- Additional tab placeholders -->
+        <div id="tab-analytics" class="tab-content hidden">
+          <div class="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm text-center">
+            <h3 class="text-xl font-bold text-gray-900">Analytics</h3>
+            <p class="text-gray-500 mt-2">Deep dive into your business metrics and performance data.</p>
+          </div>
+        </div>
+
+        <div id="tab-marketing" class="tab-content hidden">
+          <div class="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm text-center">
+            <h3 class="text-xl font-bold text-gray-900">Marketing</h3>
+            <p class="text-gray-500 mt-2">Manage campaigns, promotions, and email marketing.</p>
+          </div>
+        </div>
+
+        <div id="tab-settings" class="tab-content hidden">
+          <div class="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm text-center">
+            <h3 class="text-xl font-bold text-gray-900">Settings</h3>
+            <p class="text-gray-500 mt-2">Configure your store, payment methods, and integrations.</p>
+          </div>
+        </div>
+
+        <div id="tab-quick-actions" class="tab-content hidden">
+          <div class="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm text-center">
+            <h3 class="text-xl font-bold text-gray-900">Quick Actions</h3>
+            <p class="text-gray-500 mt-2">Access your most used tools and shortcuts.</p>
+            <div class="grid grid-cols-2 md:grid-cols-3 gap-3 max-w-2xl mx-auto mt-4">
+              <a href="#" class="p-3 bg-gray-50 rounded-xl hover:bg-brand-light transition">📦 Create Listing</a>
+              <a href="#" class="p-3 bg-gray-50 rounded-xl hover:bg-brand-light transition">👁️ My Listings</a>
+              <a href="#" class="p-3 bg-gray-50 rounded-xl hover:bg-brand-light transition">🎯 Promotions</a>
+              <a href="#" class="p-3 bg-gray-50 rounded-xl hover:bg-brand-light transition">📊 Reports</a>
+              <a href="#" class="p-3 bg-gray-50 rounded-xl hover:bg-brand-light transition">💬 Messages</a>
+              <a href="#" class="p-3 bg-gray-50 rounded-xl hover:bg-brand-light transition">⚙️ Settings</a>
+            </div>
+          </div>
+        </div>
+
+        <div id="tab-help" class="tab-content hidden">
+          <div class="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm text-center">
+            <h3 class="text-xl font-bold text-gray-900">Help & Support</h3>
+            <p class="text-gray-500 mt-2">Find documentation, guides, and contact support.</p>
+          </div>
+        </div>
+
+      </main>
+
+      <!-- Footer -->
+      <footer class="py-4 px-6 bg-white border-t border-gray-100">
+        <div class="flex flex-col md:flex-row justify-between items-center gap-3">
+          <span class="text-xs text-gray-400">© 2026 COCOCE — Admin Dashboard</span>
+          <div class="flex gap-6 text-xs text-gray-400">
+            <a href="#" class="hover:text-brand transition">Privacy</a>
+            <a href="#" class="hover:text-brand transition">Terms</a>
+            <a href="#" class="hover:text-brand transition">Support</a>
+            <a href="#" class="hover:text-brand transition">Docs</a>
+          </div>
+        </div>
+      </footer>
+    </div>
+  </div>
+
+  <!-- ========== TOP BAR MODAL ========== -->
+  <div id="topBarModal" class="modal-overlay fixed inset-0 z-50 hidden flex items-start justify-center pt-20 px-4">
+    <div class="modal-content bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden">
+      <div class="flex items-center justify-between p-4 border-b border-gray-100">
+        <h3 class="text-lg font-bold text-gray-900">Quick Actions</h3>
+        <button id="closeModalBtn" class="text-gray-400 hover:text-gray-600 transition">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+      <div class="p-4 grid grid-cols-2 md:grid-cols-3 gap-3">
+        <a href="#" class="modal-link-item flex items-center gap-3 p-3 rounded-xl border border-gray-100 hover:border-brand/20">
+          <span class="text-xl">📦</span>
+          <div>
+            <p class="text-sm font-semibold text-gray-800">Create Listing</p>
+            <p class="text-xs text-gray-400">Add new product</p>
+          </div>
+        </a>
+        <a href="#" class="modal-link-item flex items-center gap-3 p-3 rounded-xl border border-gray-100 hover:border-brand/20">
+          <span class="text-xl">👁️</span>
+          <div>
+            <p class="text-sm font-semibold text-gray-800">My Listings</p>
+            <p class="text-xs text-gray-400">View all products</p>
+          </div>
+        </a>
+        <a href="#" class="modal-link-item flex items-center gap-3 p-3 rounded-xl border border-gray-100 hover:border-brand/20">
+          <span class="text-xl">🎯</span>
+          <div>
+            <p class="text-sm font-semibold text-gray-800">Promotions</p>
+            <p class="text-xs text-gray-400">Manage offers</p>
+          </div>
+        </a>
+        <a href="#" class="modal-link-item flex items-center gap-3 p-3 rounded-xl border border-gray-100 hover:border-brand/20">
+          <span class="text-xl">📊</span>
+          <div>
+            <p class="text-sm font-semibold text-gray-800">Analytics</p>
+            <p class="text-xs text-gray-400">Performance data</p>
+          </div>
+        </a>
+        <a href="#" class="modal-link-item flex items-center gap-3 p-3 rounded-xl border border-gray-100 hover:border-brand/20">
+          <span class="text-xl">💬</span>
+          <div>
+            <p class="text-sm font-semibold text-gray-800">Messages</p>
+            <p class="text-xs text-gray-400">Customer inquiries</p>
+          </div>
+        </a>
+        <a href="#" class="modal-link-item flex items-center gap-3 p-3 rounded-xl border border-gray-100 hover:border-brand/20">
+          <span class="text-xl">⚙️</span>
+          <div>
+            <p class="text-sm font-semibold text-gray-800">Settings</p>
+            <p class="text-xs text-gray-400">Store preferences</p>
+          </div>
+        </a>
+        <a href="#" class="modal-link-item flex items-center gap-3 p-3 rounded-xl border border-gray-100 hover:border-brand/20">
+          <span class="text-xl">📈</span>
+          <div>
+            <p class="text-sm font-semibold text-gray-800">Reports</p>
+            <p class="text-xs text-gray-400">Export data</p>
+          </div>
+        </a>
+        <a href="#" class="modal-link-item flex items-center gap-3 p-3 rounded-xl border border-gray-100 hover:border-brand/20">
+          <span class="text-xl">🎨</span>
+          <div>
+            <p class="text-sm font-semibold text-gray-800">Design Studio</p>
+            <p class="text-xs text-gray-400">Brand assets</p>
+          </div>
+        </a>
+        <a href="#" class="modal-link-item flex items-center gap-3 p-3 rounded-xl border border-gray-100 hover:border-brand/20">
+          <span class="text-xl">📋</span>
+          <div>
+            <p class="text-sm font-semibold text-gray-800">Bulk Actions</p>
+            <p class="text-xs text-gray-400">Mass updates</p>
+          </div>
+        </a>
+      </div>
+      <div class="p-4 border-t border-gray-100 bg-gray-50">
+        <p class="text-xs text-gray-400 text-center">⚡ Quick access to your most used tools</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- JavaScript -->
+  <script>
+    // ========== MOBILE SIDEBAR ==========
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sidebarOverlay');
+    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+
+    function openMobileSidebar() {
+      sidebar.classList.add('mobile-open');
+      overlay.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeMobileSidebar() {
+      sidebar.classList.remove('mobile-open');
+      overlay.classList.remove('active');
+      document.body.style.overflow = '';
+    }
+
+    mobileMenuBtn.addEventListener('click', openMobileSidebar);
+
+    // Close sidebar on link click (mobile)
+    document.querySelectorAll('.sidebar-link').forEach(link => {
+      link.addEventListener('click', () => {
+        if (window.innerWidth < 1024) {
+          closeMobileSidebar();
+        }
+      });
+    });
+
+    // ========== SIDEBAR NAVIGATION ==========
+    const sidebarLinks = document.querySelectorAll('.sidebar-link');
+    const tabContents = {
+      home: document.getElementById('tab-home'),
+      profile: document.getElementById('tab-profile'),
+      business: document.getElementById('tab-business'),
+      orders: document.getElementById('tab-orders'),
+      inventory: document.getElementById('tab-inventory'),
+      customers: document.getElementById('tab-customers'),
+      analytics: document.getElementById('tab-analytics'),
+      marketing: document.getElementById('tab-marketing'),
+      settings: document.getElementById('tab-settings'),
+      'quick-actions': document.getElementById('tab-quick-actions'),
+      help: document.getElementById('tab-help'),
+    };
+
+    const tabLabelMap = {
+      home: 'Home',
+      profile: 'Admin Profile',
+      business: 'Business Profile',
+      orders: 'Orders',
+      inventory: 'Inventory',
+      customers: 'Customers',
+      analytics: 'Analytics',
+      marketing: 'Marketing',
+      settings: 'Settings',
+      'quick-actions': 'Quick Actions',
+      help: 'Help & Support'
+    };
+
+    sidebarLinks.forEach(link => {
+      link.addEventListener('click', function(e) {
+        e.preventDefault();
+        
+        // Remove active from all links
+        sidebarLinks.forEach(l => l.classList.remove('active'));
+        this.classList.add('active');
+
+        // Hide all tab contents
+        Object.values(tabContents).forEach(content => {
+          if (content) content.classList.add('hidden');
+        });
+
+        // Show selected tab
+        const tabId = this.dataset.tab;
+        if (tabContents[tabId]) {
+          tabContents[tabId].classList.remove('hidden');
+        }
+
+        // Update breadcrumb label
+        const label = document.getElementById('currentTabLabel');
+        if (label && tabLabelMap[tabId]) {
+          label.textContent = tabLabelMap[tabId];
+        }
+      });
+    });
+
+    // ========== TOP BAR MODAL ==========
+    const modalTrigger = document.getElementById('topBarModalTrigger');
+    const modal = document.getElementById('topBarModal');
+    const closeModalBtn = document.getElementById('closeModalBtn');
+
+    function openModal() {
+      modal.classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeModal() {
+      modal.classList.add('hidden');
+      document.body.style.overflow = '';
+    }
+
+    modalTrigger.addEventListener('click', openModal);
+    closeModalBtn.addEventListener('click', closeModal);
+
+    modal.addEventListener('click', function(e) {
+      if (e.target === this) {
+        closeModal();
+      }
+    });
+
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        closeModal();
+      }
+    });
+
+    // ========== CHARTS ==========
+    // Sales Chart
+    const salesCtx = document.getElementById('salesChart').getContext('2d');
+    new Chart(salesCtx, {
+      type: 'line',
+      data: {
+        labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+        datasets: [{
+          label: 'Sales ($)',
+          data: [1200, 1900, 1500, 2200, 2800, 2100, 2600],
+          borderColor: '#ED1B24',
+          backgroundColor: 'rgba(237, 27, 36, 0.05)',
+          fill: true,
+          tension: 0.4,
+          borderWidth: 2,
+          pointBackgroundColor: '#ED1B24',
+          pointBorderColor: 'white',
+          pointBorderWidth: 2,
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: false,
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            grid: {
+              color: 'rgba(0,0,0,0.04)',
+            }
+          },
+          x: {
+            grid: {
+              display: false,
+            }
+          }
+        }
+      }
+    });
+
+    // Order Status Chart
+    const orderCtx = document.getElementById('orderChart').getContext('2d');
+    new Chart(orderCtx, {
+      type: 'doughnut',
+      data: {
+        labels: ['Completed', 'Processing', 'Pending', 'Cancelled'],
+        datasets: [{
+          data: [1112, 124, 48, 23],
+          backgroundColor: ['#22c55e', '#3b82f6', '#f59e0b', '#ef4444'],
+          borderWidth: 0,
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'bottom',
+            labels: {
+              padding: 12,
+              usePointStyle: true,
+              pointStyle: 'circle',
+            }
+          }
+        },
+        cutout: '70%',
+      }
+    });
+
+    // ========== MODAL LINK ITEMS (Demo) ==========
+    document.querySelectorAll('.modal-link-item').forEach(item => {
+      item.addEventListener('click', function(e) {
+        e.preventDefault();
+        const title = this.querySelector('p')?.textContent || 'Action';
+        alert(`🚀 "${title}" — Coming soon in COCOCE Admin!`);
+        closeModal();
+      });
+    });
+
+    // ========== DEMO: Other tab interactions ==========
+    document.querySelectorAll('.tab-content:not(#tab-home)').forEach(content => {
+      const links = content.querySelectorAll('a, button');
+      links.forEach(link => {
+        link.addEventListener('click', function(e) {
+          e.preventDefault();
+          const text = this.textContent.trim() || 'feature';
+          alert(`📌 "${text}" — Coming soon in COCOCE Admin!`);
+        });
+      });
+    });
+
+    console.log('🚀 COCOCE Admin Dashboard loaded!');
+    console.log('📊 Stats: Sales $124,892 · Orders 1,284 · Inventory 3,847 · Stores 12');
+    console.log('📱 Sidebar is responsive — try resizing the window!');
+  </script>
+
+</body>
+
+</html>

@@ -8,7 +8,6 @@ module.exports = (req, res, next) => {
     //We expect the host name prefixed by these values to accept only json request
     //Since no view engines was set to their app
     const onlyJsonHostnameSubs = [
-        'auth',
         'api'
     ]
 

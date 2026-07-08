@@ -22,6 +22,10 @@
   <meta property="twitter:url" content="https://cococe.onrender.com/products/">
   <meta name="twitter:title" content="Laptops, Printers, Accessories, Game consoles, Electronics, and much more, cococe, your wish our priority">
   <meta name="twitter:description" content="COCOCE Kigali Rwanda, Laptops, Desktops, Computer accessories, Smart tv, projectors, discover what you want about digital assets near you at Kigali">
+
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.11.0/axios.min.js" integrity="sha512-h9644v03pHqrIHThkvXhB2PJ8zf5E9IyVnrSfZg8Yj8k4RsO4zldcQc4Bi9iVLUCCsqNY0b4WXVV4UB+wbWENA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  
   <link rel="stylesheet" href="/styles/main.css">
   <link rel="stylesheet" href="/styles/404.css">
 </head>
@@ -73,11 +77,12 @@
       </div>
       
       <h1 class="text-3xl md:text-4xl font-bold text-gray-900 mb-3 animate-slide-up">
-        Page Not Found
+        Page <span class="text-brand">Not</span> Found
       </h1>
       
       <p class="text-gray-500 text-lg md:text-xl max-w-lg mx-auto mb-10 animate-slide-up" style="animation-delay: 0.1s">
-        The requested page cannot be reached
+        The requested page cannot be reached,<br>
+        <small>Or have been switched to another page</small>
       </p>
       
       <div class="flex flex-wrap justify-center gap-8 mb-10 animate-slide-up" style="animation-delay: 0.2s">
@@ -98,7 +103,7 @@
   <footer class="py-6 px-6 bg-white border-t border-gray-100">
     <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
       <div class="flex items-center gap-2">
-        <span class="text-xs text-gray-400"><span class="text-brand">© 2026 COCOCE</span> — Digital Evolution</span>
+        <a href="/" class="text-xs text-gray-400"><span class="text-brand">© 2026 COCOCE</span> — Digital Evolution</a>
       </div>
       <div class="flex gap-6 text-xs text-gray-400">
         <a href="/privacy" class="hover:text-brand transition">Privacy</a>

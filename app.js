@@ -75,6 +75,10 @@ if (isProduction) {
     app.use(vhost('localhost', mainApp));
     app.use(vhost('admin.localhost', adminApp));
     app.use(vhost('auth.localhost', authApp));
+
+    app.use(vhost('localapp.com', mainApp));
+    app.use(vhost('admin.localapp.com', adminApp));
+    app.use(vhost('auth.localapp.com', authApp));
 }
 
 if (!isProduction) {
