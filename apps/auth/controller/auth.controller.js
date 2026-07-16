@@ -128,7 +128,7 @@ function renderLoginPage(req, res) {
     if (!redirectTo.includes('admin')) {
         homeImageUrl = '/images/logos/cococe.png';
         heroMessage = `<h2 class="text-2xl text-gray-500 leading-tight pl-8">
-              <span class="flex items-center gap-2">The home of <span class="text-3xl text-brand">Digital World</span></span>
+              <span class="flex items-center gap-2">Home of the <span class="text-3xl text-brand">Digital World</span></span>
               <div class="bg-brand max-w-[140px] min-h-[4px] rounded-full mt-3"></div> 
             </h2>`;
     }
@@ -284,7 +284,7 @@ async function accountLogin(req, res) {
     if (req.cookies.r) {
         redirectPayload = decodeRedirect(req.cookies.r);
     }
-    
+
     const isProduction = process.env.NODE_ENV === 'production';
     const sslUrlPrefix = isProduction ? 'https://' : 'http://';
 

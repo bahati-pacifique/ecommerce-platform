@@ -28,6 +28,7 @@
     --color-blue-700: oklch(48.8% 0.243 264.376);
     --color-purple-50: oklch(97.7% 0.014 308.299);
     --color-purple-500: oklch(62.7% 0.265 303.9);
+    --color-slate-100: oklch(96.8% 0.007 247.896);
     --color-slate-300: oklch(86.9% 0.022 252.894);
     --color-slate-500: oklch(55.4% 0.046 257.417);
     --color-slate-600: oklch(44.6% 0.043 257.281);
@@ -679,6 +680,9 @@
   .w-96 {
     width: calc(var(--spacing) * 96);
   }
+  .w-100 {
+    width: calc(var(--spacing) * 100);
+  }
   .w-\[100\%\] {
     width: 100%;
   }
@@ -999,6 +1003,9 @@
   .border-red-200 {
     border-color: var(--color-red-200);
   }
+  .border-slate-100 {
+    border-color: var(--color-slate-100);
+  }
   .border-slate-300 {
     border-color: var(--color-slate-300);
   }
@@ -1164,6 +1171,9 @@
   .p-8 {
     padding: calc(var(--spacing) * 8);
   }
+  .p-10 {
+    padding: calc(var(--spacing) * 10);
+  }
   .px-2 {
     padding-inline: calc(var(--spacing) * 2);
   }
@@ -1223,6 +1233,9 @@
   }
   .py-20 {
     padding-block: calc(var(--spacing) * 20);
+  }
+  .py-\[1rem\] {
+    padding-block: 1rem;
   }
   .pt-2 {
     padding-top: calc(var(--spacing) * 2);

@@ -31,6 +31,7 @@
   <link rel="stylesheet" href="/styles/components/notification.css">
   <link rel="stylesheet" href="/styles/main.css">
   <link rel="stylesheet" href="/styles/maintenance.css">
+  
 </head>
 
 <body>
@@ -52,9 +53,9 @@
       <div class="flex items-center gap-3">
         <a href="https://admin.cococe.rw/support"><i class="fas fa-headset"></i> Help</a>
         <select id="lang-selector">
-          <option value="kin"><i class="bi bi-globe"></i> KI</option>
           <option value="eng"><i class="bi bi-globe"></i> EN</option>
           <option value="fr"><i class="bi bi-globe"></i> FR</option>
+          <option value="kin"><i class="bi bi-globe"></i> KI</option>
         </select>
         <%if (locals.user) {%>
         <form action="/logout" method="post">
@@ -72,7 +73,7 @@
         <img src="/images/logos/cococe.png" alt="cococe" class=" max-h-[32px] md:max-h-[48px]">
       </a>
       <span class="badge-status">
-        <i class="bi bi-exclamation-triangle"></i> Site under maintenance
+        Site under maintenance
       </span>
     </div>
   </header>
@@ -196,6 +197,7 @@
   </footer>
 
   <script src="/scripts/mt.js"></script>
+  <script src="/scripts/components/notification.js"></script>
 </body>
 
 </html>
