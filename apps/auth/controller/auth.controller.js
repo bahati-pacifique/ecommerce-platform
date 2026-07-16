@@ -81,12 +81,10 @@ const {
 
 function renderLoginPage(req, res) {
 
-    
+
     const sessionMsg = req.session.message;
     delete req.session.message;
     //delete req.session.redirectTo;
-
-    console.log(req.session)
 
     const redirectPayload = decodeRedirect(req.cookies.r);
 
@@ -281,7 +279,12 @@ async function accountLogin(req, res) {
     const { accountId, originalUrl } = req.body;
 
     const preauthToken = req.cookies.p_auth;
-    const redirectPayload = decodeRedirect(req.cookies.r);
+    let redirectPayload = {};
+
+    if (req.cookies.r) {
+        redirectPayload = decodeRedirect(req.cookies.r);
+    }
+    
     const isProduction = process.env.NODE_ENV === 'production';
     const sslUrlPrefix = isProduction ? 'https://' : 'http://';
 

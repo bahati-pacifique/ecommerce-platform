@@ -45,7 +45,19 @@ module.exports = {
                 "https://images.unsplash.com",
                 "https://picsum.photos",
                 "https://fastly.picsum.photos",
+                "https://cdn.cococe.rw",
                 "data:"
+            ],
+            "media-src": [
+                "'self'",
+                "https://www.w3schools.com"
+            ],
+            "frame-src": [
+                "'self'",
+                'https://youtube.com',
+                'https://youtube.com',
+                'https://youtube-nocookie.com',
+                'https://youtube-nocookie.com'
             ]
         }
     }

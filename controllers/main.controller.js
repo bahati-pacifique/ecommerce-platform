@@ -1,7 +1,25 @@
+const path = require('path');
+
+const storage = require('../src/configs/storage.config');
+const console = require('console');
+const { logout } = require('../src/services/auth.services');
+const { clearAuthentication, acceptsHtml } = require('../util/helpers');
+const authServices = require('../src/services/auth.services');
+
 function renderLaunchPage(req, res) {
 
+    const isProduction = process.env.NODE_ENV === 'production';
+    const domain = process.env.DOMAIN;
+
+    const sslUrlPrefix = isProduction ? 'https://' : 'http://';
+    const portSuffix = isProduction ? '' : `:${process.env.PORT}`;
+
+    const authDOMAIN = `${sslUrlPrefix}auth.${domain}${portSuffix}`;
+
+    const user = req.user;
+
     if (req.accepts('html')) {
-        return res.render('launch')
+        return res.render('maintenance-mode', { authDOMAIN, user })
     }
 
     if (req.accepts('json')) {
@@ -10,10 +28,6 @@ function renderLaunchPage(req, res) {
         });
     }
 }
-
-const path = require('path');
-
-const storage = require('../src/configs/storage.config');
 
 const uploadProductImage = async (req, res) => {
 
@@ -37,7 +51,37 @@ const uploadProductImage = async (req, res) => {
     });
 };
 
+const signout = async (req, res) => {
+    try {
+        const userAccount = req.user.userAccount;
+        await authServices.logout(userAccount);
+        clearAuthentication(res);
+        if (acceptsHtml(req)) {
+            res.redirect('/')
+        }
+        else {
+            res.json({
+                success: true,
+                authenticated: false
+            })
+        }
+    } catch (error) {
+        console.log(error);
+        clearAuthentication(res);
+        if (acceptsHtml(req)) {
+            req.session.message = 'Something went wrong';
+            res.redirect('/')
+        } else {
+            res.status(500).json({
+                success: false,
+                message: 'Something Went Wrong'
+            })
+        }
+    }
+}
+
 module.exports = {
     renderLaunchPage,
-    uploadProductImage
+    uploadProductImage,
+    signout
 }

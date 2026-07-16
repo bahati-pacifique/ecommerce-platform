@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>COCOCE — The Home of the Digital World</title>
+  <meta name="description" content="COCOCE — Admin portal, COCOCE Kigali Rwanda, Laptops, Desktops, Computer accessories, Smart tv, projectors, discover what you want about digital assets near you at Kigali">
+  <meta name="keywords" content="Laptops, Desktops, Memories, Storages, Servers, keyboards, Printers, Screens, Repair, Explore, Electronic, Digital, Kigali, Rwanda">
+  <meta name="author" content="COCOCE RW">
+
+  <meta property="og:image" content="https://cdn.cococe.rw/meta/cococe.png">
+  <meta property="og:url" content="https://www.cococe.rw">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Laptops, Printers, Accessories, Game consoles, Electronics, and much more, cococe, your wish our priority">
+  <meta property="og:description" content="COCOCE Kigali Rwanda, Laptops, Desktops, Computer accessories, Smart tv, projectors, discover what you want about digital assets near you at Kigali">
+  <meta property="og:logo" content="https://cdn.cococe.rw/meta/cococe.png" />
+
+  <meta name="twitter:card" content="https://cdn.cococe.rw/meta/cococe.png">
+  <meta property="twitter:domain" content="https://cococe.rw">
+  <meta property="twitter:url" content="https://cococe.rw">
+  <meta name="twitter:title" content="Laptops, Printers, Accessories, Game consoles, Electronics, and much more, cococe, your wish our priority">
+  <meta name="twitter:description" content="COCOCE Kigali Rwanda, Laptops, Desktops, Computer accessories, Smart tv, projectors, discover what you want about digital assets near you at Kigali">
+
+  <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.11.0/axios.min.js" integrity="sha512-h9644v03pHqrIHThkvXhB2PJ8zf5E9IyVnrSfZg8Yj8k4RsO4zldcQc4Bi9iVLUCCsqNY0b4WXVV4UB+wbWENA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+  <link rel="icon" href="/favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+
+  <link rel="stylesheet" href="/styles/components/notification.css">
+  <link rel="stylesheet" href="/styles/main.css">
+  <link rel="stylesheet" href="/styles/maintenance.css">
+</head>
+
+<body>
+  <div class="top-bar">
+    <div class="container">
+      <div class="flex items-center gap-3">
+
+        <%if (!locals.user) {%>
+        <a href="<%=locals.authDOMAIN%>"><i class="fas fa-user"></i> Sign In</a>
+        <%} else {%>
+        <div class="font-semibold">
+          <span><i class="fas fa-user"></i>
+            Hi, <%- locals.user.username %>
+          </span>
+        </div>
+        <%}%>
+        <a href="https://admin.cococe.rw/store"><i class="fas fa-tag"></i> Store Center</a>
+      </div>
+      <div class="flex items-center gap-3">
+        <a href="https://admin.cococe.rw/support"><i class="fas fa-headset"></i> Help</a>
+        <select id="lang-selector">
+          <option value="kin"><i class="bi bi-globe"></i> KI</option>
+          <option value="eng"><i class="bi bi-globe"></i> EN</option>
+          <option value="fr"><i class="bi bi-globe"></i> FR</option>
+        </select>
+        <%if (locals.user) {%>
+        <form action="/logout" method="post">
+          <button>Signout</button>
+        </form>
+        <%}%>
+        
+      </div>
+    </div>
+  </div>
+
+  <header class="header">
+    <div class="container">
+      <a href="/" class="logo">
+        <img src="/images/logos/cococe.png" alt="cococe" class=" max-h-[32px] md:max-h-[48px]">
+      </a>
+      <span class="badge-status">
+        <i class="bi bi-exclamation-triangle"></i> Site under maintenance
+      </span>
+    </div>
+  </header>
+
+  <div class="main-layout">
+    <div class="left-panel">
+      <div class="content">
+        <h1>
+          <span class="text-brand font-bold">❝ </span><span class="text-black/70">We are undergoing</span>  <span class="text-brand">maintenance.</span><span class="font-bold text-black/70">❞</span>
+        </h1>
+
+        <p class="sub-text">
+          Our site is currently undergoing maintenance. 
+          For shopping & other services, 
+          please visit our 
+          <span class="text-brand text-lg">headquarters</span> 
+          at Makuza Peace Plaza.
+        </p>
+
+        <div class="location-info">
+          
+          <div class="details">
+            <a class="address hover:underline" href="https://www.google.com/maps/place/Makuza+Peace+Plaza/@-1.9465656,30.0595654,17z/data=!3m1!4b1!4m6!3m5!1s0x19dca4240db7b3f5:0x5256fd511623ef15!8m2!3d-1.9465656!4d30.0595654!16s%2Fg%2F11c1nfd6s8?entry=ttu&g_ep=EgoyMDI2MDcxMy4wIKXMDSoASAFQAw%3D%3D">
+              <span class="text-brand"><i class="bi bi-buildings"></i></span>
+              Makuza Peace Plaza, Ground Floor
+            </a>
+            <div class="address">
+              <span  class="text-brand"><i class="bi bi-sign-merge-right"></i></span> KN 84 St, Kigali
+            </div>
+            <a href="tel:+250787195425" class="address">
+              <span class="text-brand">
+                <i class="bi bi-telephone"></i>
+              </span>
+               +250 787 195 425
+            </a>
+            
+            <div class="hours bg-brand/10 rounded text-center">
+              <span><i class="bi bi-door-open"></i></span> Mon – Sat, 9:00 AM – 9:00 PM
+            </div>
+          </div>
+        </div>
+
+        <div class="action-buttons">
+          <a href="https://www.google.com/maps/place/Cococe+Ltd(Computer+core+center+ltd+)/@-1.9468875,30.059544,17z/data=!3m1!4b1!4m6!3m5!1s0x19dca533f76631a3:0x688bc4d214d7a578!8m2!3d-1.9468875!4d30.059544!16s%2Fg%2F11rg58zfgn?entry=ttu&g_ep=EgoyMDI2MDcxMy4wIKXMDSoASAFQAw%3D%3D" class="btn-primary" target="_blank">
+            <i class="bi bi-geo-alt"></i> Visit Shop
+          </a>
+          <a href="tel:+250787195425" class="btn-secondary">
+            <i class="fas fa-phone"></i> Contact
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div class="right-panel">
+      <div class="slideshow-container" id="slideshowContainer">
+        <div class="slide active" data-index="0">
+          <div class="product-icon">
+            <img src="/images/showups/m1.jpg" alt="showups">
+          </div>
+        </div>
+
+        <div class="slide" data-index="1">
+          <div class="product-icon">
+             <img src="/images/showups/m2.jpg" alt="showups">
+          </div>
+        </div>
+
+        <div class="slide video-slide" data-index="2">
+          <video id="promoVideo" muted loop playsinline>
+            <source src="/images/showups/video/v1.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+          </video>
+         
+          <button class="video-play-btn" id="videoPlayBtn" aria-label="Play video">
+            <i class="fas fa-play"></i>
+          </button>
+          
+        </div>
+
+        <div class="slide" data-index="3">
+          <div class="product-icon">
+             <img src="/images/showups/m3.jpg" alt="showups">
+          </div>
+        </div>
+
+        <div class="slide" data-index="4">
+          <div class="product-icon">
+             <img src="/images/showups/m4.jpg" alt="showups">
+          </div>
+        </div>
+
+        <div class="slide" data-index="5">
+          <div class="product-icon">
+             <img src="/images/showups/m5.jpg" alt="showups">
+          </div>
+        </div>
+
+        <button class="slide-arrow prev" id="prevSlide" aria-label="Previous slide">
+          <i class="fas fa-chevron-left"></i>
+        </button>
+        <button class="slide-arrow next" id="nextSlide" aria-label="Next slide">
+          <i class="fas fa-chevron-right"></i>
+        </button>
+      </div>
+
+      <div class="dots-container" id="dotsContainer"></div>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <div class="container">
+      <p>
+        © 2026 COCOCE — <span class="text-sm text-brand">Your Wish is Our Priority</span>
+      </p>
+      <div>
+        <a href="/"><i class="fas fa-store"></i> Shop</a>
+        <a href="tel:+250787195425"><i class="bi bi-telephone"></i> +250 787 195 425</a>
+        <a href="mailto:support@cococe.com"><i class="bi bi-envelope"></i> support@cococe.com</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/scripts/mt.js"></script>
+</body>
+
+</html>

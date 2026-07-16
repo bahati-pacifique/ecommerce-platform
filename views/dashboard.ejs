@@ -535,7 +535,7 @@
               <%- locals.user.username.charAt(0) %>
             </div>
             <div class="user-info">
-              <p class="text-sm font-medium text-gray-800"><%-locals.user.username%> — <%-locals.user.type.substring(0, 3)%></p>
+              <p class="text-sm font-medium text-gray-800"><%-locals.user?.username%> — <%-locals.user?.type?.substring(0, 3)%></p>
               <p class="text-xs text-gray-400"><%- locals.user.email %></p>
             </div>
           </div>

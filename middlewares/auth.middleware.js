@@ -492,6 +492,8 @@ async function passUser(req, res, next) {
             return next();
         }
 
+        console.log(accessToken)
+
         const user = {
             username: accessToken.username,
             name: accessToken.name,
@@ -605,9 +607,13 @@ async function validateAuthentication(req, res, next) {
 
     const portSuffix = isProduction ? '' : `:${process.env.PORT}`;
 
-    const redirectPayload = decodeRedirect(req.cookies.r);
+    let redirectPayload = {};
 
-    const redirect = redirectPayload?.redirectTo || req.session.redirectTo || req.query.r || `${sslUrlPrefix}${process.env.DOMAIN}`;
+    if (req.cookies.r) {
+        redirectPayload = decodeRedirect(req.cookies.r);
+    }
+
+    const redirect = redirectPayload?.redirectTo || req.session.redirectTo || req.query.r || `${sslUrlPrefix}${process.env.DOMAIN}${portSuffix}`;
 
     if (!allowRedirect(redirect)) {
 
@@ -631,6 +637,7 @@ async function validateAuthentication(req, res, next) {
     if (accessToken) {
         const uaOk = accessToken.ua === normalizeUA(req.get('User-Agent'));
 
+        console.log("access token")
         if (!uaOk) {
             req.user = null;
             return next();
@@ -652,13 +659,10 @@ async function validateAuthentication(req, res, next) {
         let to = redirect;
 
         if (!redirect) {
-            if (isProduction) {
-                to = `https://${process.env.DOMAIN}`;
-            } else {
-                to = `http://${process.env.DOMAIN}:${process.env.PORT}`;
-            }
+            to = `${sslUrlPrefix}${process.env.DOMAIN}${portSuffix}`
         }
 
+        
         if (acceptsHtml(req)) {
             return res.redirect(to);
         }
@@ -672,7 +676,7 @@ async function validateAuthentication(req, res, next) {
 
     } else if (refreshToken) {
         //Rotate session
-
+        console.log("Refresh token")
         const userId = refreshToken.userId;
         const userAccount = refreshToken.accountId;
         const jwtId = refreshToken.jwtId;
