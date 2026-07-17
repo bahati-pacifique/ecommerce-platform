@@ -48,10 +48,16 @@
           </span>
         </div>
         <%}%>
-        <a href="https://admin.cococe.rw/store"><i class="fas fa-tag"></i> Store Center</a>
+        <a href="https://admin.cococe.rw/store">
+          <i class="bi bi-shop-window"></i> 
+          <span class="hidden md:block">Store Center</span>
+        </a>
       </div>
       <div class="flex items-center gap-3">
-        <a href="https://admin.cococe.rw/support"><i class="fas fa-headset"></i> Help</a>
+        <a href="https://admin.cococe.rw/support">
+          <i class="bi bi-headset"></i> 
+          <span class="hidden md:block">Help</span>
+        </a>
         <select id="lang-selector">
           <option value="eng"><i class="bi bi-globe"></i> EN</option>
           <option value="fr"><i class="bi bi-globe"></i> FR</option>
@@ -59,7 +65,10 @@
         </select>
         <%if (locals.user) {%>
         <form action="/logout" method="post">
-          <button>Signout</button>
+          <button>
+            <i class="bi bi-headset"></i>
+            <span class="hidden md:block">Signout</span>
+          </button>
         </form>
         <%}%>
         
