@@ -40,7 +40,7 @@
       <div class="flex items-center gap-3">
 
         <%if (!locals.user) {%>
-        <a href="<%=locals.authDOMAIN%>"><i class="fas fa-user"></i> Sign In</a>
+        <a href="<%=locals.authDOMAIN%>" class="flex items-center gap-2"><i class="fas fa-user"></i> Sign In</a>
         <%} else {%>
         <div class="font-semibold">
           <span>
@@ -48,13 +48,13 @@
           </span>
         </div>
         <%}%>
-        <a href="https://admin.cococe.rw/store">
+        <a href="https://admin.cococe.rw/store" class="flex items-center gap-2">
           <i class="bi bi-shop-window"></i> 
           <span class="hidden md:block">Store Center</span>
         </a>
       </div>
       <div class="flex items-center gap-3">
-        <a href="https://admin.cococe.rw/support">
+        <a href="https://admin.cococe.rw/support" class="flex items-center gap-2">
           <i class="bi bi-headset"></i> 
           <span class="hidden md:block">Help</span>
         </a>
@@ -65,7 +65,7 @@
         </select>
         <%if (locals.user) {%>
         <form action="/logout" method="post">
-          <button>
+          <button class="flex items-center gap-2">
             <i class="bi bi-box-arrow-right"></i>
             <span class="hidden md:block">Signout</span>
           </button>
