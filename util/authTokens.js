@@ -49,6 +49,8 @@ function signRedirect(payload) {
 
 function decodeRedirect(redirectToken) {
 
+    if (!redirectToken) return null;
+
     let payload;
 
     try {

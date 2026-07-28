@@ -10,7 +10,10 @@ async function home(req, res) {
     // } catch (error) {
     //     console.log(error);
     // }
+
     const user = req.user;
+
+    console.log("USER: ",user)
 
     const isProduction = process.env.NODE_ENV === 'production';
 

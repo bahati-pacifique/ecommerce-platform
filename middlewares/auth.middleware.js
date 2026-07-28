@@ -309,8 +309,9 @@ function authPass({ acceptedTypes }) {
 
         if (!refreshToken) {
             clearAuthentication(res);
+            const to = `${sslUrlPrefix}${req.hostname}${portSuffix}${req.originalUrl}`;
             if (acceptsHtml(req)) {
-                const to = `${sslUrlPrefix}${req.hostname}${portSuffix}${req.originalUrl}`;
+                
                 req.session.message = 'Please signin to continue';
 
                 //Currently we're not using session database
@@ -320,6 +321,7 @@ function authPass({ acceptedTypes }) {
                 //     // This runs ONLY after the database is updated
                 //     res.redirect('/dashboard');
                 // });
+                
                 //console.log('TO: ', `${sslUrlPrefix}${req.hostname}${req.originalUrl}`)
                 return res.redirect(`${sslUrlPrefix}auth.${process.env.DOMAIN}${portSuffix}?r=${to}`)
                 //return res.redirect(`${sslUrlPrefix}auth.${process.env.DOMAIN}${portSuffix}`)
@@ -329,7 +331,8 @@ function authPass({ acceptedTypes }) {
                     authenticated: false,
                     success: false,
                     message: 'Please login to continue',
-                    redirectTo: `${sslUrlPrefix}auth.${process.env.DOMAIN}`
+                    redirectTo: `${sslUrlPrefix}auth.${process.env.DOMAIN}${portSuffix}?r=${to}`,
+                    message: 'Authentication failed — Please login to continue'
                 })
             }
             //return deny401(req, res, { message: 'Please login to continue', originalUrl: req.originalUrl });
@@ -487,12 +490,9 @@ async function passUser(req, res, next) {
 
         if (!uaOk) {
             //TODO: Implement Log action
-
             req.user = null;
             return next();
         }
-
-        console.log(accessToken)
 
         const user = {
             username: accessToken.username,
@@ -511,6 +511,7 @@ async function passUser(req, res, next) {
 
     } else if (refreshToken) {
 
+        
         //Rotating session
 
         const userId = refreshToken.userId;

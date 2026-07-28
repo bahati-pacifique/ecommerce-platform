@@ -27,7 +27,9 @@
   <script src="https://code.jquery.com/jquery-4.0.0.js" integrity="sha256-9fsHeVnKBvqh3FB2HYu7g2xseAZ5MlN6Kz/qnkASV8U=" crossorigin="anonymous"></script>
 
   <link rel="stylesheet" href="/styles/components/notification.css">
+  <link rel="stylesheet" href="/styles/components/d-spinner.css">
   <link rel="stylesheet" href="/styles/main.css">
+  <link rel="stylesheet" href="/styles/categories.css">
 
   <!-- Chart.js for charts -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
@@ -60,7 +62,7 @@
     .sidebar {
       background: white;
       border-right: 1px solid #e5e7eb;
-      height: 100vh;
+      height: 100dvh;
       position: sticky;
       top: 0;
       overflow-y: auto;
@@ -441,74 +443,65 @@
 
 <body class="bg-bg-soft">
 
-  <!-- Sidebar Overlay for mobile -->
   <div id="sidebarOverlay" class="sidebar-overlay" onclick="closeMobileSidebar()"></div>
 
   <div class="flex min-h-screen">
 
-    <!-- ========== SIDEBAR ========== -->
     <aside id="sidebar" class="sidebar">
       <div class="flex flex-col h-full">
-        <!-- Sidebar Brand -->
         <div class="sidebar-brand">
           <img src="/images/logos/administration.png" alt="Logo-brand" class="max-h-[38px]">
-          <!-- <span class="brand-badge">ADMIN</span> -->
         </div>
 
-        <!-- Sidebar Navigation -->
         <nav class="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
-          <!-- Home -->
           <a href="#" class="sidebar-link active" data-tab="home">
             <span class="icon"><i class="bi bi-house"></i></span>
             <span class="link-text">Dashboard</span>
           </a>
 
-          <!-- Profile -->
           <a href="#" class="sidebar-link" data-tab="profile">
             <span class="icon"><i class="bi bi-person"></i></span>
-            <span class="link-text">Admin Profile</span>
+            <span class="link-text">Profile</span>
           </a>
 
-          <!-- Business -->
           <a href="#" class="sidebar-link" data-tab="business">
             <span class="icon"><i class="bi bi-person-gear"></i></span>
             <span class="link-text">Business Profile</span>
           </a>
 
-          <!-- Orders -->
           <a href="#" class="sidebar-link" data-tab="orders">
             <span class="icon"><i class="bi bi-receipt"></i></span>
             <span class="link-text">Orders</span>
             <span class="badge amber">48</span>
           </a>
 
-          <!-- Inventory -->
           <a href="#" class="sidebar-link" data-tab="inventory">
             <span class="icon"><i class="bi bi-bar-chart-line"></i></span>
             <span class="link-text">Inventory</span>
             <span class="badge">23</span>
           </a>
 
-          <!-- Customers -->
           <a href="#" class="sidebar-link" data-tab="customers">
             <span class="icon"><i class="bi bi-people-fill"></i></span>
             <span class="link-text">Customers</span>
             <span class="badge green">+12</span>
           </a>
 
-          <!-- Analytics -->
           <a href="#" class="sidebar-link" data-tab="analytics">
             <span class="icon"><i class="bi bi-graph-down"></i></span>
             <span class="link-text">Analytics</span>
           </a>
 
-          <!-- Marketing -->
+          <a href="#" class="sidebar-link" data-tab="categories">
+            <span class="icon"><i class="bi bi-tag"></i></span>
+            <span class="link-text">Categories</span>
+          </a>
+
           <a href="#" class="sidebar-link" data-tab="marketing">
             <span class="icon"><i class="bi bi-badge-ad"></i></span>
             <span class="link-text">Marketing</span>
           </a>
 
-          <!-- Settings -->
           <a href="#" class="sidebar-link" data-tab="settings">
             <span class="icon"><i class="bi bi-gear"></i></span>
             <span class="link-text">Settings</span>
@@ -516,7 +509,6 @@
 
           <div class="border-t border-gray-100 my-3"></div>
 
-          <!-- Quick Actions (in sidebar) -->
           <a href="#" class="sidebar-link" data-tab="quick-actions">
             <span class="icon"><i class="bi bi-list"></i></span>
             <span class="link-text">Quick Actions</span>
@@ -528,7 +520,6 @@
           </a>
         </nav>
 
-        <!-- Sidebar Footer -->
         <div class="sidebar-footer">
           <div class="flex items-center gap-3">
             <div class="avatar w-8 h-8 rounded-full bg-brand-light flex items-center justify-center text-brand font-bold text-sm flex-shrink-0">
@@ -544,7 +535,7 @@
     </aside>
 
     <!-- ========== MAIN CONTENT ========== -->
-    <div class="flex-1 min-w-0">
+    <div class="flex-1 min-w-0 flex flex-col">
 
       <!-- Top Bar -->
       <header class="top-bar">
@@ -586,7 +577,7 @@
       </header>
 
       <!-- Main Content Area -->
-      <main class="p-4 md:p-6 max-w-full">
+      <main class="p-4 md:p-6 flex-3 overflow-y-auto max-w-full">
 
         <!-- Tab Content: Home -->
         <div id="tab-home" class="tab-content">
@@ -857,7 +848,6 @@
           </div>
         </div>
 
-        <!-- Additional tab placeholders -->
         <div id="tab-analytics" class="tab-content hidden">
           <div class="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm text-center">
             <h3 class="text-xl font-bold text-gray-900">Analytics</h3>
@@ -870,6 +860,302 @@
             <h3 class="text-xl font-bold text-gray-900">Marketing</h3>
             <p class="text-gray-500 mt-2">Manage campaigns, promotions, and email marketing.</p>
           </div>
+        </div>
+
+        <div id="tab-categories" class="tab-content h-full relative hidden">
+
+          <div class="d-container-abs-centered hidden" id="categorySyncLoader">
+            <div class="d-spinner d-xlg"></div>
+          </div>
+          <div class="w-full h-full">
+
+            <header class="border-b border-gray-100 px-4 md:px-6 py-3 sticky top-0">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                  <button id="mobileMenuBtn" class="lg:hidden p-2 rounded-lg hover:bg-gray-100 transition">
+                    <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                    </svg>
+                  </button>
+                  <h1 class="text-xl font-bold text-gray-900">Categories</h1>
+                </div>
+                <div class="flex items-center gap-2 md:gap-3">
+                  
+                  <button class="px-5 py-2 bg-brand hover:bg-brand-dark text-white font-medium rounded-lg border border-gray-200 shadow-sm transition-all duration-200 flex items-center gap-2 new-category-btn">
+                    <i class="fas fa-plus"></i>
+                    <span class="hidden md:block">New Category</span>
+                  </button>
+                  <button class="px-5 py-2 bg-white text-black font-medium rounded-lg border border-gray-200 shadow-sm hover:bg-gray-100 transition-all duration-200" id="refreshCategories">
+                    <i class="bi bi-arrow-repeat"></i>
+                  </button>
+                </div>
+
+              </div>
+            </header>
+
+            <!-- Main Content -->
+            <main class="p-4 md:p-6">
+
+              <!-- ========== FILTERS & SEARCH ========== -->
+              <div class="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm mb-6">
+                <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                  <div class="flex-1 w-full">
+                    <div class="relative">
+                      <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
+                      <input type="text" id="searchInput" placeholder="Search categories by title, slug, or description..." class="search-input w-full pl-9 pr-4 py-2.5 rounded-xl border border-gray-200 bg-gray-50 text-sm text-gray-700
+                       focus:outline-none transition max-w-[320px]">
+                    </div>
+                  </div>
+                  <div class="flex items-center gap-3 w-full sm:w-auto">
+                    <select id="statusFilter" class="px-3 py-2.5 rounded-xl border border-gray-200 bg-gray-50 text-sm text-gray-700 focus:outline-none focus:border-brand focus:ring-2 focus:ring-brand/10 w-full sm:w-auto">
+                      <option value="all">All Status</option>
+                      <option value="active">Active</option>
+                      <option value="inactive">Inactive</option>
+                      <option value="draft">Draft</option>
+                    </select>
+                    <button class="px-4 py-2.5 rounded-xl border border-gray-200 text-sm text-gray-600 hover:bg-gray-50 transition whitespace-nowrap">
+                      <i class="fas fa-undo-alt mr-1"></i> Reset
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- ========== TABLE ========== -->
+              <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+
+                <div class="overflow-x-auto">
+
+                  <div id="categorySkeletonLoader" class="hidden">
+                    <div class="overflow-x-auto">
+                      <table class="w-full">
+                        <thead>
+                          <tr class="bg-gray-50 border-b border-gray-100">
+                            <th class="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">ID</th>
+                            <th class="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Title</th>
+                            <th class="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider hidden md:table-cell">Slug</th>
+                            <th class="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider hidden lg:table-cell">Description</th>
+                            <th class="text-center px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
+                            <th class="text-center px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <!-- Skeleton Rows -->
+                          <tr>
+                            <td colspan="6" class="p-0">
+                              <div class="skeleton-row">
+                                <div class="skeleton-avatar"></div>
+                                <div class="flex-1 space-y-2">
+                                  <div class="skeleton skeleton-text w-32"></div>
+                                  <div class="skeleton skeleton-text short"></div>
+                                </div>
+                                <div class="skeleton skeleton-text medium hidden md:block"></div>
+                                <div class="skeleton skeleton-text hidden lg:block"></div>
+                                <div class="skeleton skeleton-badge"></div>
+                                <div class="flex gap-2">
+                                  <div class="skeleton-avatar"></div>
+                                  <div class="skeleton-avatar"></div>
+                                </div>
+                              </div>
+                              <div class="skeleton-row">
+                                <div class="skeleton-avatar"></div>
+                                <div class="flex-1 space-y-2">
+                                  <div class="skeleton skeleton-text w-40"></div>
+                                  <div class="skeleton skeleton-text short"></div>
+                                </div>
+                                <div class="skeleton skeleton-text medium hidden md:block"></div>
+                                <div class="skeleton skeleton-text hidden lg:block"></div>
+                                <div class="skeleton skeleton-badge"></div>
+                                <div class="flex gap-2">
+                                  <div class="skeleton-avatar"></div>
+                                  <div class="skeleton-avatar"></div>
+                                </div>
+                              </div>
+                              <div class="skeleton-row">
+                                <div class="skeleton-avatar"></div>
+                                <div class="flex-1 space-y-2">
+                                  <div class="skeleton skeleton-text w-36"></div>
+                                  <div class="skeleton skeleton-text short"></div>
+                                </div>
+                                <div class="skeleton skeleton-text medium hidden md:block"></div>
+                                <div class="skeleton skeleton-text hidden lg:block"></div>
+                                <div class="skeleton skeleton-badge"></div>
+                                <div class="flex gap-2">
+                                  <div class="skeleton-avatar"></div>
+                                  <div class="skeleton-avatar"></div>
+                                </div>
+                              </div>
+                              <div class="skeleton-row">
+                                <div class="skeleton-avatar"></div>
+                                <div class="flex-1 space-y-2">
+                                  <div class="skeleton skeleton-text w-44"></div>
+                                  <div class="skeleton skeleton-text short"></div>
+                                </div>
+                                <div class="skeleton skeleton-text medium hidden md:block"></div>
+                                <div class="skeleton skeleton-text hidden lg:block"></div>
+                                <div class="skeleton skeleton-badge"></div>
+                                <div class="flex gap-2">
+                                  <div class="skeleton-avatar"></div>
+                                  <div class="skeleton-avatar"></div>
+                                </div>
+                              </div>
+                              <div class="skeleton-row">
+                                <div class="skeleton-avatar"></div>
+                                <div class="flex-1 space-y-2">
+                                  <div class="skeleton skeleton-text w-28"></div>
+                                  <div class="skeleton skeleton-text short"></div>
+                                </div>
+                                <div class="skeleton skeleton-text medium hidden md:block"></div>
+                                <div class="skeleton skeleton-text hidden lg:block"></div>
+                                <div class="skeleton skeleton-badge"></div>
+                                <div class="flex gap-2">
+                                  <div class="skeleton-avatar"></div>
+                                  <div class="skeleton-avatar"></div>
+                                </div>
+                              </div>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                    <!-- Skeleton Footer -->
+                    <div class="px-4 py-3 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-3 bg-gray-50/50">
+                      <div class="skeleton skeleton-text w-48"></div>
+                      <div class="flex items-center gap-2">
+                        <div class="skeleton skeleton-avatar"></div>
+                        <div class="skeleton skeleton-text w-20"></div>
+                        <div class="skeleton skeleton-avatar"></div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <table class="w-full hidden" id="categoriesContainer">
+                    <thead>
+                      <tr class="bg-gray-50 border-b border-gray-100">
+                        <th class="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">ID</th>
+                        <th class="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Title</th>
+                        <th class="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider hidden md:table-cell">Slug</th>
+                        <th class="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider hidden lg:table-cell">Description</th>
+                        <th class="text-center px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
+                        <th class="text-center px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                    </tbody>
+                  </table>
+                </div>
+
+                <div class="px-4 py-3 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-3 bg-gray-50/50">
+                  <p class="text-xs text-gray-500">
+                    Showing <span id="showingCount">0</span> of <span id="totalCount">0</span> categories
+                  </p>
+                  <div class="flex items-center gap-2">
+                    <button id="prevCategoryPageBtn" class="px-3 py-1 rounded-lg border border-gray-200 text-sm text-gray-600 hover:bg-gray-50 transition disabled:opacity-40 disabled:cursor-not-allowed">
+                      <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <span id="pageInfo" class="text-xs text-gray-500">Page 1 of 1</span>
+                    <button id="nextCategoryPageBtn" class="px-3 py-1 rounded-lg border border-gray-200 text-sm text-gray-600 hover:bg-gray-50 transition disabled:opacity-40 disabled:cursor-not-allowed">
+                      <i class="fas fa-chevron-right"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div id="emptyState" class="hidden text-center py-12">
+                <div class="text-5xl mb-4">
+                  <i class="bi bi-folder"></i>
+                </div>
+                <h3 class="text-lg font-semibold text-gray-900">No categories found</h3>
+                <p class="text-sm text-gray-500 mt-1">Get started by creating your first category.</p>
+                <button id="emptyCategoryBtn" class="mt-4 btn-primary px-6 py-2.5 rounded-xl text-white text-sm font-medium inline-flex items-center gap-2">
+                  <i class="fas fa-plus"></i> Create Category
+                </button>
+              </div>
+            </main>
+
+          </div>
+
+          <div id="formModal" class="fixed inset-0 z-50 hidden items-center justify-center px-4">
+            <div class="modal-overlay absolute inset-0"></div>
+            <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto animate-slide-down">
+              <div class="sticky top-0 bg-white border-b border-gray-100 px-6 py-4 flex items-center justify-between z-10">
+                <h3 id="formModalTitle" class="text-lg font-bold text-gray-900">Create New Category</h3>
+                <button class="text-gray-400 hover:text-gray-600 transition" id="closeFormModal">
+                  <i class="fas fa-times text-xl"></i>
+                </button>
+              </div>
+
+              <form id="categoryForm" class="p-6 space-y-4">
+                <input type="hidden" id="editId" value="">
+
+                <div>
+                  <label for="title" class="block text-sm font-medium text-gray-700 mb-1.5">
+                    Title <span class="text-brand">*</span>
+                  </label>
+                  <input type="text" id="title" placeholder="e.g., Electronics" class="form-input w-full px-4 py-2.5 rounded-xl border border-gray-200 text-gray-900 placeholder-gray-400 transition" required>
+                </div>
+
+                <div>
+                  <label for="slug" class="block text-sm font-medium text-gray-700 mb-1.5">
+                    Slug <span class="text-brand">*</span>
+                  </label>
+                  <input type="text" id="slug" placeholder="e.g., electronics" class="form-input w-full px-4 py-2.5 rounded-xl border border-gray-200 text-gray-900 placeholder-gray-400 transition" required>
+                  <p class="text-xs text-gray-400 mt-1">URL-friendly version of the title (auto-generated if left empty)</p>
+                </div>
+
+                <div>
+                  <label for="description" class="block text-sm font-medium text-gray-700 mb-1.5">
+                    Description
+                  </label>
+                  <textarea id="description" rows="3" placeholder="Brief description of the category..." class="form-input w-full px-4 py-2.5 rounded-xl border border-gray-200 text-gray-900 placeholder-gray-400 transition resize-y"></textarea>
+                </div>
+
+                <div>
+                  <label for="status" class="block text-sm font-medium text-gray-700 mb-1.5">
+                    Status
+                  </label>
+                  <select id="status" class="form-input w-full px-4 py-2.5 rounded-xl border border-gray-200 text-gray-700 transition">
+                    <option value="active">Active</option>
+                    <option value="inactive">Inactive</option>
+                    <option value="draft">Draft</option>
+                  </select>
+                </div>
+
+                <div class="flex items-center gap-3 pt-2">
+                  <button type="submit" id="formSubmitBtn" class="flex-1 btn-primary px-6 py-2.5 rounded-xl text-white font-medium">
+                    <i class="fas fa-save mr-2"></i> Save Category
+                  </button>
+                  <button type="button" class="px-6 py-2.5 rounded-xl border border-gray-200 text-gray-600 hover:bg-gray-50 transition font-medium cancel-create-category">
+                    Cancel
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+
+          <div id="deleteModal" class="fixed inset-0 z-50 hidden items-center justify-center px-4">
+            <div class="modal-overlay absolute inset-0"></div>
+            <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-md animate-slide-down">
+              <div class="p-6 text-center">
+                <div class="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <i class="fas fa-exclamation-triangle text-3xl text-brand"></i>
+                </div>
+                <h3 class="text-lg font-bold text-gray-900">Delete Category</h3>
+                <p class="text-sm text-gray-500 mt-2">
+                  Are you sure you want to delete <strong id="deleteTitle" class="text-gray-700"></strong>?
+                  <br>This action cannot be undone.
+                </p>
+                <div class="flex items-center gap-3 mt-6">
+                  <button class="flex-1 btn-primary px-6 py-2.5 rounded-xl text-white font-medium bg-red-600 hover:bg-red-700 confirm-delete-btn">
+                    <i class="fas fa-trash mr-2"></i> Delete
+                  </button>
+                  <button class="flex-1 px-6 py-2.5 rounded-xl border border-gray-200 text-gray-600 hover:bg-gray-50 transition font-medium close-delete-modal">
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
         </div>
 
         <div id="tab-settings" class="tab-content hidden">
@@ -903,22 +1189,20 @@
 
       </main>
 
-      <!-- Footer -->
-      <footer class="py-4 px-6 bg-white border-t border-gray-100">
+      <footer class="py-4 px-6 bg-white border-t border-gray-100 mt-auto">
         <div class="flex flex-col md:flex-row justify-between items-center gap-3">
-          <span class="text-xs text-gray-400">© 2026 COCOCE — Admin Dashboard</span>
+          <span class="text-xs text-gray-400">© 2026 <span class="text-brand font-bold">COCOCE</span> — Admin Dashboard</span>
           <div class="flex gap-6 text-xs text-gray-400">
-            <a href="#" class="hover:text-brand transition">Privacy</a>
-            <a href="#" class="hover:text-brand transition">Terms</a>
-            <a href="#" class="hover:text-brand transition">Support</a>
-            <a href="#" class="hover:text-brand transition">Docs</a>
+            <a href="/privacy" class="hover:text-brand transition">Privacy</a>
+            <a href="/terms" class="hover:text-brand transition">Terms</a>
+            <a href="mailto:support@cococe.rw" class="hover:text-brand transition">Support</a>
+            <a href="/docs" class="hover:text-brand transition">Docs</a>
           </div>
         </div>
       </footer>
     </div>
   </div>
 
-  <!-- ========== TOP BAR MODAL ========== -->
   <div id="topBarModal" class="modal-overlay fixed inset-0 z-50 hidden flex items-start justify-center pt-20 px-4">
     <div class="modal-content bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden">
       <div class="flex items-center justify-between p-4 border-b border-gray-100">
@@ -1001,251 +1285,9 @@
   </div>
 
   <script src="/scripts/components/notification.js"></script>
+  <script src="/scripts/categories.js"></script>
 
-  <!-- JavaScript -->
-  <script>
-    // ========== SIDEBAR TOGGLE (DESKTOP) ==========
-    const sidebarToggle = document.getElementById('sidebarToggle');
-    const sidebar = document.getElementById('sidebar');
-    let isSidebarCollapsed = false;
-
-    sidebarToggle.addEventListener('click', function() {
-      isSidebarCollapsed = !isSidebarCollapsed;
-      sidebar.classList.toggle('collapsed', isSidebarCollapsed);
-
-      // Update button text/icon
-      const icon = this.querySelector('svg');
-      //const text = this.querySelector('.toggle-text');
-      if (isSidebarCollapsed) {
-        //text.textContent = 'Expand';
-        icon.innerHTML = `
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7" />
-        `;
-      } else {
-        //text.textContent = 'Collapse';
-        icon.innerHTML = `
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
-        `;
-      }
-    });
-
-    // ========== MOBILE SIDEBAR ==========
-    const overlay = document.getElementById('sidebarOverlay');
-    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
-
-    function openMobileSidebar() {
-      sidebar.classList.add('mobile-open');
-      overlay.classList.add('active');
-      document.body.style.overflow = 'hidden';
-    }
-
-    function closeMobileSidebar() {
-      sidebar.classList.remove('mobile-open');
-      overlay.classList.remove('active');
-      document.body.style.overflow = '';
-    }
-
-    mobileMenuBtn.addEventListener('click', openMobileSidebar);
-
-    // Close sidebar on link click (mobile)
-    document.querySelectorAll('.sidebar-link').forEach(link => {
-      link.addEventListener('click', () => {
-        if (window.innerWidth < 1024) {
-          closeMobileSidebar();
-        }
-      });
-    });
-
-    // ========== SIDEBAR NAVIGATION ==========
-    const sidebarLinks = document.querySelectorAll('.sidebar-link');
-    const tabContents = {
-      home: document.getElementById('tab-home'),
-      profile: document.getElementById('tab-profile'),
-      business: document.getElementById('tab-business'),
-      orders: document.getElementById('tab-orders'),
-      inventory: document.getElementById('tab-inventory'),
-      customers: document.getElementById('tab-customers'),
-      analytics: document.getElementById('tab-analytics'),
-      marketing: document.getElementById('tab-marketing'),
-      settings: document.getElementById('tab-settings'),
-      'quick-actions': document.getElementById('tab-quick-actions'),
-      help: document.getElementById('tab-help'),
-    };
-
-    const tabLabelMap = {
-      home: 'Home',
-      profile: 'Admin Profile',
-      business: 'Business Profile',
-      orders: 'Orders',
-      inventory: 'Inventory',
-      customers: 'Customers',
-      analytics: 'Analytics',
-      marketing: 'Marketing',
-      settings: 'Settings',
-      'quick-actions': 'Quick Actions',
-      help: 'Help & Support'
-    };
-
-    sidebarLinks.forEach(link => {
-      link.addEventListener('click', function(e) {
-        e.preventDefault();
-
-        // Remove active from all links
-        sidebarLinks.forEach(l => l.classList.remove('active'));
-        this.classList.add('active');
-
-        // Hide all tab contents
-        Object.values(tabContents).forEach(content => {
-          if (content) content.classList.add('hidden');
-        });
-
-        // Show selected tab
-        const tabId = this.dataset.tab;
-        if (tabContents[tabId]) {
-          tabContents[tabId].classList.remove('hidden');
-        }
-
-        // Update breadcrumb label
-        const label = document.getElementById('currentTabLabel');
-        if (label && tabLabelMap[tabId]) {
-          label.textContent = tabLabelMap[tabId];
-        }
-      });
-    });
-
-    // ========== TOP BAR MODAL ==========
-    const modalTrigger = document.getElementById('topBarModalTrigger');
-    const modal = document.getElementById('topBarModal');
-    const closeModalBtn = document.getElementById('closeModalBtn');
-
-    function openModal() {
-      modal.classList.remove('hidden');
-      document.body.style.overflow = 'hidden';
-    }
-
-    function closeModal() {
-      modal.classList.add('hidden');
-      document.body.style.overflow = '';
-    }
-
-    modalTrigger.addEventListener('click', openModal);
-    closeModalBtn.addEventListener('click', closeModal);
-
-    modal.addEventListener('click', function(e) {
-      if (e.target === this) {
-        closeModal();
-      }
-    });
-
-    document.addEventListener('keydown', function(e) {
-      if (e.key === 'Escape') {
-        closeModal();
-      }
-    });
-
-    // ========== CHARTS ==========
-    // Sales Chart
-    const salesCtx = document.getElementById('salesChart').getContext('2d');
-    new Chart(salesCtx, {
-      type: 'line',
-      data: {
-        labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-        datasets: [{
-          label: 'Sales ($)',
-          data: [1200, 1900, 1500, 2200, 2800, 2100, 2600],
-          borderColor: '#ED1B24',
-          backgroundColor: 'rgba(237, 27, 36, 0.05)',
-          fill: true,
-          tension: 0.4,
-          borderWidth: 2,
-          pointBackgroundColor: '#ED1B24',
-          pointBorderColor: 'white',
-          pointBorderWidth: 2,
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            display: false,
-          }
-        },
-        scales: {
-          y: {
-            beginAtZero: true,
-            grid: {
-              color: 'rgba(0,0,0,0.04)',
-            }
-          },
-          x: {
-            grid: {
-              display: false,
-            }
-          }
-        }
-      }
-    });
-
-    // Order Status Chart
-    const orderCtx = document.getElementById('orderChart').getContext('2d');
-    new Chart(orderCtx, {
-      type: 'doughnut',
-      data: {
-        labels: ['Completed', 'Processing', 'Pending', 'Cancelled'],
-        datasets: [{
-          data: [1112, 124, 48, 23],
-          backgroundColor: ['#22c55e', '#3b82f6', '#f59e0b', '#ef4444'],
-          borderWidth: 0,
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            position: 'bottom',
-            labels: {
-              padding: 12,
-              usePointStyle: true,
-              pointStyle: 'circle',
-            }
-          }
-        },
-        cutout: '70%',
-      }
-    });
-
-    // ========== MODAL LINK ITEMS (Demo) ==========
-    document.querySelectorAll('.modal-link-item').forEach(item => {
-      item.addEventListener('click', function(e) {
-        e.preventDefault();
-        const title = this.querySelector('p')?.textContent || 'Action';
-        alert(`🚀 "${title}" — Coming soon in COCOCE Admin!`);
-        closeModal();
-      });
-    });
-
-    // ========== DEMO: Other tab interactions ==========
-    document.querySelectorAll('.tab-content:not(#tab-home)').forEach(content => {
-      const links = content.querySelectorAll('a, button');
-      links.forEach(link => {
-        link.addEventListener('click', function(e) {
-          e.preventDefault();
-          const text = this.textContent.trim() || 'feature';
-          alert(`📌 "${text}" — Coming soon in COCOCE Admin!`);
-        });
-      });
-    });
-
-    $(document).ready(() => {
-      Notification.showNotification({
-        title: 'Hey!',
-        type: 'warning',
-        message: 'You are visiting this page for testing & mockup purposes — No real data is being presented!'
-      })
-    })
-  </script>
+  <script src="/scripts/d.js"></script>
 
 </body>
 
