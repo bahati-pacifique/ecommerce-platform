@@ -22,7 +22,9 @@ const allowedOrigins = [
 module.exports = {
     origin: function (origin, callback) {
 
-        console.log(origin)
+        //console.log(origin)
+
+        console.log("Origin:", origin);
 
         if (!origin || origin === 'null') {
             return callback(null, true);
@@ -32,6 +34,7 @@ module.exports = {
             return callback(null, true);
         }
 
+        
         callback(new Error('Not allowed by CORS'));
     },
 

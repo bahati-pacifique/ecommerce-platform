@@ -13,8 +13,6 @@ async function home(req, res) {
 
     const user = req.user;
 
-    console.log("USER: ",user)
-
     const isProduction = process.env.NODE_ENV === 'production';
 
     const auth_host = isProduction ? `https://auth.${process.env.DOMAIN}?r=https://admin.${process.env.DOMAIN}`
@@ -41,8 +39,17 @@ async function renderAccountSelection(req, res) {
 }
 
 async function renderDashboard(req, res) {
+
+    const isProduction = process.env.NODE_ENV === 'production';
+
+    const domain = process.env.DOMAIN;
+
+    const protocal = isProduction ? "https://" : "http://"
+    const port = isProduction ? '' : process.env.PORT;
+
     const user = req.user || {};
-    res.render('dashboard', { user })
+
+    res.render('dashboard', { user, protocal, port, domain });
 }
 
 async function logout(req, res) {

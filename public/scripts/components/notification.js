@@ -7,7 +7,7 @@ const Notification = (() => {
         types: {
             success: {
                 icon: 'bi bi-check-circle',
-                title: 'Success',
+                title: '',
                 defaultDuration: 5000
             },
             error: {
@@ -17,12 +17,12 @@ const Notification = (() => {
             },
             warning: {
                 icon: 'bi bi-exclamation-triangle',
-                title: 'Warning',
+                title: '',
                 defaultDuration: 10000
             },
             info: {
                 icon: 'bi bi-info-circle',
-                title: 'Information',
+                title: '',
                 defaultDuration: 5000
             }
         },

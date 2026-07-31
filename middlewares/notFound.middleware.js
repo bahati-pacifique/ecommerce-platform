@@ -17,7 +17,7 @@ module.exports = (req, res, next) => {
     if (type === 'json' || hasJsonHostMatch) {
         return res.status(404).json({
             status_code: 404,
-            message: 'Not Found'
+            message: `The requested URL could not be found`
         });
     }
 

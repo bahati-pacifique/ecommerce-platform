@@ -23,6 +23,7 @@ const storage = require('./src/configs/storage.config');
 const mainApp = require('./apps/main/main.app');
 const adminApp = require('./apps/admin/admin.app');
 const authApp = require('./apps/auth/auth.app');
+const apiApp = require('./apps/api/api.app');
 
 app.set('trust proxy', 1);
 
@@ -71,14 +72,17 @@ if (isProduction) {
     app.use(vhost('cococe.rw', mainApp));
     app.use(vhost('admin.cococe.rw', adminApp));
     app.use(vhost('auth.cococe.rw', authApp));
+    app.use(vhost('api.cococe.rw', authApp));
 } else {
     app.use(vhost('localhost', mainApp));
     app.use(vhost('admin.localhost', adminApp));
     app.use(vhost('auth.localhost', authApp));
+    app.use(vhost('api.localhost', apiApp));
 
     app.use(vhost('localapp.com', mainApp));
     app.use(vhost('admin.localapp.com', adminApp));
     app.use(vhost('auth.localapp.com', authApp));
+    app.use(vhost('api.localapp.com', apiApp));
 }
 
 if (!isProduction) {

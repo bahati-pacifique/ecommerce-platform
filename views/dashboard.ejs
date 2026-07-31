@@ -24,14 +24,20 @@
 
   <link rel="icon" href="/favicon.ico" type="image/x-icon">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.11.0/axios.min.js" integrity="sha512-h9644v03pHqrIHThkvXhB2PJ8zf5E9IyVnrSfZg8Yj8k4RsO4zldcQc4Bi9iVLUCCsqNY0b4WXVV4UB+wbWENA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
   <script src="https://code.jquery.com/jquery-4.0.0.js" integrity="sha256-9fsHeVnKBvqh3FB2HYu7g2xseAZ5MlN6Kz/qnkASV8U=" crossorigin="anonymous"></script>
 
+  <script>
+    const p = "<%= locals.protocal %>";
+    const d = "<%= locals.domain %>";
+    const t = "<%= locals.port %>";
+  </script>
+
   <link rel="stylesheet" href="/styles/components/notification.css">
-  <link rel="stylesheet" href="/styles/components/d-spinner.css">
+  <link rel="stylesheet" href="/styles/components/loaders.css">
   <link rel="stylesheet" href="/styles/main.css">
   <link rel="stylesheet" href="/styles/categories.css">
 
-  <!-- Chart.js for charts -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 
   <style>
@@ -44,7 +50,6 @@
       scroll-behavior: smooth;
     }
 
-    /* Custom scrollbar */
     ::-webkit-scrollbar {
       width: 5px;
     }
@@ -89,7 +94,6 @@
       border-radius: 10px;
     }
 
-    /* Sidebar nav items */
     .sidebar-link {
       display: flex;
       align-items: center;
@@ -163,7 +167,6 @@
       background: #22C55E;
     }
 
-    /* Sidebar Brand */
     .sidebar-brand {
       display: flex;
       align-items: center;
@@ -205,7 +208,6 @@
       border: 1px solid rgba(237, 27, 36, 0.2);
     }
 
-    /* Sidebar Footer */
     .sidebar-footer {
       padding: 16px 20px;
       border-top: 1px solid #e5e7eb;
@@ -225,7 +227,6 @@
       margin: 0 auto;
     }
 
-    /* Top bar */
     .top-bar {
       background: white;
       border-bottom: 1px solid #e5e7eb;
@@ -252,7 +253,6 @@
       border-color: #D1D5DB;
     }
 
-    /* Sidebar toggle button */
     .sidebar-toggle {
       transition: all 0.3s ease;
       background: white;
@@ -276,7 +276,6 @@
       display: none;
     }
 
-    /* Modal overlay */
     .modal-overlay {
       background: rgba(0, 0, 0, 0.4);
       backdrop-filter: blur(8px);
@@ -311,7 +310,6 @@
       }
     }
 
-    /* Stat card hover */
     .stat-card {
       transition: all 0.3s ease;
     }
@@ -321,7 +319,6 @@
       box-shadow: 0 12px 40px rgba(0, 0, 0, 0.06);
     }
 
-    /* Inventory item hover */
     .inventory-item {
       transition: all 0.2s ease;
     }
@@ -331,7 +328,6 @@
       transform: translateX(4px);
     }
 
-    /* Modal link items */
     .modal-link-item {
       transition: all 0.2s ease;
     }
@@ -341,7 +337,6 @@
       transform: translateX(4px);
     }
 
-    /* Chart container */
     .chart-container {
       position: relative;
       height: 280px;
@@ -438,6 +433,85 @@
       -ms-overflow-style: none;
       scrollbar-width: none;
     }
+
+    /* ========== SEARCHABLE CATEGORY SELECTOR ========== */
+    #categoryDropdown {
+      animation: slideDown 0.2s ease-out;
+      scroll-behavior: smooth;
+    }
+
+    #categoryDropdown::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    #categoryDropdown::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 10px;
+    }
+
+    #categoryDropdown::-webkit-scrollbar-thumb {
+      background: #ED1B24;
+      border-radius: 10px;
+    }
+
+    .category-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      border-left: 3px solid transparent;
+    }
+
+    .category-item:hover {
+      background: #FFF5F5;
+      border-left-color: #ED1B24;
+    }
+
+    .category-item.active {
+      background: #FEE2E3;
+      border-left-color: #ED1B24;
+    }
+
+    .category-item .category-title {
+      font-size: 14px;
+      color: #1F2937;
+      font-weight: 500;
+    }
+
+    .category-item .category-badge {
+      font-size: 10px;
+      padding: 2px 10px;
+      border-radius: 20px;
+      background: #F3F4F6;
+      color: #6B7280;
+      font-weight: 500;
+    }
+
+    .category-item .category-badge.active-badge {
+      background: #DCFCE7;
+      color: #16A34A;
+    }
+
+    .category-item .category-badge.inactive-badge {
+      background: #FEE2E3;
+      color: #ED1B24;
+    }
+
+    .category-item .category-badge.draft-badge {
+      background: #FEF3C7;
+      color: #D97706;
+    }
+
+    .category-highlight {
+      background: #FEE2E3;
+      font-weight: 600;
+    }
+
+    #selectedCategoryDisplay {
+      animation: slideDown 0.2s ease-out;
+    }
   </style>
 </head>
 
@@ -492,9 +566,15 @@
             <span class="link-text">Analytics</span>
           </a>
 
+
           <a href="#" class="sidebar-link" data-tab="categories">
             <span class="icon"><i class="bi bi-tag"></i></span>
             <span class="link-text">Categories</span>
+          </a>
+
+          <a href="#" class="sidebar-link" data-tab="families">
+            <span class="icon"><i class="bi bi-table"></i></span>
+            <span class="link-text">Families</span>
           </a>
 
           <a href="#" class="sidebar-link" data-tab="marketing">
@@ -534,13 +614,10 @@
       </div>
     </aside>
 
-    <!-- ========== MAIN CONTENT ========== -->
     <div class="flex-1 min-w-0 flex flex-col">
 
-      <!-- Top Bar -->
       <header class="top-bar">
         <div class="flex items-center justify-between">
-          <!-- Left: Mobile hamburger + breadcrumb + toggle -->
           <div class="flex items-center gap-3">
             <button id="mobileMenuBtn" class="lg:hidden p-2 rounded-lg hover:bg-gray-100 transition">
               <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -548,12 +625,10 @@
               </svg>
             </button>
 
-            <!-- Sidebar Toggle Button (desktop only) -->
             <button id="sidebarToggle" class="sidebar-toggle hidden lg:flex" title="Toggle sidebar">
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
               </svg>
-              <!-- <span class="toggle-text text-sm">Collapse</span> -->
             </button>
 
             <span class="text-sm font-medium text-gray-700 hidden sm:block">Dashboard / <span id="currentTabLabel" class="text-brand">Home</span></span>
@@ -864,23 +939,20 @@
 
         <div id="tab-categories" class="tab-content h-full relative hidden">
 
-          <div class="d-container-abs-centered hidden" id="categorySyncLoader">
-            <div class="d-spinner d-xlg"></div>
+          <div class="abs-centered hidden" id="categorySyncLoader">
+            <svg version="1.1" x="0" y="0" width="150px" height="150px" viewBox="-10 -10 120 120" enable-background="new 0 0 200 200" xml:space="preserve">
+              <path class="c-loader" d="M0,50 A50,50,0 1 1 100,50 A50,50,0 1 1 0,50" />
+            </svg>
           </div>
+
           <div class="w-full h-full">
 
             <header class="border-b border-gray-100 px-4 md:px-6 py-3 sticky top-0">
               <div class="flex items-center justify-between">
                 <div class="flex items-center gap-3">
-                  <button id="mobileMenuBtn" class="lg:hidden p-2 rounded-lg hover:bg-gray-100 transition">
-                    <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-                    </svg>
-                  </button>
-                  <h1 class="text-xl font-bold text-gray-900">Categories</h1>
+                  <h1 class="text-xl font-bold text-gray-900">Product categories</h1>
                 </div>
                 <div class="flex items-center gap-2 md:gap-3">
-                  
                   <button class="px-5 py-2 bg-brand hover:bg-brand-dark text-white font-medium rounded-lg border border-gray-200 shadow-sm transition-all duration-200 flex items-center gap-2 new-category-btn">
                     <i class="fas fa-plus"></i>
                     <span class="hidden md:block">New Category</span>
@@ -893,10 +965,8 @@
               </div>
             </header>
 
-            <!-- Main Content -->
-            <main class="p-4 md:p-6">
+            <main class="p-1 md:p-3">
 
-              <!-- ========== FILTERS & SEARCH ========== -->
               <div class="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm mb-6">
                 <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
                   <div class="flex-1 w-full">
@@ -911,16 +981,16 @@
                       <option value="all">All Status</option>
                       <option value="active">Active</option>
                       <option value="inactive">Inactive</option>
-                      <option value="draft">Draft</option>
+                      <option value="disabled">Disabled</option>
+                      <option value="deleted">Deleted</option>
                     </select>
-                    <button class="px-4 py-2.5 rounded-xl border border-gray-200 text-sm text-gray-600 hover:bg-gray-50 transition whitespace-nowrap">
+                    <button id="categoryFilterResetBtn" class="px-4 py-2.5 rounded-xl border border-gray-200 text-sm text-gray-600 hover:bg-gray-50 transition whitespace-nowrap">
                       <i class="fas fa-undo-alt mr-1"></i> Reset
                     </button>
                   </div>
                 </div>
               </div>
 
-              <!-- ========== TABLE ========== -->
               <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
 
                 <div class="overflow-x-auto">
@@ -930,7 +1000,7 @@
                       <table class="w-full">
                         <thead>
                           <tr class="bg-gray-50 border-b border-gray-100">
-                            <th class="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">ID</th>
+                            <!-- <th class="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">ID</th> -->
                             <th class="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Title</th>
                             <th class="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider hidden md:table-cell">Slug</th>
                             <th class="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider hidden lg:table-cell">Description</th>
@@ -939,99 +1009,59 @@
                           </tr>
                         </thead>
                         <tbody>
-                          <!-- Skeleton Rows -->
                           <tr>
                             <td colspan="6" class="p-0">
                               <div class="skeleton-row">
-                                <div class="skeleton-avatar"></div>
-                                <div class="flex-1 space-y-2">
-                                  <div class="skeleton skeleton-text w-32"></div>
-                                  <div class="skeleton skeleton-text short"></div>
-                                </div>
-                                <div class="skeleton skeleton-text medium hidden md:block"></div>
-                                <div class="skeleton skeleton-text hidden lg:block"></div>
+                                <div class="skeleton skeleton-text medium"></div>
+                                <div class="skeleton skeleton-text short"></div>
+                                <div class="skeleton skeleton-text"></div>
+                                <div class="skeleton skeleton-text short"></div>
                                 <div class="skeleton skeleton-badge"></div>
-                                <div class="flex gap-2">
-                                  <div class="skeleton-avatar"></div>
-                                  <div class="skeleton-avatar"></div>
-                                </div>
+                                <div class="skeleton skeleton-badge"></div>
                               </div>
                               <div class="skeleton-row">
-                                <div class="skeleton-avatar"></div>
-                                <div class="flex-1 space-y-2">
-                                  <div class="skeleton skeleton-text w-40"></div>
-                                  <div class="skeleton skeleton-text short"></div>
-                                </div>
-                                <div class="skeleton skeleton-text medium hidden md:block"></div>
-                                <div class="skeleton skeleton-text hidden lg:block"></div>
+                                <div class="skeleton skeleton-text medium"></div>
+                                <div class="skeleton skeleton-text short"></div>
+                                <div class="skeleton skeleton-text"></div>
+                                <div class="skeleton skeleton-text short"></div>
                                 <div class="skeleton skeleton-badge"></div>
-                                <div class="flex gap-2">
-                                  <div class="skeleton-avatar"></div>
-                                  <div class="skeleton-avatar"></div>
-                                </div>
+                                <div class="skeleton skeleton-badge"></div>
                               </div>
                               <div class="skeleton-row">
-                                <div class="skeleton-avatar"></div>
-                                <div class="flex-1 space-y-2">
-                                  <div class="skeleton skeleton-text w-36"></div>
-                                  <div class="skeleton skeleton-text short"></div>
-                                </div>
-                                <div class="skeleton skeleton-text medium hidden md:block"></div>
-                                <div class="skeleton skeleton-text hidden lg:block"></div>
+                                <div class="skeleton skeleton-text medium"></div>
+                                <div class="skeleton skeleton-text short"></div>
+                                <div class="skeleton skeleton-text"></div>
+                                <div class="skeleton skeleton-text short"></div>
                                 <div class="skeleton skeleton-badge"></div>
-                                <div class="flex gap-2">
-                                  <div class="skeleton-avatar"></div>
-                                  <div class="skeleton-avatar"></div>
-                                </div>
+                                <div class="skeleton skeleton-badge"></div>
                               </div>
                               <div class="skeleton-row">
-                                <div class="skeleton-avatar"></div>
-                                <div class="flex-1 space-y-2">
-                                  <div class="skeleton skeleton-text w-44"></div>
-                                  <div class="skeleton skeleton-text short"></div>
-                                </div>
-                                <div class="skeleton skeleton-text medium hidden md:block"></div>
-                                <div class="skeleton skeleton-text hidden lg:block"></div>
+                                <div class="skeleton skeleton-text medium"></div>
+                                <div class="skeleton skeleton-text short"></div>
+                                <div class="skeleton skeleton-text"></div>
+                                <div class="skeleton skeleton-text short"></div>
                                 <div class="skeleton skeleton-badge"></div>
-                                <div class="flex gap-2">
-                                  <div class="skeleton-avatar"></div>
-                                  <div class="skeleton-avatar"></div>
-                                </div>
+                                <div class="skeleton skeleton-badge"></div>
                               </div>
                               <div class="skeleton-row">
-                                <div class="skeleton-avatar"></div>
-                                <div class="flex-1 space-y-2">
-                                  <div class="skeleton skeleton-text w-28"></div>
-                                  <div class="skeleton skeleton-text short"></div>
-                                </div>
-                                <div class="skeleton skeleton-text medium hidden md:block"></div>
-                                <div class="skeleton skeleton-text hidden lg:block"></div>
+                                <div class="skeleton skeleton-text medium"></div>
+                                <div class="skeleton skeleton-text short"></div>
+                                <div class="skeleton skeleton-text"></div>
+                                <div class="skeleton skeleton-text short"></div>
                                 <div class="skeleton skeleton-badge"></div>
-                                <div class="flex gap-2">
-                                  <div class="skeleton-avatar"></div>
-                                  <div class="skeleton-avatar"></div>
-                                </div>
+                                <div class="skeleton skeleton-badge"></div>
                               </div>
                             </td>
                           </tr>
                         </tbody>
                       </table>
                     </div>
-                    <!-- Skeleton Footer -->
-                    <div class="px-4 py-3 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-3 bg-gray-50/50">
-                      <div class="skeleton skeleton-text w-48"></div>
-                      <div class="flex items-center gap-2">
-                        <div class="skeleton skeleton-avatar"></div>
-                        <div class="skeleton skeleton-text w-20"></div>
-                        <div class="skeleton skeleton-avatar"></div>
-                      </div>
-                    </div>
+
                   </div>
 
                   <table class="w-full hidden" id="categoriesContainer">
                     <thead>
                       <tr class="bg-gray-50 border-b border-gray-100">
-                        <th class="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">ID</th>
                         <th class="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Title</th>
                         <th class="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider hidden md:table-cell">Slug</th>
                         <th class="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider hidden lg:table-cell">Description</th>
@@ -1076,7 +1106,7 @@
 
           <div id="formModal" class="fixed inset-0 z-50 hidden items-center justify-center px-4">
             <div class="modal-overlay absolute inset-0"></div>
-            <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto animate-slide-down">
+            <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] min-h-[300px] overflow-y-auto animate-slide-down">
               <div class="sticky top-0 bg-white border-b border-gray-100 px-6 py-4 flex items-center justify-between z-10">
                 <h3 id="formModalTitle" class="text-lg font-bold text-gray-900">Create New Category</h3>
                 <button class="text-gray-400 hover:text-gray-600 transition" id="closeFormModal">
@@ -1116,19 +1146,27 @@
                   <select id="status" class="form-input w-full px-4 py-2.5 rounded-xl border border-gray-200 text-gray-700 transition">
                     <option value="active">Active</option>
                     <option value="inactive">Inactive</option>
-                    <option value="draft">Draft</option>
+                    <option value="disabled">Disabled</option>
+                    <option value="deleted">Deleted</option>
                   </select>
                 </div>
 
-                <div class="flex items-center gap-3 pt-2">
-                  <button type="submit" id="formSubmitBtn" class="flex-1 btn-primary px-6 py-2.5 rounded-xl text-white font-medium">
-                    <i class="fas fa-save mr-2"></i> Save Category
-                  </button>
+                <div class="flex items-center justify-end gap-3 pt-2">
                   <button type="button" class="px-6 py-2.5 rounded-xl border border-gray-200 text-gray-600 hover:bg-gray-50 transition font-medium cancel-create-category">
                     Cancel
                   </button>
+                  <button type="submit" id="formSubmitBtn" class="bg-brand hover:bg-brand-dark px-6 py-2.5 rounded-xl text-white font-medium flex items-center gap-2">
+                    <i class="bi bi-check2"></i> Submit
+                  </button>
                 </div>
               </form>
+
+              <div class="abs-centered hidden" id="categoryModalLoader">
+                <svg version="1.1" x="0" y="0" width="150px" height="150px" viewBox="-10 -10 120 120" enable-background="new 0 0 200 200" xml:space="preserve">
+                  <path class="c-loader" d="M0,50 A50,50,0 1 1 100,50 A50,50,0 1 1 0,50" />
+                </svg>
+              </div>
+
             </div>
           </div>
 
@@ -1145,11 +1183,295 @@
                   <br>This action cannot be undone.
                 </p>
                 <div class="flex items-center gap-3 mt-6">
-                  <button class="flex-1 btn-primary px-6 py-2.5 rounded-xl text-white font-medium bg-red-600 hover:bg-red-700 confirm-delete-btn">
-                    <i class="fas fa-trash mr-2"></i> Delete
-                  </button>
                   <button class="flex-1 px-6 py-2.5 rounded-xl border border-gray-200 text-gray-600 hover:bg-gray-50 transition font-medium close-delete-modal">
                     Cancel
+                  </button>
+                  <button class="flex-1 bg-brand hover:bg-brand-dark px-6 py-2.5 rounded-xl text-white font-medium bg-red-600 hover:bg-red-700 confirm-delete-btn">
+                    <i class="bi bi-trash"></i> Delete
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <div id="tab-families" class="tab-content h-full relative hidden">
+
+          <div class="abs-centered hidden" id="familySyncLoader">
+            <svg version="1.1" x="0" y="0" width="150px" height="150px" viewBox="-10 -10 120 120" enable-background="new 0 0 200 200" xml:space="preserve">
+              <path class="c-loader" d="M0,50 A50,50,0 1 1 100,50 A50,50,0 1 1 0,50" />
+            </svg>
+          </div>
+
+          <div class="w-full h-full">
+
+            <header class="border-b border-gray-100 px-4 md:px-6 py-3 sticky top-0">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                  <h1 class="text-xl font-bold text-gray-900">Products families</h1>
+                </div>
+                <div class="flex items-center gap-2 md:gap-3">
+                  <button class="px-5 py-2 bg-brand hover:bg-brand-dark text-white font-medium rounded-lg border border-gray-200 shadow-sm transition-all duration-200 flex items-center gap-2 new-family-btn">
+                    <i class="fas fa-plus"></i>
+                    <span class="hidden md:block">Create Family</span>
+                  </button>
+                  <button class="px-5 py-2 bg-white text-black font-medium rounded-lg border border-gray-200 shadow-sm hover:bg-gray-100 transition-all duration-200" id="refreshFamilies">
+                    <i class="bi bi-arrow-repeat"></i>
+                  </button>
+                </div>
+
+              </div>
+            </header>
+
+            <main class="p-1 md:p-3">
+
+              <div class="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm mb-6">
+                <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                  <div class="flex-1 w-full">
+                    <div class="relative">
+                      <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
+                      <input type="text" id="familySearchInput" placeholder="Search families by title, slug, or description..." class="search-input w-full pl-9 pr-4 py-2.5 rounded-xl border border-gray-200 bg-gray-50 text-sm text-gray-700
+                       focus:outline-none transition max-w-[320px]">
+                    </div>
+                  </div>
+                  <div class="flex items-center gap-3 w-full sm:w-auto">
+                    <select id="familyStatusFilter" class="px-3 py-2.5 rounded-xl border border-gray-200 bg-gray-50 text-sm text-gray-700 focus:outline-none focus:border-brand focus:ring-2 focus:ring-brand/10 w-full sm:w-auto">
+                      <option value="all">All Status</option>
+                      <option value="active">Active</option>
+                      <option value="inactive">Inactive</option>
+                      <option value="disabled">Disabled</option>
+                      <option value="deleted">Deleted</option>
+                    </select>
+                    <button id="familyFilterResetBtn" class="px-4 py-2.5 rounded-xl border border-gray-200 text-sm text-gray-600 hover:bg-gray-50 transition whitespace-nowrap">
+                      <i class="fas fa-undo-alt mr-1"></i> Reset
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+
+                <div class="overflow-x-auto">
+
+                  <div id="familySkeletonLoader" class="hidden">
+                    <div class="overflow-x-auto">
+                      <table class="w-full">
+                        <thead>
+                          <tr class="bg-gray-50 border-b border-gray-100">
+                            <th class="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Title</th>
+                            <th class="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider hidden md:table-cell">Slug</th>
+                            <th class="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider hidden lg:table-cell">Description</th>
+                            <th class="text-center px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
+                            <th class="text-center px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr>
+                            <td colspan="6" class="p-0">
+                              <div class="skeleton-row">
+                                <div class="skeleton skeleton-text medium"></div>
+                                <div class="skeleton skeleton-text short"></div>
+                                <div class="skeleton skeleton-text"></div>
+                                <div class="skeleton skeleton-text short"></div>
+                                <div class="skeleton skeleton-badge"></div>
+                                <div class="skeleton skeleton-badge"></div>
+                              </div>
+                              <div class="skeleton-row">
+                                <div class="skeleton skeleton-text medium"></div>
+                                <div class="skeleton skeleton-text short"></div>
+                                <div class="skeleton skeleton-text"></div>
+                                <div class="skeleton skeleton-text short"></div>
+                                <div class="skeleton skeleton-badge"></div>
+                                <div class="skeleton skeleton-badge"></div>
+                              </div>
+                              <div class="skeleton-row">
+                                <div class="skeleton skeleton-text medium"></div>
+                                <div class="skeleton skeleton-text short"></div>
+                                <div class="skeleton skeleton-text"></div>
+                                <div class="skeleton skeleton-text short"></div>
+                                <div class="skeleton skeleton-badge"></div>
+                                <div class="skeleton skeleton-badge"></div>
+                              </div>
+                              <div class="skeleton-row">
+                                <div class="skeleton skeleton-text medium"></div>
+                                <div class="skeleton skeleton-text short"></div>
+                                <div class="skeleton skeleton-text"></div>
+                                <div class="skeleton skeleton-text short"></div>
+                                <div class="skeleton skeleton-badge"></div>
+                                <div class="skeleton skeleton-badge"></div>
+                              </div>
+                              <div class="skeleton-row">
+                                <div class="skeleton skeleton-text medium"></div>
+                                <div class="skeleton skeleton-text short"></div>
+                                <div class="skeleton skeleton-text"></div>
+                                <div class="skeleton skeleton-text short"></div>
+                                <div class="skeleton skeleton-badge"></div>
+                                <div class="skeleton skeleton-badge"></div>
+                              </div>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+
+                  </div>
+
+                  <table class="w-full hidden" id="familiesContainer">
+                    <thead>
+                      <tr class="bg-gray-50 border-b border-gray-100">
+                        <th class="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Title</th>
+                        <th class="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider hidden md:table-cell">Slug</th>
+                        <th class="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider hidden lg:table-cell">Description</th>
+                        <th class="text-center px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
+                        <th class="text-center px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody id="familiesTableBody">
+                    </tbody>
+                  </table>
+                </div>
+
+                <div class="px-4 py-3 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-3 bg-gray-50/50">
+                  <p class="text-xs text-gray-500">
+                    Showing <span id="familyShowingCount">0</span> of <span id="familyTotalCount">0</span> families
+                  </p>
+                  <div class="flex items-center gap-2">
+                    <button id="prevFamilyPageBtn" class="px-3 py-1 rounded-lg border border-gray-200 text-sm text-gray-600 hover:bg-gray-50 transition disabled:opacity-40 disabled:cursor-not-allowed">
+                      <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <span id="familiesPageInfo" class="text-xs text-gray-500">Page 1 of 1</span>
+                    <button id="nextFamilyPageBtn" class="px-3 py-1 rounded-lg border border-gray-200 text-sm text-gray-600 hover:bg-gray-50 transition disabled:opacity-40 disabled:cursor-not-allowed">
+                      <i class="fas fa-chevron-right"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div id="familiesEmptyState" class="hidden text-center py-12">
+                <div class="text-5xl mb-4">
+                  <i class="bi bi-folder"></i>
+                </div>
+                <h3 class="text-lg font-semibold text-gray-900">No family found</h3>
+                <p class="text-sm text-gray-500 mt-1">Get started by creating your first product family.</p>
+                <button id="emptyFamilyBtn" class="mt-4 btn-primary px-6 py-2.5 rounded-xl text-white text-sm font-medium inline-flex items-center gap-2">
+                  <i class="fas fa-plus"></i> Create Product family
+                </button>
+              </div>
+            </main>
+
+          </div>
+
+          
+          <div id="familyFormModal" class="fixed inset-0 z-50 hidden items-center justify-center px-4">
+            <div class="modal-overlay absolute inset-0 family-modal-overlay"></div>
+            <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] min-h-[300px] overflow-y-auto animate-slide-down">
+              <div class="sticky top-0 bg-white border-b border-gray-100 px-6 py-4 flex items-center justify-between z-10">
+                <h3 id="familyFormModalTitle" class="text-lg font-bold text-gray-900">Create New Family</h3>
+                <button id="closeFamilyFormModal" class="text-gray-400 hover:text-gray-600 transition">
+                  <i class="fas fa-times text-xl"></i>
+                </button>
+              </div>
+
+              <div class="abs-centered hidden" id="familyModalLoader">
+                <svg version="1.1" x="0" y="0" width="150px" height="150px" viewBox="-10 -10 120 120" enable-background="new 0 0 200 200" xml:space="preserve">
+                  <path class="c-loader" d="M0,50 A50,50,0 1 1 100,50 A50,50,0 1 1 0,50" />
+                </svg>
+              </div>
+
+              <form id="familyForm" class="p-6 space-y-4">
+                <input type="hidden" id="familyEditId" value="">
+                <input type="hidden" id="familyCategoryId" value="">
+
+                <div>
+                  <label for="familyTitle" class="block text-sm font-medium text-gray-700 mb-1.5">
+                    Title <span class="text-brand">*</span>
+                  </label>
+                  <input type="text" id="familyTitle" placeholder="e.g., Laptops" class="form-input w-full px-4 py-2.5 rounded-xl border border-gray-200 text-gray-900 placeholder-gray-400 transition" required>
+                </div>
+
+                <div>
+                  <label for="familySlug" class="block text-sm font-medium text-gray-700 mb-1.5">
+                    Slug <span class="text-brand">*</span>
+                  </label>
+                  <input type="text" id="familySlug" placeholder="e.g., laptops" class="form-input w-full px-4 py-2.5 rounded-xl border border-gray-200 text-gray-900 placeholder-gray-400 transition" required>
+                  <p class="text-xs text-gray-400 mt-1">URL-friendly version of the title (auto-generated if left empty)</p>
+                </div>
+
+                <div>
+                  <label for="familyDescription" class="block text-sm font-medium text-gray-700 mb-1.5">
+                    Description
+                  </label>
+                  <textarea id="familyDescription" rows="3" placeholder="Brief description of the family..." class="form-input w-full px-4 py-2.5 rounded-xl border border-gray-200 text-gray-900 placeholder-gray-400 transition resize-y"></textarea>
+                </div>
+
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1.5">
+                    Category
+                  </label>
+                  <div class="relative" id="categorySelector">
+                    <input type="text" id="familyCategorySearch" placeholder="Search or select a category..." class="form-input w-full px-4 py-2.5 rounded-xl border border-gray-200 text-gray-900 placeholder-gray-400 transition" autocomplete="off">
+                    <button type="button" id="clearCategoryBtn" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 hidden">
+                      <i class="fas fa-times-circle"></i>
+                    </button>
+                    <div id="categoryDropdown" class="hidden absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-xl shadow-lg max-h-60 overflow-y-auto">
+                      <div id="categoryList" class="py-1"></div>
+                      <div id="noCategoryResult" class="hidden px-4 py-3 text-sm text-gray-500 text-center">
+                        No categories found
+                      </div>
+                    </div>
+                    <div id="selectedCategoryDisplay" class="hidden mt-2 flex items-center gap-2 px-3 py-2 bg-brand-light rounded-xl border border-brand/20">
+                      <span class="text-brand text-sm font-medium">Selected:</span>
+                      <span id="selectedCategoryName" class="text-sm text-gray-700"></span>
+                      <button type="button" id="removeCategoryBtn" class="ml-auto text-gray-400 hover:text-brand transition">
+                        <i class="fas fa-times"></i>
+                      </button>
+                    </div>
+                  </div>
+                  <p class="text-xs text-gray-400 mt-1">Type to search for a category or select from the list</p>
+                </div>
+
+                <div>
+                  <label for="familyStatus" class="block text-sm font-medium text-gray-700 mb-1.5">
+                    Status
+                  </label>
+                  <select id="familyStatus" class="form-input w-full px-4 py-2.5 rounded-xl border border-gray-200 text-gray-700 transition">
+                    <option value="active">Active</option>
+                    <option value="inactive">Inactive</option>
+                    <option value="draft">Draft</option>
+                  </select>
+                </div>
+
+                <div class="flex items-center justify-end gap-3 pt-2">
+                  <button type="button" class="cancel-create-family px-6 py-2.5 rounded-xl border border-gray-200 text-gray-600 hover:bg-gray-50 transition font-medium">
+                    Cancel
+                  </button>
+                  <button type="submit" id="familyFormSubmitBtn" class="bg-brand hover:bg-brand-dark px-6 py-2.5 rounded-xl text-white font-medium flex items-center gap-2">
+                    <i class="fas fa-save"></i> <span id="familySubmitBtnText">Create Family</span>
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+
+          <div id="familyDeleteModal" class="fixed inset-0 z-50 hidden items-center justify-center px-4">
+            <div class="modal-overlay absolute inset-0"></div>
+            <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-md animate-slide-down">
+              <div class="p-6 text-center">
+                <div class="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <i class="fas fa-exclamation-triangle text-3xl text-brand"></i>
+                </div>
+                <h3 class="text-lg font-bold text-gray-900">Delete Category</h3>
+                <p class="text-sm text-gray-500 mt-2">
+                  Are you sure you want to delete <strong id="familyDeleteTitle" class="text-gray-700"></strong>?
+                  <br>This action cannot be undone.
+                </p>
+                <div class="flex items-center gap-3 mt-6">
+                  <button class="flex-1 px-6 py-2.5 rounded-xl border border-gray-200 text-gray-600 hover:bg-gray-50 transition font-medium close-family-delete-modal">
+                    Cancel
+                  </button>
+                  <button class="flex-1 bg-brand hover:bg-brand-dark px-6 py-2.5 rounded-xl text-white font-medium bg-red-600 hover:bg-red-700 confirm-delete-family-btn">
+                    <i class="bi bi-trash"></i> Delete
                   </button>
                 </div>
               </div>
@@ -1284,8 +1606,11 @@
     </div>
   </div>
 
+  <script src="/scripts/helper/utils.js"></script>
   <script src="/scripts/components/notification.js"></script>
+
   <script src="/scripts/categories.js"></script>
+  <script src="/scripts/families.js"></script>
 
   <script src="/scripts/d.js"></script>
 

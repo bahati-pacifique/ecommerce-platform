@@ -1,0 +1,74 @@
+/* HTML: <div class="loader"></div> */
+.d-spinner {
+    width: 50px;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    border: 8px solid;
+    border-color: var(--color-brand) #0000;
+    animation: l1 1s infinite;
+}
+
+.d-sm{
+    width: 24px;
+}
+.d-lg{
+    width: 100px;
+}
+
+.d-xlg{
+    width: 120px;
+}
+
+.abs-centered{
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+}
+
+@keyframes l1 {
+    to {
+        transform: rotate(.5turn)
+    }
+}
+
+/*================ C-loader ========================*/
+.c-loader {
+    fill: transparent;
+    stroke: var(--color-brand);
+    stroke-width: 4px;
+    -webkit-animation: 1.5s circle infinite ease-in;
+    animation: 1.5s circle infinite ease-in;
+}
+
+@keyframes circle {
+    0% {
+        stroke-dasharray: 0 400;
+        stroke-dashoffset: 0;
+    }
+
+    25% {
+        stroke-dashoffset: 0;
+    }
+
+    100% {
+        stroke-dasharray: 400 400;
+        stroke-dashoffset: -400;
+    }
+}
+
+@-webkit-keyframes circle {
+    0% {
+        stroke-dasharray: 0 400;
+        stroke-dashoffset: 0;
+    }
+
+    25% {
+        stroke-dashoffset: 0;
+    }
+
+    100% {
+        stroke-dasharray: 400 400;
+        stroke-dashoffset: -400;
+    }
+}

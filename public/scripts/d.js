@@ -1,7 +1,8 @@
-
 const sidebarToggle = document.getElementById('sidebarToggle');
 const sidebar = document.getElementById('sidebar');
 let isSidebarCollapsed = false;
+
+let productCategories = [];
 
 sidebarToggle.addEventListener('click', function () {
     isSidebarCollapsed = !isSidebarCollapsed;
@@ -60,6 +61,7 @@ const tabContents = {
     orders: document.getElementById('tab-orders'),
     inventory: document.getElementById('tab-inventory'),
     categories: document.getElementById('tab-categories'),
+    families: document.getElementById('tab-families'),
     customers: document.getElementById('tab-customers'),
     analytics: document.getElementById('tab-analytics'),
     marketing: document.getElementById('tab-marketing'),
@@ -76,12 +78,15 @@ const tabLabelMap = {
     inventory: 'Inventory',
     customers: 'Customers',
     categories: 'Categories',
+    families: 'Families',
     analytics: 'Analytics',
     marketing: 'Marketing',
     settings: 'Settings',
     'quick-actions': 'Quick Actions',
     help: 'Help & Support'
 };
+
+let currentTab = 'home';
 
 sidebarLinks.forEach(link => {
     link.addEventListener('click', function (e) {
@@ -98,12 +103,20 @@ sidebarLinks.forEach(link => {
 
 
         const tabId = this.dataset.tab;
-        console.log(tabId)
-        switch (tabId) {
-            case 'categories':
-                fetchCategories();
-                break;
+
+        if (currentTab !== tabId) {
+            switch (tabId) {
+                case 'categories':
+                    fetchCategories(1, false);
+                    break;
+                case 'families':
+                    fetchFamilies(1, false);
+                    initCategorySelector();
+                    break;
+            }
         }
+
+        currentTab = tabId;
 
         if (tabContents[tabId]) {
             tabContents[tabId].classList.remove('hidden');
@@ -249,5 +262,5 @@ $(document).ready(() => {
         title: 'Hey!',
         type: 'warning',
         message: 'You are visiting this page for testing & mockup purposes — No real data is being presented!'
-    })
+    });
 })

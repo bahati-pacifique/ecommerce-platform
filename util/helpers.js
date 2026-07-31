@@ -107,6 +107,14 @@ function safeRedirectPath(path, fallback = '/') {
   return path;
 }
 
+function formatError(name, status = 500, error, message, res) {
+  console.log(`${name} `, error);
+  res.status(status).json({
+    success: false,
+    message
+  })
+}
+
 
 module.exports = {
   acceptsHtml,
@@ -118,5 +126,6 @@ module.exports = {
   deny401,
   deny403,
   deny500,
-  isSameOrigin
+  isSameOrigin,
+  formatError
 }

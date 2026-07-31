@@ -1,436 +1,507 @@
-// ========== SAMPLE DATA ==========
-let categories = [{
-    id: 1,
-    title: 'Electronics',
-    slug: 'electronics',
-    description: 'All electronic devices, gadgets, and accessories.',
-    status: 'active',
-    created_at: '2024-01-15T10:30:00Z',
-    updated_at: '2024-01-15T10:30:00Z'
-}, {
-    id: 2,
-    title: 'Clothing',
-    slug: 'clothing',
-    description: 'Fashion apparel, footwear, and accessories for all ages.',
-    status: 'active',
-    created_at: '2024-01-20T14:15:00Z',
-    updated_at: '2024-02-10T09:00:00Z'
-}, {
-    id: 3,
-    title: 'Books',
-    slug: 'books',
-    description: 'Fiction, non-fiction, educational, and digital books.',
-    status: 'draft',
-    created_at: '2024-02-01T08:45:00Z',
-    updated_at: '2024-02-01T08:45:00Z'
-}, {
-    id: 4,
-    title: 'Home & Kitchen',
-    slug: 'home-kitchen',
-    description: 'Furniture, appliances, cookware, and home decor.',
-    status: 'active',
-    created_at: '2024-02-15T16:20:00Z',
-    updated_at: '2024-03-01T11:30:00Z'
-}, {
-    id: 5,
-    title: 'Sports & Outdoors',
-    slug: 'sports-outdoors',
-    description: 'Sports equipment, camping gear, and outdoor activities.',
-    status: 'inactive',
-    created_at: '2024-03-01T12:00:00Z',
-    updated_at: '2024-03-15T08:00:00Z'
-}, {
-    id: 6,
-    title: 'Toys & Games',
-    slug: 'toys-games',
-    description: 'Children\'s toys, board games, and educational games.',
-    status: 'active',
-    created_at: '2024-03-10T09:30:00Z',
-    updated_at: '2024-03-10T09:30:00Z'
-}, {
-    id: 7,
-    title: 'Health & Beauty',
-    slug: 'health-beauty',
-    description: 'Skincare, cosmetics, wellness products, and supplements.',
-    status: 'draft',
-    created_at: '2024-03-20T13:45:00Z',
-    updated_at: '2024-03-20T13:45:00Z'
-}, {
-    id: 8,
-    title: 'Automotive',
-    slug: 'automotive',
-    description: 'Car parts, accessories, tools, and maintenance supplies.',
-    status: 'inactive',
-    created_at: '2024-04-01T10:00:00Z',
-    updated_at: '2024-04-01T10:00:00Z'
-},];
-
 // ========== STATE ==========
 let currentPage = 1;
-const itemsPerPage = 5;
+const itemsPerPage = 31;
 let deleteTargetId = null;
-let filteredCategories = [...categories];
+let allCategories = [];
+let filteredCategories = [];
+let currentSearchTerm = '';
+let currentStatusFilter = 'all';
+let paginationData = {
+    counts: 0,
+    totalPages: 0,
+    page: 1,
+    limit: 5
+};
+let isFetching = false;
 
-// ========== DOM REFS ==========
-const tableBody = document.getElementById('tableBody');
-const totalCount = document.getElementById('totalCount');
-const showingCount = document.getElementById('showingCount');
-const pageInfo = document.getElementById('pageInfo');
-const prevBtn = document.getElementById('prevCategoryPageBtn');
-const nextBtn = document.getElementById('nextCategoryPageBtn');
-const emptyState = document.getElementById('emptyState');
-const searchInput = document.getElementById('searchInput');
-const statusFilter = document.getElementById('statusFilter');
+const $tableBody = $('#tableBody');
+const $totalCount = $('#totalCount');
+const $showingCount = $('#showingCount');
+const $pageInfo = $('#pageInfo');
+const $prevBtn = $('#prevCategoryPageBtn');
+const $nextBtn = $('#nextCategoryPageBtn');
+const $emptyState = $('#emptyState');
+const $searchInput = $('#searchInput');
+const $statusFilter = $('#statusFilter');
 
-// ========== RENDER TABLE ==========
-function renderTable() {
-    const start = (currentPage - 1) * itemsPerPage;
-    const end = start + itemsPerPage;
-    const categoryItems = filteredCategories.slice(start, end);
+function renderCategoryTable() {
 
-    totalCount.textContent = filteredCategories.length;
+    const data = filteredCategories || [];
+    const totalItems = data.length;
 
-    if (filteredCategories.length === 0) {
-        tableBody.innerHTML = '';
-        emptyState.classList.remove('hidden');
-        showingCount.textContent = '0';
-        pageInfo.textContent = 'Page 0 of 0';
-        prevBtn.disabled = true;
-        nextBtn.disabled = true;
+    $totalCount.text(paginationData.counts || 0);
+
+    if (totalItems === 0 && paginationData.counts === 0) {
+        $tableBody.html('');
+        $emptyState.removeClass('hidden');
+        $showingCount.text('0');
+        $pageInfo.text('Page 0 of 0');
+        $prevBtn.prop('disabled', true);
+        $nextBtn.prop('disabled', true);
         return;
     }
 
-    emptyState.classList.add('hidden');
+    $emptyState.addClass('hidden');
 
-    // Update pagination info
-    const totalPages = Math.ceil(filteredCategories.length / itemsPerPage);
+    const totalPages = paginationData.totalPages || 1;
+    const currentPageNum = paginationData.page || 1;
 
-    showingCount.textContent = categoryItems.length;
-    pageInfo.textContent = `Page ${currentPage} of ${totalPages}`;
-    prevBtn.disabled = currentPage === 1;
-    nextBtn.disabled = currentPage === totalPages;
+    $showingCount.text(data.length);
+    $pageInfo.text(`Page ${currentPageNum} of ${totalPages}`);
+    $prevBtn.prop('disabled', currentPageNum <= 1);
+    $nextBtn.prop('disabled', currentPageNum >= totalPages);
 
-    // Render rows
-    tableBody.innerHTML = categoryItems.map(cat => `
-        <tr class="table-row border-b border-gray-50 transition">
-          <td class="px-4 py-3 text-sm text-gray-500 font-mono">#${cat.id}</td>
-          <td class="px-4 py-3">
-            <div>
-              <p class="text-sm font-medium text-gray-900">${escapeHtml(cat.title)}</p>
-              <p class="text-xs text-gray-400 md:hidden">${escapeHtml(cat.slug)}</p>
-            </div>
-          </td>
-          <td class="px-4 py-3 text-sm text-gray-500 hidden md:table-cell">${escapeHtml(cat.slug)}</td>
-          <td class="px-4 py-3 text-sm text-gray-500 hidden lg:table-cell max-w-xs truncate">${escapeHtml(cat.description || '-')}</td>
-          <td class="px-4 py-3 text-center">
-            <span class="status-badge ${cat.status}">${cat.status}</span>
-          </td>
-          <td class="px-4 py-3 text-center">
-            <div class="flex items-center justify-center gap-2">
-              <button class="p-1.5 rounded-lg text-blue-600 hover:bg-blue-50 transition category-edit-btn" title="Edit" data-id="${cat.id}">
-                <i class="fas fa-edit"></i>
-              </button>
-              <button class="p-1.5 rounded-lg text-brand hover:bg-brand-light transition category-delete-btn" title="Delete" data-id="${cat.id}">
-                <i class="fas fa-trash"></i>
-              </button>
-            </div>
-          </td>
-        </tr>
-    `).join('');
+    if (data.length === 0 && paginationData.totalCategories > 0) {
+        $tableBody.html(`
+            <tr>
+                <td colspan="6" class="text-center py-8 text-gray-500">
+                    <i class="fas fa-search text-2xl block mb-2"></i>
+                    No categories match your search criteria.
+                </td>
+            </tr>
+        `);
+        return;
+    }
 
-    $('.category-edit-btn').click((e) => {
-        const id = Number(e.currentTarget.dataset.id);
+    let html = '';
+    data.forEach(cat => {
+        html += `
+            <tr class="table-row border-b border-gray-50 transition">
+                
+                <td class="px-4 py-3">
+                    <div>
+                        <p class="text-sm font-medium text-gray-900">${stripHtml2(cat.title)}</p>
+                        <p class="text-xs text-gray-400 md:hidden">${stripHtml2(cat.slug)}</p>
+                    </div>
+                </td>
+                <td class="px-4 py-3 text-sm text-gray-500 hidden md:table-cell">${stripHtml2(cat.slug)}</td>
+                <td class="px-4 py-3 text-sm text-gray-500 hidden lg:table-cell max-w-xs truncate">${stripHtml2(cat.description || '-')}</td>
+                <td class="px-4 py-3 text-center">
+                    <span class="status-badge ${cat.status}">${cat.status}</span>
+                </td>
+                <td class="px-4 py-3 text-center">
+                    <div class="flex items-center justify-center gap-2">
+                        <button class="p-1.5 rounded-lg text-blue-600 hover:bg-blue-50 transition category-edit-btn" title="Edit" data-id="${cat.id}">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="p-1.5 rounded-lg text-brand hover:bg-brand-light transition category-delete-btn" title="Delete" data-id="${cat.id}">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        `;
+    });
+    $tableBody.html(html);
+
+    $('.category-edit-btn').off('click').on('click', function () {
+        const id = parseInt($(this).data('id'));
         openEditModal(id);
     });
 
-    $('.category-delete-btn').click((e) => {
-        const id = Number(e.currentTarget.dataset.id);
+    $('.category-delete-btn').off('click').on('click', function () {
+        const id = parseInt($(this).data('id'));
         openDeleteModal(id);
     });
 }
 
-// ========== HELPER FUNCTIONS ==========
-function escapeHtml(text) {
-    if (!text) return '';
-    const div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
-}
-
-function generateSlug(title) {
-    return title
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, '-')
-        .replace(/^-+|-+$/g, '');
-}
-
-// Auto-generate slug from title
-document.getElementById('title').addEventListener('input', function () {
-    const slugInput = document.getElementById('slug');
-    if (!slugInput.value || slugInput.dataset.auto === 'true') {
-        slugInput.value = generateSlug(this.value);
-        slugInput.dataset.auto = 'true';
+$('#title').on('input', function () {
+    const $slugInput = $('#slug');
+    if (!$slugInput.val() || $slugInput.data('auto') === 'true') {
+        $slugInput.val(generateSlug($(this).val()));
+        $slugInput.data('auto', 'true');
     }
 });
 
-document.getElementById('slug').addEventListener('input', function () {
-    this.dataset.auto = this.value === generateSlug(document.getElementById('title').value) ? 'true' : 'false';
+$('#slug').on('input', function () {
+    const title = $('#title').val();
+    const auto = $(this).val() === generateSlug(title);
+    $(this).data('auto', auto);
 });
 
-// ========== FILTERS ==========
-function filterTable() {
-    const search = searchInput.value.toLowerCase().trim();
-    const status = statusFilter.value;
+function applyLocalSearch() {
+    const search = $searchInput.val().toLowerCase().trim();
 
-    filteredCategories = categories.filter(cat => {
-        const matchesSearch = cat.title.toLowerCase().includes(search) ||
+    currentSearchTerm = search;
+
+    if (!allCategories || allCategories.length === 0) {
+        filteredCategories = [];
+        renderCategoryTable();
+        return;
+    }
+
+    if (search === '') {
+        filteredCategories = [...allCategories];
+        currentPage = 1;
+        renderCategoryTable();
+        return;
+    }
+
+    filteredCategories = allCategories.filter(cat => {
+        return cat.title.toLowerCase().includes(search) ||
             cat.slug.toLowerCase().includes(search) ||
             (cat.description && cat.description.toLowerCase().includes(search));
-        const matchesStatus = status === 'all' || cat.status === status;
-        return matchesSearch && matchesStatus;
     });
 
     currentPage = 1;
-
-    renderTable();
+    renderCategoryTable();
 }
 
-function resetFilters() {
-    searchInput.value = '';
-    statusFilter.value = 'all';
-    filterTable();
+// ========== STATUS FILTER (server-side) ==========
+function applyStatusFilter() {
+    const status = $statusFilter.val();
+
+    currentStatusFilter = status;
+    currentPage = 1;
+
+    fetchCategories(1);
 }
 
-// ========== PAGINATION ==========
+
+function resetFilters(shouldFetch = true) {
+    $searchInput.val('');
+    $statusFilter.val('all');
+    currentSearchTerm = '';
+    currentStatusFilter = 'all';
+    currentPage = 1;
+
+    if (shouldFetch) fetchCategories(1);
+}
+
+// ========== PAGINATION (server-side) ==========
 function prevCategoryPage() {
-    if (currentPage > 1) {
-        currentPage--;
-        renderTable();
+    if (paginationData.page > 1) {
+        const newPage = Number(paginationData.page) - 1;
+        fetchCategories(newPage);
     }
 }
 
 function nextCategoryPage() {
-    const totalPages = Math.ceil(filteredCategories.length / itemsPerPage);
-    if (currentPage < totalPages) {
-        currentPage++;
-        renderTable();
+    if (paginationData.page < paginationData.totalPages) {
+        const newPage = Number(paginationData.page) + 1;
+        fetchCategories(newPage);
     }
 }
 
-// ========== TOAST ==========
-// function showToast(title, message, type = 'success') {
-//     const toast = document.getElementById('toast');
-//     const icon = document.getElementById('toastIcon');
-//     const titleEl = document.getElementById('toastTitle');
-//     const messageEl = document.getElementById('toastMessage');
 
-//     const colors = {
-//         success: 'bg-green-500',
-//         error: 'bg-brand',
-//         warning: 'bg-amber-500',
-//         info: 'bg-blue-500'
-//     };
+async function fetchCategories(page = 1, isRefesh = false) {
+    if (isFetching) return;
+    isFetching = true;
 
-//     const icons = {
-//         success: 'fa-check',
-//         error: 'fa-exclamation',
-//         warning: 'fa-exclamation-triangle',
-//         info: 'fa-info'
-//     };
+    const $skeletonLoader = $('#categorySkeletonLoader');
+    const $syncLoader = $('#categorySyncLoader');
+    const $container = $('#categoriesContainer');
 
-//     icon.className = `w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${colors[type] || colors.success}`;
-//     icon.innerHTML = `<i class="fas ${icons[type] || icons.success} text-white"></i>`;
+    if (!isRefesh) {
+        $skeletonLoader.removeClass('hidden');
+        $syncLoader.addClass('hidden');
+        $container.addClass('hidden');
+    } else {
+        $skeletonLoader.addClass('hidden');
+        $syncLoader.removeClass('hidden');
+    }
 
-//     titleEl.textContent = title;
-//     messageEl.textContent = message;
+    $emptyState.addClass('hidden');
 
-//     toast.classList.remove('hidden');
+    try {
+        const params = {
+            page: page,
+            limit: itemsPerPage
+        };
 
-//     // Auto-hide after 4 seconds
-//     clearTimeout(window.toastTimeout);
-//     window.toastTimeout = setTimeout(hideToast, 4000);
-// }
+        if (currentStatusFilter && currentStatusFilter !== 'all') {
+            params.status = currentStatusFilter;
+        }
 
-// function hideToast() {
-//     document.getElementById('toast').classList.add('hidden');
-// }
+        const response = await axios.get(`/product-categories/`, {
+            params: params,
+            withCredentials: true
+        });
 
-// ========== MODALS ==========
-function openCreateModal() {
-    document.getElementById('formModalTitle').textContent = 'Create New Category';
-    document.getElementById('formSubmitBtn').innerHTML = '<i class="fas fa-save mr-2"></i> Save Category';
-    document.getElementById('categoryForm').reset();
-    document.getElementById('editId').value = '';
-    document.getElementById('slug').dataset.auto = 'false';
-    document.getElementById('formModal').classList.remove('hidden');
-    document.getElementById('formModal').style.display = 'flex';
-    document.body.style.overflow = 'hidden';
+        let categories = [];
+        let pagination = {};
+
+        allCategories = response.data.categories || [];
+        paginationData = response.data.pagination || {
+            counts: 0,
+            totalPages: 0,
+            currentPage: 1,
+            limit: 5
+        };
+
+        if (currentSearchTerm && currentSearchTerm !== '') {
+            filteredCategories = allCategories.filter(cat => {
+                return cat.title.toLowerCase().includes(currentSearchTerm) ||
+                    cat.slug.toLowerCase().includes(currentSearchTerm) ||
+                    (cat.description && cat.description.toLowerCase().includes(currentSearchTerm));
+            });
+        } else {
+            filteredCategories = [...allCategories];
+        }
+
+        renderCategoryTable();
+
+    } catch (error) {
+        console.error('Fetch error:', error);
+        allCategories = [];
+        filteredCategories = [];
+        paginationData = {
+            totalCategories: 0,
+            totalPages: 0,
+            currentPage: 1,
+            limit: 5
+        };
+
+        renderCategoryTable();
+
+        Notification.showNotification({
+            type: 'error',
+            message: error.response?.data?.message || 'Failed to load categories'
+        });
+    } finally {
+        isFetching = false;
+        $('#categorySkeletonLoader').addClass('hidden');
+        $('#categorySyncLoader').addClass('hidden');
+        $('#categoriesContainer').removeClass('hidden');
+    }
 }
 
-function openEditModal(id) {
-    const cat = categories.find(c => c.id === id);
-    if (!cat) return;
+async function fetchCategoryById(id) {
+    try {
+        const response = await axios.get(`/product-categories/${id}`, {
+            withCredentials: true
+        });
+        return response.data || null;
+    } catch (error) {
+        Notification.showNotification({
+            type: 'error',
+            message: error.response?.data?.message || 'Failed to fetch category details'
+        });
+        return null;
+    }
+}
 
-    document.getElementById('formModalTitle').textContent = 'Edit Category';
-    document.getElementById('formSubmitBtn').innerHTML = '<i class="fas fa-save mr-2"></i> Update Category';
-    document.getElementById('editId').value = cat.id;
-    document.getElementById('title').value = cat.title;
-    document.getElementById('slug').value = cat.slug;
-    document.getElementById('slug').dataset.auto = 'true';
-    document.getElementById('description').value = cat.description || '';
-    document.getElementById('status').value = cat.status;
+async function createCategory(data) {
+    try {
+        const response = await axios.post('/product-categories/', data, {
+            withCredentials: true
+        });
 
-    document.getElementById('formModal').classList.remove('hidden');
-    document.getElementById('formModal').style.display = 'flex';
-    document.body.style.overflow = 'hidden';
+        const newCategory = response.data.category || response.data.data?.category || response.data;
+
+        await fetchCategories(currentPage);
+
+        Notification.showNotification({
+            type: 'success',
+            message: 'Category created successfully!'
+        });
+
+        closeFormModal();
+
+    } catch (error) {
+        console.error('Create error:', error);
+        Notification.showNotification({
+            type: 'error',
+            message: errorMessage
+        });
+    }
+}
+
+async function updateCategory(id, data) {
+
+    try {
+        const response = await axios.put(`/product-categories/${id}`, {
+            id,
+            ...data
+        }, {
+            withCredentials: true
+        });
+
+        Notification.showNotification({
+            type: 'success',
+            message: 'Category updated successfully!'
+        });
+
+        await fetchCategories(currentPage);
+
+        return true;
+
+    } catch (error) {
+        console.error('Update error:', error);
+        Notification.showNotification({
+            type: 'error',
+            message: error.response?.data?.message || 'Failed to update category'
+        });
+    }
+}
+
+// DELETE category
+async function deleteCategory(id) {
+    try {
+        const response = await axios.delete(`/product-categories/${id}`, {
+            withCredentials: true
+        });
+
+        Notification.showNotification({
+            type: 'warning',
+            title: "",
+            message: 'Category has been deleted.'
+        });
+
+        await fetchCategories(currentPage);
+        return true;
+
+    } catch (error) {
+        console.error('Delete error:', error);
+        Notification.showNotification({
+            type: 'error',
+            message: error.response?.data?.message || 'Failed to delete category'
+        });
+    }
+}
+
+// REMOVE category
+async function removeCategory(id) {
+    try {
+        const response = await axios.patch(`/product-categories/remove/${id}`, {
+            withCredentials: true
+        });
+
+        Notification.showNotification({
+            type: 'success',
+            message: 'Category has been removed.'
+        });
+
+        closeDeleteModal();
+
+        await fetchCategories(currentPage);
+    } catch (error) {
+        console.error('Remove error:', error);
+        Notification.showNotification({
+            type: 'error',
+            message: error.response?.data?.message || 'Failed to remove category'
+        });
+    }
+}
+
+function openCreateModal() {
+    $('#formModalTitle').text('Create New Category');
+    $('#formSubmitBtn').html('Submit');
+    $('#categoryForm')[0].reset();
+    $('#editId').val('');
+    $('#slug').data('auto', 'false');
+    $('#formModal').removeClass('hidden').css('display', 'flex');
+    $('body').css('overflow', 'hidden');
+}
+
+let originalEditing;
+
+async function openEditModal(id) {
+
+    $('#formModal').removeClass('hidden').css('display', 'flex');
+    $('body').css('overflow', 'hidden');
+
+    $('#categoryForm').addClass('hidden');
+    $('#categoryModalLoader').removeClass('hidden');
+
+    const cat = await fetchCategoryById(id);
+
+    $('#categoryForm').removeClass('hidden');
+    $('#categoryModalLoader').addClass('hidden');
+
+    if (!cat) {
+        Notification.showNotification({
+            type: 'error',
+            title: "",
+            message: 'Category not found'
+        });
+        return;
+    }
+
+    originalEditing = cat;
+
+    $('#formModalTitle').text('Edit Category');
+    $('#formSubmitBtn').html('Update');
+    $('#editId').val(cat.id);
+    $('#title').val(cat.title);
+    $('#slug').val(cat.slug).data('auto', 'true');
+    $('#description').val(cat.description || '');
+    $('#status').val(cat.status);
+
 }
 
 function closeFormModal() {
-    document.getElementById('formModal').classList.add('hidden');
-    document.getElementById('formModal').style.display = 'none';
-    document.body.style.overflow = '';
+    $('#formModal').addClass('hidden').css('display', 'none');
+    $('body').css('overflow', '');
 }
 
 function openDeleteModal(id) {
-    const cat = categories.find(c => c.id === id);
+    const cat = filteredCategories.find(c => c.id === id);
     if (!cat) return;
     deleteTargetId = id;
-    document.getElementById('deleteTitle').textContent = `"${cat.title}"`;
-    document.getElementById('deleteModal').classList.remove('hidden');
-    document.getElementById('deleteModal').style.display = 'flex';
-    document.body.style.overflow = 'hidden';
+    $('#deleteTitle').text(`"${cat.title}"`);
+    $('#deleteModal').removeClass('hidden').css('display', 'flex');
+    $('body').css('overflow', 'hidden');
 }
 
 function closeDeleteModal() {
-    document.getElementById('deleteModal').classList.add('hidden');
-    document.getElementById('deleteModal').style.display = 'none';
-    document.body.style.overflow = '';
+    $('#deleteModal').addClass('hidden').css('display', 'none');
+    $('body').css('overflow', '');
     deleteTargetId = null;
 }
 
-// ========== FORM SUBMIT ==========
-function handleFormSubmit(e) {
+async function handleFormSubmit(e) {
     e.preventDefault();
 
-    const id = document.getElementById('editId').value;
-    const title = document.getElementById('title').value.trim();
-    const slug = document.getElementById('slug').value.trim() || generateSlug(title);
-    const description = document.getElementById('description').value.trim();
-    const status = document.getElementById('status').value;
+    const id = $('#editId').val();
+    const title = $('#title').val().trim();
+    const slug = $('#slug').val().trim() || generateSlug(title);
+    const description = $('#description').val().trim();
+    const status = $('#status').val();
 
     if (!title || !slug) {
-        showToast('Validation Error', 'Title and slug are required.', 'error');
+        Notification.showNotification({
+            type: 'error',
+            message: 'Title and slug are required.'
+        });
         return;
     }
 
-    // Check for duplicate slug
-    const duplicate = categories.find(c => c.slug === slug && c.id != id);
-    if (duplicate) {
-        showToast('Duplicate Slug', 'A category with this slug already exists.', 'error');
-        return;
-    }
+    const formData = { title, slug, description, status };
+
+    const $submitBtn = $('#formSubmitBtn');
+    const originalText = $submitBtn.html();
+
+    $submitBtn.html('Saving...').prop('disabled', true);
 
     if (id) {
-        // EDIT
-        const index = categories.findIndex(c => c.id === parseInt(id));
-        if (index !== -1) {
-            categories[index] = {
-                ...categories[index],
-                title,
-                slug,
-                description,
-                status,
-                updated_at: new Date().toISOString()
-            };
-
-            Notification.showNotification({
-                type: 'success',
-                message: 'Category updated successfully.'
-            })
-        }
+        const payload = getChangedAttributes(originalEditing, formData);
+        await updateCategory(parseInt(id), payload);
     } else {
-        // CREATE
-        const newCategory = {
-            id: Math.max(...categories.map(c => c.id), 0) + 1,
-            title,
-            slug,
-            description,
-            status,
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString()
-        };
-        categories.push(newCategory);
-        Notification.showNotification({
-            type: 'success',
-            message: 'Category created successfully.'
-        });
+        await createCategory(formData);
     }
 
-    closeFormModal();
-    filterTable();
+    $submitBtn.html(originalText).prop('disabled', false);
 }
 
-function confirmDelete() {
+async function confirmDelete() {
     if (deleteTargetId === null) return;
 
-    const index = categories.findIndex(c => c.id === deleteTargetId);
-    if (index !== -1) {
-        const deleted = categories[index];
-        categories.splice(index, 1);
-        Notification.showNotification({
-            type: 'warning',
-            message: `Category "${deleted.title}" has been deleted.`
-        })
-    }
+    const $confirmBtn = $('.confirm-delete-btn');
+    const originalText = $confirmBtn.html();
+    $confirmBtn.html('<i class="bi bi-trash"></i> Deleting...').prop('disabled', true);
 
-    closeDeleteModal();
-    filterTable();
+    await removeCategory(deleteTargetId);
+
+    $confirmBtn.html(originalText).prop('disabled', false);
 }
 
-// // ========== MOBILE SIDEBAR ==========
-// const sidebar = document.getElementById('sidebar');
-// const mobileOverlay = document.getElementById('mobileOverlay');
-// const mobileMenuBtn = document.getElementById('mobileMenuBtn');
-
-// function openMobileSidebar() {
-//     sidebar.classList.add('mobile-open');
-//     mobileOverlay.classList.add('active');
-//     document.body.style.overflow = 'hidden';
-// }
-
-// function closeMobileSidebar() {
-//     sidebar.classList.remove('mobile-open');
-//     mobileOverlay.classList.remove('active');
-//     document.body.style.overflow = '';
-// }
-
-// mobileMenuBtn.addEventListener('click', openMobileSidebar);
-
-// // Close sidebar on link click (mobile)
-// document.querySelectorAll('.sidebar-link').forEach(link => {
-//     link.addEventListener('click', () => {
-//         if (window.innerWidth < 1024) {
-//             closeMobileSidebar();
-//         }
-//     });
-// });
-
-// // ========== SIDEBAR NAVIGATION ==========
-// document.querySelectorAll('.sidebar-link').forEach(link => {
-//     link.addEventListener('click', function (e) {
-//         e.preventDefault();
-//         document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
-//         this.classList.add('active');
-//     });
-// });
-
-// ========== KEYBOARD SHORTCUTS ==========
-document.addEventListener('keydown', function (e) {
+$(document).on('keydown', function (e) {
     if (e.key === 'Escape') {
-        if (!document.getElementById('formModal').classList.contains('hidden')) {
+        if (!$('#formModal').hasClass('hidden')) {
             closeFormModal();
         }
-        if (!document.getElementById('deleteModal').classList.contains('hidden')) {
+        if (!$('#deleteModal').hasClass('hidden')) {
             closeDeleteModal();
         }
     }
@@ -440,100 +511,77 @@ document.addEventListener('keydown', function (e) {
     }
 });
 
-let fetchedCategories = false;
+$(document).ready(function () {
 
-async function fetchCategories() {
-    //categorySkeleton
-    //categoriesContainer
+    resetFilters(false);
 
-    // $('#categoriesContainer').addClass('hidden');
+    // Close delete modal
+    $('.close-delete-modal').on('click', closeDeleteModal);
 
-    if (!fetchedCategories) {
-        $('#categorySkeletonLoader').removeClass('hidden');
-        $('#categorySyncLoader').addClass('hidden');
-    } else {
-        $('#categorySyncLoader').removeClass('hidden');
-        $('#categorySkeletonLoader').addClass('hidden');
-    }
+    // New category button
+    $('.new-category-btn').on('click', openCreateModal);
 
-    // skeletonLoader.classList.remove('hidden');
-    // tableContent.classList.add('hidden');
+    // Confirm delete button
+    $('.confirm-delete-btn').on('click', confirmDelete);
 
-    emptyState.classList.add('hidden');
-
-    // Simulate API delay (1.5 seconds)
-    setTimeout(() => {
-
-
-        $('#categorySyncLoader').addClass('hidden');
-        $('#categorySkeletonLoader').addClass('hidden');
-
-        $('#categoriesContainer').removeClass('hidden');
-        fetchedCategories = true;
-
-        renderTable();
-    }, 5000);
-}
-
-$(document).ready(() => {
-    $('.close-delete-modal').click(() => {
-        closeDeleteModal();
+    // ========== SEARCH - LOCAL ONLY ==========
+    $searchInput.on('input', function () {
+        applyLocalSearch();
     });
 
-    $('.new-category-btn').click(() => {
-        openCreateModal();
+    // ========== STATUS FILTER - SERVER-SIDE ==========
+    $statusFilter.on('change', function () {
+        applyStatusFilter();
     });
 
-    $('.confirm-delete-btn').click(() => {
-        confirmDelete();
+    // Reset filters
+    $('#resetFilters').on('click', resetFilters);
+
+    // Modal overlay close
+    $('.modal-overlay').on('click', function (e) {
+        if ($(e.target).hasClass('modal-overlay')) {
+            closeDeleteModal();
+            closeFormModal();
+        }
     });
 
-    $('#searchInput').on('keyup', (e) => {
-        filterTable();
+    // Close form modal
+    $('#closeFormModal').on('click', closeFormModal);
+
+    // Form submit
+    $("#categoryForm").on('submit', handleFormSubmit);
+
+    // Cancel create category
+    $('.cancel-create-category').on('click', closeFormModal);
+
+    // Empty state create button
+    $('#emptyCategoryBtn').on('click', openCreateModal);
+
+    // ========== PAGINATION - SERVER-SIDE ==========
+    $('#prevCategoryPageBtn').on('click', prevCategoryPage);
+    $('#nextCategoryPageBtn').on('click', nextCategoryPage);
+
+    // Refresh - fetch from server
+    $('#refreshCategories').on('click', function () {
+        fetchCategories(currentPage, true);
     });
 
-    $('#statusFilter').on('change', (e) => {
-        filterTable();
+    $('#categoryFilterResetBtn').on('click', function () {
+        resetFilters(true)
     });
+});
 
-    $('#resetFilters').click(() => {
-        resetFilters();
-    });
-
-    $('.modal-overlay').click((e) => {
-        closeDeleteModal();
-        closeFormModal();
-
-    });
-
-    $('#closeFormModal').click(() => {
-        closeFormModal();
-    });
-
-    $("#categoryForm").on('submit', (e) => {
-        handleFormSubmit(e);
-    });
-
-    $('.cancel-create-category').click((e) => {
-        closeFormModal();
-    });
-
-    $('#emptyCategoryBtn').click((e) => {
-        openCreateModal();
-    });
-
-    prevBtn.addEventListener('click', (e) => {
-        prevCategoryPage();
-    });
-
-    nextBtn.addEventListener('click', (e) => {
-        nextCategoryPage();
-    });
-
-    $('#refreshCategories').click('click', (e) => {
-        fetchCategories();
-    })
-
-})
-
-renderTable();
+// ========== EXPOSE GLOBALLY ==========
+window.openCreateModal = openCreateModal;
+window.openEditModal = openEditModal;
+window.openDeleteModal = openDeleteModal;
+window.confirmDelete = confirmDelete;
+window.closeFormModal = closeFormModal;
+window.closeDeleteModal = closeDeleteModal;
+window.prevCategoryPage = prevCategoryPage;
+window.nextCategoryPage = nextCategoryPage;
+window.resetFilters = resetFilters;
+window.fetchCategories = fetchCategories;
+window.handleFormSubmit = handleFormSubmit;
+window.applyLocalSearch = applyLocalSearch;
+window.applyStatusFilter = applyStatusFilter;
