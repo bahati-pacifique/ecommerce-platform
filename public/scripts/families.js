@@ -563,7 +563,6 @@ const fetchCategoriesForSelector = async () => {
             </div>
         `);
 
-
         const sfx = !!t ? `:${t}` : '';
         const url = `${p}api.${d}${sfx}/`;
         console.log(url);

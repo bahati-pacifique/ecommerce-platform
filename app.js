@@ -72,7 +72,7 @@ if (isProduction) {
     app.use(vhost('cococe.rw', mainApp));
     app.use(vhost('admin.cococe.rw', adminApp));
     app.use(vhost('auth.cococe.rw', authApp));
-    app.use(vhost('api.cococe.rw', authApp));
+    app.use(vhost('api.cococe.rw', apiApp));
 } else {
     app.use(vhost('localhost', mainApp));
     app.use(vhost('admin.localhost', adminApp));
