@@ -565,7 +565,7 @@ const fetchCategoriesForSelector = async () => {
 
         const sfx = !!t ? `:${t}` : '';
         const url = `${p}api.${d}${sfx}/`;
-        console.log(url);
+        
         const response = await axios.get(`${url}categories`, { withCredentials: true });
         allCategoriesForSelector = response.data || [];
         renderCategoryList(allCategoriesForSelector);

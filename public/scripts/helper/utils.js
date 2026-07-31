@@ -118,6 +118,7 @@ function stripHtml(htmlString) {
  * @returns Html tags free plain text
  */
 function stripHtml2(htmlString) {
+    if (!htmlString) return '';
     return htmlString
         .replace(/<\/?(li|div)[^>]*>/gi, " ")
         .replace(/<\/?[^>]+(>|$)/g, "")

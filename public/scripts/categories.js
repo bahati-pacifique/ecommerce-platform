@@ -70,12 +70,12 @@ function renderCategoryTable() {
                 
                 <td class="px-4 py-3">
                     <div>
-                        <p class="text-sm font-medium text-gray-900">${stripHtml2(cat.title)}</p>
-                        <p class="text-xs text-gray-400 md:hidden">${stripHtml2(cat.slug)}</p>
+                        <p class="text-sm font-medium text-gray-900">${cat.title}</p>
+                        <p class="text-xs text-gray-400 md:hidden">${cat.slug}</p>
                     </div>
                 </td>
-                <td class="px-4 py-3 text-sm text-gray-500 hidden md:table-cell">${stripHtml2(cat.slug)}</td>
-                <td class="px-4 py-3 text-sm text-gray-500 hidden lg:table-cell max-w-xs truncate">${stripHtml2(cat.description || '-')}</td>
+                <td class="px-4 py-3 text-sm text-gray-500 hidden md:table-cell">${cat.slug}</td>
+                <td class="px-4 py-3 text-sm text-gray-500 hidden lg:table-cell max-w-xs truncate">${cat.description || '-'}</td>
                 <td class="px-4 py-3 text-center">
                     <span class="status-badge ${cat.status}">${cat.status}</span>
                 </td>
