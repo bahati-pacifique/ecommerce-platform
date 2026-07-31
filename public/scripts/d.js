@@ -244,23 +244,12 @@ document.querySelectorAll('.modal-link-item').forEach(item => {
     });
 });
 
-// ========== DEMO: Other tab interactions ==========
-// document.querySelectorAll('.tab-content:not(#tab-home)').forEach(content => {
-//   const links = content.querySelectorAll('a, button');
-//   links.forEach(link => {
-//     link.addEventListener('click', function(e) {
-//       e.preventDefault();
-
-//       const text = this.textContent.trim() || 'feature';
-//       alert(`📌 "${text}" — Coming soon in COCOCE Admin!`);
-//     });
-//   });
-// });
-
 $(document).ready(() => {
     Notification.showNotification({
         title: 'Hey!',
         type: 'warning',
         message: 'You are visiting this page for testing & mockup purposes — No real data is being presented!'
     });
+
+    overlay.addEventListener('click', closeMobileSidebar);
 })
