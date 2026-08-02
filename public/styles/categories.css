@@ -24,7 +24,7 @@
     color: #16A34A;
 }
 
-.status-badge.inactive {
+.status-badge.inactive, .status-badge.deleted {
     background: #FEE2E3;
     color: #ED1B24;
 }

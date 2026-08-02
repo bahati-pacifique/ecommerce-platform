@@ -121,16 +121,23 @@ module.exports = {
                 "https://cdn.lineicons.com"
             ],
 
+            // "img-src": [
+            //     "'self'",
+            //     "data:",
+            //     isProduction ? domain : domainWithPort,
+            //     "https://res.cloudinary.com",
+            //     "https://upload.wikimedia.org",
+            //     "https://images.unsplash.com",
+            //     "https://picsum.photos",
+            //     "https://fastly.picsum.photos",
+            //     "https://cdn.cococe.rw"
+            // ],
+
             "img-src": [
                 "'self'",
+                "*",
                 "data:",
-                isProduction ? domain : domainWithPort,
-                "https://res.cloudinary.com",
-                "https://upload.wikimedia.org",
-                "https://images.unsplash.com",
-                "https://picsum.photos",
-                "https://fastly.picsum.photos",
-                "https://cdn.cococe.rw"
+                "blob:"
             ],
 
             "media-src": [

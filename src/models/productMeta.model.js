@@ -14,7 +14,7 @@ class ProductMetaModel {
     }
 
     /**
-     * 
+     * Create new product category
      * @param {string} title category title
      * @param {string} slug category slug identifier
      * @param {string} description category details/description
@@ -171,17 +171,17 @@ class ProductMetaModel {
         const values = [];
         let index = 1;
 
-        if (!title) {
+        if (title) {
             updates.push(`title = $${index++}`);
             values.push(title);
         }
 
-        if (!slug) {
+        if (slug) {
             updates.push(`slug = $${index++}`);
             values.push(slug);
         }
 
-        if (!description) {
+        if (description) {
             updates.push(`description = $${index++}`);
             values.push(description);
         }
@@ -206,7 +206,7 @@ class ProductMetaModel {
 
 
     /**
-     * Create new product category in system
+     * Create new product family
      * @param {number} categoryId 
      * @param {string} title 
      * @param {string} slug
@@ -407,6 +407,215 @@ class ProductMetaModel {
             ORDER BY title ASC`);
 
         return rows;
+    }
+
+
+
+    /* =========================================================================
+       BRAND METHODS (NEW)
+       ========================================================================= */
+
+    /**
+     * 
+     * @param {string} title brand title
+     * @param {string} slug brand slug identifier
+     * @param {string} description brand details/description
+     * @returns {object|null} created brand or null
+     */
+    static async createProductBrand({title, slug, logo_url, website, description, meta}) {
+        const { rows } = await db.query(`
+            INSERT INTO brands(title, slug, logo_url, website, description, meta) 
+            VALUES ($1, $2, $3, $4, $5, $6) RETURNING *;
+            `, [title, slug, logo_url || null, website || null,  description, meta || null]);
+
+        return rows[0] ?? null;
+    }
+
+    /**
+     * Soft deleting brand
+     * @param {number} id system brand unique identifier
+     * @returns {object|null} returns object of the removed brand or null
+     */
+    static async removeProductBrand(id) {
+        const result = await this.#setStatus('deleted', id, 'brands');
+
+        return result;
+    }
+
+    /**
+     * Re-Activate brand by its id
+     * @param {number} id system brand unique identifier
+     * @returns {object|null} object of the activated brand or null
+     */
+    static async activateProductBrand(id) {
+        const result = await this.#setStatus('active', id, 'brands');
+
+        return result;
+    }
+
+    /**
+     * Hard deleting brand
+     * @param {number} id system brand unique identifier
+     * @returns {object|null} object of the deleted brand or null
+     */
+    static async deleteProductBrand(id) {
+        const { rows } = await db.query(`
+            DELETE FROM brands WHERE id = $1 RETURNING *
+            `, [id]);
+
+        return rows[0] ?? null;
+    }
+
+    /**
+     * Get brand by id
+     * @param {number} id system brand unique identifier
+     * @returns {object|null} object of brand or null
+     */
+    static async getProductBrandById(id) {
+        const { rows } = await db.query(`
+            SELECT * FROM brands WHERE id =  $1
+            `, [id]);
+
+        return rows[0] ?? null;
+    }
+
+    /**
+     * Returns paginated product brands.
+     *
+     * @param {Object} options
+     * @param {number} [options.page=1]
+     * @param {number} [options.limit=10]
+     * @param {string|null} [options.status='active'] Set to null to fetch all statuses.
+     *
+     * @returns {Object}
+     */
+    static async getProductBrands({
+        page = 1,
+        limit = 10,
+        status = 'active'
+    } = {}) {
+
+        const offset = (page - 1) * limit;
+
+        const where = [];
+        const values = [];
+        let index = 1;
+
+        if (!status || status === 'all') status = null;
+
+        if (status !== null) {
+            where.push(`status = $${index++}`);
+            values.push(status);
+        }
+
+        const whereClause = where.length
+            ? `WHERE ${where.join(' AND ')}`
+            : '';
+
+        // Total records
+        const { rows: [{ total }] } = await db.query(`
+            SELECT COUNT(*)::INTEGER AS total
+            FROM brands
+            ${whereClause}
+        `, values);
+
+        // Current page
+        values.push(limit);
+        values.push(offset);
+
+        const { rows: brands } = await db.query(`
+            SELECT *
+            FROM brands
+            ${whereClause}
+            ORDER BY id DESC
+            LIMIT $${index++}
+            OFFSET $${index}
+        `, values);
+
+        const totalPages = Math.ceil(total / limit);
+
+        return {
+            brands,
+            pagination: {
+                page,
+                limit,
+                counts: total,
+                totalPages,
+                hasPrevPage: page > 1,
+                hasNextPage: page < totalPages
+            }
+        };
+    }
+
+    /**
+     * Get active brands
+     * @returns brands with minimal data
+     */
+    static async getActiveBrands() {
+        const { rows } = await db.query(`SELECT 
+            id, 
+            title, 
+            COALESCE(updated_at, created_at) 
+            AS last_updates 
+            FROM brands WHERE status = 'active' 
+            ORDER BY title ASC`);
+
+        return rows;
+    }
+
+    static async updateProductBrand(id, { title, slug, website, logo_url, meta, description }) {
+        const updates = [];
+        const values = [];
+        let index = 1;
+
+        if (title) {
+            updates.push(`title = $${index++}`);
+            values.push(title);
+        }
+
+        if (slug) {
+            updates.push(`slug = $${index++}`);
+            values.push(slug);
+        }
+
+        if (website) {
+            updates.push(`website = $${index++}`);
+            values.push(website);
+        }
+
+        if (logo_url) {
+            updates.push(`logo_url = $${index++}`);
+            values.push(logo_url);
+        }
+
+        if (meta) {
+            updates.push(`meta = $${index++}`);
+            values.push(meta);
+        }
+
+        if (description) {
+            updates.push(`description = $${index++}`);
+            values.push(description);
+        }
+
+        if (updates.length === 0) {
+            throw new Error("No fields to update.");
+        }
+
+        values.push(id);
+
+        const query = `
+            UPDATE brands
+            SET
+                ${updates.join(", ")} 
+            WHERE id = $${index}
+            RETURNING *;
+        `;
+
+        console.log(query)
+
+        const { rows } = await db.query(query, values);
+        return rows[0] || null;
     }
 
 }

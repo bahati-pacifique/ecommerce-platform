@@ -1,13 +1,13 @@
 // ========== STATE ==========
 let currentFamiliesPage = 1;
-const familiesItemsPerPage = 31;
+const familiesItemsPerPage = 100;
 let deleteFamilyTargetId = null;
 let allFamilies = [];
 let filteredFamilies = [];
 let currentFamilySearchTerm = '';
 let currentFamilyStatusFilter = 'all';
 let familyPaginationData = {
-    totalFamilies: 0,
+    counts: 0,
     totalPages: 0,
     page: 1,
     limit: 7
@@ -84,7 +84,7 @@ function renderFamiliesTable() {
                         <button class="p-1.5 rounded-lg text-blue-600 hover:bg-blue-50 transition family-edit-btn" title="Edit" data-id="${fam.id}">
                             <i class="fas fa-edit"></i>
                         </button>
-                        <button class="p-1.5 rounded-lg text-brand hover:bg-brand-light transition family-delete-btn" title="Delete" data-id="${fam.id}">
+                        <button class="p-1.5 rounded-lg text-brand hover:bg-brand-light transition family-delete-btn ${fam.status === "deleted" ? 'hidden' : ''}" title="Delete" data-id="${fam.id}">
                             <i class="fas fa-trash"></i>
                         </button>
                     </div>

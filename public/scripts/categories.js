@@ -1,6 +1,5 @@
-// ========== STATE ==========
 let currentPage = 1;
-const itemsPerPage = 31;
+const itemsPerPage = 100;
 let deleteTargetId = null;
 let allCategories = [];
 let filteredCategories = [];
@@ -84,7 +83,7 @@ function renderCategoryTable() {
                         <button class="p-1.5 rounded-lg text-blue-600 hover:bg-blue-50 transition category-edit-btn" title="Edit" data-id="${cat.id}">
                             <i class="fas fa-edit"></i>
                         </button>
-                        <button class="p-1.5 rounded-lg text-brand hover:bg-brand-light transition category-delete-btn" title="Delete" data-id="${cat.id}">
+                        <button class="p-1.5 rounded-lg text-brand hover:bg-brand-light transition category-delete-btn ${cat.status === "deleted" ? 'hidden' : ''}" title="Delete" data-id="${cat.id}">
                             <i class="fas fa-trash"></i>
                         </button>
                     </div>
@@ -92,6 +91,7 @@ function renderCategoryTable() {
             </tr>
         `;
     });
+
     $tableBody.html(html);
 
     $('.category-edit-btn').off('click').on('click', function () {

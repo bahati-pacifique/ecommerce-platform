@@ -62,6 +62,7 @@ const tabContents = {
     inventory: document.getElementById('tab-inventory'),
     categories: document.getElementById('tab-categories'),
     families: document.getElementById('tab-families'),
+    brands: document.getElementById('tab-brands'),
     customers: document.getElementById('tab-customers'),
     analytics: document.getElementById('tab-analytics'),
     marketing: document.getElementById('tab-marketing'),
@@ -79,6 +80,7 @@ const tabLabelMap = {
     customers: 'Customers',
     categories: 'Categories',
     families: 'Families',
+    brands: 'Brands',
     analytics: 'Analytics',
     marketing: 'Marketing',
     settings: 'Settings',
@@ -112,6 +114,9 @@ sidebarLinks.forEach(link => {
                 case 'families':
                     fetchFamilies(1, false);
                     initCategorySelector();
+                    break;
+                case 'brands':
+                    fetchBrands(1, false);
                     break;
             }
         }

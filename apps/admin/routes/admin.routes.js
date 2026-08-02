@@ -15,20 +15,29 @@ router.post('/logout', adminController.logout);
 
                     //================= Categories =============
 router.get('/product-categories/', administration, ProductMetaController.getProductCategories);
-router.get('/product-categories/:id', administration, ProductMetaController.getProductCategory);
 router.post('/product-categories/', administration, ProductMetaController.createProductCategory);
+router.get('/product-categories/:id', administration, ProductMetaController.getProductCategory);
 router.put('/product-categories/:id', administration, ProductMetaController.updatedProductCategory);
 router.patch('/product-categories/:id', administration, ProductMetaController.activateProductCategory);
 router.patch('/product-categories/remove/:id', administration, ProductMetaController.removeProductCategory);
 router.delete('/product-categories/:id', administration, ProductMetaController.deleteProductCategory);
 
                     //================= Families =============
-router.post('/product-families/', ProductMetaController.createProductFamily);
-router.get('/product-families/', ProductMetaController.getProductFamilies);
-router.get('/product-families/:id', ProductMetaController.getProductFamily);
-router.put('/product-families/:id', ProductMetaController.updateProductFamily);
-router.patch('/product-families/:id', ProductMetaController.activateProductFamily);
-router.patch('/product-families/remove/:id', ProductMetaController.removeProductFamily);
-router.delete('/product-families/:id', ProductMetaController.deleteProductFamily);
+router.post('/product-families/', administration, ProductMetaController.createProductFamily);
+router.get('/product-families/', administration, ProductMetaController.getProductFamilies);
+router.get('/product-families/:id', administration, ProductMetaController.getProductFamily);
+router.put('/product-families/:id', administration, ProductMetaController.updateProductFamily);
+router.patch('/product-families/:id', administration, ProductMetaController.activateProductFamily);
+router.patch('/product-families/remove/:id', administration, ProductMetaController.removeProductFamily);
+router.delete('/product-families/:id', administration, ProductMetaController.deleteProductFamily);
+
+                    //================= Brands =============
+router.post('/product-brands/', ProductMetaController.createBrand);
+router.get('/product-brands/', ProductMetaController.getBrands);
+router.get('/product-brands/:id', ProductMetaController.getBrandById);
+router.put('/product-brands/:id', ProductMetaController.updateBrand);
+router.patch('/product-brands/:id', ProductMetaController.activateBrand);
+router.patch('/product-brands/remove/:id', ProductMetaController.softDeleteBrand);
+router.delete('/product-brands/:id', ProductMetaController.hardDeleteBrand);
 
 module.exports = router;

@@ -78,6 +78,74 @@ class ProductMetaService {
         return await ProductMetaModel.getActiveFamilies();
     }
 
+    /**
+     * 
+     * @param {object} payload { title, slug, logo_url, website, description, meta }
+     * @returns created brand or null
+     */
+    static async createBrand(payload) {
+        return await ProductMetaModel.createProductBrand(payload);
+    }
+
+    static async getBrandById(id) {
+        if (!id || isNaN(id)) {
+            throw new Error("A valid numeric brand ID must be provided.");
+        }
+        const brand = await ProductMetaModel.getProductBrandById(id);
+        if (!brand) {
+            throw new Error("Brand not found");
+        }
+        return brand;
+    }
+
+    static async getPaginatedBrands(queryOptions) {
+        const page = parseInt(queryOptions.page, 10) || 1;
+        const limit = parseInt(queryOptions.limit, 10) || 10;
+        const status = queryOptions.status || 'active';
+
+        return await ProductMetaModel.getProductBrands({ page, limit, status });
+    }
+
+    static async getActiveBrandsList() {
+        return await ProductMetaModel.getActiveBrands();
+    }
+
+    static async updateBrand(id, updateData) {
+        if (!id || isNaN(id)) {
+            throw new Error("A valid numeric brand ID must be provided.");
+        }
+        return await ProductMetaModel.updateProductBrand(id, updateData);
+    }
+
+    static async softDeleteBrand(id) {
+        if (!id || isNaN(id)) {
+            throw new Error("A valid numeric brand ID must be provided.");
+        }
+        const result = await ProductMetaModel.removeProductBrand(id);
+        if (!result) {
+            throw new Error("Brand not found or could not be soft deleted.");
+        }
+        return result;
+    }
+
+    static async activateBrand(id) {
+        if (!id || isNaN(id)) {
+            throw new Error("A valid numeric brand ID must be provided.");
+        }
+        const result = await ProductMetaModel.activateProductBrand(id);
+        if (!result) {
+            throw new Error("Brand not found or could not be activated.");
+        }
+        return result;
+    }
+
+    static async hardDeleteBrand(id) {
+        if (!id || isNaN(id)) {
+            throw new Error("A valid numeric brand ID must be provided.");
+        }
+        return await ProductMetaModel.deleteProductBrand(id);
+    }
+
 }
 
 module.exports = ProductMetaService;

@@ -15,8 +15,8 @@ async function createProductCategory(req, res) {
         return res.json(category)
 
     } catch (error) {
-        let message = 'Unable to create category — Internal Server Error'
-        if (error.code == 23505) message = `${title} category already exists`
+        let message = 'Unable to create category — Internal Server Error';
+        if (error.code == 23505) message = `${title} category already exists`;
         return formatError('createProductCategory()', 500, error, message, res);
     }
 }
@@ -183,6 +183,91 @@ async function updateProductFamily(req, res) {
     }
 }
 
+async function createBrand(req, res) {
+    const { title } = req.body;
+    try {
+        const newBrand = await ProductMetaServices.createBrand(req.body);
+        return res.status(newBrand ? 201 : 500).json(newBrand);
+    } catch (error) {
+        console.log(error);
+        let message = 'Failed — Internal Server Error';
+        if (error.code == '23505') message = `${title} brand already exists`;
+        
+        return formatError('createBrand()', 400, error, message, res);
+    }
+}
+
+// GET /api/brands/:id
+async function getBrandById(req, res) {
+    try {
+        const brand = await ProductMetaServices.getBrandById(req.params.id);
+        return res.status(200).json(brand);
+    } catch (error) {
+        const status = error.message === "Brand not found" ? 404 : 400;
+        return formatError('getBrandById()', status, error, error.message, res);
+    }
+}
+
+// GET /api/brands
+async function getBrands(req, res) {
+    try {
+        const paginatedData = await ProductMetaServices.getPaginatedBrands(req.query);
+        return res.status(200).json(paginatedData);
+    } catch (error) {
+        return formatError('getBrands()', 500, error, error.message, res);
+    }
+}
+
+// GET /api/brands/list/active
+async function getActiveBrands(req, res) {
+    try {
+        const result = await ProductMetaServices.getActiveBrandsList();
+        return res.status(200).json(result);
+    } catch (error) {
+        return formatError('getActiveBrands()', 500, error, error.message, res);
+    }
+}
+
+// PUT /api/brands/:id
+async function updateBrand(req, res) {
+    try {
+        const updatedBrand = await ProductMetaServices.updateBrand(req.params.id, req.body);
+        return res.status(200).json(updatedBrand);
+    } catch (error) {
+        return formatError('updateBrand()', 404, error, error.message, res);
+    }
+}
+
+// PATCH /api/brands/:id/soft-delete
+async function softDeleteBrand(req, res) {
+    try {
+        const brand = await ProductMetaServices.softDeleteBrand(req.params.id);
+        return res.status(200).json(brand);
+    } catch (error) {
+        return res.status(400).json({ message: error.message });
+    }
+}
+
+// PATCH /api/brands/:id/activate
+async function activateBrand(req, res) {
+    try {
+        const brand = await ProductMetaServices.activateBrand(req.params.id);
+        return res.status(200).json(brand);
+    } catch (error) {
+        return res.status(400).json({ message: error.message });
+    }
+}
+
+// DELETE /api/brands/:id
+async function hardDeleteBrand(req, res) {
+    try {
+        const brand = await ProductMetaServices.hardDeleteBrand(req.params.id);
+        return res.status(200).json({ success: true, message: "Brand permanently purged from database.", data: brand });
+    } catch (error) {
+        return res.status(400).json({ message: error.message });
+    }
+}
+
 module.exports = {
     createProductCategory,
     getProductCategories,
@@ -198,5 +283,14 @@ module.exports = {
     deleteProductFamily,
     removeProductFamily,
     activateProductFamily,
-    updateProductFamily
+    updateProductFamily,
+
+    createBrand,
+    getBrandById,
+    getBrands,
+    updateBrand,
+    softDeleteBrand,
+    hardDeleteBrand,
+    activateBrand
+
 };
