@@ -1,6 +1,15 @@
 const ProductMetaModel = require('../models/productMeta.model');
 
 class ProductMetaService {
+
+    static async batchInsert(tableName, columns, values, conflictOptionals = {}){
+        
+        const result = await ProductMetaModel.batchInsert(tableName, columns, values, conflictOptionals)
+
+        return result;
+    }
+
+    //===========================================================================
     static async createProductCategory(title, slug, description) {
         const result = await ProductMetaModel.createProductCategory(title, slug, description);
 
@@ -27,7 +36,7 @@ class ProductMetaService {
         return await ProductMetaModel.activateProductCategory(id)
     }
 
-    static async getActiveCategories(){
+    static async getActiveCategories() {
         return await ProductMetaModel.getActiveCategories();
     }
 
@@ -74,7 +83,7 @@ class ProductMetaService {
         return await ProductMetaModel.updateProductFamily(id, payload)
     }
 
-    static async getActiveFamilies(){
+    static async getActiveFamilies() {
         return await ProductMetaModel.getActiveFamilies();
     }
 
@@ -99,9 +108,9 @@ class ProductMetaService {
     }
 
     static async getPaginatedBrands(queryOptions) {
-        const page = parseInt(queryOptions.page, 10) || 1;
-        const limit = parseInt(queryOptions.limit, 10) || 10;
-        const status = queryOptions.status || 'active';
+        const page = parseInt(queryOptions?.page, 10) || 1;
+        const limit = parseInt(queryOptions?.limit, 10) || 10;
+        const status = queryOptions?.status || 'active';
 
         return await ProductMetaModel.getProductBrands({ page, limit, status });
     }
@@ -144,6 +153,155 @@ class ProductMetaService {
             throw new Error("A valid numeric brand ID must be provided.");
         }
         return await ProductMetaModel.deleteProductBrand(id);
+    }
+
+    //Attributes operations
+
+    //Attributes
+    static async createAttribute(payload) {
+        return await ProductMetaModel.createAttribute(payload);
+    }
+
+    static async getAttributeById(id) {
+        if (!id || isNaN(id)) {
+            throw new Error("ID must be provided.");
+        }
+        const attribute = await ProductMetaModel.getAttributeById(id);
+        if (!attribute) {
+            throw new Error("Not found");
+        }
+        return attribute;
+    }
+
+    static async getPaginatedAttributes(queryOptions) {
+        const page = parseInt(queryOptions?.page, 10) || 1;
+        const limit = parseInt(queryOptions?.limit, 10) || 10;
+        const status = queryOptions?.status || 'active';
+        return await ProductMetaModel.getAttributes({ page, limit, status });
+    }
+
+    static async getActiveAttribute() {
+        return await ProductMetaModel.getActiveAttributes();
+    }
+
+    static async updateAttribute(id, updateData) {
+        if (!id || isNaN(id)) {
+            throw new Error("ID must be provided.");
+        }
+        const result = ProductMetaModel.updateAttribute(id, updateData);
+        if (!result) { throw new Error("Not found"); }
+        return result;
+    }
+
+    static async softDeleteAttribute(id) {
+        if (!id || isNaN(id)) {
+            throw new Error("ID must be provided.");
+        }
+        const result = await ProductMetaModel.removeAttribute(id);
+        if (!result) {
+            throw new Error("Not found");
+        }
+        return result;
+    }
+
+    static async activateAttribute(id) {
+        if (!id || isNaN(id)) {
+            throw new Error("ID must be provided.");
+        }
+        const result = await ProductMetaModel.activateAttribute(id);
+        if (!result) {
+            throw new Error("Not found");
+        }
+        return result;
+    }
+
+    static async hardDeleteAttribute(id) {
+        if (!id || isNaN(id)) {
+            throw new Error("ID must be provided.");
+        }
+        const result = await ProductMetaModel.deleteAttribute(id);
+
+        if (!result) {
+            throw new Error('Not found')
+        }
+
+        return result;
+    }
+
+    //Attribute values
+    static async createAttributeValue(payload) {
+        return await ProductMetaModel.createAttributeValue(payload);
+    }
+
+    static async getAttributeValueById(id) {
+        if (!id || isNaN(id)) {
+            throw new Error("ID must be provided.");
+        }
+        const attribute = await ProductMetaModel.getAttributeValueById(id);
+        if (!attribute) {
+            throw new Error("Not found");
+        }
+        return attribute;
+    }
+
+    static async getPaginatedAttributesValue(queryOptions) {
+
+        queryOptions.page = parseInt(queryOptions.page, 10) || 1;
+        queryOptions.limit = parseInt(queryOptions.limit, 10) || 10;
+        queryOptions.status = queryOptions?.status || 'active';
+
+        return await ProductMetaModel.getAttributeValues(queryOptions);
+
+    }
+
+    static async getActiveAttributeValues() {
+        return await ProductMetaModel.getActiveAttributeValues();
+    }
+
+    static async updateAttributeValue(id, updateData) {
+        console.log("***", updateData)
+        if (!id || isNaN(id)) {
+            throw new Error("ID must be provided.");
+        }
+        const result = await ProductMetaModel.updateAttributeValues(id, updateData);
+        if (!result) {
+            throw new Error('Not found');
+        }
+        return result;
+    }
+
+    static async softDeleteAttributeValue(id) {
+        if (!id || isNaN(id)) {
+            throw new Error("ID must be provided.");
+        }
+        const result = await ProductMetaModel.removeAttributeValue(id);
+        if (!result) {
+            throw new Error("Not found");
+        }
+        return result;
+    }
+
+    static async activateAttributeValue(id) {
+        if (!id || isNaN(id)) {
+            throw new Error("ID must be provided.");
+        }
+        const result = await ProductMetaModel.activateAttributeValue(id);
+        if (!result) {
+            throw new Error("Not found");
+        }
+        return result;
+    }
+
+    static async hardDeleteAttributeValue(id) {
+        if (!id || isNaN(id)) {
+            throw new Error("ID must be provided.");
+        }
+
+        const result = await ProductMetaModel.deleteAttributeValue(id);
+        if (!result) {
+            throw new Error('Not found');
+        }
+        return result
     }
 
 }

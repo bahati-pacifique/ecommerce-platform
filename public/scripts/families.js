@@ -651,9 +651,14 @@ function searchCategories(searchTerm) {
         return;
     }
 
+    // const filtered = allCategoriesForSelector.filter(cat =>
+    //     cat?.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    //     cat?.slug.toLowerCase().includes(searchTerm.toLowerCase())
+    // );
+
+    //cat no longer include slug from api call
     const filtered = allCategoriesForSelector.filter(cat =>
-        cat.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        cat.slug.toLowerCase().includes(searchTerm.toLowerCase())
+        cat?.title.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
     renderCategoryList(filtered, searchTerm);

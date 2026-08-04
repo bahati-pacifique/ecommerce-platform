@@ -14,6 +14,85 @@ class ProductMetaModel {
     }
 
     /**
+     * Batch insert records into a table.
+     *
+     * @param {string} tableName
+     * @param {string[]} columns
+     * @param {Object[]} dataArray
+     * @param {Object} options
+     * @param {string|null} options.onConflict — "(title) DO NOTHING"
+     * @param {string} options.returning i.e: "*", "id", "id, title"
+     * @returns {Promise<Array>}
+     */
+    static async batchInsert(
+        tableName,
+        columns,
+        dataArray,
+        {
+            onConflict = null,
+            returning = "*"
+        } = {}
+    ) {
+
+        if (!tableName || !columns) throw new Error("Required fields was not provided");
+        if (!Array.isArray(dataArray) || dataArray.length === 0) throw new Error("No values provided");
+
+        if (!Array.isArray(columns) || columns.length === 0)
+            throw new Error("Columns are required.");
+
+        const allowedTables = [
+            "attributes",
+            "attribute_values",
+            "brands",
+            "categories",
+            "product_families",
+            "products"
+        ];
+
+        if (!allowedTables.includes(tableName))
+            throw new Error(`Table '${tableName}' is not allowed.`);
+
+        // Validate column names
+        const identifierRegex = /^[a-zA-Z_][a-zA-Z0-9_]*$/;
+
+        for (const column of columns) {
+            if (!identifierRegex.test(column)) {
+                throw new Error(`Invalid column name '${column}'.`);
+            }
+        }
+
+        const placeholders = [];
+        const values = [];
+
+        let index = 1;
+
+        for (const row of dataArray) {
+
+            const rowPlaceholders = [];
+
+            for (const column of columns) {
+                rowPlaceholders.push(`$${index++}`);
+                values.push(row[column] ?? null);
+            }
+
+            placeholders.push(`(${rowPlaceholders.join(", ")})`);
+        }
+
+        const query = `
+            INSERT INTO ${tableName} (${columns.join(", ")})
+            VALUES
+                ${placeholders.join(",\n            ")}
+            ${onConflict ? `ON CONFLICT ${onConflict}` : ""}
+            RETURNING ${returning};
+        `;
+
+        const { rows } = await db.query(query, values);
+
+        return rows;
+    }
+
+
+    /**
      * Create new product category
      * @param {string} title category title
      * @param {string} slug category slug identifier
@@ -422,11 +501,11 @@ class ProductMetaModel {
      * @param {string} description brand details/description
      * @returns {object|null} created brand or null
      */
-    static async createProductBrand({title, slug, logo_url, website, description, meta}) {
+    static async createProductBrand({ title, slug, logo_url, website, description, meta }) {
         const { rows } = await db.query(`
             INSERT INTO brands(title, slug, logo_url, website, description, meta) 
             VALUES ($1, $2, $3, $4, $5, $6) RETURNING *;
-            `, [title, slug, logo_url || null, website || null,  description, meta || null]);
+            `, [title, slug, logo_url || null, website || null, description, meta || null]);
 
         return rows[0] ?? null;
     }
@@ -612,12 +691,335 @@ class ProductMetaModel {
             RETURNING *;
         `;
 
-        console.log(query)
+        const { rows } = await db.query(query, values);
+        return rows[0] || null;
+    }
+
+
+    //Attribute & values operations
+    static async createAttribute({ title, description, display_order }) {
+        const { rows } = await db.query(`
+            INSERT INTO attributes(title, description, display_order) 
+            VALUES ($1, $2, $3) RETURNING *;
+            `, [title, description, display_order || null]);
+
+        return rows[0] ?? null;
+    }
+
+
+    static async removeAttribute(id) {
+        const result = await this.#setStatus('deleted', id, 'attributes');
+
+        return result;
+    }
+
+
+    static async activateAttribute(id) {
+        const result = await this.#setStatus('active', id, 'attributes');
+
+        return result;
+    }
+
+    static async deleteAttribute(id) {
+        const { rows } = await db.query(`
+            DELETE FROM attributes WHERE id = $1 RETURNING *
+            `, [id]);
+
+        return rows[0] ?? null;
+    }
+
+    static async getAttributeById(id) {
+        const { rows } = await db.query(`
+            SELECT * FROM attributes WHERE id =  $1
+            `, [id]);
+
+        return rows[0] ?? null;
+    }
+
+    static async getAttributes({
+        page = 1,
+        limit = 10,
+        status = 'active'
+    } = {}) {
+
+        const offset = (page - 1) * limit;
+
+        const where = [];
+        const values = [];
+        let index = 1;
+
+        if (!status || status === 'all') status = null;
+
+        if (status !== null) {
+            where.push(`status = $${index++}`);
+            values.push(status);
+        }
+
+        const whereClause = where.length
+            ? `WHERE ${where.join(' AND ')}`
+            : '';
+
+        // Total records
+        const { rows: [{ total }] } = await db.query(`
+            SELECT COUNT(*)::INTEGER AS total
+            FROM attributes
+            ${whereClause}
+        `, values);
+
+        // Current page
+        values.push(limit);
+        values.push(offset);
+
+        const { rows: attributes } = await db.query(`
+            SELECT *
+            FROM attributes
+            ${whereClause}
+            ORDER BY title ASC
+            LIMIT $${index++}
+            OFFSET $${index}
+        `, values);
+
+        const totalPages = Math.ceil(total / limit);
+
+        return {
+            attributes,
+            pagination: {
+                page,
+                limit,
+                counts: total,
+                totalPages,
+                hasPrevPage: page > 1,
+                hasNextPage: page < totalPages
+            }
+        };
+    }
+
+    static async getActiveAttributes() {
+        const { rows } = await db.query(`SELECT 
+            id, 
+            title, 
+            COALESCE(updated_at, created_at) 
+            AS last_updates 
+            FROM attributes WHERE status = 'active' 
+            ORDER BY title ASC`);
+
+        return rows;
+    }
+
+    static async updateAttribute(id, { title, description, display_order }) {
+        const updates = [];
+        const values = [];
+        let index = 1;
+
+        if (title) {
+            updates.push(`title = $${index++}`);
+            values.push(title);
+        }
+
+        if (description) {
+            updates.push(`description = $${index++}`);
+            values.push(description);
+        }
+
+        if (display_order) {
+            updates.push(`description = $${index++}`);
+            values.push(display_order);
+        }
+
+        if (updates.length === 0) {
+            throw new Error("No fields to update.");
+        }
+
+        values.push(id);
+
+        const query = `
+            UPDATE attributes
+            SET
+                ${updates.join(", ")} 
+            WHERE id = $${index}
+            RETURNING *;
+        `;
 
         const { rows } = await db.query(query, values);
         return rows[0] || null;
     }
 
+
+    //Values
+    static async createAttributeValue({ attribute_id, value, display_order, meta }) {
+        const { rows } = await db.query(`
+            INSERT INTO attribute_values(attribute_id, value, display_order, meta) 
+            VALUES ($1, $2, $3, $4) RETURNING *;
+            `, [attribute_id, value, display_order || null, meta]);
+
+        return rows[0] ?? null;
+    }
+
+
+    static async removeAttributeValue(id) {
+        const result = await this.#setStatus('deleted', id, 'attribute_values');
+
+        return result;
+    }
+
+
+    static async activateAttributeValue(id) {
+        const result = await this.#setStatus('active', id, 'attribute_values');
+
+        return result;
+    }
+
+    static async deleteAttributeValue(id) {
+        const { rows } = await db.query(`
+            DELETE FROM attribute_values WHERE id = $1 RETURNING *
+            `, [id]);
+
+        return rows[0] ?? null;
+    }
+
+    static async getAttributeValueById(id) {
+        const { rows } = await db.query(`
+                        SELECT
+                            av.*,
+                            at.title AS attribute_title
+                        FROM attribute_values av
+                        INNER JOIN attributes at
+                            ON at.id = av.attribute_id
+                        WHERE av.id = $1
+                    `, [id]);
+
+        return rows[0] ?? null;
+    }
+
+    static async getAttributeValues({
+        page = 1,
+        limit = 10,
+        attribute_id
+    } = {}) {
+
+        const offset = (page - 1) * limit;
+
+        const where = [];
+        const values = [];
+        let index = 1;
+
+        // if (!status || status === 'all')
+        //     status = null;
+
+        // if (status !== null) {
+        //     where.push(`av.status = $${index++}`);
+        //     values.push(status);
+        // }
+
+        if (attribute_id) {
+            where.push(`av.attribute_id = $${index++}`);
+            values.push(attribute_id);
+        }
+
+        const whereClause = where.length
+            ? `WHERE ${where.join(' AND ')}`
+            : '';
+
+        const {
+            rows: [{ total }]
+        } = await db.query(`
+                SELECT COUNT(*)::INTEGER AS total
+                FROM attribute_values av
+                ${whereClause}
+            `, values);
+
+        values.push(limit);
+        values.push(offset);
+
+        const { rows: attributeValues } = await db.query(`
+                                    SELECT
+                                        av.*,
+                                        at.id AS attribute_id,
+                                        at.title AS attribute_title,
+                                        at.status AS attribute_status,
+                                        at.description AS attribute_description
+                                    FROM attribute_values av
+                                    INNER JOIN attributes at
+                                        ON av.attribute_id = at.id
+                                    ${whereClause}
+                                    ORDER BY av.id DESC
+                                    LIMIT $${index++}
+                                    OFFSET $${index}
+                        `, values);
+
+        const totalPages = Math.ceil(total / limit);
+
+        return {
+            attributeValues,
+            pagination: {
+                page,
+                limit,
+                counts: total,
+                totalPages,
+                hasPrevPage: page > 1,
+                hasNextPage: page < totalPages
+            }
+        };
+    }
+
+    static async getActiveAttributeValues() {
+        const { rows } = await db.query(`SELECT 
+            av.id, 
+            av.title, 
+            COALESCE(av.updated_at, av.created_at) 
+            AS last_updates, 
+            at.title AS attribute_title
+            INNER JOIN attributes at
+                    ON av.attribute_id = at.id
+            FROM attribute_values av 
+            WHERE status = 'active' 
+            ORDER BY title ASC`);
+
+        return rows;
+    }
+
+    static async updateAttributeValues(id, { attribute_id, value, display_order, meta }) {
+        const updates = [];
+        const values = [];
+        let index = 1;
+
+        if (value) {
+            updates.push(`value = $${index++}`);
+            values.push(title);
+        }
+
+        if (attribute_id) {
+            updates.push(`attribute_id = $${index++}`);
+            values.push(description);
+        }
+
+        if (meta) {
+            updates.push(`meta = $${index++}`);
+            values.push(meta);
+        }
+
+        if (display_order) {
+            updates.push(`display_order = $${index++}`);
+            values.push(display_order);
+        }
+
+        if (updates.length === 0) {
+            throw new Error("No fields to update.");
+        }
+
+        values.push(id);
+
+        const query = `
+            UPDATE attribute_values
+            SET
+                ${updates.join(", ")} 
+            WHERE id = $${index}
+            RETURNING *;
+        `;
+
+        const { rows } = await db.query(query, values);
+        return rows[0] || null;
+    }
 }
 
 module.exports = ProductMetaModel

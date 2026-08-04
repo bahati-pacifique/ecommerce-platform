@@ -24,7 +24,6 @@ sidebarToggle.addEventListener('click', function () {
     }
 });
 
-// ========== MOBILE SIDEBAR ==========
 const overlay = document.getElementById('sidebarOverlay');
 const mobileMenuBtn = document.getElementById('mobileMenuBtn');
 
@@ -51,7 +50,6 @@ document.querySelectorAll('.sidebar-link').forEach(link => {
     });
 });
 
-// ========== SIDEBAR NAVIGATION ==========
 const sidebarLinks = document.querySelectorAll('.sidebar-link');
 
 const tabContents = {
@@ -63,6 +61,7 @@ const tabContents = {
     categories: document.getElementById('tab-categories'),
     families: document.getElementById('tab-families'),
     brands: document.getElementById('tab-brands'),
+    attributes: document.getElementById('tab-attributes'),
     customers: document.getElementById('tab-customers'),
     analytics: document.getElementById('tab-analytics'),
     marketing: document.getElementById('tab-marketing'),
@@ -81,6 +80,7 @@ const tabLabelMap = {
     categories: 'Categories',
     families: 'Families',
     brands: 'Brands',
+    attributes: 'System attributes',
     analytics: 'Analytics',
     marketing: 'Marketing',
     settings: 'Settings',
@@ -117,6 +117,11 @@ sidebarLinks.forEach(link => {
                     break;
                 case 'brands':
                     fetchBrands(1, false);
+                    break;
+                case 'attributes':
+                    fetchAttributes(1, false);
+                    renderValuesTable();
+                    switchTab('attributes');
                     break;
             }
         }

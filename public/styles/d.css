@@ -469,3 +469,57 @@ body {
 #selectedCategoryDisplay {
     animation: slideDown 0.2s ease-out;
 }
+
+/* ========== FIXED TAB CONTENT ========== */
+/* .tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+.attribute-tab.active {
+    color: #ED1B24;
+    border-bottom: 2px solid #ED1B24;
+    font-weight: 600;
+}
+
+.attribute-tab {
+    color: #6B7280;
+    border-bottom: 2px solid transparent;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.attribute-tab:hover {
+    color: #374151;
+}
+
+.meta-field-row {
+    transition: all 0.2s ease;
+}
+
+.meta-field-row:hover {
+    background: #FFF5F5;
+    border-color: #ED1B24;
+} */
+
+/* ========== ATTRIBUTE TABS - FIXED ========== */
+.attr-tab-content {
+    display: none !important;
+}
+
+.attr-tab-content.active {
+    display: block !important;
+}
+
+#attr-tab-attributes,
+#attr-tab-values {
+    display: none !important;
+}
+
+#attr-tab-attributes.active,
+#attr-tab-values.active {
+    display: block !important;
+}

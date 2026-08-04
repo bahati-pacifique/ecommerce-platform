@@ -11,6 +11,10 @@ router.get('/', session, adminController.home);
 router.get('/dashboard', administration, adminController.renderDashboard);
 router.post('/logout', adminController.logout);
 
+/* ================================ Batch insert ================================*/
+router.post('/product-metas/batch/', ProductMetaController.batchInsert);
+
+
 /* ================================ Admin Product Meta routes ================================*/
 
                     //================= Categories =============
@@ -39,5 +43,23 @@ router.put('/product-brands/:id', ProductMetaController.updateBrand);
 router.patch('/product-brands/:id', ProductMetaController.activateBrand);
 router.patch('/product-brands/remove/:id', ProductMetaController.softDeleteBrand);
 router.delete('/product-brands/:id', ProductMetaController.hardDeleteBrand);
+
+            //Attributes
+router.post('/attributes/', ProductMetaController.createAttribute);
+router.get('/attributes/', ProductMetaController.getAttributes);
+router.get('/attributes/:id', ProductMetaController.getAttribute);
+router.put('/attributes/:id', ProductMetaController.updateAttribute);
+router.patch('/attributes/:id', ProductMetaController.activateAttribute);
+router.patch('/attributes/remove/:id', ProductMetaController.softDeleteAttribute);
+router.delete('/attributes/:id', ProductMetaController.hardDeleteAttribute);
+
+            //Attributes values
+router.post('/attribute-values/', ProductMetaController.createAttributeValue);
+router.get('/attribute-values/', ProductMetaController.getAttributesValues);
+router.get('/attribute-values/:id', ProductMetaController.getAttributeValue);
+router.put('/attribute-values/:id', ProductMetaController.updateAttributeValue);
+router.patch('/attribute-values/:id', ProductMetaController.activateAttributeValue);
+router.patch('/attribute-values/remove/:id', ProductMetaController.softDeleteAttributeValue);
+router.delete('/attribute-values/:id', ProductMetaController.hardDeleteAttributeValue);      
 
 module.exports = router;

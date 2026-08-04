@@ -2,6 +2,17 @@
 const ProductMetaServices = require('../src/services/productMeta.services');
 const { formatError } = require('../util/helpers');
 
+async function batchInsert(req, res) {
+    const { tableName, columns, values, confictOptions } = req.body;
+
+    try {
+        const result = await ProductMetaServices.batchInsert(tableName, columns, values, confictOptions);
+        return res.json(result);
+    } catch (error) {
+        formatError('batchInsert()', 500, error, error.message || 'Failed — Internal Server Error', res)
+    }
+}
+
 async function createProductCategory(req, res) {
     const { title, slug, description } = req.body;
     try {
@@ -192,12 +203,11 @@ async function createBrand(req, res) {
         console.log(error);
         let message = 'Failed — Internal Server Error';
         if (error.code == '23505') message = `${title} brand already exists`;
-        
+
         return formatError('createBrand()', 400, error, message, res);
     }
 }
 
-// GET /api/brands/:id
 async function getBrandById(req, res) {
     try {
         const brand = await ProductMetaServices.getBrandById(req.params.id);
@@ -208,7 +218,6 @@ async function getBrandById(req, res) {
     }
 }
 
-// GET /api/brands
 async function getBrands(req, res) {
     try {
         const paginatedData = await ProductMetaServices.getPaginatedBrands(req.query);
@@ -218,7 +227,6 @@ async function getBrands(req, res) {
     }
 }
 
-// GET /api/brands/list/active
 async function getActiveBrands(req, res) {
     try {
         const result = await ProductMetaServices.getActiveBrandsList();
@@ -228,7 +236,6 @@ async function getActiveBrands(req, res) {
     }
 }
 
-// PUT /api/brands/:id
 async function updateBrand(req, res) {
     try {
         const updatedBrand = await ProductMetaServices.updateBrand(req.params.id, req.body);
@@ -238,37 +245,178 @@ async function updateBrand(req, res) {
     }
 }
 
-// PATCH /api/brands/:id/soft-delete
 async function softDeleteBrand(req, res) {
     try {
         const brand = await ProductMetaServices.softDeleteBrand(req.params.id);
         return res.status(200).json(brand);
     } catch (error) {
-        return res.status(400).json({ message: error.message });
+        return formatError('softDeleteBrand()', 400, error, error.message, res);
     }
 }
 
-// PATCH /api/brands/:id/activate
 async function activateBrand(req, res) {
     try {
         const brand = await ProductMetaServices.activateBrand(req.params.id);
         return res.status(200).json(brand);
     } catch (error) {
-        return res.status(400).json({ message: error.message });
+        return formatError('activateBrand()', 400, error, error.message, res);
     }
 }
 
-// DELETE /api/brands/:id
 async function hardDeleteBrand(req, res) {
     try {
         const brand = await ProductMetaServices.hardDeleteBrand(req.params.id);
         return res.status(200).json({ success: true, message: "Brand permanently purged from database.", data: brand });
     } catch (error) {
-        return res.status(400).json({ message: error.message });
+        return formatError('hardDeleteBrands()', 400, error, error.message, res);
+    }
+}
+
+//Attributes
+async function createAttribute(req, res) {
+    const { title } = req.body;
+    try {
+        const attribute = await ProductMetaServices.createAttribute(req.body);
+
+        return res.json(attribute)
+    } catch (error) {
+        return formatError('createAttribute()', 500, error, error.message, res);
+    }
+}
+
+async function getAttribute(req, res) {
+    try {
+        const attribute = await ProductMetaServices.getAttributeById(req.params.id);
+        return res.json(attribute);
+    } catch (error) {
+        const status = error.message === "Not found" ? 404 : 400;
+        return formatError('getAttribute()', status, error, error.message, res);
+    }
+}
+
+async function getAttributes(req, res) {
+    try {
+        const attributes = await ProductMetaServices.getPaginatedAttributes();
+        return res.json(attributes);
+    } catch (error) {
+        return formatError('getAttributes()', 500, error, error.message, res);
+    }
+}
+
+async function updateAttribute(req, res) {
+    try {
+        const attribute = await ProductMetaServices.updateAttribute(req.params.id, req.body);
+        return res.json(attribute);
+    } catch (error) {
+        const status = error.message === "Not found" ? 404 : 400;
+        return formatError('updateAttribute()', status, error, error.message, res);
+    }
+}
+
+async function activateAttribute(req, res) {
+    try {
+        const attribute = await ProductMetaServices.activateAttribute(req.params.id);
+        return res.json(attribute);
+    } catch (error) {
+        const status = error.message === "Not found" ? 404 : 400;
+        return formatError('activateAttribute()', status, error, error.message, res);
+    }
+}
+
+async function softDeleteAttribute(req, res) {
+    try {
+        const attribute = await ProductMetaServices.softDeleteAttribute(req.params.id);
+        return res.json(attribute);
+    } catch (error) {
+        const status = error.message === "Not found" ? 404 : 400;
+        return formatError('softDeleteAttribute()', status, error, error.message, res);
+    }
+}
+
+async function hardDeleteAttribute(req, res) {
+    try {
+        const attribute = await ProductMetaServices.hardDeleteAttribute(req.params.id);
+        return res.json(attribute);
+    } catch (error) {
+        const status = error.message === "Not found" ? 404 : 400;
+        return formatError('hardDeleteAttribute()', status, error, error.message, res);
+    }
+}
+
+//Values
+async function createAttributeValue(req, res) {
+    const { title } = req.body;
+    try {
+        const attributeValue = await ProductMetaServices.createAttributeValue(req.body);
+
+        return res.json(attributeValue)
+    } catch (error) {
+        return formatError('createAttributeValue()', 500, error, error.message, res);
+    }
+}
+
+async function getAttributeValue(req, res) {
+    try {
+        const attributeValue = await ProductMetaServices.getAttributeValueById(req.params.id);
+        return res.json(attributeValue);
+    } catch (error) {
+        const status = error.message === "Not found" ? 404 : 400;
+        return formatError('getAttributeValue()', status, error, error.message, res);
+    }
+}
+
+async function getAttributesValues(req, res) {
+    try {
+        const result = await ProductMetaServices.getPaginatedAttributesValue(req.query);
+        return res.json(result);
+    } catch (error) {
+        return formatError('getAttributeValues()', 500, error, error.message, res);
+    }
+}
+
+async function updateAttributeValue(req, res) {
+    try {
+        const attributeValue = await ProductMetaServices.updateAttributeValue(req.params.id, req.body);
+        return res.json(attributeValue);
+    } catch (error) {
+        const status = error.message === "Not found" ? 404 : 400;
+        return formatError('updateAttributeValue()', status, error, error.message, res);
+    }
+}
+
+async function activateAttributeValue(req, res) {
+    try {
+        const attributeValue = await ProductMetaServices.activateAttributeValue(req.params.id);
+        return res.json(attributeValue);
+    } catch (error) {
+        const status = error.message === "Not found" ? 404 : 400;
+        return formatError('activateAttributeValue()', status, error, error.message, res);
+    }
+}
+
+async function softDeleteAttributeValue(req, res) {
+    try {
+        const attributeValue = await ProductMetaServices.softDeleteAttributeValue(req.params.id);
+        return res.json(attributeValue);
+    } catch (error) {
+        const status = error.message === "Not found" ? 404 : 400;
+        return formatError('softDeleteAttributeValue()', status, error, error.message, res);
+    }
+}
+
+async function hardDeleteAttributeValue(req, res) {
+    try {
+        const attributeValue = await ProductMetaServices.hardDeleteAttributeValue(req.params.id);
+        return res.json(attributeValue);
+    } catch (error) {
+        const status = error.message === "Not found" ? 404 : 400;
+        return formatError('hardDeleteAttributeValue()', status, error, error.message, res);
     }
 }
 
 module.exports = {
+    batchInsert,
+
     createProductCategory,
     getProductCategories,
     removeProductCategory,
@@ -291,6 +439,21 @@ module.exports = {
     updateBrand,
     softDeleteBrand,
     hardDeleteBrand,
-    activateBrand
+    activateBrand,
 
+    createAttribute,
+    getAttribute,
+    getAttributes,
+    updateAttribute,
+    activateAttribute,
+    softDeleteAttribute,
+    hardDeleteAttribute,
+
+    createAttributeValue,
+    getAttributeValue,
+    getAttributesValues,
+    updateAttributeValue,
+    activateAttributeValue,
+    softDeleteAttributeValue,
+    hardDeleteAttributeValue
 };
