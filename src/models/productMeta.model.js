@@ -798,8 +798,7 @@ class ProductMetaModel {
         const { rows } = await db.query(`SELECT 
             id, 
             title, 
-            COALESCE(updated_at, created_at) 
-            AS last_updates 
+            created_at
             FROM attributes WHERE status = 'active' 
             ORDER BY title ASC`);
 
@@ -985,7 +984,7 @@ class ProductMetaModel {
 
         if (value) {
             updates.push(`value = $${index++}`);
-            values.push(title);
+            values.push(value);
         }
 
         if (attribute_id) {

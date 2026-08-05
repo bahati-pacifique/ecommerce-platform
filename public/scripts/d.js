@@ -122,6 +122,16 @@ sidebarLinks.forEach(link => {
                     fetchAttributes(1, false);
                     renderValuesTable();
                     switchTab('attributes');
+
+                    /**
+                     * fetchAttributes(1);
+
+                        // Initially show values tab placeholder
+                        renderValuesTable();
+
+                        // Ensure the initial tab is properly displayed
+                        switchTab('attributes');
+                     */
                     break;
             }
         }

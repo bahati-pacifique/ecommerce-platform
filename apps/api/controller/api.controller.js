@@ -37,7 +37,7 @@ async function getActiveAttributes(req, res) {
 
         return res.json(result);
     } catch (error) {
-        return formatError('getAttribute()', 500, error, 'Failed — Internal Server Error', res);
+        return formatError('getActiveAttributes()', 500, error, 'Failed — Internal Server Error', res);
     }
 }
 

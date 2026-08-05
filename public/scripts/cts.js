@@ -80,7 +80,7 @@ function renderCategoryTable() {
                 </td>
                 <td class="px-4 py-3 text-center">
                     <div class="flex items-center justify-center gap-2">
-                        <button class="p-1.5 rounded-lg text-blue-600 hover:bg-blue-50 transition category-edit-btn" title="Edit" data-id="${cat.id}">
+                        <button class="p-1.5 rounded-lg text-black-100 hover:bg-black/5 transition category-edit-btn" title="Edit" data-id="${cat.id}">
                             <i class="fas fa-edit"></i>
                         </button>
                         <button class="p-1.5 rounded-lg text-brand hover:bg-brand-light transition category-delete-btn ${cat.status === "deleted" ? 'hidden' : ''}" title="Delete" data-id="${cat.id}">

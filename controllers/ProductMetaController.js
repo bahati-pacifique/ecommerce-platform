@@ -296,7 +296,7 @@ async function getAttribute(req, res) {
 
 async function getAttributes(req, res) {
     try {
-        const attributes = await ProductMetaServices.getPaginatedAttributes();
+        const attributes = await ProductMetaServices.getPaginatedAttributes(req.query);
         return res.json(attributes);
     } catch (error) {
         return formatError('getAttributes()', 500, error, error.message, res);

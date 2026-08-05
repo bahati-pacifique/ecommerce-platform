@@ -259,7 +259,7 @@ class ProductMetaService {
     }
 
     static async updateAttributeValue(id, updateData) {
-        console.log("***", updateData)
+        
         if (!id || isNaN(id)) {
             throw new Error("ID must be provided.");
         }

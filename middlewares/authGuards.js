@@ -20,6 +20,6 @@ module.exports = {
     administration: authPass({ acceptedTypes: ['admin', 'dev', 'Development', 'qa'] }),
     dev: authPass({ acceptedTypes: ['dev'] }),
     qa: authPass({ acceptedTypes: ['qa'] }),
-    dashboard: authPass({ acceptedTypes: ['admin', 'dev', 'engineer', 'qa', 'moderator', 'seller', 'hr', 'technical', 'store'] }),
+    dashboard: authPass({ acceptedTypes: ['admin', 'dev', 'Development', 'engineer', 'qa', 'moderator', 'seller', 'hr', 'technical', 'store'] }),
     membership: authPass({ acceptedTypes: ['client', 'member', 'customer'] })
 };

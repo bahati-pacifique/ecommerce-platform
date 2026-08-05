@@ -1,4 +1,3 @@
-// ========== ATTRIBUTES STATE ==========
 let currentAttributePage = 1;
 const attributeItemsPerPage = 20;
 let deleteAttributeTargetId = null;
@@ -7,7 +6,7 @@ let filteredAttributes = [];
 let currentAttributeSearchTerm = '';
 let currentAttributeStatusFilter = 'all';
 let attributePaginationData = {
-    totalAttributes: 0,
+    counts: 0,
     totalPages: 0,
     page: 1,
     limit: 20
@@ -15,7 +14,7 @@ let attributePaginationData = {
 let isFetchingAttribute = false;
 let attributeOriginalEditing = null;
 
-// ========== VALUES STATE ==========
+
 let currentValuePage = 1;
 const valueItemsPerPage = 20;
 let deleteValueTargetId = null;
@@ -32,7 +31,6 @@ let valuePaginationData = {
 let isFetchingValue = false;
 let valueOriginalEditing = null;
 
-// ========== DOM REFS - ATTRIBUTES ==========
 const $attributesTableBody = $('#attributesTableBody');
 const $attributesTotalCount = $('#attributeTotalCount');
 const $attributeShowingCount = $('#attributeShowingCount');
@@ -44,7 +42,6 @@ const $attributeSearchInput = $('#attributeSearchInput');
 const $attributeStatusFilter = $('#attributeStatusFilter');
 const $attributeCount = $('#attributeCount');
 
-// ========== DOM REFS - VALUES ==========
 const $valuesTableBody = $('#valuesTableBody');
 const $valuesTotalCount = $('#valueTotalCount');
 const $valueShowingCount = $('#valueShowingCount');
@@ -55,21 +52,18 @@ const $valuesEmptyState = $('#valuesEmptyState');
 const $valueAttributeFilter = $('#valueAttributeFilter');
 const $valueCount = $('#valueCount');
 
-// ========== VALUE META FIELDS STATE ==========
 let valueMetaFieldCount = 0;
 let valueMetaFieldsData = {};
 
-// ========== RENDER ATTRIBUTES TABLE ==========
 function renderAttributesTable() {
     const data = filteredAttributes || [];
     const totalItems = data.length;
 
-    $attributesTotalCount.text(attributePaginationData.totalAttributes || 0);
-    $attributeCount.text(attributePaginationData.totalAttributes || 0);
+    $attributesTotalCount.text(attributePaginationData.counts || 0);
+    $attributeCount.text(attributePaginationData.counts || 0);
 
-    if (totalItems === 0 && attributePaginationData.totalAttributes === 0) {
+    if (totalItems === 0 && attributePaginationData.counts === 0) {
         $attributesTableBody.html('');
-        $attributesEmptyState.removeClass('hidden');
         $attributeShowingCount.text('0');
         $attributesPageInfo.text('Page 0 of 0');
         $prevAttributePageBtn.prop('disabled', true);
@@ -87,7 +81,7 @@ function renderAttributesTable() {
     $prevAttributePageBtn.prop('disabled', currentPageNum <= 1);
     $nextAttributePageBtn.prop('disabled', currentPageNum >= totalPages);
 
-    if (data.length === 0 && attributePaginationData.totalAttributes > 0) {
+    if (data.length === 0 && attributePaginationData.counts > 0) {
         $attributesTableBody.html(`
             <tr>
                 <td colspan="6" class="text-center py-8 text-gray-500">
@@ -107,7 +101,6 @@ function renderAttributesTable() {
                     <p class="text-sm font-medium text-gray-900">
                         ${stripHtml2(attr.title)}
                     </p>
-                    <p class="text-xs text-gray-400 md:hidden">${stripHtml2(attr.description || '')}</p>
                 </td>
                 <td class="px-4 py-3 text-sm text-gray-500 hidden md:table-cell max-w-xs truncate">${stripHtml2(attr.description || '-')}</td>
                 <td class="px-4 py-3 text-center text-sm text-gray-600">${attr.display_order || 0}</td>
@@ -116,7 +109,7 @@ function renderAttributesTable() {
                 </td>
                 <td class="px-4 py-3 text-center">
                     <div class="flex items-center justify-center gap-2">
-                        <button class="p-1.5 rounded-lg text-blue-600 hover:bg-blue-50 transition attribute-edit-btn" title="Edit" data-id="${attr.id}">
+                        <button class="p-1.5 rounded-lg text-black-100 hover:bg-black/5 transition attribute-edit-btn" title="Edit" data-id="${attr.id}">
                             <i class="fas fa-edit"></i>
                         </button>
                         <button class="p-1.5 rounded-lg text-brand hover:bg-brand-light transition attribute-delete-btn" title="Delete" data-id="${attr.id}">
@@ -198,7 +191,7 @@ function renderValuesTable() {
                 <td class="px-4 py-3 text-center text-sm text-gray-500">${metaDisplay}</td>
                 <td class="px-4 py-3 text-center">
                     <div class="flex items-center justify-center gap-2">
-                        <button class="p-1.5 rounded-lg text-blue-600 hover:bg-blue-50 transition value-edit-btn" title="Edit" data-id="${val.id}">
+                        <button class="p-1.5 rounded-lg text-black-100 hover:bg-black/5 transition value-edit-btn" title="Edit" data-id="${val.id}">
                             <i class="fas fa-edit"></i>
                         </button>
                         <button class="p-1.5 rounded-lg text-brand hover:bg-brand-light transition value-delete-btn" title="Delete" data-id="${val.id}">
@@ -371,8 +364,6 @@ function initValueMetaFields() {
     renderValueMetaFields({});
 }
 
-// ========== ATTRIBUTE API CALLS ==========
-
 async function fetchAttributes(page = 1, isRefresh = false) {
     if (isFetchingAttribute) return;
     isFetchingAttribute = true;
@@ -381,6 +372,9 @@ async function fetchAttributes(page = 1, isRefresh = false) {
     const $attrSysncLoader = $('#attrSyncLoader');
     const $container = $('#attributesContainer');
 
+
+    $attributesEmptyState.addClass('hidden');
+
     if (!isRefresh) {
         $skeletonLoader.removeClass('hidden');
         $container.addClass('hidden');
@@ -388,16 +382,14 @@ async function fetchAttributes(page = 1, isRefresh = false) {
         $attrSysncLoader.removeClass('hidden')
     }
 
-    $attributesEmptyState.addClass('hidden');
-
     try {
         const params = {
             page: page,
             limit: attributeItemsPerPage
         };
 
-        if (currentAttributeStatusFilter && currentAttributeStatusFilter !== 'all') {
-            params.status = currentAttributeStatusFilter;
+        if ($attributeStatusFilter.val() && $attributeStatusFilter.val() !== 'all') {
+            params.status = $attributeStatusFilter.val();
         }
 
         const response = await axios.get(`/attributes/`, {
@@ -408,7 +400,7 @@ async function fetchAttributes(page = 1, isRefresh = false) {
         allAttributes = response.data.attributes || [];
 
         attributePaginationData = response.data.pagination || {
-            totalAttributes: 0,
+            counts: 0,
             totalPages: 0,
             page: 1,
             limit: attributeItemsPerPage
@@ -428,11 +420,11 @@ async function fetchAttributes(page = 1, isRefresh = false) {
         renderAttributesTable();
 
     } catch (error) {
-        console.error('Fetch error:', error);
+        console.error(error);
         allAttributes = [];
         filteredAttributes = [];
         attributePaginationData = {
-            totalAttributes: 0,
+            counts: 0,
             totalPages: 0,
             page: 1,
             limit: attributeItemsPerPage
@@ -485,7 +477,7 @@ async function createAttribute(data) {
         }
         throw new Error('Invalid response format');
     } catch (error) {
-        console.error('Create error:', error);
+        console.error(error);
         Notification.showNotification({
             type: 'error',
             message: error.response?.data?.message || 'Failed to create attribute'
@@ -511,7 +503,7 @@ async function updateAttribute(id, data) {
         await fetchAttributes(currentAttributePage, true);
         return true;
     } catch (error) {
-        console.error('Update error:', error);
+        console.error(error);
         Notification.showNotification({
             type: 'error',
             message: error.response?.data?.message || 'Failed to update attribute'
@@ -522,7 +514,7 @@ async function updateAttribute(id, data) {
 
 async function deleteAttribute(id) {
     try {
-        await axios.delete(`/attributes/${id}`, {
+        await axios.patch(`/attributes/remove/${id}`, {
             withCredentials: true
         });
 
@@ -534,7 +526,7 @@ async function deleteAttribute(id) {
         await fetchAttributes(currentAttributePage, true);
         return true;
     } catch (error) {
-        console.error('Delete error:', error);
+        console.error(error);
         Notification.showNotification({
             type: 'error',
             message: error.response?.data?.message || 'Failed to delete attribute'
@@ -542,8 +534,6 @@ async function deleteAttribute(id) {
         return false;
     }
 }
-
-// ========== VALUE API CALLS ==========
 
 async function fetchValues(attributeId, page = 1, isRefresh = false) {
     if (isFetchingValue) return;
@@ -594,7 +584,7 @@ async function fetchValues(attributeId, page = 1, isRefresh = false) {
         renderValuesTable();
 
     } catch (error) {
-        console.error('Fetch values error:', error);
+        console.error(error);
         allValues = [];
         filteredValues = [];
         valuePaginationData = {
@@ -644,7 +634,7 @@ async function createValue(data) {
 
         await fetchValues(currentValueAttributeId, 1, true);
     } catch (error) {
-        console.error('Create value error:', error);
+        console.error(error);
         Notification.showNotification({
             type: 'error',
             message: error.response?.data?.message || 'Failed to create value'
@@ -670,7 +660,7 @@ async function updateValue(id, data) {
         await fetchValues(currentValueAttributeId, currentValuePage, true);
         return true;
     } catch (error) {
-        console.error('Update value error:', error);
+        console.error(error);
         Notification.showNotification({
             type: 'error',
             message: error.response?.data?.message || 'Failed to update value'
@@ -681,7 +671,7 @@ async function updateValue(id, data) {
 
 async function deleteValue(id) {
     try {
-        await axios.delete(`/attribute-values/${id}`, {
+        await axios.delete(`/attribute-values/remove/${id}`, {
             withCredentials: true
         });
 
@@ -693,7 +683,7 @@ async function deleteValue(id) {
         await fetchValues(currentValueAttributeId, currentValuePage, true);
         return true;
     } catch (error) {
-        console.error('Delete value error:', error);
+        console.error(error);
         Notification.showNotification({
             type: 'error',
             message: error.response?.data?.message || 'Failed to delete value'
@@ -702,7 +692,6 @@ async function deleteValue(id) {
     }
 }
 
-// ========== FETCH ATTRIBUTES FOR DROPDOWN ==========
 async function fetchAttributesForDropdown() {
     try {
         const response = await axios.get(`/attributes/`, {
@@ -723,7 +712,7 @@ async function fetchAttributesForDropdown() {
 
         return attributes;
     } catch (error) {
-        console.error('Error fetching attributes for dropdown:', error);
+        console.error(error);
         return [];
     }
 }
@@ -785,8 +774,6 @@ function closeAttributeDeleteModal() {
     $('body').css('overflow', '');
     deleteAttributeTargetId = null;
 }
-
-// ========== VALUE MODALS ==========
 
 function openValueCreateModal() {
     const attributeId = $valueAttributeFilter.val();
@@ -976,8 +963,6 @@ async function confirmValueDelete() {
     }
 }
 
-// ========== FILTERS ==========
-
 function applyAttributeSearch() {
     const search = $attributeSearchInput.val().toLowerCase().trim();
     currentAttributeSearchTerm = search;
@@ -1021,8 +1006,6 @@ function resetAttributeFilters(shouldFetch = true) {
     if (shouldFetch) fetchAttributes(1, true);
 }
 
-// ========== PAGINATION ==========
-
 function prevAttributePage() {
     if (attributePaginationData.page > 1) {
         const newPage = Number(attributePaginationData.page) - 1;
@@ -1051,11 +1034,8 @@ function nextValuePage() {
     }
 }
 
-// ========== TABS (UPDATED WITH RENAMED CLASSES) ==========
 
-// ========== FIXED SWITCH TAB FUNCTION ==========
 function switchTab(tabName) {
-    console.log('🔄 Switching to tab:', tabName);
 
     // Update tab buttons
     $('.attr-tab').removeClass('active border-brand text-brand');
@@ -1087,7 +1067,6 @@ function switchTab(tabName) {
     }
 }
 
-// ========== KEYBOARD SHORTCUTS ==========
 $(document).on('keydown', function (e) {
     if (e.key === 'Escape') {
         if (!$('#attributeFormModal').hasClass('hidden')) {
@@ -1114,153 +1093,11 @@ $(document).on('keydown', function (e) {
     }
 });
 
-// ========== DOCUMENT READY ==========
-
-// $(document).ready(function () {
-
-//     $('#attr-tab-attributes').addClass('active');
-//     $('#attr-tab-attributes').css('display', 'block');
-//     $('#attr-tab-values').removeClass('active');
-//     $('#attr-tab-values').css('display', 'none');
-
-//     initValueMetaFields();
-
-//     // ========== TAB CLICK HANDLER ==========
-//     $('.attr-tab').on('click', function () {
-//         const tabName = $(this).data('tab');
-//         console.log('🔀 Tab clicked:', tabName);
-//         switchTab(tabName);
-//     });
-
-//     // ========== ATTRIBUTE EVENTS ==========
-
-//     // New Attribute button
-//     $('.new-attribute-btn').on('click', openAttributeCreateModal);
-
-//     // Search - LOCAL ONLY
-//     $attributeSearchInput.on('input', function () {
-//         applyAttributeSearch();
-//     });
-
-//     // Status filter - SERVER-SIDE
-//     $attributeStatusFilter.on('change', function () {
-//         applyAttributeStatusFilter();
-//     });
-
-//     // Reset filters
-//     $('#attributeFilterResetBtn').on('click', function () {
-//         resetAttributeFilters(true);
-//     });
-
-//     // Pagination
-//     $('#prevAttributePageBtn').on('click', prevAttributePage);
-//     $('#nextAttributePageBtn').on('click', nextAttributePage);
-
-//     // Refresh
-//     $('#refreshAttributes').on('click', function () {
-//         fetchAttributes(currentAttributePage, true);
-//     });
-
-//     // Empty state create
-//     $('#emptyAttributeBtn').on('click', openAttributeCreateModal);
-
-//     // ========== ATTRIBUTE MODALS ==========
-
-//     // Close modal buttons
-//     $('#closeAttributeFormModal').on('click', closeAttributeFormModal);
-//     $('.cancel-create-attribute').on('click', closeAttributeFormModal);
-//     $('.close-attribute-delete-modal').on('click', closeAttributeDeleteModal);
-//     $('.confirm-delete-attribute-btn').on('click', confirmAttributeDelete);
-
-//     // Modal overlay close
-//     $('.attribute-modal-overlay').on('click', function (e) {
-//         if ($(e.target).hasClass('attribute-modal-overlay')) {
-//             closeAttributeFormModal();
-//         }
-//     });
-
-//     // Form submit
-//     $("#attributeForm").on('submit', handleAttributeFormSubmit);
-
-//     // ========== VALUE EVENTS ==========
-//     $('.new-value-btn').on('click', openValueCreateModal);
-
-//     // Load Values on attribute select
-//     $('#loadValuesBtn').on('click', function () {
-//         const attributeId = $valueAttributeFilter.val();
-//         if (!attributeId) {
-//             Notification.showNotification({
-//                 type: 'warning',
-//                 message: 'Please select an attribute first.'
-//             });
-//             renderValuesTable();
-//             return;
-//         }
-//         currentValueAttributeId = parseInt(attributeId);
-//         currentValuePage = 1;
-//         fetchValues(currentValueAttributeId, 1, true);
-//     });
-
-//     // Attribute filter change - show placeholder
-//     $valueAttributeFilter.on('change', function () {
-//         filteredValues = [];
-//         valuePaginationData = {
-//             counts: 0,
-//             totalPages: 0,
-//             page: 1,
-//             limit: valueItemsPerPage
-//         };
-//         renderValuesTable();
-//         if ($(this).val()) {
-//             $('.new-value-btn').prop('disabled', false);
-//         } else {
-//             $('.new-value-btn').prop('disabled', true);
-//         }
-//     });
-
-//     // ========== VALUE MODALS ==========
-//     $('#closeValueFormModal').on('click', closeValueFormModal);
-//     $('.cancel-create-value').on('click', closeValueFormModal);
-//     $('.close-value-delete-modal').on('click', closeValueDeleteModal);
-//     $('.confirm-delete-value-btn').on('click', confirmValueDelete);
-
-//     // Modal overlay close
-//     $('.value-modal-overlay').on('click', function (e) {
-//         if ($(e.target).hasClass('value-modal-overlay')) {
-//             closeValueFormModal();
-//         }
-//     });
-
-//     // Form submit
-//     $("#valueForm").on('submit', handleValueFormSubmit);
-
-//     // ========== PAGINATION - VALUES ==========
-//     $('#prevValuePageBtn').on('click', prevValuePage);
-//     $('#nextValuePageBtn').on('click', nextValuePage);
-
-//     // ========== INITIAL LOAD ==========
-//     fetchAttributesForDropdown().then(() => {
-//         if ($valueAttributeFilter.find('option').length <= 1) {
-//             $valuesTableBody.html(`
-//                 <tr>
-//                     <td colspan="5" class="text-center py-8 text-gray-500">
-//                         <i class="fas fa-exclamation-triangle text-2xl block mb-2 text-amber-400"></i>
-//                         <p class="text-sm">No attributes available</p>
-//                         <p class="text-xs text-gray-400 mt-1">Please create an attribute first in the <strong>"Attributes"</strong> tab</p>
-//                     </td>
-//                 </tr>
-//             `);
-//             $('.new-value-btn').prop('disabled', true);
-//         }
-//     });
-// });
-
 // ========== ATTRIBUTE SEARCH SELECTOR STATE ==========
 let allAttributesForSearch = [];
 let selectedAttributeForSearch = null;
 let isAttributeDropdownOpen = false;
 
-// ========== RENDER ATTRIBUTE SEARCH LIST ==========
 function renderAttributeSearchList(attributes, searchTerm = '') {
     const $list = $('#attributeSearchList');
     const $noResult = $('#noAttributeResult');
@@ -1294,28 +1131,24 @@ function renderAttributeSearchList(attributes, searchTerm = '') {
 
     $list.html(html);
 
-    // Bind click events
     $('.attribute-search-item').off('click').on('click', function () {
         const id = parseInt($(this).data('id'));
         const title = $(this).data('title');
         selectAttributeForSearch(id, title);
     });
 
-    // Keyboard navigation
     $('.attribute-search-item').off('mouseenter').on('mouseenter', function () {
         $('.attribute-search-item').removeClass('bg-gray-100');
         $(this).addClass('bg-gray-100');
     });
 }
 
-// ========== HIGHLIGHT SEARCH TEXT ==========
 function highlightAttributeText(text, search) {
     if (!search || search === '') return text;
     const regex = new RegExp(`(${search.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
     return text.replace(regex, '<span class="bg-brand-light text-brand font-semibold">$1</span>');
 }
 
-// ========== SELECT ATTRIBUTE ==========
 function selectAttributeForSearch(id, title) {
     selectedAttributeForSearch = { id, title };
     $('#valueAttributeSearch').val(title);
@@ -1324,7 +1157,6 @@ function selectAttributeForSearch(id, title) {
     $('#clearAttributeSearch').removeClass('hidden');
     closeAttributeDropdown();
 
-    // Enable new value button
     $('.new-value-btn').prop('disabled', false);
 
     // Update the hidden filter value
@@ -1334,7 +1166,6 @@ function selectAttributeForSearch(id, title) {
     renderAttributeSearchList(allAttributesForSearch, $('#valueAttributeSearch').val());
 }
 
-// ========== DESELECT ATTRIBUTE ==========
 function deselectAttributeForSearch() {
     selectedAttributeForSearch = null;
     currentValueAttributeId = null;
@@ -1346,7 +1177,6 @@ function deselectAttributeForSearch() {
     renderValuesTable();
 }
 
-// ========== SEARCH ATTRIBUTES ==========
 function searchAttributes(searchTerm) {
     if (!searchTerm || searchTerm.trim() === '') {
         renderAttributeSearchList(allAttributesForSearch, '');
@@ -1361,7 +1191,6 @@ function searchAttributes(searchTerm) {
     openAttributeDropdown();
 }
 
-// ========== OPEN/CLOSE DROPDOWN ==========
 function openAttributeDropdown() {
     if (allAttributesForSearch.length === 0) return;
     isAttributeDropdownOpen = true;
@@ -1373,7 +1202,6 @@ function closeAttributeDropdown() {
     $('#attributeSearchDropdown').addClass('hidden');
 }
 
-// ========== INIT ATTRIBUTE SEARCH SELECTOR ==========
 function initAttributeSearchSelector() {
     const $search = $('#valueAttributeSearch');
     const $dropdown = $('#attributeSearchDropdown');
@@ -1477,7 +1305,6 @@ function initAttributeSearchSelector() {
     fetchAttributesForSearch();
 }
 
-// ========== FETCH ATTRIBUTES FOR SEARCH ==========
 async function fetchAttributesForSearch() {
     try {
         // Show loading state
@@ -1499,7 +1326,7 @@ async function fetchAttributesForSearch() {
         allAttributesForSearch = response.data.attributes || [];
         renderAttributeSearchList(allAttributesForSearch, '');
 
-        // Also populate the modal dropdown
+        // populating the modal dropdown
         const $modalDropdown = $('#valueModalAttribute');
         $modalDropdown.html('<option value="">Select an attribute...</option>');
         allAttributesForSearch.forEach(attr => {
@@ -1507,7 +1334,7 @@ async function fetchAttributesForSearch() {
         });
 
     } catch (error) {
-        console.error('Error fetching attributes for search:', error);
+        console.error(error);
         $('#attributeSearchList').html(`
             <div class="px-4 py-3 text-sm text-red-500 text-center">
                 <i class="fas fa-exclamation-triangle mr-2"></i> Failed to load attributes
@@ -1517,6 +1344,7 @@ async function fetchAttributesForSearch() {
 }
 
 // ========== UPDATE LOAD VALUES BUTTON ==========
+
 // Replace the old load values event with this
 $('#loadValuesBtn').off('click').on('click', function () {
     if (!selectedAttributeForSearch) {
@@ -1571,7 +1399,6 @@ function openValueCreateModal() {
 
 // ========== UPDATE DOCUMENT READY ==========
 $(document).ready(function () {
-    console.log('🚀 Document ready for Attributes & Values...');
 
     // Initialize tab visibility
     $('#attr-tab-attributes').addClass('active');
@@ -1579,40 +1406,29 @@ $(document).ready(function () {
     $('#attr-tab-values').removeClass('active');
     $('#attr-tab-values').css('display', 'none');
 
-    // Initialize Attribute Search Selector
     initAttributeSearchSelector();
 
-    // Initialize Value Meta Fields
     initValueMetaFields();
 
-    // ========== TAB CLICK HANDLER ==========
     $('.attr-tab').on('click', function () {
         const tabName = $(this).data('tab');
-        console.log('🔀 Tab clicked:', tabName);
         switchTab(tabName);
     });
 
-    // ========== ATTRIBUTE EVENTS ==========
-
-    // New Attribute button
     $('.new-attribute-btn').on('click', openAttributeCreateModal);
 
-    // Search - LOCAL ONLY
     $attributeSearchInput.on('input', function () {
         applyAttributeSearch();
     });
 
-    // Status filter - SERVER-SIDE
     $attributeStatusFilter.on('change', function () {
         applyAttributeStatusFilter();
     });
 
-    // Reset filters
     $('#attributeFilterResetBtn').on('click', function () {
         resetAttributeFilters(true);
     });
 
-    // Pagination
     $('#prevAttributePageBtn').on('click', prevAttributePage);
     $('#nextAttributePageBtn').on('click', nextAttributePage);
 
@@ -1626,28 +1442,21 @@ $(document).ready(function () {
 
     // ========== ATTRIBUTE MODALS ==========
 
-    // Close modal buttons
     $('#closeAttributeFormModal').on('click', closeAttributeFormModal);
     $('.cancel-create-attribute').on('click', closeAttributeFormModal);
     $('.close-attribute-delete-modal').on('click', closeAttributeDeleteModal);
     $('.confirm-delete-attribute-btn').on('click', confirmAttributeDelete);
 
-    // Modal overlay close
     $('.attribute-modal-overlay').on('click', function (e) {
         if ($(e.target).hasClass('attribute-modal-overlay')) {
             closeAttributeFormModal();
         }
     });
 
-    // Form submit
     $("#attributeForm").on('submit', handleAttributeFormSubmit);
 
-    // ========== VALUE EVENTS ==========
-
-    // New Value button
     $('.new-value-btn').on('click', openValueCreateModal);
 
-    // Load Values button
     $('#loadValuesBtn').off('click').on('click', function () {
         if (!selectedAttributeForSearch) {
             Notification.showNotification({
@@ -1683,15 +1492,5 @@ $(document).ready(function () {
     // ========== PAGINATION - VALUES ==========
     $('#prevValuePageBtn').on('click', prevValuePage);
     $('#nextValuePageBtn').on('click', nextValuePage);
-
-    // ========== INITIAL LOAD ==========
-
-    // Fetch attributes for table
-    fetchAttributes(1);
-
-    // Initially show values tab placeholder
-    renderValuesTable();
-
-    // Ensure the initial tab is properly displayed
-    switchTab('attributes');
+    
 });

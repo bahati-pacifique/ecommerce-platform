@@ -14,6 +14,7 @@ module.exports = (req, res, next) => {
     //TODO register as system activity log
 
     const hasJsonHostMatch = onlyJsonHostnameSubs.some(sub => req.hostname.includes(sub));
+
     if (type === 'json' || hasJsonHostMatch) {
         return res.status(404).json({
             status_code: 404,
@@ -21,5 +22,5 @@ module.exports = (req, res, next) => {
         });
     }
 
-    return res.render('404');
+    return res.render('404', {message: `The requested URL could not be found`, status_code: 404});
 };

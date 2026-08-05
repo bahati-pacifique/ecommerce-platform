@@ -35,6 +35,7 @@
   <link rel="stylesheet" href="/styles/main.css">
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap');
+    @import url("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css");
 
     html,
     body {
@@ -51,7 +52,6 @@
       flex-direction: column;
     }
 
-    /* Custom scrollbar */
     ::-webkit-scrollbar {
       width: 5px;
     }
@@ -150,7 +150,7 @@
       align-items: center;
       gap: 8px;
       padding: 6px 16px;
-      border-radius: 20px;
+      border-radius: 8px;
       font-size: 12px;
       font-weight: 600;
       text-transform: uppercase;
@@ -215,6 +215,30 @@
       background: #FFF5F5;
       transform: translateY(-2px);
     }
+
+    .scrollbar-thin {
+      scrollbar-width: thin;
+      scrollbar-color: var(--color-brand) transparent;
+    }
+
+    /* Chrome, Edge, Safari */
+    .scrollbar-thin::-webkit-scrollbar {
+      width: 5px;
+      height: 5px;
+    }
+
+    .scrollbar-thin::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    .scrollbar-thin::-webkit-scrollbar-thumb {
+      background: var(--color-brand);
+      border-radius: 9999px;
+    }
+
+    .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+      background: var(--color-brand-dark);
+    }
   </style>
 </head>
 
@@ -235,44 +259,129 @@
     <div class="bg-shape w-96 h-96 bg-brand/50 bottom-[-10%] right-[-5%] animate-float" style="animation-delay: 2s;"></div>
     <div class="bg-shape w-48 h-48 bg-brand-light top-1/2 left-1/3 animate-float" style="animation-delay: 4s;"></div>
 
-    <div class="w-full max-w-2xl text-center animate-fade-in px-4">
+    <div class="w-full max-w-7xl flex flex-col items-center justify-center text-center animate-fade-in px-4">
 
-      <div class="lock-icon-wrapper mb-6">
-        <div class="pulse-ring"></div>
-        <div class="pulse-ring"></div>
-        <div class="w-20 h-20 bg-brand-light rounded-full flex items-center justify-center mx-auto relative animate-shake">
-          <svg class="w-10 h-10 text-brand" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6" />
-          </svg>
+      <div class="lock-icon-wrapper mb-4">
+        <span class="text-[50px] text-[128px] text-brand"><i class="bi bi-shield-lock"></i></span>
+      </div>
+
+      <h1 class="text-3xl mt-1 md:text-4xl font-bold text-gray-900 mb-2 animate-slide-up">
+        Access <span class="text-brand">Restricted</span>
+      </h1>
+      <p class="text-gray-500 text-base md:text-sm max-w-lg mx-auto mb-4 animate-slide-up p-4 mt-1" style="animation-delay: 0.1s">
+        <%= locals.message %>
+      </p>
+
+      <div class="mt-4 mb-5 w-full max-w-4xl mx-auto text-left">
+        <div class="bg-white border border-gray-200 rounded-2xl shadow-sm">
+
+          <div class="flex items-center gap-2 px-6 pt-5">
+            <h3 class="text-base font-semibold text-gray-900">
+              Permission Details
+            </h3>
+
+            <i class="bi bi-info-circle text-gray-400"></i>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-gray-200 px-6 py-6">
+
+            <div class="flex items-center gap-4 py-3 md:py-0">
+
+              <div class="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center">
+                <i class="bi bi-person text-gray-600 text-xl"></i>
+              </div>
+
+              <div>
+                <p class="text-sm text-gray-500">
+                  <%= locals.user.username %>
+                </p>
+
+                <p class="font-semibold text-xs text-gray-900">
+                  <%= locals.user.account_category %> | <%= locals.user.role %>
+                </p>
+              </div>
+
+            </div>
+
+            <div class="flex items-center gap-4 py-3 md:py-0 md:px-8">
+
+              <div class="w-full">
+                <p class="text-sm text-gray-500">
+                  Required
+                </p>
+
+                <div class="flex flex-nowrap gap-2 py-1 overflow-x-auto max-w-[100%] scrollbar-thin">
+
+                  <% locals.accepted.forEach(role => { %>
+
+                  <span class="px-3 py-1 rounded-full bg-red-50 text-brand text-xs font-medium border border-red-100 capitalize">
+                    <%= role %>
+                  </span>
+
+                  <% }) %>
+
+                </div>
+              </div>
+
+            </div>
+
+            <div class="flex items-center gap-4 py-3 md:py-0 md:px-8">
+
+              <div class="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center">
+                <i class="bi bi-lock text-gray-600 text-xl"></i>
+              </div>
+
+              <div>
+                <p class="text-sm text-gray-500">
+                  Reason
+                </p>
+                <p class="font-medium text-xs text-gray-800 leading-6">
+                  Missing Privilege
+                </p>
+              </div>
+
+            </div>
+
+          </div>
+
         </div>
       </div>
 
-      <h1 class="text-3xl mt-3 md:text-4xl font-bold text-gray-900 mb-3 animate-slide-up">
-        Hey, <span class="text-brand"><%=locals.user.username%></span>
-      </h1>
-
-      <p class="text-gray-500 text-base md:text-lg max-w-lg mx-auto mb-6 animate-slide-up p-4 mt-3" style="animation-delay: 0.1s">
-        <%=locals.message%>
-      </p>
-
       <div class="flex flex-col sm:flex-row items-center justify-center gap-3 md:gap-8 animate-slide-up" style="animation-delay: 0.2s">
-        <a href="/" class="btn-primary">
+        <a href="https://admin.cococe.rw/" class="btn-primary" target="_blank">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0a1 1 0 01-1-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 01-1 1h-2z" />
           </svg>
-          Go Home
+          Home Page
         </a>
-        <form action="/logout" method="post">
-          <button type="submit" class="btn-outline cursor-pointer">
-            Logout <i class="bi bi-box-arrow-right"></i>
+        <a href="mailto:admin@cococe.rw" class="btn-outline cursor-pointer">
+          <i class="bi bi-person-plus mr-2"></i>
+          Request Access
+        </a>
+        <form action="/logout" method="post" class="btn-outline cursor-pointer">
+          <button type="submit">
+            <i class="bi bi-box-arrow-right mr-2"></i>Logout
           </button>
         </form>
+
       </div>
 
-      <p class="text-xs text-gray-400 mt-6 animate-slide-up" style="animation-delay: 0.25s">
-        Need access? <a href="mailto:support@cococe.rw" class="text-brand hover:underline transition font-medium"> contact our support team</a>
-      </p>
+      <div class="bg-brand-light/30 min-h-h-12 md:min-w-2xl px-4 py-3 mt-[2.5rem] rounded-xl flex items-center gap-4">
+
+        <div>
+          <i class="bi bi-question-circle"></i>
+        </div>
+        <div class="flex flex-col text-left gap-1">
+          <strong class="text-sm">Need additional permission?</strong>
+          <span class="text-xs text-gray-400">
+            Contact our support team or <a href="https://admin.cococe.rw" class="text-brand hover:underline transition font-medium" target="_blank"> access admin dashboard</a>
+          </span>
+        </div>
+        <a href="https://admin.cococe.rw/docs/privileges" class="ml-auto text-sm md:text-base text-brand hover:underline" target="_blank">
+          Learn More <i class="bi bi-arrow-right"></i>
+        </a>
+
+      </div>
     </div>
   </div>
 

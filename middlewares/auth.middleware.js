@@ -254,11 +254,12 @@ function authPass({ acceptedTypes }) {
 
         if (accessToken) {
             const uaOk = accessToken.ua === normalizeUA(req.get('User-Agent'));
-
+            console.warn('UA INVALIDATION ua')
             if (!uaOk) {
                 req.session.message = 'Some suspicious behaviour detected. Please log in to continue';
                 if (acceptsHtml(req)) {
-                    return res.redirect(`${sslUrlPrefix}auth.${process.env.DOMAIN}`)
+                    console.log(`${sslUrlPrefix}auth.${process.env.DOMAIN}${portSuffix}`)
+                    return res.redirect(`${sslUrlPrefix}auth.${process.env.DOMAIN}${portSuffix}`)
                 } else {
                     return res.status(401).json({
                         authenticated: false,
@@ -286,21 +287,46 @@ function authPass({ acceptedTypes }) {
             //Validate account type
             if (acceptedTypes && !acceptedTypes.includes(accessToken.ac_type)) {
 
+                // if (acceptsHtml(req)) {
+                //     return res.render('no-access', {
+                //         user,
+                //         title: 'Access Restricted',
+                //         message: `You don't currently have permission to access this page. 
+                //         Your account is signed in successfully, 
+                //         but your assigned role doesn't include access to this resource. `
+                //     })
+                //     //return res.redirect(`${sslUrlPrefix}auth.${process.env.DOMAIN}${portSuffix}`)
+                // } else {
+                //     return res.status(401).json({
+                //         authenticated: false,
+                //         success: false,
+                //         message: 'Please login to continue',
+                //         redirectTo: `${sslUrlPrefix}auth.${process.env.DOMAIN}`
+                //     })
+                // }
+
                 if (acceptsHtml(req)) {
                     return res.render('no-access', {
                         user,
-                        title: 'Access Denied',
-                        message: 'You do not have access to this page'
+                        accepted: acceptedTypes,
+                        title: 'Access Restricted',
+                        message: `You don't currently have permission to access this page. 
+                        Your account is signed in successfully, 
+                        but your assigned role doesn't include access to this resource. `
                     })
                     //return res.redirect(`${sslUrlPrefix}auth.${process.env.DOMAIN}${portSuffix}`)
                 } else {
                     return res.status(401).json({
                         authenticated: false,
                         success: false,
-                        message: 'Please login to continue',
-                        redirectTo: `${sslUrlPrefix}auth.${process.env.DOMAIN}`
+                        accepted: acceptedTypes,
+                        message: `You don't currently have permission to access this page. 
+                        Your account is signed in successfully, 
+                        but your assigned role doesn't include access to this resource. `,
+                        redirectTo: `${sslUrlPrefix}auth.${process.env.DOMAIN}:${portSuffix}`
                     })
                 }
+
                 //return deny401(req, res, { message: 'Access Denied', details: 'Sorry, you do not have access to the requested page. Please login with valid account to continue' });
             }
 
@@ -311,7 +337,7 @@ function authPass({ acceptedTypes }) {
             clearAuthentication(res);
             const to = `${sslUrlPrefix}${req.hostname}${portSuffix}${req.originalUrl}`;
             if (acceptsHtml(req)) {
-                
+
                 req.session.message = 'Please signin to continue';
 
                 //Currently we're not using session database
@@ -321,7 +347,7 @@ function authPass({ acceptedTypes }) {
                 //     // This runs ONLY after the database is updated
                 //     res.redirect('/dashboard');
                 // });
-                
+
                 //console.log('TO: ', `${sslUrlPrefix}${req.hostname}${req.originalUrl}`)
                 return res.redirect(`${sslUrlPrefix}auth.${process.env.DOMAIN}${portSuffix}?r=${to}`)
                 //return res.redirect(`${sslUrlPrefix}auth.${process.env.DOMAIN}${portSuffix}`)
@@ -345,6 +371,7 @@ function authPass({ acceptedTypes }) {
         const uaOk = refreshToken.ua === normalizeUA(req.get('User-Agent'));
 
         if (!uaOk) {
+            console.warn('UA INVALIDATION')
             if (acceptsHtml(req)) {
                 req.session.message = 'Please login to continue';
                 return res.redirect(`${sslUrlPrefix}auth.${process.env.DOMAIN}${portSuffix}`)
@@ -395,21 +422,25 @@ function authPass({ acceptedTypes }) {
 
         if (acceptedTypes && !acceptedTypes.includes(user.account_category)) {
 
-            console.log(acceptedTypes, user.account_category)
-
             if (acceptsHtml(req)) {
                 return res.render('no-access', {
                     user,
-                    title: 'Access Denied',
-                    message: 'You do not have access to this page'
+                    accepted: acceptedTypes,
+                    title: 'Access Restricted',
+                    message: `You don't currently have permission to access this page. 
+                        Your account is signed in successfully, 
+                        but your assigned role doesn't include access to this resource. `
                 })
                 //return res.redirect(`${sslUrlPrefix}auth.${process.env.DOMAIN}${portSuffix}`)
             } else {
                 return res.status(401).json({
                     authenticated: false,
                     success: false,
-                    message: 'Please login to continue',
-                    redirectTo: `${sslUrlPrefix}auth.${process.env.DOMAIN}`
+                    accepted: acceptedTypes,
+                    message: `You don't currently have permission to access this page. 
+                        Your account is signed in successfully, 
+                        but your assigned role doesn't include access to this resource. `,
+                    redirectTo: `${sslUrlPrefix}auth.${process.env.DOMAIN}:${portSuffix}`
                 })
             }
             //return deny401(req, res, { message: 'Access Denied', details: 'Sorry, you do not have access to the requested page. Please login with valid account to continue' });
@@ -511,7 +542,7 @@ async function passUser(req, res, next) {
 
     } else if (refreshToken) {
 
-        
+
         //Rotating session
 
         const userId = refreshToken.userId;
@@ -663,7 +694,7 @@ async function validateAuthentication(req, res, next) {
             to = `${sslUrlPrefix}${process.env.DOMAIN}${portSuffix}`
         }
 
-        
+
         if (acceptsHtml(req)) {
             return res.redirect(to);
         }

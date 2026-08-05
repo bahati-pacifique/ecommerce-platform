@@ -300,7 +300,7 @@ function renderBrandsTable() {
                 </td>
                 <td class="px-4 py-3 text-center">
                     <div class="flex items-center justify-center gap-2">
-                        <button class="p-1.5 rounded-lg text-blue-600 hover:bg-blue-50 transition brand-edit-btn" title="Edit" data-id="${brand.id}">
+                        <button class="p-1.5 rounded-lg text-black-100 hover:bg-black/5 transition brand-edit-btn" title="Edit" data-id="${brand.id}">
                             <i class="fas fa-edit"></i>
                         </button>
                         <button class="p-1.5 rounded-lg text-brand hover:bg-brand-light transition brand-delete-btn ${brand.status === "deleted" ? 'hidden' : ''}" title="Remove" data-id="${brand.id}">
