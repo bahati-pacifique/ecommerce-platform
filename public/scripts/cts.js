@@ -86,6 +86,9 @@ function renderCategoryTable() {
                         <button class="p-1.5 rounded-lg text-brand hover:bg-brand-light transition category-delete-btn ${cat.status === "deleted" ? 'hidden' : ''}" title="Delete" data-id="${cat.id}">
                             <i class="fas fa-trash"></i>
                         </button>
+                        <button class="p-1.5 font-medium text-sm rounded-lg text-green-800 hover:bg-green-100 transition category-activate-btn ${(['deleted', 'disabled'].includes(cat.status)) ? '' : 'hidden'}" title="Delete" data-id="${cat.id}">
+                            <i class="bi bi-arrow-counterclockwise"></i>
+                        </button>
                     </div>
                 </td>
             </tr>
@@ -102,6 +105,11 @@ function renderCategoryTable() {
     $('.category-delete-btn').off('click').on('click', function () {
         const id = parseInt($(this).data('id'));
         openDeleteModal(id);
+    });
+
+    $('.category-activate-btn').off('click').on('click', function () {
+        const id = parseInt($(this).data('id'));
+        activateCategory(id, this);
     });
 }
 
@@ -209,9 +217,9 @@ async function fetchCategories(page = 1, isRefesh = false) {
             limit: itemsPerPage
         };
 
-        if (currentStatusFilter && currentStatusFilter !== 'all') {
-            params.status = currentStatusFilter;
-        }
+        currentStatusFilter = $statusFilter.val();
+
+        params.status = currentStatusFilter;
 
         const response = await axios.get(`/product-categories/`, {
             params: params,
@@ -382,6 +390,42 @@ async function removeCategory(id) {
             message: error.response?.data?.message || 'Failed to remove category'
         });
     }
+}
+
+async function activateCategory(id, target) {
+    const targetHtml = target?.innerHtml || '<i class="bi bi-arrow-counterclockwise"></i>';
+
+    showSnackbar({
+        type: 'warning',
+        message: "Do you want to activate this category?",
+        actionText: "Yes",
+        onAction: async () => {
+            try {
+                if (target) {
+                    target.disabled = true;
+                    target.textContent = 'Activating...';
+                }
+                const response = await axios.patch(`/product-categories/${id}`, {
+                    withCredentials: true
+                });
+
+                showSnackbar({ type: "success", message: "Category activated" });
+                fetchCategories(currentFamiliesPage, true);
+
+            } catch (error) {
+                console.error('Remove error:', error);
+                Notification.showNotification({
+                    type: 'error',
+                    message: error.response?.data?.message || 'Failed to activate'
+                });
+            } finally {
+                if (target) {
+                    target.disabled = false
+                    target.innerHtml = targetHtml;
+                }
+            }
+        }
+    });
 }
 
 function openCreateModal() {

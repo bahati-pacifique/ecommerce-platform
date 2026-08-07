@@ -115,9 +115,9 @@
             <span class="link-text">Attributes</span>
           </a>
 
-          <a href="#" class="sidebar-link" data-tab="marketing">
-            <span class="icon"><i class="bi bi-badge-ad"></i></span>
-            <span class="link-text">Marketing</span>
+          <a href="#" class="sidebar-link" data-tab="vendors">
+            <span class="icon"><i class="bi bi-people"></i></span>
+            <span class="link-text">Vendors</span>
           </a>
 
           <a href="#" class="sidebar-link" data-tab="settings">
@@ -468,10 +468,315 @@
           </div>
         </div>
 
-        <div id="tab-marketing" class="tab-content hidden">
-          <div class="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm text-center">
-            <h3 class="text-xl font-bold text-gray-900">Marketing</h3>
-            <p class="text-gray-500 mt-2">Manage campaigns, promotions, and email marketing.</p>
+        <div id="tab-vendors" class="tab-content hidden">
+          <!-- ========== VENDORS MANAGEMENT ========== -->
+          <div class="w-full h-full">
+            <!-- Header -->
+            <header class="border-b border-gray-100 px-4 md:px-6 py-3 sticky top-0 bg-white z-10">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                  <h1 class="text-xl font-bold text-gray-900">Vendors</h1>
+                </div>
+                <div class="flex items-center gap-2 md:gap-3">
+                  <button class="px-5 py-2 bg-brand hover:bg-brand-dark text-white font-medium rounded-lg border border-gray-200 shadow-sm transition-all duration-200 flex items-center gap-2 new-vendor-btn">
+                    <i class="fas fa-plus"></i>
+                    <span class="hidden md:block">New Vendor</span>
+                  </button>
+                  <button class="px-5 py-2 bg-white text-black font-medium rounded-lg border border-gray-200 shadow-sm hover:bg-gray-100 transition-all duration-200" id="refreshVendors">
+                    <i class="fas fa-sync-alt"></i>
+                  </button>
+                </div>
+              </div>
+            </header>
+
+            <main class="p-1 md:p-3">
+              <!-- Filters -->
+              <div class="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm mb-6">
+                <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                  <div class="flex-1 w-full">
+                    <div class="relative">
+                      <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
+                      <input type="text" id="vendorSearchInput" placeholder="Search vendors by business name, TIN, or email..." class="search-input w-full pl-9 pr-4 py-2.5 rounded-xl border border-gray-200 bg-gray-50 text-sm text-gray-700 focus:outline-none transition max-w-[320px]">
+                    </div>
+                  </div>
+                  <div class="flex flex-wrap items-center gap-3 w-full sm:w-auto">
+                    <select id="vendorTypeFilter" class="px-3 py-2.5 rounded-xl border border-gray-200 bg-gray-50 text-sm text-gray-700 focus:outline-none focus:border-brand focus:ring-2 focus:ring-brand/10">
+                      <option value="all">All Types</option>
+                      <option value="retailer">Retailer</option>
+                      <option value="wholesaler">Wholesaler</option>
+                      <option value="distributor">Distributor</option>
+                      <option value="manufacturer">Manufacturer</option>
+                      <option value="supplier">Supplier</option>
+                    </select>
+                    <select id="vendorStatusFilter" class="px-3 py-2.5 rounded-xl border border-gray-200 bg-gray-50 text-sm text-gray-700 focus:outline-none focus:border-brand focus:ring-2 focus:ring-brand/10">
+                      <option value="all">All Status</option>
+                      <option value="active">Active</option>
+                      <option value="inactive">Inactive</option>
+                      <option value="draft">Draft</option>
+                    </select>
+                    <button id="vendorFilterResetBtn" class="px-4 py-2.5 rounded-xl border border-gray-200 text-sm text-gray-600 hover:bg-gray-50 transition whitespace-nowrap">
+                      <i class="fas fa-undo-alt mr-1"></i> Reset
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Table -->
+              <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+                <div class="overflow-x-auto">
+                  <!-- Skeleton -->
+                  <div id="vendorSkeletonLoader" class="hidden">
+                    <table class="w-full">
+                      <thead>
+                        <tr class="bg-gray-50 border-b border-gray-100">
+                          <th class="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Business</th>
+                          <th class="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider hidden md:table-cell">Type</th>
+                          <th class="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider hidden lg:table-cell">TIN/VAT</th>
+                          <th class="text-center px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
+                          <th class="text-center px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Verification</th>
+                          <th class="text-center px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td colspan="6" class="p-0">
+                            <div class="skeleton-row">
+                              <div class="skeleton skeleton-text medium"></div>
+                              <div class="skeleton skeleton-text short"></div>
+                              <div class="skeleton skeleton-text"></div>
+                              <div class="skeleton skeleton-badge"></div>
+                              <div class="skeleton skeleton-badge"></div>
+                              <div class="flex gap-2">
+                                <div class="skeleton-avatar"></div>
+                                <div class="skeleton-avatar"></div>
+                              </div>
+                            </div>
+                            <div class="skeleton-row">
+                              <div class="skeleton skeleton-text medium"></div>
+                              <div class="skeleton skeleton-text short"></div>
+                              <div class="skeleton skeleton-text"></div>
+                              <div class="skeleton skeleton-badge"></div>
+                              <div class="skeleton skeleton-badge"></div>
+                              <div class="flex gap-2">
+                                <div class="skeleton-avatar"></div>
+                                <div class="skeleton-avatar"></div>
+                              </div>
+                            </div>
+                            <div class="skeleton-row">
+                              <div class="skeleton skeleton-text medium"></div>
+                              <div class="skeleton skeleton-text short"></div>
+                              <div class="skeleton skeleton-text"></div>
+                              <div class="skeleton skeleton-badge"></div>
+                              <div class="skeleton skeleton-badge"></div>
+                              <div class="flex gap-2">
+                                <div class="skeleton-avatar"></div>
+                                <div class="skeleton-avatar"></div>
+                              </div>
+                            </div>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+
+                  <!-- Actual Table -->
+                  <table class="w-full hidden" id="vendorsContainer">
+                    <thead>
+                      <tr class="bg-gray-50 border-b border-gray-100">
+                        <th class="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Business</th>
+                        <th class="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider hidden md:table-cell">Type</th>
+                        <th class="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider hidden lg:table-cell">TIN/VAT</th>
+                        <th class="text-center px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
+                        <th class="text-center px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Verification</th>
+                        <th class="text-center px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody id="vendorsTableBody"></tbody>
+                  </table>
+                </div>
+
+                <!-- Pagination -->
+                <div class="px-4 py-3 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-3 bg-gray-50/50">
+                  <p class="text-xs text-gray-500">
+                    Showing <span id="vendorShowingCount">0</span> of <span id="vendorTotalCount">0</span> vendors
+                  </p>
+                  <div class="flex items-center gap-2">
+                    <button id="prevVendorPageBtn" class="px-3 py-1 rounded-lg border border-gray-200 text-sm text-gray-600 hover:bg-gray-50 transition disabled:opacity-40 disabled:cursor-not-allowed">
+                      <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <span id="vendorsPageInfo" class="text-xs text-gray-500">Page 1 of 1</span>
+                    <button id="nextVendorPageBtn" class="px-3 py-1 rounded-lg border border-gray-200 text-sm text-gray-600 hover:bg-gray-50 transition disabled:opacity-40 disabled:cursor-not-allowed">
+                      <i class="fas fa-chevron-right"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Empty State -->
+              <div id="vendorsEmptyState" class="hidden text-center py-12">
+                <div class="text-5xl mb-4"><i class="fas fa-truck text-gray-300"></i></div>
+                <h3 class="text-lg font-semibold text-gray-900">No vendors found</h3>
+                <p class="text-sm text-gray-500 mt-1">Get started by adding your first vendor.</p>
+                <button id="emptyVendorBtn" class="mt-4 btn-primary px-6 py-2.5 rounded-xl text-white text-sm font-medium inline-flex items-center gap-2">
+                  <i class="fas fa-plus"></i> Add Vendor
+                </button>
+              </div>
+            </main>
+          </div>
+
+          <!-- ========== VENDOR FORM MODAL ========== -->
+          <div id="vendorFormModal" class="fixed inset-0 z-50 hidden items-center justify-center px-4">
+            <div class="modal-overlay absolute inset-0 vendor-modal-overlay"></div>
+            <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto animate-slide-down">
+              <div class="sticky top-0 bg-white border-b border-gray-100 px-6 py-4 flex items-center justify-between z-10">
+                <h3 id="vendorFormModalTitle" class="text-lg font-bold text-gray-900">Add New Vendor</h3>
+                <button id="closeVendorFormModal" class="text-gray-400 hover:text-gray-600 transition">
+                  <i class="fas fa-times text-xl"></i>
+                </button>
+              </div>
+
+              <form id="vendorForm" class="p-6 space-y-4">
+                <input type="hidden" id="vendorEditId" value="">
+                <input type="hidden" id="vendorUserId" value="">
+
+                <!-- Business Information -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label for="vendorBusinessName" class="block text-sm font-medium text-gray-700 mb-1.5">
+                      Business Name <span class="text-brand">*</span>
+                    </label>
+                    <input type="text" id="vendorBusinessName" placeholder="e.g., Tech Supplies Ltd" class="form-input w-full px-4 py-2.5 rounded-xl border border-gray-200 text-gray-900 placeholder-gray-400 transition" required>
+                  </div>
+                  <div>
+                    <label for="vendorEmail" class="block text-sm font-medium text-gray-700 mb-1.5">
+                      Email <span class="text-brand">*</span>
+                    </label>
+                    <input type="email" id="vendorEmail" placeholder="vendor@example.com" class="form-input w-full px-4 py-2.5 rounded-xl border border-gray-200 text-gray-900 placeholder-gray-400 transition" required>
+                  </div>
+                </div>
+
+                <div>
+                  <label for="vendorBusinessAddress" class="block text-sm font-medium text-gray-700 mb-1.5">
+                    Business Address
+                  </label>
+                  <textarea id="vendorBusinessAddress" rows="2" placeholder="Street, City, Country..." class="form-input w-full px-4 py-2.5 rounded-xl border border-gray-200 text-gray-900 placeholder-gray-400 transition resize-y"></textarea>
+                </div>
+
+                <!-- Tax Information -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label for="vendorTinNumber" class="block text-sm font-medium text-gray-700 mb-1.5">
+                      TIN Number
+                    </label>
+                    <input type="text" id="vendorTinNumber" placeholder="e.g., TIN-123456" class="form-input w-full px-4 py-2.5 rounded-xl border border-gray-200 text-gray-900 placeholder-gray-400 transition">
+                  </div>
+                  <div>
+                    <label for="vendorVatNumber" class="block text-sm font-medium text-gray-700 mb-1.5">
+                      VAT Number
+                    </label>
+                    <input type="text" id="vendorVatNumber" placeholder="e.g., VAT-789012" class="form-input w-full px-4 py-2.5 rounded-xl border border-gray-200 text-gray-900 placeholder-gray-400 transition">
+                  </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label for="vendorTaxRegistered" class="block text-sm font-medium text-gray-700 mb-1.5">
+                      Tax Registered
+                    </label>
+                    <input type="text" id="vendorTaxRegistered" placeholder="e.g., Registered" class="form-input w-full px-4 py-2.5 rounded-xl border border-gray-200 text-gray-900 placeholder-gray-400 transition">
+                  </div>
+                  <div>
+                    <label for="vendorTaxCountry" class="block text-sm font-medium text-gray-700 mb-1.5">
+                      Tax Country
+                    </label>
+                    <input type="text" id="vendorTaxCountry" placeholder="e.g., Rwanda" class="form-input w-full px-4 py-2.5 rounded-xl border border-gray-200 text-gray-900 placeholder-gray-400 transition">
+                  </div>
+                </div>
+
+                <!-- Vendor Classification -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <label for="vendorType" class="block text-sm font-medium text-gray-700 mb-1.5">
+                      Type <span class="text-brand">*</span>
+                    </label>
+                    <select id="vendorType" class="form-input w-full px-4 py-2.5 rounded-xl border border-gray-200 text-gray-700 transition" required>
+                      <option value="retailer">Retailer</option>
+                      <option value="wholesaler">Wholesaler</option>
+                      <option value="distributor">Distributor</option>
+                      <option value="manufacturer">Manufacturer</option>
+                      <option value="supplier">Supplier</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label for="vendorCategory" class="block text-sm font-medium text-gray-700 mb-1.5">
+                      Category
+                    </label>
+                    <select id="vendorCategory" class="form-input w-full px-4 py-2.5 rounded-xl border border-gray-200 text-gray-700 transition">
+                      <option value="internal">Internal</option>
+                      <option value="external">External</option>
+                      <option value="preferred">Preferred</option>
+                      <option value="standard">Standard</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label for="vendorVerificationStatus" class="block text-sm font-medium text-gray-700 mb-1.5">
+                      Verification Status
+                    </label>
+                    <select id="vendorVerificationStatus" class="form-input w-full px-4 py-2.5 rounded-xl border border-gray-200 text-gray-700 transition">
+                      <option value="pending">Pending</option>
+                      <option value="verified">Verified</option>
+                      <option value="rejected">Rejected</option>
+                      <option value="suspended">Suspended</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div>
+                  <label for="vendorStatus" class="block text-sm font-medium text-gray-700 mb-1.5">
+                    Status
+                  </label>
+                  <select id="vendorStatus" class="form-input w-full px-4 py-2.5 rounded-xl border border-gray-200 text-gray-700 transition">
+                    <option value="active">Active</option>
+                    <option value="inactive">Inactive</option>
+                    <option value="draft">Draft</option>
+                  </select>
+                </div>
+
+                <div class="flex items-center justify-end gap-3 pt-2">
+                  <button type="button" class="cancel-create-vendor px-6 py-2.5 rounded-xl border border-gray-200 text-gray-600 hover:bg-gray-50 transition font-medium">
+                    Cancel
+                  </button>
+                  <button type="submit" id="vendorFormSubmitBtn" class="bg-brand hover:bg-brand-dark px-6 py-2.5 rounded-xl text-white font-medium flex items-center gap-2">
+                    <i class="fas fa-save"></i> <span id="vendorSubmitBtnText">Add Vendor</span>
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+
+          <!-- ========== VENDOR DELETE MODAL ========== -->
+          <div id="vendorDeleteModal" class="fixed inset-0 z-50 hidden items-center justify-center px-4">
+            <div class="modal-overlay absolute inset-0"></div>
+            <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-md animate-slide-down">
+              <div class="p-6 text-center">
+                <div class="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <i class="fas fa-exclamation-triangle text-3xl text-brand"></i>
+                </div>
+                <h3 class="text-lg font-bold text-gray-900">Delete Vendor</h3>
+                <p class="text-sm text-gray-500 mt-2">
+                  Are you sure you want to delete <strong id="vendorDeleteTitle" class="text-gray-700"></strong>?
+                  <br>This action cannot be undone.
+                </p>
+                <div class="flex items-center gap-3 mt-6">
+                  <button class="flex-1 px-6 py-2.5 rounded-xl border border-gray-200 text-gray-600 hover:bg-gray-50 transition font-medium close-vendor-delete-modal">
+                    Cancel
+                  </button>
+                  <button class="flex-1 bg-brand hover:bg-brand-dark px-6 py-2.5 rounded-xl text-white font-medium bg-red-600 hover:bg-red-700 confirm-delete-vendor-btn">
+                    <i class="bi bi-trash"></i> Delete
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -1461,7 +1766,7 @@
                           <tr class="bg-gray-50 border-b border-gray-100">
                             <th class="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Title</th>
                             <th class="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider hidden md:table-cell">Description</th>
-                            <th class="text-center px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Display Order</th>
+                            <th class="text-center px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">D. Order</th>
                             <th class="text-center px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
                             <th class="text-center px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
                           </tr>
@@ -1946,6 +2251,7 @@
   <script src="/scripts/fms.js"></script>
   <script src="/scripts/bds.js"></script>
   <script src="/scripts/atrs.js"></script>
+  <script src="/scripts/vdr.js"></script>
 
   <script src="/scripts/d.js"></script>
 

@@ -254,7 +254,6 @@ function authPass({ acceptedTypes }) {
 
         if (accessToken) {
             const uaOk = accessToken.ua === normalizeUA(req.get('User-Agent'));
-            console.warn('UA INVALIDATION ua')
             if (!uaOk) {
                 req.session.message = 'Some suspicious behaviour detected. Please log in to continue';
                 if (acceptsHtml(req)) {
@@ -274,7 +273,7 @@ function authPass({ acceptedTypes }) {
             const user = {
                 userId: accessToken.u_id,
                 userAccount: accessToken.ac,
-                type: accessToken.ac_type,
+                type: accessToken.ac_type?.toLowerCase(),
                 role: accessToken.role,
                 username: accessToken.username,
                 email: accessToken.email,
@@ -285,8 +284,9 @@ function authPass({ acceptedTypes }) {
             req.user = user;
 
             //Validate account type
-            if (acceptedTypes && !acceptedTypes.includes(accessToken.ac_type)) {
+            if (acceptedTypes && !acceptedTypes.includes(accessToken.ac_type?.toLowerCase() || '')) {
 
+                console.log(acceptedTypes, accessToken.ac_type)
                 // if (acceptsHtml(req)) {
                 //     return res.render('no-access', {
                 //         user,
@@ -371,7 +371,6 @@ function authPass({ acceptedTypes }) {
         const uaOk = refreshToken.ua === normalizeUA(req.get('User-Agent'));
 
         if (!uaOk) {
-            console.warn('UA INVALIDATION')
             if (acceptsHtml(req)) {
                 req.session.message = 'Please login to continue';
                 return res.redirect(`${sslUrlPrefix}auth.${process.env.DOMAIN}${portSuffix}`)
@@ -420,7 +419,7 @@ function authPass({ acceptedTypes }) {
         //     //return deny401(req, res, { message: 'You do not have access to the requested page. Login with valid account' });
         // }
 
-        if (acceptedTypes && !acceptedTypes.includes(user.account_category)) {
+        if (acceptedTypes && !acceptedTypes.includes(user.account_category?.toLowerCase())) {
 
             if (acceptsHtml(req)) {
                 return res.render('no-access', {
@@ -529,7 +528,7 @@ async function passUser(req, res, next) {
             username: accessToken.username,
             name: accessToken.name,
             user_account_id: accessToken.ac,
-            account_type: accessToken.ac_type,
+            account_type: accessToken.ac_type?.toLowerCase(),
             account_code: accessToken.account_code,
             email: accessToken.email,
             userId: accessToken.u_id,
@@ -679,7 +678,7 @@ async function validateAuthentication(req, res, next) {
             username: accessToken.username,
             name: accessToken.name,
             user_account_id: accessToken.ac,
-            account_type: accessToken.ac_type,
+            account_type: accessToken.ac_type?.toLowerCase(),
             account_code: accessToken.account_code,
             email: accessToken.email,
             userId: accessToken.u_id,

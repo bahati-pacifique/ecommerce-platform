@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>COCOCE Business — Enterprise Solutions</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              DEFAULT: '#ED1B24',
+              dark: '#C9171F',
+              light: '#FEE2E3',
+              ultraLight: '#FFF5F5',
+            },
+            slate: {
+              50: '#F8FAFC',
+              100: '#F1F5F9',
+              200: '#E2E8F0',
+              300: '#CBD5E1',
+              400: '#94A3B8',
+              500: '#64748B',
+              600: '#475569',
+              700: '#334155',
+              800: '#1E293B',
+              900: '#0F172A',
+            }
+          },
+          fontFamily: {
+            'sans': ['Inter', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+          },
+          animation: {
+            'float': 'float 6s ease-in-out infinite',
+            'fade-in': 'fadeIn 0.6s ease-out forwards',
+            'slide-up': 'slideUp 0.5s ease-out forwards',
+            'pulse-slow': 'pulse 3s ease-in-out infinite',
+            'shimmer': 'shimmer 3s ease-in-out infinite',
+            'border-pulse': 'borderPulse 2s ease-in-out infinite',
+          },
+          keyframes: {
+            float: {
+              '0%, 100%': {
+                transform: 'translateY(0px)'
+              },
+              '50%': {
+                transform: 'translateY(-12px)'
+              },
+            },
+            fadeIn: {
+              '0%': {
+                opacity: '0'
+              },
+              '100%': {
+                opacity: '1'
+              },
+            },
+            slideUp: {
+              '0%': {
+                opacity: '0',
+                transform: 'translateY(30px)'
+              },
+              '100%': {
+                opacity: '1',
+                transform: 'translateY(0)'
+              },
+            },
+            shimmer: {
+              '0%': {
+                backgroundPosition: '-200% center'
+              },
+              '100%': {
+                backgroundPosition: '200% center'
+              },
+            },
+            borderPulse: {
+              '0%, 100%': {
+                borderColor: 'rgba(237, 27, 36, 0.2)'
+              },
+              '50%': {
+                borderColor: 'rgba(237, 27, 36, 0.6)'
+              },
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&display=swap');
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #F8FAFC;
+      font-family: 'Inter', sans-serif;
+      scroll-behavior: smooth;
+      color: #0F172A;
+    }
+
+    /* Premium gradient backgrounds */
+    .bg-hero {
+      background:
+        radial-gradient(ellipse at 20% 50%, rgba(237, 27, 36, 0.04) 0%, transparent 60%),
+        radial-gradient(ellipse at 80% 50%, rgba(237, 27, 36, 0.04) 0%, transparent 60%),
+        #F8FAFC;
+    }
+
+    .bg-features {
+      background:
+        radial-gradient(ellipse at 30% 20%, rgba(237, 27, 36, 0.02) 0%, transparent 50%),
+        #FFFFFF;
+    }
+
+    /* Premium card styles */
+    .premium-card {
+      background: white;
+      border: 1px solid rgba(0, 0, 0, 0.04);
+      border-radius: 20px;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+    }
+
+    .premium-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.06);
+      border-color: rgba(237, 27, 36, 0.1);
+    }
+
+    /* Button styles */
+    .btn-primary-premium {
+      background: #0F172A;
+      color: white;
+      padding: 12px 28px;
+      border-radius: 12px;
+      font-weight: 600;
+      font-size: 15px;
+      border: none;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+    }
+
+    .btn-primary-premium:hover {
+      background: #1E293B;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px rgba(15, 23, 42, 0.15);
+    }
+
+    .btn-primary-premium:active {
+      transform: scale(0.96);
+    }
+
+    .btn-outline-premium {
+      background: transparent;
+      color: #0F172A;
+      padding: 12px 28px;
+      border-radius: 12px;
+      font-weight: 600;
+      font-size: 15px;
+      border: 1.5px solid #E2E8F0;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+    }
+
+    .btn-outline-premium:hover {
+      border-color: #0F172A;
+      background: #F8FAFC;
+      transform: translateY(-2px);
+    }
+
+    .btn-outline-premium:active {
+      transform: scale(0.96);
+    }
+
+    /* Feature icon wrapper */
+    .feature-icon {
+      width: 52px;
+      height: 52px;
+      border-radius: 16px;
+      background: #FEE2E3;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ED1B24;
+      font-size: 22px;
+      transition: all 0.3s ease;
+    }
+
+    .premium-card:hover .feature-icon {
+      background: #ED1B24;
+      color: white;
+      transform: scale(1.05);
+    }
+
+    /* Stats counter */
+    .stat-number {
+      font-size: 2.5rem;
+      font-weight: 800;
+      line-height: 1;
+      color: #0F172A;
+      letter-spacing: -0.02em;
+    }
+
+    .stat-label {
+      font-size: 0.875rem;
+      color: #64748B;
+      font-weight: 500;
+      margin-top: 0.25rem;
+    }
+
+    /* Testimonial card */
+    .testimonial-card {
+      background: white;
+      border: 1px solid rgba(0, 0, 0, 0.04);
+      border-radius: 16px;
+      padding: 24px;
+      transition: all 0.3s ease;
+    }
+
+    .testimonial-card:hover {
+      border-color: rgba(237, 27, 36, 0.15);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.04);
+    }
+
+    .testimonial-avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: #F1F5F9;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-size: 18px;
+      color: #0F172A;
+      flex-shrink: 0;
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar {
+      width: 5px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: #f1f1f1;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #ED1B24;
+      border-radius: 10px;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 640px) {
+      .stat-number {
+        font-size: 2rem;
+      }
+
+      .btn-primary-premium,
+      .btn-outline-premium {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ========== NAVIGATION ========== -->
+  <nav class="fixed top-0 w-full z-50 bg-white/80 backdrop-blur-lg border-b border-gray-100/60">
+    <div class="max-w-7xl mx-auto px-6 md:px-10">
+      <div class="flex items-center justify-between h-16">
+        <!-- Logo -->
+        <a href="/" class="flex items-center gap-2 group">
+          <span class="text-2xl font-black tracking-tighter text-brand">COCOCE</span>
+          <span class="text-[10px] font-medium text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full border border-slate-200/60">BUSINESS</span>
+        </a>
+
+        <!-- Desktop Navigation -->
+        <div class="hidden md:flex items-center gap-8 text-sm font-medium text-slate-600">
+          <a href="#features" class="hover:text-brand transition">Features</a>
+          <a href="#solutions" class="hover:text-brand transition">Solutions</a>
+          <a href="#testimonials" class="hover:text-brand transition">Testimonials</a>
+          <a href="#pricing" class="hover:text-brand transition">Pricing</a>
+        </div>
+
+        <!-- Right Actions -->
+        <div class="flex items-center gap-3">
+          <a href="/login" class="text-sm font-medium text-slate-600 hover:text-brand transition">
+            Sign In
+          </a>
+          <a href="/register" class="btn-primary-premium text-sm py-2 px-5">
+            Get Started
+            <i class="fas fa-arrow-right text-xs"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ========== HERO SECTION ========== -->
+  <section class="bg-hero min-h-screen flex items-center pt-20 overflow-hidden">
+    <div class="max-w-7xl mx-auto px-6 md:px-10 py-12 md:py-20">
+      <div class="grid lg:grid-cols-2 gap-12 items-center">
+        <!-- Left Content -->
+        <div class="space-y-8 animate-fade-in">
+          <!-- Badge -->
+          <div class="inline-flex items-center gap-2 px-4 py-1.5 bg-white rounded-full border border-slate-200/60 shadow-sm text-sm font-medium text-slate-600">
+            <span class="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></span>
+            Empowering businesses since 2024
+          </div>
+
+          <!-- Heading -->
+          <h1 class="text-4xl md:text-6xl font-bold tracking-tight leading-tight">
+            Your Business
+            <span class="text-brand">Ecosystem</span>
+            <br>in One Platform
+          </h1>
+
+          <p class="text-lg text-slate-500 max-w-lg leading-relaxed">
+            COCOCE Business provides vendors, stores, and partners with everything they need
+            to manage, grow, and scale their operations — all in one place.
+          </p>
+
+          <!-- CTA Buttons -->
+          <div class="flex flex-wrap gap-4">
+            <a href="/register" class="btn-primary-premium">
+              Start Free Trial
+              <i class="fas fa-arrow-right text-xs"></i>
+            </a>
+            <a href="#features" class="btn-outline-premium">
+              <i class="fas fa-play-circle"></i>
+              See How It Works
+            </a>
+          </div>
+
+          <!-- Trust Badges -->
+          <div class="flex flex-wrap items-center gap-6 pt-4 text-sm text-slate-400">
+            <span class="flex items-center gap-1.5">
+              <i class="fas fa-check-circle text-green-500"></i>
+              No credit card required
+            </span>
+            <span class="flex items-center gap-1.5">
+              <i class="fas fa-shield-alt text-blue-500"></i>
+              256-bit encryption
+            </span>
+            <span class="flex items-center gap-1.5">
+              <i class="fas fa-clock text-amber-500"></i>
+              14-day free trial
+            </span>
+          </div>
+        </div>
+
+        <!-- Right Content - Hero Visual -->
+        <div class="relative flex justify-center lg:justify-end animate-slide-up">
+          <div class="relative w-full max-w-md">
+            <!-- Main Card -->
+            <div class="premium-card p-6 md:p-8 border-2 border-brand/10 shadow-xl">
+              <!-- Decorative element -->
+              <div class="absolute -top-3 -right-3 w-16 h-16 bg-brand/10 rounded-full blur-xl"></div>
+              <div class="absolute -bottom-3 -left-3 w-16 h-16 bg-brand/5 rounded-full blur-xl"></div>
+
+              <!-- Stats Preview -->
+              <div class="relative">
+                <div class="flex items-center justify-between mb-6">
+                  <div>
+                    <p class="text-xs font-semibold text-brand uppercase tracking-wider">Business Dashboard</p>
+                    <h3 class="text-xl font-bold text-slate-900 mt-1">Vendor Analytics</h3>
+                  </div>
+                  <div class="w-10 h-10 bg-brand-light rounded-xl flex items-center justify-center text-brand">
+                    <i class="fas fa-chart-line"></i>
+                  </div>
+                </div>
+
+                <!-- Stats Grid -->
+                <div class="grid grid-cols-3 gap-4">
+                  <div class="bg-slate-50 rounded-xl p-3 text-center">
+                    <p class="text-2xl font-bold text-slate-900">$12.4k</p>
+                    <p class="text-xs text-slate-400">Revenue</p>
+                  </div>
+                  <div class="bg-slate-50 rounded-xl p-3 text-center">
+                    <p class="text-2xl font-bold text-slate-900">234</p>
+                    <p class="text-xs text-slate-400">Orders</p>
+                  </div>
+                  <div class="bg-slate-50 rounded-xl p-3 text-center">
+                    <p class="text-2xl font-bold text-slate-900">4.8★</p>
+                    <p class="text-xs text-slate-400">Rating</p>
+                  </div>
+                </div>
+
+                <!-- Recent Activity -->
+                <div class="mt-6 pt-6 border-t border-slate-100">
+                  <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Recent Activity</p>
+                  <div class="space-y-3">
+                    <div class="flex items-center gap-3">
+                      <span class="w-2 h-2 bg-green-500 rounded-full"></span>
+                      <p class="text-sm text-slate-600">New order #ORD-2341</p>
+                      <span class="text-xs text-slate-400 ml-auto">2 min ago</span>
+                    </div>
+                    <div class="flex items-center gap-3">
+                      <span class="w-2 h-2 bg-blue-500 rounded-full"></span>
+                      <p class="text-sm text-slate-600">Product listing approved</p>
+                      <span class="text-xs text-slate-400 ml-auto">15 min ago</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Floating Badges -->
+            <div class="absolute -top-4 -right-4 md:-top-6 md:-right-6 bg-white rounded-2xl shadow-xl border border-slate-100 px-4 py-3 animate-float">
+              <div class="flex items-center gap-2">
+                <i class="fas fa-rocket text-brand"></i>
+                <span class="text-sm font-semibold text-slate-900">100+ Vendors</span>
+              </div>
+            </div>
+            <div class="absolute -bottom-4 -left-4 md:-bottom-6 md:-left-6 bg-white rounded-2xl shadow-xl border border-slate-100 px-4 py-3 animate-float" style="animation-delay: 2s;">
+              <div class="flex items-center gap-2">
+                <i class="fas fa-star text-amber-400"></i>
+                <span class="text-sm font-semibold text-slate-900">4.98/5 Rating</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== STATS SECTION ========== -->
+  <section class="py-16 bg-white border-y border-slate-100/60">
+    <div class="max-w-7xl mx-auto px-6 md:px-10">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+        <div>
+          <p class="stat-number">500+</p>
+          <p class="stat-label">Active Vendors</p>
+        </div>
+        <div>
+          <p class="stat-number">12.4k</p>
+          <p class="stat-label">Orders Processed</p>
+        </div>
+        <div>
+          <p class="stat-number">98%</p>
+          <p class="stat-label">Satisfaction Rate</p>
+        </div>
+        <div>
+          <p class="stat-number">24/7</p>
+          <p class="stat-label">Support Available</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== FEATURES SECTION ========== -->
+  <section id="features" class="py-20 bg-features">
+    <div class="max-w-7xl mx-auto px-6 md:px-10">
+      <!-- Section Header -->
+      <div class="text-center max-w-3xl mx-auto mb-16">
+        <span class="inline-block text-xs font-semibold text-brand bg-brand-light px-3 py-1 rounded-full uppercase tracking-wider">
+          Features
+        </span>
+        <h2 class="text-3xl md:text-4xl font-bold text-slate-900 mt-3">
+          Everything You Need to <span class="text-brand">Succeed</span>
+        </h2>
+        <p class="text-slate-500 text-lg mt-4">
+          Powerful tools designed to help you manage, grow, and scale your business effortlessly.
+        </p>
+      </div>
+
+      <!-- Features Grid -->
+      <div class="grid md:grid-cols-3 gap-6">
+        <!-- Feature 1 -->
+        <div class="premium-card p-6">
+          <div class="feature-icon mb-4">
+            <i class="fas fa-store"></i>
+          </div>
+          <h3 class="text-lg font-bold text-slate-900 mb-2">Vendor Management</h3>
+          <p class="text-sm text-slate-500 leading-relaxed">
+            Complete vendor profile management with verification, product listing, and performance tracking.
+          </p>
+        </div>
+
+        <!-- Feature 2 -->
+        <div class="premium-card p-6">
+          <div class="feature-icon mb-4">
+            <i class="fas fa-chart-simple"></i>
+          </div>
+          <h3 class="text-lg font-bold text-slate-900 mb-2">Analytics & Insights</h3>
+          <p class="text-sm text-slate-500 leading-relaxed">
+            Real-time analytics, sales reports, and performance metrics to make data-driven decisions.
+          </p>
+        </div>
+
+        <!-- Feature 3 -->
+        <div class="premium-card p-6">
+          <div class="feature-icon mb-4">
+            <i class="fas fa-truck"></i>
+          </div>
+          <h3 class="text-lg font-bold text-slate-900 mb-2">Order Management</h3>
+          <p class="text-sm text-slate-500 leading-relaxed">
+            Streamlined order processing, fulfillment tracking, and customer communication tools.
+          </p>
+        </div>
+
+        <!-- Feature 4 -->
+        <div class="premium-card p-6">
+          <div class="feature-icon mb-4">
+            <i class="fas fa-cart-shopping"></i>
+          </div>
+          <h3 class="text-lg font-bold text-slate-900 mb-2">Product Catalog</h3>
+          <p class="text-sm text-slate-500 leading-relaxed">
+            Easy product listing, inventory management, and catalog organization for your store.
+          </p>
+        </div>
+
+        <!-- Feature 5 -->
+        <div class="premium-card p-6">
+          <div class="feature-icon mb-4">
+            <i class="fas fa-users"></i>
+          </div>
+          <h3 class="text-lg font-bold text-slate-900 mb-2">Customer Engagement</h3>
+          <p class="text-sm text-slate-500 leading-relaxed">
+            Tools to connect with customers, manage reviews, and build lasting relationships.
+          </p>
+        </div>
+
+        <!-- Feature 6 -->
+        <div class="premium-card p-6">
+          <div class="feature-icon mb-4">
+            <i class="fas fa-shield"></i>
+          </div>
+          <h3 class="text-lg font-bold text-slate-900 mb-2">Secure & Reliable</h3>
+          <p class="text-sm text-slate-500 leading-relaxed">
+            Enterprise-grade security, data protection, and 99.9% uptime guaranteed.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== SOLUTIONS SECTION ========== -->
+  <section id="solutions" class="py-20 bg-white">
+    <div class="max-w-7xl mx-auto px-6 md:px-10">
+      <div class="grid lg:grid-cols-2 gap-12 items-center">
+        <div>
+          <span class="inline-block text-xs font-semibold text-brand bg-brand-light px-3 py-1 rounded-full uppercase tracking-wider">
+            Solutions
+          </span>
+          <h2 class="text-3xl md:text-4xl font-bold text-slate-900 mt-3">
+            Built for Every
+            <span class="text-brand">Business Type</span>
+          </h2>
+          <p class="text-slate-500 text-lg mt-4">
+            Whether you're a vendor, store owner, or partner, COCOCE Business has the tools you need.
+          </p>
+
+          <div class="space-y-4 mt-8">
+            <div class="flex items-start gap-4 p-4 rounded-xl hover:bg-slate-50 transition">
+              <div class="w-10 h-10 bg-brand-light rounded-lg flex items-center justify-center text-brand flex-shrink-0">
+                <i class="fas fa-store"></i>
+              </div>
+              <div>
+                <h4 class="font-semibold text-slate-900">Vendors</h4>
+                <p class="text-sm text-slate-500">Manage products, orders, and analytics in one dashboard.</p>
+              </div>
+            </div>
+            <div class="flex items-start gap-4 p-4 rounded-xl hover:bg-slate-50 transition">
+              <div class="w-10 h-10 bg-brand-light rounded-lg flex items-center justify-center text-brand flex-shrink-0">
+                <i class="fas fa-building"></i>
+              </div>
+              <div>
+                <h4 class="font-semibold text-slate-900">Stores</h4>
+                <p class="text-sm text-slate-500">Multi-store management, inventory, and sales analytics.</p>
+              </div>
+            </div>
+            <div class="flex items-start gap-4 p-4 rounded-xl hover:bg-slate-50 transition">
+              <div class="w-10 h-10 bg-brand-light rounded-lg flex items-center justify-center text-brand flex-shrink-0">
+                <i class="fas fa-handshake"></i>
+              </div>
+              <div>
+                <h4 class="font-semibold text-slate-900">Partners</h4>
+                <p class="text-sm text-slate-500">Affiliate tracking, commission management, and partner resources.</p>
+              </div>
+            </div>
+          </div>
+
+          <a href="/register" class="btn-primary-premium mt-8">
+            Get Started
+            <i class="fas fa-arrow-right text-xs"></i>
+          </a>
+        </div>
+
+        <div class="relative">
+          <div class="premium-card p-8 border-2 border-brand/5">
+            <div class="flex items-center justify-between mb-6">
+              <h3 class="text-lg font-bold text-slate-900">Quick Stats</h3>
+              <span class="text-xs text-slate-400">Last 30 days</span>
+            </div>
+            <div class="space-y-4">
+              <div>
+                <div class="flex justify-between text-sm mb-1">
+                  <span class="text-slate-600">Revenue</span>
+                  <span class="font-semibold text-slate-900">$48,234</span>
+                </div>
+                <div class="w-full bg-slate-100 rounded-full h-2">
+                  <div class="bg-brand rounded-full h-2" style="width: 78%"></div>
+                </div>
+              </div>
+              <div>
+                <div class="flex justify-between text-sm mb-1">
+                  <span class="text-slate-600">Orders</span>
+                  <span class="font-semibold text-slate-900">1,234</span>
+                </div>
+                <div class="w-full bg-slate-100 rounded-full h-2">
+                  <div class="bg-brand rounded-full h-2" style="width: 65%"></div>
+                </div>
+              </div>
+              <div>
+                <div class="flex justify-between text-sm mb-1">
+                  <span class="text-slate-600">Growth</span>
+                  <span class="font-semibold text-green-600">+24.5%</span>
+                </div>
+                <div class="w-full bg-slate-100 rounded-full h-2">
+                  <div class="bg-green-500 rounded-full h-2" style="width: 85%"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Decorative badge -->
+          <div class="absolute -bottom-4 -right-4 bg-brand rounded-2xl px-4 py-2 shadow-lg">
+            <span class="text-white text-sm font-semibold flex items-center gap-2">
+              <i class="fas fa-arrow-up"></i>
+              +24.5% Growth
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== TESTIMONIALS SECTION ========== -->
+  <section id="testimonials" class="py-20 bg-slate-50/50">
+    <div class="max-w-7xl mx-auto px-6 md:px-10">
+      <div class="text-center max-w-3xl mx-auto mb-16">
+        <span class="inline-block text-xs font-semibold text-brand bg-brand-light px-3 py-1 rounded-full uppercase tracking-wider">
+          Testimonials
+        </span>
+        <h2 class="text-3xl md:text-4xl font-bold text-slate-900 mt-3">
+          What Our <span class="text-brand">Vendors Say</span>
+        </h2>
+        <p class="text-slate-500 text-lg mt-4">
+          Hear from businesses that have grown with COCOCE Business.
+        </p>
+      </div>
+
+      <div class="grid md:grid-cols-3 gap-6">
+        <div class="testimonial-card">
+          <div class="flex items-center gap-3 mb-3">
+            <div class="testimonial-avatar">JD</div>
+            <div>
+              <p class="font-semibold text-slate-900">John Doe</p>
+              <p class="text-xs text-slate-400">Tech Supplies Rwanda</p>
+            </div>
+          </div>
+          <div class="flex text-amber-400 text-sm mb-2">
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+          </div>
+          <p class="text-sm text-slate-600 leading-relaxed">
+            "COCOCE Business transformed how we manage our vendor operations. The dashboard gives us real-time insights that drive our business decisions."
+          </p>
+        </div>
+
+        <div class="testimonial-card">
+          <div class="flex items-center gap-3 mb-3">
+            <div class="testimonial-avatar">JS</div>
+            <div>
+              <p class="font-semibold text-slate-900">Jane Smith</p>
+              <p class="text-xs text-slate-400">Global Electronics Ltd</p>
+            </div>
+          </div>
+          <div class="flex text-amber-400 text-sm mb-2">
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+          </div>
+          <p class="text-sm text-slate-600 leading-relaxed">
+            "The product listing and order management features have streamlined our entire workflow. We've seen a 30% increase in efficiency."
+          </p>
+        </div>
+
+        <div class="testimonial-card">
+          <div class="flex items-center gap-3 mb-3">
+            <div class="testimonial-avatar">AJ</div>
+            <div>
+              <p class="font-semibold text-slate-900">Alice Johnson</p>
+              <p class="text-xs text-slate-400">Green Energy Solutions</p>
+            </div>
+          </div>
+          <div class="flex text-amber-400 text-sm mb-2">
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+          </div>
+          <p class="text-sm text-slate-600 leading-relaxed">
+            "The analytics and reporting tools are game-changers. We can now track our performance in real-time and make data-driven decisions."
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== CTA SECTION ========== -->
+  <section class="py-20 bg-slate-900">
+    <div class="max-w-4xl mx-auto px-6 md:px-10 text-center">
+      <h2 class="text-3xl md:text-4xl font-bold text-white">
+        Ready to Grow Your Business?
+      </h2>
+      <p class="text-slate-300 text-lg mt-4 max-w-2xl mx-auto">
+        Join 500+ vendors already using COCOCE Business to manage and scale their operations.
+      </p>
+      <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mt-8">
+        <a href="/register" class="bg-white text-slate-900 px-8 py-3.5 rounded-xl font-semibold hover:bg-slate-100 transition flex items-center gap-2">
+          Start Free Trial
+          <i class="fas fa-arrow-right text-xs"></i>
+        </a>
+        <a href="/contact" class="border border-white/20 text-white px-8 py-3.5 rounded-xl font-semibold hover:bg-white/10 transition flex items-center gap-2">
+          <i class="fas fa-headset"></i>
+          Contact Sales
+        </a>
+      </div>
+      <p class="text-slate-400 text-sm mt-4">
+        No credit card required. 14-day free trial.
+      </p>
+    </div>
+  </section>
+
+  <!-- ========== FOOTER ========== -->
+  <footer class="bg-slate-950 text-slate-400 border-t border-slate-800/50">
+    <div class="max-w-7xl mx-auto px-6 md:px-10 py-12">
+      <div class="grid md:grid-cols-4 gap-8">
+        <div>
+          <span class="text-2xl font-black text-white">COCOCE</span>
+          <span class="text-[10px] font-medium text-slate-500 block mt-1">Business Portal</span>
+          <p class="text-sm mt-3 max-w-xs">
+            Empowering vendors, stores, and partners with enterprise-grade tools.
+          </p>
+        </div>
+        <div>
+          <h4 class="text-white font-semibold text-sm mb-3">Product</h4>
+          <ul class="space-y-2 text-sm">
+            <li><a href="#" class="hover:text-white transition">Features</a></li>
+            <li><a href="#" class="hover:text-white transition">Pricing</a></li>
+            <li><a href="#" class="hover:text-white transition">Integrations</a></li>
+            <li><a href="#" class="hover:text-white transition">Changelog</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="text-white font-semibold text-sm mb-3">Company</h4>
+          <ul class="space-y-2 text-sm">
+            <li><a href="#" class="hover:text-white transition">About</a></li>
+            <li><a href="#" class="hover:text-white transition">Careers</a></li>
+            <li><a href="#" class="hover:text-white transition">Blog</a></li>
+            <li><a href="#" class="hover:text-white transition">Contact</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="text-white font-semibold text-sm mb-3">Support</h4>
+          <ul class="space-y-2 text-sm">
+            <li><a href="#" class="hover:text-white transition">Help Center</a></li>
+            <li><a href="#" class="hover:text-white transition">Documentation</a></li>
+            <li><a href="#" class="hover:text-white transition">Status</a></li>
+            <li><a href="#" class="hover:text-white transition">Community</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="border-t border-slate-800/50 mt-8 pt-8 flex flex-col md:flex-row items-center justify-between gap-4 text-sm">
+        <p>© 2026 COCOCE Business. All rights reserved.</p>
+        <div class="flex gap-6">
+          <a href="#" class="hover:text-white transition">Privacy</a>
+          <a href="#" class="hover:text-white transition">Terms</a>
+          <a href="#" class="hover:text-white transition">Cookies</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ========== JAVASCRIPT ========== -->
+  <script>
+    // Smooth scroll for anchor links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function(e) {
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+          e.preventDefault();
+          target.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'
+          });
+        }
+      });
+    });
+
+    // Intersection Observer for animations
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('animate-fade-in');
+        }
+      });
+    }, {
+      threshold: 0.1
+    });
+
+    document.querySelectorAll('.premium-card, .stat-number').forEach(el => {
+      observer.observe(el);
+    });
+
+    console.log('🚀 COCOCE Business Landing Page Loaded');
+    console.log('📊 Stats: 500+ Vendors, 12.4k Orders, 98% Satisfaction');
+  </script>
+
+</body>
+
+</html>

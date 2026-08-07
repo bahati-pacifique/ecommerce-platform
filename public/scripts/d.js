@@ -64,7 +64,7 @@ const tabContents = {
     attributes: document.getElementById('tab-attributes'),
     customers: document.getElementById('tab-customers'),
     analytics: document.getElementById('tab-analytics'),
-    marketing: document.getElementById('tab-marketing'),
+    vendors: document.getElementById('tab-vendors'),
     settings: document.getElementById('tab-settings'),
     'quick-actions': document.getElementById('tab-quick-actions'),
     help: document.getElementById('tab-help'),
@@ -82,7 +82,7 @@ const tabLabelMap = {
     brands: 'Brands',
     attributes: 'System attributes',
     analytics: 'Analytics',
-    marketing: 'Marketing',
+    vendors: 'Vendors',
     settings: 'Settings',
     'quick-actions': 'Quick Actions',
     help: 'Help & Support'

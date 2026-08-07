@@ -382,7 +382,7 @@ async function accountLogin(req, res) {
             ac: result.userAccount.user_account_id,
             a_id: result.userAccount.account_id,
             account_code: result.userAccount.account_code,
-            ac_type: result.userAccount.account_category,
+            ac_type: result.userAccount.account_category?.toLowerCase(),
             ac_title: result.userAccount.account_title,
             role: result.userAccount.role,
             username: result.userAccount.username,

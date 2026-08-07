@@ -24,6 +24,7 @@ const mainApp = require('./apps/main/main.app');
 const adminApp = require('./apps/admin/admin.app');
 const authApp = require('./apps/auth/auth.app');
 const apiApp = require('./apps/api/api.app');
+const businessApp = require('./apps/business/business.app');
 
 app.set('trust proxy', 1);
 
@@ -83,6 +84,7 @@ if (isProduction) {
     app.use(vhost('admin.localapp.com', adminApp));
     app.use(vhost('auth.localapp.com', authApp));
     app.use(vhost('api.localapp.com', apiApp));
+    app.use(vhost('business.localapp.com', businessApp));
 }
 
 if (!isProduction) {

@@ -583,7 +583,7 @@ async function removeBrand(id) {
         });
 
         Notification.showNotification({
-            type: 'error',
+            type: 'success',
             message: 'Brand has been removed.'
         });
 
@@ -669,7 +669,7 @@ function openBrandDeleteModal(id) {
 function activateBrand(id, target) {
     showSnackbar({
         type: 'warning',
-        message: "Do you want to active this brand?",
+        message: "Do you want to activate this brand?",
         actionText: "Yes",
         onAction: async () => {
             try {
@@ -684,7 +684,7 @@ function activateBrand(id, target) {
                 });
             }
         }
-    })
+    });
 }
 
 function closeBrandDeleteModal() {

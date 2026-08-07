@@ -4,6 +4,7 @@ const router = express.Router();
 const adminController = require('../controller/admin.controller');
 
 const ProductMetaController = require('../../../controllers/ProductMetaController');
+const VendorController = require('../../../controllers/vendors.controller');
 
 const { administration, session } = require('../../../middlewares/authGuards');
 
@@ -36,30 +37,35 @@ router.patch('/product-families/remove/:id', administration, ProductMetaControll
 router.delete('/product-families/:id', administration, ProductMetaController.deleteProductFamily);
 
                     //================= Brands =============
-router.post('/product-brands/', ProductMetaController.createBrand);
-router.get('/product-brands/', ProductMetaController.getBrands);
-router.get('/product-brands/:id', ProductMetaController.getBrandById);
-router.put('/product-brands/:id', ProductMetaController.updateBrand);
-router.patch('/product-brands/:id', ProductMetaController.activateBrand);
-router.patch('/product-brands/remove/:id', ProductMetaController.softDeleteBrand);
-router.delete('/product-brands/:id', ProductMetaController.hardDeleteBrand);
+router.post('/product-brands/', administration, ProductMetaController.createBrand);
+router.get('/product-brands/', administration, ProductMetaController.getBrands);
+router.get('/product-brands/:id', administration, ProductMetaController.getBrandById);
+router.put('/product-brands/:id', administration, ProductMetaController.updateBrand);
+router.patch('/product-brands/:id', administration, ProductMetaController.activateBrand);
+router.patch('/product-brands/remove/:id', administration, ProductMetaController.softDeleteBrand);
+router.delete('/product-brands/:id', administration, ProductMetaController.hardDeleteBrand);
 
             //Attributes
-router.post('/attributes/', ProductMetaController.createAttribute);
-router.get('/attributes/', ProductMetaController.getAttributes);
-router.get('/attributes/:id', ProductMetaController.getAttribute);
-router.put('/attributes/:id', ProductMetaController.updateAttribute);
-router.patch('/attributes/:id', ProductMetaController.activateAttribute);
-router.patch('/attributes/remove/:id', ProductMetaController.softDeleteAttribute);
-router.delete('/attributes/:id', ProductMetaController.hardDeleteAttribute);
+router.post('/attributes/', administration, ProductMetaController.createAttribute);
+router.get('/attributes/', administration, ProductMetaController.getAttributes);
+router.get('/attributes/:id', administration, ProductMetaController.getAttribute);
+router.put('/attributes/:id', administration, ProductMetaController.updateAttribute);
+router.patch('/attributes/:id', administration, ProductMetaController.activateAttribute);
+router.patch('/attributes/remove/:id', administration, ProductMetaController.softDeleteAttribute);
+router.delete('/attributes/:id', administration, ProductMetaController.hardDeleteAttribute);
 
             //Attributes values
-router.post('/attribute-values/', ProductMetaController.createAttributeValue);
-router.get('/attribute-values/', ProductMetaController.getAttributesValues);
-router.get('/attribute-values/:id', ProductMetaController.getAttributeValue);
-router.put('/attribute-values/:id', ProductMetaController.updateAttributeValue);
-router.patch('/attribute-values/:id', ProductMetaController.activateAttributeValue);
-router.patch('/attribute-values/remove/:id', ProductMetaController.softDeleteAttributeValue);
-router.delete('/attribute-values/:id', ProductMetaController.hardDeleteAttributeValue);      
+router.post('/attribute-values/', administration, ProductMetaController.createAttributeValue);
+router.get('/attribute-values/', administration, ProductMetaController.getAttributesValues);
+router.get('/attribute-values/:id', administration, ProductMetaController.getAttributeValue);
+router.put('/attribute-values/:id', administration, ProductMetaController.updateAttributeValue);
+router.patch('/attribute-values/:id', administration, ProductMetaController.activateAttributeValue);
+router.patch('/attribute-values/remove/:id', administration, ProductMetaController.softDeleteAttributeValue);
+router.delete('/attribute-values/:id', administration, ProductMetaController.hardDeleteAttributeValue);
+
+        //Vendors functionalities
+router.patch('/vendors/v/:id', VendorController.updateVendorVerificationStatus);
+router.patch('/vendors/s/:id', VendorController.updateVendorStatus);
+router.get('/vendors/', VendorController.getVendors);
 
 module.exports = router;

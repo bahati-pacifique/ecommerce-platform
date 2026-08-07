@@ -87,6 +87,9 @@ function renderFamiliesTable() {
                         <button class="p-1.5 rounded-lg text-brand hover:bg-brand-light transition family-delete-btn ${fam.status === "deleted" ? 'hidden' : ''}" title="Delete" data-id="${fam.id}">
                             <i class="fas fa-trash"></i>
                         </button>
+                        <button class="p-1.5 font-medium text-sm rounded-lg text-green-800 hover:bg-green-100 transition family-activate-btn ${(['deleted', 'disabled'].includes(fam.status)) ? '' : 'hidden'}" title="Delete" data-id="${fam.id}">
+                            <i class="bi bi-arrow-counterclockwise"></i>
+                        </button>
                     </div>
                 </td>
             </tr>
@@ -102,6 +105,10 @@ function renderFamiliesTable() {
     $('.family-delete-btn').off('click').on('click', function () {
         const id = parseInt($(this).data('id'));
         openFamilyDeleteModal(id);
+    });
+    $('.family-activate-btn').off('click').on('click', function () {
+        const id = parseInt($(this).data('id'));
+        activateFamily(id, this);
     });
 }
 
@@ -208,9 +215,8 @@ async function fetchFamilies(page = 1, isRefesh = false) {
             limit: familiesItemsPerPage
         };
 
-        if (currentFamilyStatusFilter && currentFamilyStatusFilter !== 'all') {
-            params.status = currentFamilyStatusFilter;
-        }
+        currentFamilyStatusFilter = $familyStatusFilter.val();
+        params.status = currentFamilyStatusFilter;
 
         const response = await axios.get(`/product-families/`, {
             params,
@@ -357,7 +363,6 @@ async function deleteFamily(id) {
 
         Notification.showNotification({
             type: 'warning',
-            title: "",
             message: 'Family has been deleted.'
         });
 
@@ -381,7 +386,7 @@ async function removeFamily(id) {
         });
 
         Notification.showNotification({
-            type: 'error',
+            type: 'success',
             message: 'Family has been removed.'
         });
 
@@ -395,6 +400,38 @@ async function removeFamily(id) {
         });
         return false;
     }
+}
+
+function activateFamily(id, target) {
+    const targetHtml = target?.innerHtml || '<i class="bi bi-arrow-counterclockwise"></i>';
+
+    showSnackbar({
+        type: 'warning',
+        message: "Do you want to activate this family?",
+        actionText: "Yes",
+        onAction: async () => {
+            try {
+                if (target) {
+                    target.disabled = true;
+                    target.textContent = 'Activating...';
+                }
+                await axios.patch(`/product-families/${id}`, { withCredentials: true });
+                fetchFamilies(currentFamiliesPage, true);
+                showSnackbar({ type: "success", message: "Family activated" })
+            } catch (error) {
+                console.log(error);
+                Notification.showNotification({
+                    type: 'Error',
+                    message: error.response?.data?.message || "Internal Server Error"
+                });
+            } finally {
+                if (target) {
+                    target.disabled = false
+                    target.innerHtml = targetHtml;
+                }
+            }
+        }
+    });
 }
 
 function openFamilyCreateModal() {
@@ -565,7 +602,7 @@ const fetchCategoriesForSelector = async () => {
 
         const sfx = !!t ? `:${t}` : '';
         const url = `${p}api.${d}${sfx}/`;
-        
+
         const response = await axios.get(`${url}categories`, { withCredentials: true });
         allCategoriesForSelector = response.data || [];
         renderCategoryList(allCategoriesForSelector);
@@ -833,7 +870,11 @@ $(document).ready(function () {
 
     $('.confirm-delete-family-btn').on('click', function () {
         confirmFamilyDelete();
-    })
+    });
+
+    $('.close-family-delete-modal').on('click', function () {
+        closeFamilyDeleteModal();
+    });
 
     $("#familyForm").on('submit', handleFamilyFormSubmit);
 

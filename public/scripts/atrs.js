@@ -1,5 +1,5 @@
 let currentAttributePage = 1;
-const attributeItemsPerPage = 20;
+const attributeItemsPerPage = 100;
 let deleteAttributeTargetId = null;
 let allAttributes = [];
 let filteredAttributes = [];
@@ -68,6 +68,7 @@ function renderAttributesTable() {
         $attributesPageInfo.text('Page 0 of 0');
         $prevAttributePageBtn.prop('disabled', true);
         $nextAttributePageBtn.prop('disabled', true);
+        $attributesEmptyState.removeClass('hidden');
         return;
     }
 
@@ -99,7 +100,7 @@ function renderAttributesTable() {
             <tr class="table-row border-b border-gray-50 transition">
                 <td class="px-4 py-3">
                     <p class="text-sm font-medium text-gray-900">
-                        ${stripHtml2(attr.title)}
+                        ${stripHtml2(attr.title)}<br><small class="text-gray-300">#${attr.id}</small>
                     </p>
                 </td>
                 <td class="px-4 py-3 text-sm text-gray-500 hidden md:table-cell max-w-xs truncate">${stripHtml2(attr.description || '-')}</td>
@@ -112,8 +113,11 @@ function renderAttributesTable() {
                         <button class="p-1.5 rounded-lg text-black-100 hover:bg-black/5 transition attribute-edit-btn" title="Edit" data-id="${attr.id}">
                             <i class="fas fa-edit"></i>
                         </button>
-                        <button class="p-1.5 rounded-lg text-brand hover:bg-brand-light transition attribute-delete-btn" title="Delete" data-id="${attr.id}">
+                        <button class="p-1.5 rounded-lg text-brand hover:bg-brand-light transition attribute-delete-btn ${attr.status === "deleted" ? 'hidden' : ''}" title="Delete" data-id="${attr.id}">
                             <i class="fas fa-trash"></i>
+                        </button>
+                        <button class="p-1.5 font-normal text-sm rounded-lg text-green-800 hover:bg-green-100 transition attribute-activate-btn ${(['deleted', 'disabled'].includes(attr.status)) ? '' : 'hidden'}" title="Delete" data-id="${attr.id}">
+                            <i class="bi bi-arrow-counterclockwise"></i>
                         </button>
                     </div>
                 </td>
@@ -237,6 +241,39 @@ function renderValueMetaFields(metaData = {}) {
         index++;
     }
     valueMetaFieldCount = index;
+}
+
+function activateAttribute(id, target) {
+    const targetHtml = target?.innerHtml || '<i class="bi bi-arrow-counterclockwise"></i>';
+    showSnackbar({
+        type: 'warning',
+        message: "Do you want to activate this attribute?",
+        actionText: "Yes",
+        onAction: async () => {
+            try {
+                if (target) {
+                    target.disabled = true;
+                    target.textContent = 'Activating...';
+                }
+                await axios.patch(`/attributes/${id}`, { withCredentials: true });
+                await fetchAttributes(currentAttributePage, true);
+                //await fetchAttributesForDropdown();
+                await fetchAttributesForSearch();
+                showSnackbar({ type: "success", message: "Attribute activated" })
+            } catch (error) {
+                console.log(error);
+                Notification.showNotification({
+                    type: 'Error',
+                    message: error.response?.data?.message || "Internal Server Error"
+                });
+            } finally {
+                if (target) {
+                    target.disabled = false
+                    target.innerHtml = targetHtml;
+                }
+            }
+        }
+    });
 }
 
 function addValueMetaFieldRow(key = '', value = '', index = null) {
@@ -388,9 +425,7 @@ async function fetchAttributes(page = 1, isRefresh = false) {
             limit: attributeItemsPerPage
         };
 
-        if ($attributeStatusFilter.val() && $attributeStatusFilter.val() !== 'all') {
-            params.status = $attributeStatusFilter.val();
-        }
+        params.status = $attributeStatusFilter.val();
 
         const response = await axios.get(`/attributes/`, {
             params,
@@ -519,11 +554,13 @@ async function deleteAttribute(id) {
         });
 
         Notification.showNotification({
-            type: 'warning',
+            type: 'success',
             message: 'Attribute has been deleted.'
         });
 
         await fetchAttributes(currentAttributePage, true);
+        // await fetchAttributesForDropdown()
+        fetchAttributesForSearch();
         return true;
     } catch (error) {
         console.error(error);
@@ -605,7 +642,7 @@ async function fetchValues(attributeId, page = 1, isRefresh = false) {
         $('#valueSkeletonLoader').addClass('hidden');
         $('#valuesContainer').removeClass('hidden');
         $attrSysncLoader.addClass('hidden');
-        
+
     }
 }
 
@@ -705,7 +742,9 @@ async function fetchAttributesForDropdown() {
 
         const attributes = response.data.attributes || [];
         const $dropdown = $valueAttributeFilter;
+
         $dropdown.html('<option value="">Select Attribute</option>');
+
         attributes.forEach(attr => {
             $dropdown.append(`<option value="${attr.id}">${stripHtml2(attr.title)}</option>`);
         });
@@ -1486,11 +1525,15 @@ $(document).ready(function () {
         }
     });
 
+    $(document).on("click", ".attribute-activate-btn", function (e) {
+        activateAttribute(e.currentTarget.dataset.id, e.target);
+    });
+
     // Form submit
     $("#valueForm").on('submit', handleValueFormSubmit);
 
     // ========== PAGINATION - VALUES ==========
     $('#prevValuePageBtn').on('click', prevValuePage);
     $('#nextValuePageBtn').on('click', nextValuePage);
-    
+
 });
