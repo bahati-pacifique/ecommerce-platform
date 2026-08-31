@@ -1,0 +1,1443 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>COCOCE — Business</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="description" content="COCOCE — Admin portal, COCOCE Kigali Rwanda, Laptops, Desktops, Computer accessories, Smart tv, projectors, discover what you want about digital assets near you at Kigali">
+  <meta name="keywords" content="Laptops, Desktops, Memories, Storages, Servers, keyboards, Printers, Screens, Repair, Explore, Electronic, Digital, Kigali, Rwanda">
+  <meta name="author" content="COCOCE RW">
+  <meta property="og:image" content="https://cdn.cococe.rw/meta/cococe.png">
+  <meta property="og:url" content="https://www.cococe.rw">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Laptops, Printers, Accessories, Game consoles, Electronics, and much more, cococe, your wish our priority">
+  <meta property="og:description" content="COCOCE Kigali Rwanda, Laptops, Desktops, Computer accessories, Smart tv, projectors, discover what you want about digital assets near you at Kigali">
+  <meta property="og:logo" content="https://cdn.cococe.rw/meta/cococe.png" />
+  <meta name="twitter:card" content="https://cdn.cococe.rw/meta/cococe.png">
+  <meta property="twitter:domain" content="https://cococe.rw">
+  <meta property="twitter:url" content="https://cococe.rw">
+  <meta name="twitter:title" content="Laptops, Printers, Accessories, Game consoles, Electronics, and much more, cococe, your wish our priority">
+  <meta name="twitter:description" content="COCOCE Kigali Rwanda, Laptops, Desktops, Computer accessories, Smart tv, projectors, discover what you want about digital assets near you at Kigali">
+  <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.11.0/axios.min.js" integrity="sha512-h9644v03pHqrIHThkvXhB2PJ8zf5E9IyVnrSfZg8Yj8k4RsO4zldcQc4Bi9iVLUCCsqNY0b4WXVV4UB+wbWENA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <link rel="icon" href="/favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" href="/styles/components/notification.css">
+  <link rel="stylesheet" href="/styles/components/main-snackbar.css">
+  <link rel="stylesheet" href="/styles/components/loaders.css">
+  <link rel="stylesheet" href="/styles/main.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js">
+  </script>
+  <%
+      function getInitials(name) {
+          if (!name) return '';
+          
+          const cleanName = name.replace(/[^A-Z]/gi, '').toUpperCase();
+          
+          const vowels = new Set(['A', 'E', 'I', 'O', 'U']);
+          
+          const consonants = [];
+          for (let i = 0; i < cleanName.length; i++) {
+            const char = cleanName[i];
+            if (!vowels.has(char)) {
+              consonants.push(char);
+            }
+            if (consonants.length === 2) break;
+          }
+          
+          if (consonants.length < 2) {
+            return cleanName.slice(0, 2);
+          }
+          
+          return consonants.join('');
+      }
+    %>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap');
+    @import url("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css");
+
+    body {
+      background: #F8FAFC;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .sidebar {
+      background: white;
+      border-right: 1px solid #e5e7eb;
+      height: 100vh;
+      position: sticky;
+      top: 0;
+      overflow-y: auto;
+      width: 264px;
+      flex-shrink: 0;
+      transition: width 0.3s ease;
+    }
+
+    .sidebar.collapsed {
+      width: 72px;
+    }
+
+    .sidebar.collapsed .sidebar-link .link-text,
+    .sidebar.collapsed .sidebar-brand .brand-text,
+    .sidebar.collapsed .sidebar-footer .user-info {
+      display: none;
+    }
+
+    .sidebar.collapsed .sidebar-link {
+      justify-content: center;
+      padding: 10px 14px;
+    }
+
+    .sidebar.collapsed .sidebar-footer {
+      padding: 12px 14px;
+    }
+
+    .sidebar-link {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 16px;
+      border-radius: 12px;
+      color: #6B7280;
+      font-weight: 500;
+      font-size: 14px;
+      transition: all 0.2s ease;
+      cursor: pointer;
+      text-decoration: none;
+      white-space: nowrap;
+      overflow: hidden;
+    }
+
+    .sidebar-link:hover {
+      background: #F9FAFB;
+      color: #1F2937;
+    }
+
+    .sidebar-link.active {
+      background: #FEE2E3;
+      color: #ED1B24;
+      font-weight: 600;
+    }
+
+    .sidebar-link .icon {
+      font-size: 18px;
+      width: 24px;
+      text-align: center;
+      flex-shrink: 0;
+    }
+
+    .sidebar-link .badge {
+      margin-left: auto;
+      background: #ED1B24;
+      color: white;
+      font-size: 10px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 20px;
+      flex-shrink: 0;
+    }
+
+    .sidebar-link .badge.amber {
+      background: #F59E0B;
+    }
+
+    .sidebar-link .badge.green {
+      background: #22C55E;
+    }
+
+    /* Mobile sidebar overlay */
+    .sidebar-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.4);
+      z-index: 49;
+    }
+
+    .sidebar-overlay.active {
+      display: block;
+    }
+
+    @media (max-width: 1023px) {
+      .sidebar {
+        position: fixed;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        z-index: 50;
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+        box-shadow: 4px 0 20px rgba(0, 0, 0, 0.05);
+      }
+
+      .sidebar.mobile-open {
+        transform: translateX(0);
+      }
+
+      .sidebar-overlay.active {
+        display: block;
+      }
+
+      .sidebar.collapsed {
+        width: 280px !important;
+      }
+
+      .sidebar.collapsed .sidebar-link .link-text,
+      .sidebar.collapsed .sidebar-brand .brand-text,
+      .sidebar.collapsed .sidebar-footer .user-info {
+        display: inline !important;
+      }
+
+      .sidebar.collapsed .sidebar-link {
+        justify-content: flex-start !important;
+        padding: 10px 16px !important;
+      }
+    }
+
+    /* Stat cards */
+    .stat-card {
+      transition: all 0.3s ease;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.06);
+    }
+
+    /* Tab content */
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    .tab-btn {
+      transition: all 0.2s ease;
+      position: relative;
+    }
+
+    .tab-btn.active {
+      color: #ED1B24;
+      font-weight: 600;
+      border-bottom: 2px solid #ED1B24;
+    }
+
+    .tab-btn:hover:not(.active) {
+      color: #1F2937;
+    }
+
+    /* Inventory items */
+    .inventory-item {
+      transition: all 0.2s ease;
+    }
+
+    .inventory-item:hover {
+      background: #f9fafb;
+      transform: translateX(4px);
+    }
+
+    /* Status badges */
+    .status-badge {
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .status-badge.active {
+      background: #DCFCE7;
+      color: #16A34A;
+    }
+
+    .status-badge.inactive {
+      background: #FEE2E3;
+      color: #ED1B24;
+    }
+
+    .status-badge.draft {
+      background: #FEF3C7;
+      color: #D97706;
+    }
+
+    .status-badge.pending {
+      background: #FEF3C7;
+      color: #D97706;
+    }
+
+    .status-badge.verified {
+      background: #DCFCE7;
+      color: #16A34A;
+    }
+
+    /* Chart container */
+    .chart-container {
+      position: relative;
+      height: 280px;
+    }
+
+    @media (max-width: 640px) {
+      .chart-container {
+        height: 220px;
+      }
+    }
+
+    /* Top bar */
+    .top-bar-btn {
+      transition: all 0.2s ease;
+      background: white;
+      border: 1px solid #e5e7eb;
+      padding: 8px 16px;
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: 500;
+      color: #4B5563;
+      cursor: pointer;
+    }
+
+    .top-bar-btn:hover {
+      background: #F9FAFB;
+      border-color: #D1D5DB;
+    }
+
+    /* Avatar upload */
+    .avatar-upload {
+      position: relative;
+      cursor: pointer;
+    }
+
+    .avatar-upload .overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .avatar-upload:hover .overlay {
+      opacity: 1;
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar {
+      width: 5px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: #f1f1f1;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #ED1B24;
+      border-radius: 10px;
+    }
+
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+
+    .store-container div {
+      cursor: pointer;
+    }
+
+    /* ========== PROFILE POPUP MENU ========== */
+    .profile-popup {
+      position: absolute;
+      bottom: 70px;
+      left: 16px;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.12);
+      border: 1px solid #e5e7eb;
+      min-width: 200px;
+      padding: 8px 0;
+      z-index: 100;
+      opacity: 0;
+      transform: translateY(10px) scale(0.95);
+      pointer-events: none;
+      transition: all 0.2s ease;
+    }
+
+    .profile-popup.show {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      pointer-events: auto;
+    }
+
+    .profile-popup .popup-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 16px;
+      color: #4B5563;
+      font-size: 14px;
+      font-weight: 500;
+      transition: all 0.15s ease;
+      cursor: pointer;
+      text-decoration: none;
+      border: none;
+      background: transparent;
+      width: 100%;
+      text-align: left;
+    }
+
+    .profile-popup .popup-item:hover {
+      background: #F9FAFB;
+      color: #1F2937;
+    }
+
+    .profile-popup .popup-item.danger {
+      color: #ED1B24;
+    }
+
+    .profile-popup .popup-item.danger:hover {
+      background: #FEE2E3;
+    }
+
+    .profile-popup .popup-divider {
+      height: 1px;
+      background: #e5e7eb;
+      margin: 4px 0;
+    }
+
+    .profile-popup .popup-item .icon {
+      width: 20px;
+      text-align: center;
+      font-size: 16px;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="sidebarOverlay" class="sidebar-overlay"></div>
+
+  <div class="flex min-h-screen">
+    <aside class="sidebar" id="sidebar">
+      <div class="flex flex-col h-full">
+        <div class="sidebar-brand px-4 py-2 border-b border-gray-100 flex items-center gap-3">
+          <img src="/images/logos/business.png" alt="Logo-brand" class="max-h-[56px]">
+        </div>
+        <nav class="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
+          <a href="#" class="sidebar-link active" data-tab="overview" data-title="Dashboard">
+            <span class="icon">📊</span>
+            <span class="link-text">Overview</span>
+          </a>
+          <a href="#" class="sidebar-link" data-tab="stores" data-title="Stores">
+            <span class="icon">🏪</span>
+            <span class="link-text">Stores <span class="badge green">3</span></span>
+
+          </a>
+          <a href="#" class="sidebar-link" data-tab="inventory" data-title="Inventory">
+            <span class="icon">📦</span>
+            <span class="link-text">Inventory <span class="badge amber">12</span></span>
+
+          </a>
+          <a href="#" class="sidebar-link" data-tab="orders" data-title="Orders">
+            <span class="icon">🛒</span>
+            <span class="link-text">Orders <span class="badge">8</span></span>
+
+          </a>
+          <a href="#" class="sidebar-link" data-tab="analytics" data-title="Analytics">
+            <span class="icon">📈</span>
+            <span class="link-text">Analytics</span>
+          </a>
+          <a href="#" class="sidebar-link" data-tab="profile" data-title="Profile">
+            <span class="icon">👤</span>
+            <span class="link-text">Profile</span>
+          </a>
+          <a href="#" class="sidebar-link" data-tab="settings" data-title="Settings">
+            <span class="icon">⚙️</span>
+            <span class="link-text">Settings</span>
+          </a>
+          <a href="#" class="sidebar-link" data-tab="support" data-title="Support">
+            <span class="icon">❓</span>
+            <span class="link-text">Support</span>
+          </a>
+        </nav>
+
+        <div class="sidebar-footer px-4 py-4 border-t border-gray-100 relative">
+          <div id="profileTrigger" class="flex items-center gap-3 cursor-pointer hover:bg-gray-50 rounded-lg p-2 transition">
+            <div class="w-8 h-8 rounded-full bg-brand-light flex items-center justify-center text-brand font-bold text-sm flex-shrink-0">
+              <%-getInitials(locals.user?.username || '')%>
+            </div>
+            <div class="user-info flex-1 min-w-0">
+              <p class="text-sm font-medium text-gray-800 truncate"><%=locals.user?.username || ''%></p>
+              <p class="text-xs text-gray-400 truncate"><%=locals.user?.email || ''%></p>
+            </div>
+            <i class="fas fa-chevron-up text-xs text-gray-400 transition-transform" id="popupChevron"></i>
+          </div>
+
+          <!-- Profile Popup Menu -->
+          <div id="profilePopup" class="profile-popup">
+            <button class="popup-item" id="viewProfileBtn">
+              <span class="icon">👤</span>
+              <span>View Profile</span>
+            </button>
+            <button class="popup-item" id="accountSettingsBtn">
+              <span class="icon">⚙️</span>
+              <span>Account Settings</span>
+            </button>
+            <div class="popup-divider"></div>
+            <form action="<%=locals.protocal%>auth.<%=locals.domain%>/signout" method="POST" class="popup-item danger">
+              <input type="hidden" value="<%=locals.protocal%>business.<%=locals.domain%>" name="host">
+              <button type="submit">
+                <span class="icon">
+                  <i class="bi bi-box-arrow-right"></i>
+                </span>
+                <span>
+                  Sign Out
+                </span>
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <div class="flex-1 min-w-0 flex flex-col">
+
+      <header class="bg-white border-b border-gray-100/60 px-4 md:px-6 py-3 sticky top-0 z-40 shadow-sm">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <button id="mobileMenuBtn" class="lg:hidden p-2 rounded-lg hover:bg-gray-100 transition">
+              <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            </button>
+            <button id="sidebarToggle" class="w-full flex items-center justify-center gap-2 text-sm text-gray-400 hover:text-gray-600 transition py-2">
+              <i class="fas fa-chevron-left" id="toggleIcon"></i>
+              <span id="toggleText" class="text-xs hidden">Collapse</span>
+            </button>
+            <h1 class="text-xl font-bold text-gray-900" id="mainTitle">Dashboard</h1>
+          </div>
+          <div class="flex items-center gap-2">
+            <button class="top-bar-btn flex items-center gap-2" id="quickActionsBtn">
+              <span class="hidden sm:inline">Quick Actions</span>
+            </button>
+
+          </div>
+        </div>
+      </header>
+
+      <main class="p-4 md:p-6 max-w-full">
+
+        <div id="tab-overview" class="tab-content active">
+
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+            <div class="stat-card bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
+              <div class="flex items-start justify-between">
+                <div>
+                  <p class="text-sm text-gray-500 font-medium">Total Revenue</p>
+                  <p class="text-2xl font-bold text-gray-900 mt-1">$124,892</p>
+                  <p class="text-xs text-green-600 mt-1">↑ 12.5% from last month</p>
+                </div>
+                <div class="w-10 h-10 bg-brand-light rounded-xl flex items-center justify-center text-brand text-xl">💰</div>
+              </div>
+            </div>
+
+            <div class="stat-card bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
+              <div class="flex items-start justify-between">
+                <div>
+                  <p class="text-sm text-gray-500 font-medium">Total Orders</p>
+                  <p class="text-2xl font-bold text-gray-900 mt-1">1,284</p>
+                  <p class="text-xs text-gray-500 mt-1">48 pending</p>
+                </div>
+                <div class="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center text-blue-500 text-xl">📦</div>
+              </div>
+            </div>
+
+            <div class="stat-card bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
+              <div class="flex items-start justify-between">
+                <div>
+                  <p class="text-sm text-gray-500 font-medium">Inventory Items</p>
+                  <p class="text-2xl font-bold text-gray-900 mt-1">3,847</p>
+                  <p class="text-xs text-amber-600 mt-1">⚠️ 23 low stock</p>
+                </div>
+                <div class="w-10 h-10 bg-amber-50 rounded-xl flex items-center justify-center text-amber-500 text-xl">📊</div>
+              </div>
+            </div>
+
+            <div class="stat-card bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
+              <div class="flex items-start justify-between">
+                <div>
+                  <p class="text-sm text-gray-500 font-medium">Total Stores</p>
+                  <p class="text-2xl font-bold text-gray-900 mt-1">12</p>
+                  <p class="text-xs text-gray-500 mt-1">8 active · 4 pending</p>
+                </div>
+                <div class="w-10 h-10 bg-purple-50 rounded-xl flex items-center justify-center text-purple-500 text-xl">🏪</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Charts -->
+          <div class="grid md:grid-cols-2 gap-6 mb-6">
+            <!-- Sales Chart -->
+            <div class="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
+              <div class="flex items-center justify-between mb-4">
+                <h3 class="text-sm font-semibold text-gray-700">Sales Overview</h3>
+                <span class="text-xs text-gray-400">Last 7 days</span>
+              </div>
+              <div class="chart-container">
+                <canvas id="salesChart"></canvas>
+              </div>
+            </div>
+
+            <!-- Order Status Chart -->
+            <div class="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
+              <div class="flex items-center justify-between mb-4">
+                <h3 class="text-sm font-semibold text-gray-700">Order Status</h3>
+                <span class="text-xs text-gray-400">Current</span>
+              </div>
+              <div class="chart-container">
+                <canvas id="orderChart"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <!-- Alerts & Inventory Preview -->
+          <div class="grid md:grid-cols-2 gap-6">
+            <!-- Alerts -->
+            <div class="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
+              <h3 class="text-sm font-semibold text-gray-700 mb-4">⚠️ Alerts</h3>
+              <div class="space-y-3">
+                <div class="flex items-center gap-3 p-3 bg-red-50 rounded-xl border border-red-200">
+                  <span class="text-xl">🔴</span>
+                  <div class="flex-1">
+                    <p class="text-sm font-medium text-red-700">Low Stock Alert</p>
+                    <p class="text-xs text-red-600">5 items below minimum threshold</p>
+                  </div>
+                  <span class="text-xs font-semibold text-red-700">URGENT</span>
+                </div>
+                <div class="flex items-center gap-3 p-3 bg-amber-50 rounded-xl border border-amber-200">
+                  <span class="text-xl">🟡</span>
+                  <div class="flex-1">
+                    <p class="text-sm font-medium text-amber-700">Old Stock Warning</p>
+                    <p class="text-xs text-amber-600">12 items aging > 180 days</p>
+                  </div>
+                  <span class="text-xs font-semibold text-amber-700">ATTENTION</span>
+                </div>
+                <div class="flex items-center gap-3 p-3 bg-green-50 rounded-xl border border-green-200">
+                  <span class="text-xl">🟢</span>
+                  <div class="flex-1">
+                    <p class="text-sm font-medium text-green-700">Stock Restocked</p>
+                    <p class="text-xs text-green-600">34 items restocked this week</p>
+                  </div>
+                  <span class="text-xs font-semibold text-green-700">DONE</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Recent Orders -->
+            <div class="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
+              <h3 class="text-sm font-semibold text-gray-700 mb-4">🛒 Recent Orders</h3>
+              <div class="space-y-3">
+                <div class="flex items-center justify-between p-3 bg-gray-50 rounded-xl">
+                  <div>
+                    <p class="text-sm font-medium text-gray-800">#ORD-2341</p>
+                    <p class="text-xs text-gray-400">Tech Supplies Rwanda</p>
+                  </div>
+                  <span class="status-badge pending">Pending</span>
+                </div>
+                <div class="flex items-center justify-between p-3 bg-gray-50 rounded-xl">
+                  <div>
+                    <p class="text-sm font-medium text-gray-800">#ORD-2340</p>
+                    <p class="text-xs text-gray-400">Global Electronics Ltd</p>
+                  </div>
+                  <span class="status-badge active">Completed</span>
+                </div>
+                <div class="flex items-center justify-between p-3 bg-gray-50 rounded-xl">
+                  <div>
+                    <p class="text-sm font-medium text-gray-800">#ORD-2339</p>
+                    <p class="text-xs text-gray-400">Green Energy Solutions</p>
+                  </div>
+                  <span class="status-badge inactive">Cancelled</span>
+                </div>
+              </div>
+              <a href="#" class="block text-center text-sm text-brand hover:text-brand-dark transition mt-3 font-medium">View All Orders →</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- TAB: STORES -->
+        <!-- ============================================================ -->
+        <div id="tab-stores" class="tab-content">
+          <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+            <div class="flex items-center justify-between mb-6">
+              <div>
+                <h2 class="text-lg font-bold text-gray-900">Stores</h2>
+                <p class="text-sm text-gray-500">Manage your store locations and settings</p>
+              </div>
+              <button class="px-4 py-2 bg-brand text-white rounded-xl text-sm font-medium hover:bg-brand-dark transition flex items-center gap-2">
+                <i class="fas fa-plus"></i> Add Store
+              </button>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-4 store-container">
+              <div class="border border-gray-200 rounded-xl p-4 hover:border-brand/30 transition">
+                <div class="flex items-start justify-between">
+                  <div>
+                    <h4 class="font-semibold text-gray-900">Main Store</h4>
+                    <p class="text-sm text-gray-500">Kigali, Rwanda</p>
+                    <p class="text-xs text-gray-400 mt-1">Products: 1,234 · Orders: 456</p>
+                  </div>
+                  <span class="status-badge active">Active</span>
+                </div>
+              </div>
+              <div class="border border-gray-200 rounded-xl p-4 hover:border-brand/30 transition">
+                <div class="flex items-start justify-between">
+                  <div>
+                    <h4 class="font-semibold text-gray-900">Branch Store</h4>
+                    <p class="text-sm text-gray-500">Musanze, Rwanda</p>
+                    <p class="text-xs text-gray-400 mt-1">Products: 567 · Orders: 234</p>
+                  </div>
+                  <span class="status-badge active">Active</span>
+                </div>
+              </div>
+              <div class="border border-gray-200 rounded-xl p-4 hover:border-brand/30 transition">
+                <div class="flex items-start justify-between">
+                  <div>
+                    <h4 class="font-semibold text-gray-900">Online Store</h4>
+                    <p class="text-sm text-gray-500">shop.cococe.com</p>
+                    <p class="text-xs text-gray-400 mt-1">Products: 890 · Orders: 345</p>
+                  </div>
+                  <span class="status-badge active">Active</span>
+                </div>
+              </div>
+              <div class="border border-gray-200 rounded-xl p-4 hover:border-brand/30 transition">
+                <div class="flex items-start justify-between">
+                  <div>
+                    <h4 class="font-semibold text-gray-900">Warehouse</h4>
+                    <p class="text-sm text-gray-500">Kigali Logistics Hub</p>
+                    <p class="text-xs text-gray-400 mt-1">Products: 2,345 · Inventory: 12,456</p>
+                  </div>
+                  <span class="status-badge pending">Pending</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- TAB: INVENTORY -->
+        <!-- ============================================================ -->
+        <div id="tab-inventory" class="tab-content">
+          <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+            <div class="flex items-center justify-between mb-6">
+              <div>
+                <h2 class="text-lg font-bold text-gray-900">Inventory</h2>
+                <p class="text-sm text-gray-500">Manage your products and stock levels</p>
+              </div>
+              <div class="flex gap-2">
+                <button class="px-4 py-2 bg-brand text-white rounded-xl text-sm font-medium hover:bg-brand-dark transition flex items-center gap-2">
+                  <i class="fas fa-plus"></i> Add Product
+                </button>
+                <button class="px-4 py-2 bg-white border border-gray-200 rounded-xl text-sm font-medium hover:bg-gray-50 transition">
+                  <i class="fas fa-download"></i>
+                </button>
+              </div>
+            </div>
+
+            <!-- Inventory Stats -->
+            <div class="grid grid-cols-3 gap-4 mb-6">
+              <div class="bg-gray-50 rounded-xl p-3 text-center">
+                <p class="text-2xl font-bold text-gray-900">3,847</p>
+                <p class="text-xs text-gray-500">Total Items</p>
+              </div>
+              <div class="bg-green-50 rounded-xl p-3 text-center">
+                <p class="text-2xl font-bold text-green-600">3,524</p>
+                <p class="text-xs text-gray-500">In Stock</p>
+              </div>
+              <div class="bg-red-50 rounded-xl p-3 text-center">
+                <p class="text-2xl font-bold text-red-600">323</p>
+                <p class="text-xs text-gray-500">Low Stock</p>
+              </div>
+            </div>
+
+            <!-- Inventory Table -->
+            <div class="overflow-x-auto">
+              <table class="w-full">
+                <thead>
+                  <tr class="bg-gray-50 border-b border-gray-100">
+                    <th class="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Product</th>
+                    <th class="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider hidden md:table-cell">SKU</th>
+                    <th class="text-center px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Stock</th>
+                    <th class="text-center px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider hidden lg:table-cell">Status</th>
+                    <th class="text-center px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr class="border-b border-gray-50 hover:bg-gray-50 transition">
+                    <td class="px-4 py-3">
+                      <p class="text-sm font-medium text-gray-900">MacBook Pro 16"</p>
+                      <p class="text-xs text-gray-400">Electronics</p>
+                    </td>
+                    <td class="px-4 py-3 text-sm text-gray-500 hidden md:table-cell">MBP-16-2024</td>
+                    <td class="px-4 py-3 text-center text-sm font-semibold text-gray-900">45</td>
+                    <td class="px-4 py-3 text-center hidden lg:table-cell"><span class="status-badge active">In Stock</span></td>
+                    <td class="px-4 py-3 text-center">
+                      <button class="p-1.5 rounded-lg text-blue-600 hover:bg-blue-50 transition"><i class="fas fa-edit"></i></button>
+                      <button class="p-1.5 rounded-lg text-red-500 hover:bg-red-50 transition"><i class="fas fa-trash"></i></button>
+                    </td>
+                  </tr>
+                  <tr class="border-b border-gray-50 hover:bg-gray-50 transition">
+                    <td class="px-4 py-3">
+                      <p class="text-sm font-medium text-gray-900">iPhone 15 Pro Max</p>
+                      <p class="text-xs text-gray-400">Electronics</p>
+                    </td>
+                    <td class="px-4 py-3 text-sm text-gray-500 hidden md:table-cell">IP15PM-2024</td>
+                    <td class="px-4 py-3 text-center text-sm font-semibold text-red-600">12</td>
+                    <td class="px-4 py-3 text-center hidden lg:table-cell"><span class="status-badge inactive">Low Stock</span></td>
+                    <td class="px-4 py-3 text-center">
+                      <button class="p-1.5 rounded-lg text-blue-600 hover:bg-blue-50 transition"><i class="fas fa-edit"></i></button>
+                      <button class="p-1.5 rounded-lg text-red-500 hover:bg-red-50 transition"><i class="fas fa-trash"></i></button>
+                    </td>
+                  </tr>
+                  <tr class="border-b border-gray-50 hover:bg-gray-50 transition">
+                    <td class="px-4 py-3">
+                      <p class="text-sm font-medium text-gray-900">Sony WH-1000XM5</p>
+                      <p class="text-xs text-gray-400">Audio</p>
+                    </td>
+                    <td class="px-4 py-3 text-sm text-gray-500 hidden md:table-cell">SONY-WH5</td>
+                    <td class="px-4 py-3 text-center text-sm font-semibold text-gray-900">89</td>
+                    <td class="px-4 py-3 text-center hidden lg:table-cell"><span class="status-badge active">In Stock</span></td>
+                    <td class="px-4 py-3 text-center">
+                      <button class="p-1.5 rounded-lg text-blue-600 hover:bg-blue-50 transition"><i class="fas fa-edit"></i></button>
+                      <button class="p-1.5 rounded-lg text-red-500 hover:bg-red-50 transition"><i class="fas fa-trash"></i></button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Pagination -->
+            <div class="flex flex-wrap items-center justify-between gap-3 mt-4 pt-3 border-t border-gray-100">
+              <p class="text-xs text-gray-500">Showing 1-3 of 1,234 items</p>
+              <div class="flex items-center gap-2">
+                <button class="px-3 py-1 rounded-lg border border-gray-200 text-sm text-gray-600 hover:bg-gray-50 transition disabled:opacity-40 disabled:cursor-not-allowed">
+                  <i class="fas fa-chevron-left"></i>
+                </button>
+                <span class="text-xs text-gray-500">Page 1 of 412</span>
+                <button class="px-3 py-1 rounded-lg border border-gray-200 text-sm text-gray-600 hover:bg-gray-50 transition disabled:opacity-40 disabled:cursor-not-allowed">
+                  <i class="fas fa-chevron-right"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- TAB: ORDERS -->
+        <!-- ============================================================ -->
+        <div id="tab-orders" class="tab-content">
+          <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+            <div class="flex items-center justify-between mb-6">
+              <div>
+                <h2 class="text-lg font-bold text-gray-900">Orders</h2>
+                <p class="text-sm text-gray-500">Track and manage all your orders</p>
+              </div>
+              <div class="flex gap-2">
+                <select class="px-3 py-2 rounded-xl border border-gray-200 bg-gray-50 text-sm text-gray-700 focus:outline-none focus:border-brand">
+                  <option>All Status</option>
+                  <option>Pending</option>
+                  <option>Processing</option>
+                  <option>Completed</option>
+                  <option>Cancelled</option>
+                </select>
+                <button class="px-4 py-2 bg-brand text-white rounded-xl text-sm font-medium hover:bg-brand-dark transition">
+                  <i class="fas fa-filter"></i>
+                </button>
+              </div>
+            </div>
+
+            <div class="overflow-x-auto">
+              <table class="w-full">
+                <thead>
+                  <tr class="bg-gray-50 border-b border-gray-100">
+                    <th class="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Order ID</th>
+                    <th class="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Customer</th>
+                    <th class="text-center px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider hidden md:table-cell">Total</th>
+                    <th class="text-center px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
+                    <th class="text-center px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider hidden lg:table-cell">Date</th>
+                    <th class="text-center px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr class="border-b border-gray-50 hover:bg-gray-50 transition">
+                    <td class="px-4 py-3 text-sm font-mono text-gray-500">#ORD-2341</td>
+                    <td class="px-4 py-3">
+                      <p class="text-sm font-medium text-gray-900">John Doe</p>
+                      <p class="text-xs text-gray-400">john@example.com</p>
+                    </td>
+                    <td class="px-4 py-3 text-center hidden md:table-cell text-sm font-semibold text-gray-900">$234.00</td>
+                    <td class="px-4 py-3 text-center"><span class="status-badge pending">Pending</span></td>
+                    <td class="px-4 py-3 text-center hidden lg:table-cell text-sm text-gray-500">2024-12-15</td>
+                    <td class="px-4 py-3 text-center">
+                      <button class="p-1.5 rounded-lg text-blue-600 hover:bg-blue-50 transition"><i class="fas fa-eye"></i></button>
+                      <button class="p-1.5 rounded-lg text-blue-600 hover:bg-blue-50 transition"><i class="fas fa-edit"></i></button>
+                    </td>
+                  </tr>
+                  <tr class="border-b border-gray-50 hover:bg-gray-50 transition">
+                    <td class="px-4 py-3 text-sm font-mono text-gray-500">#ORD-2340</td>
+                    <td class="px-4 py-3">
+                      <p class="text-sm font-medium text-gray-900">Jane Smith</p>
+                      <p class="text-xs text-gray-400">jane@example.com</p>
+                    </td>
+                    <td class="px-4 py-3 text-center hidden md:table-cell text-sm font-semibold text-gray-900">$1,234.00</td>
+                    <td class="px-4 py-3 text-center"><span class="status-badge active">Completed</span></td>
+                    <td class="px-4 py-3 text-center hidden lg:table-cell text-sm text-gray-500">2024-12-14</td>
+                    <td class="px-4 py-3 text-center">
+                      <button class="p-1.5 rounded-lg text-blue-600 hover:bg-blue-50 transition"><i class="fas fa-eye"></i></button>
+                      <button class="p-1.5 rounded-lg text-blue-600 hover:bg-blue-50 transition"><i class="fas fa-edit"></i></button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- TAB: ANALYTICS -->
+        <!-- ============================================================ -->
+        <div id="tab-analytics" class="tab-content">
+          <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+            <h2 class="text-lg font-bold text-gray-900 mb-2">Analytics</h2>
+            <p class="text-sm text-gray-500 mb-6">Deep insights into your business performance</p>
+
+            <div class="grid md:grid-cols-2 gap-6">
+              <div class="bg-gray-50 rounded-xl p-4">
+                <p class="text-xs text-gray-400 uppercase tracking-wider">Revenue</p>
+                <p class="text-3xl font-bold text-gray-900 mt-1">$124,892</p>
+                <p class="text-sm text-green-600 mt-1">↑ 12.5% from last month</p>
+              </div>
+              <div class="bg-gray-50 rounded-xl p-4">
+                <p class="text-xs text-gray-400 uppercase tracking-wider">Orders</p>
+                <p class="text-3xl font-bold text-gray-900 mt-1">1,284</p>
+                <p class="text-sm text-green-600 mt-1">↑ 8.3% from last month</p>
+              </div>
+              <div class="bg-gray-50 rounded-xl p-4">
+                <p class="text-xs text-gray-400 uppercase tracking-wider">Conversion Rate</p>
+                <p class="text-3xl font-bold text-gray-900 mt-1">3.8%</p>
+                <p class="text-sm text-amber-600 mt-1">↓ 0.2% from last month</p>
+              </div>
+              <div class="bg-gray-50 rounded-xl p-4">
+                <p class="text-xs text-gray-400 uppercase tracking-wider">Average Order Value</p>
+                <p class="text-3xl font-bold text-gray-900 mt-1">$97.20</p>
+                <p class="text-sm text-green-600 mt-1">↑ 4.1% from last month</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- TAB: PROFILE -->
+        <!-- ============================================================ -->
+        <div id="tab-profile" class="tab-content">
+          <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+            <div class="flex items-center justify-between mb-6">
+              <div>
+                <h2 class="text-lg font-bold text-gray-900">Profile</h2>
+                <p class="text-sm text-gray-500">Manage your vendor profile and settings</p>
+              </div>
+              <span class="status-badge verified">Verified Vendor</span>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-6">
+              <!-- Avatar -->
+              <div class="flex flex-col items-center">
+                <div class="avatar-upload relative">
+                  <img src="https://ui-avatars.com/api/?name=Admin+User&background=ED1B24&color=fff&size=128" alt="Profile" class="w-32 h-32 rounded-full border-4 border-gray-200 object-cover">
+                  <div class="overlay">
+                    <span class="text-white text-sm font-medium"><i class="fas fa-camera"></i></span>
+                  </div>
+                </div>
+                <button class="mt-3 text-sm text-brand hover:text-brand-dark transition font-medium">Change Photo</button>
+                <p class="text-xs text-gray-400 mt-1">JPG, PNG, GIF up to 5MB</p>
+              </div>
+
+              <!-- Profile Info -->
+              <div class="md:col-span-2 space-y-4">
+                <div class="grid md:grid-cols-2 gap-4">
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Business Name</label>
+                    <input type="text" value="Tech Supplies Rwanda" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-gray-900 focus:outline-none focus:border-brand focus:ring-2 focus:ring-brand/10">
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                    <input type="email" value="admin@techsupplies.rw" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-gray-900 focus:outline-none focus:border-brand focus:ring-2 focus:ring-brand/10">
+                  </div>
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1">Business Address</label>
+                  <input type="text" value="KG 123 St, Kigali, Rwanda" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-gray-900 focus:outline-none focus:border-brand focus:ring-2 focus:ring-brand/10">
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                  <textarea rows="2" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-gray-900 focus:outline-none focus:border-brand focus:ring-2 focus:ring-brand/10 resize-y">Leading supplier of tech products in Rwanda.</textarea>
+                </div>
+                <button class="px-6 py-2.5 bg-brand text-white rounded-xl font-medium hover:bg-brand-dark transition">
+                  Save Changes
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- TAB: SETTINGS -->
+        <!-- ============================================================ -->
+        <div id="tab-settings" class="tab-content">
+          <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+            <h2 class="text-lg font-bold text-gray-900 mb-2">Settings</h2>
+            <p class="text-sm text-gray-500 mb-6">Configure your business preferences</p>
+
+            <div class="space-y-6">
+              <div class="flex items-center justify-between p-4 border border-gray-200 rounded-xl">
+                <div>
+                  <h4 class="font-medium text-gray-900">Store Currency</h4>
+                  <p class="text-sm text-gray-500">Set your preferred currency for transactions</p>
+                </div>
+                <select class="px-3 py-2 rounded-xl border border-gray-200 bg-gray-50 text-sm text-gray-700 focus:outline-none focus:border-brand">
+                  <option>RWF - Rwandan Franc</option>
+                  <option>USD - US Dollar</option>
+                  <option>EUR - Euro</option>
+                </select>
+              </div>
+              <div class="flex items-center justify-between p-4 border border-gray-200 rounded-xl">
+                <div>
+                  <h4 class="font-medium text-gray-900">Tax Settings</h4>
+                  <p class="text-sm text-gray-500">Configure tax rates and rules</p>
+                </div>
+                <button class="px-4 py-2 bg-gray-100 text-gray-700 rounded-xl text-sm font-medium hover:bg-gray-200 transition">Configure</button>
+              </div>
+              <div class="flex items-center justify-between p-4 border border-gray-200 rounded-xl">
+                <div>
+                  <h4 class="font-medium text-gray-900">Shipping Methods</h4>
+                  <p class="text-sm text-gray-500">Manage shipping options and rates</p>
+                </div>
+                <button class="px-4 py-2 bg-gray-100 text-gray-700 rounded-xl text-sm font-medium hover:bg-gray-200 transition">Configure</button>
+              </div>
+              <div class="flex items-center justify-between p-4 border border-gray-200 rounded-xl">
+                <div>
+                  <h4 class="font-medium text-gray-900">Payment Gateways</h4>
+                  <p class="text-sm text-gray-500">Connect payment providers</p>
+                </div>
+                <button class="px-4 py-2 bg-gray-100 text-gray-700 rounded-xl text-sm font-medium hover:bg-gray-200 transition">Configure</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- TAB: SUPPORT -->
+        <!-- ============================================================ -->
+        <div id="tab-support" class="tab-content">
+          <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+            <h2 class="text-lg font-bold text-gray-900 mb-2">Support</h2>
+            <p class="text-sm text-gray-500 mb-6">Get help with your business</p>
+
+            <div class="grid md:grid-cols-3 gap-4">
+              <a href="#" class="p-4 border border-gray-200 rounded-xl hover:border-brand/30 transition text-center">
+                <div class="w-12 h-12 bg-brand-light rounded-xl flex items-center justify-center text-brand text-xl mx-auto mb-3">
+                  <i class="fas fa-file-alt"></i>
+                </div>
+                <h4 class="font-medium text-gray-900">Documentation</h4>
+                <p class="text-sm text-gray-500">Guides & tutorials</p>
+              </a>
+              <a href="#" class="p-4 border border-gray-200 rounded-xl hover:border-brand/30 transition text-center">
+                <div class="w-12 h-12 bg-brand-light rounded-xl flex items-center justify-center text-brand text-xl mx-auto mb-3">
+                  <i class="fas fa-envelope"></i>
+                </div>
+                <h4 class="font-medium text-gray-900">Contact Support</h4>
+                <p class="text-sm text-gray-500">Email & chat</p>
+              </a>
+              <a href="#" class="p-4 border border-gray-200 rounded-xl hover:border-brand/30 transition text-center">
+                <div class="w-12 h-12 bg-brand-light rounded-xl flex items-center justify-center text-brand text-xl mx-auto mb-3">
+                  <i class="fas fa-community"></i>
+                </div>
+                <h4 class="font-medium text-gray-900">Community</h4>
+                <p class="text-sm text-gray-500">Forum & discussions</p>
+              </a>
+            </div>
+          </div>
+        </div>
+
+      </main>
+
+
+      <footer class="py-3 px-6 bg-white border-t border-gray-100 mt-auto">
+        <div class="flex flex-col md:flex-row justify-between items-center gap-2 text-xs text-gray-400">
+          <span>© 2026 COCOCE Business — Vendor Dashboard</span>
+          <div class="flex gap-6">
+            <a href="/privacy" class="hover:text-brand transition">Privacy</a>
+            <a href="/terms" class="hover:text-brand transition">Terms</a>
+            <a href="mailto:support@cococe.rw" class="hover:text-brand transition">Support</a>
+            <a href="/docs" class="hover:text-brand transition">Docs</a>
+          </div>
+        </div>
+      </footer>
+    </div>
+  </div>
+
+  <!-- ========== QUICK ACTIONS MODAL ========== -->
+  <div id="quickActionsModal" class="fixed inset-0 z-50 hidden items-center justify-center px-4">
+    <div class="modal-overlay absolute inset-0 bg-black/40 backdrop-blur-sm"></div>
+    <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[80vh] overflow-y-auto animate-slide-down">
+      <div class="sticky top-0 bg-white border-b border-gray-100 px-6 py-4 flex items-center justify-between">
+        <h3 class="text-lg font-bold text-gray-900">Quick Actions</h3>
+        <button id="closeQuickActionsBtn" class="text-gray-400 hover:text-gray-600 transition">
+          <i class="fas fa-times text-xl"></i>
+        </button>
+      </div>
+      <div class="p-6 grid grid-cols-2 md:grid-cols-3 gap-3">
+        <a href="#" class="flex items-center gap-3 p-3 rounded-xl border border-gray-100 hover:border-brand/20 hover:bg-brand-light transition">
+          <span class="text-xl">🏪</span>
+          <div>
+            <p class="text-sm font-semibold text-gray-800">Add Store</p>
+            <p class="text-xs text-gray-400">New location</p>
+          </div>
+        </a>
+        <a href="#" class="flex items-center gap-3 p-3 rounded-xl border border-gray-100 hover:border-brand/20 hover:bg-brand-light transition">
+          <span class="text-xl">📦</span>
+          <div>
+            <p class="text-sm font-semibold text-gray-800">Add Product</p>
+            <p class="text-xs text-gray-400">New inventory</p>
+          </div>
+        </a>
+        <a href="#" class="flex items-center gap-3 p-3 rounded-xl border border-gray-100 hover:border-brand/20 hover:bg-brand-light transition">
+          <span class="text-xl">👤</span>
+          <div>
+            <p class="text-sm font-semibold text-gray-800">Edit Profile</p>
+            <p class="text-xs text-gray-400">Update info</p>
+          </div>
+        </a>
+        <a href="#" class="flex items-center gap-3 p-3 rounded-xl border border-gray-100 hover:border-brand/20 hover:bg-brand-light transition">
+          <span class="text-xl">📊</span>
+          <div>
+            <p class="text-sm font-semibold text-gray-800">View Reports</p>
+            <p class="text-xs text-gray-400">Analytics</p>
+          </div>
+        </a>
+        <a href="#" class="flex items-center gap-3 p-3 rounded-xl border border-gray-100 hover:border-brand/20 hover:bg-brand-light transition">
+          <span class="text-xl">📋</span>
+          <div>
+            <p class="text-sm font-semibold text-gray-800">Bulk Import</p>
+            <p class="text-xs text-gray-400">Products</p>
+          </div>
+        </a>
+        <a href="#" class="flex items-center gap-3 p-3 rounded-xl border border-gray-100 hover:border-brand/20 hover:bg-brand-light transition">
+          <span class="text-xl">⚙️</span>
+          <div>
+            <p class="text-sm font-semibold text-gray-800">Settings</p>
+            <p class="text-xs text-gray-400">Preferences</p>
+          </div>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== JAVASCRIPT ========== -->
+  <script>
+    // ============================================================
+    // SIDEBAR TOGGLE
+    // ============================================================
+    const sidebar = document.getElementById('sidebar');
+    const toggleBtn = document.getElementById('sidebarToggle');
+    const toggleIcon = document.getElementById('toggleIcon');
+    const toggleText = document.getElementById('toggleText');
+    let isCollapsed = false;
+
+    toggleBtn.addEventListener('click', function() {
+      isCollapsed = !isCollapsed;
+      sidebar.classList.toggle('collapsed', isCollapsed);
+      toggleIcon.className = isCollapsed ? 'fas fa-chevron-right' : 'fas fa-chevron-left';
+      toggleText.textContent = isCollapsed ? 'Expand' : 'Collapse';
+    });
+
+    // ============================================================
+    // MOBILE SIDEBAR
+    // ============================================================
+    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+    const overlay = document.getElementById('sidebarOverlay');
+
+    function openMobileSidebar() {
+      sidebar.classList.add('mobile-open');
+      overlay.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeMobileSidebar() {
+      sidebar.classList.remove('mobile-open');
+      overlay.classList.remove('active');
+      document.body.style.overflow = '';
+    }
+
+    mobileMenuBtn.addEventListener('click', openMobileSidebar);
+
+    // Close sidebar on link click (mobile)
+    document.querySelectorAll('.sidebar-link').forEach(link => {
+      link.addEventListener('click', () => {
+        if (window.innerWidth < 1024) {
+          closeMobileSidebar();
+        }
+      });
+    });
+
+    // ============================================================
+    // TAB SWITCHING WITH TITLE UPDATE
+    // ============================================================
+    const sidebarLinks = document.querySelectorAll('.sidebar-link');
+    const tabContents = {
+      overview: document.getElementById('tab-overview'),
+      stores: document.getElementById('tab-stores'),
+      inventory: document.getElementById('tab-inventory'),
+      orders: document.getElementById('tab-orders'),
+      analytics: document.getElementById('tab-analytics'),
+      profile: document.getElementById('tab-profile'),
+      settings: document.getElementById('tab-settings'),
+      support: document.getElementById('tab-support'),
+    };
+
+    const mainTitle = document.getElementById('mainTitle');
+
+    // Tab titles mapping
+    const tabTitles = {
+      overview: 'Dashboard',
+      stores: 'Stores',
+      inventory: 'Inventory',
+      orders: 'Orders',
+      analytics: 'Analytics',
+      profile: 'Profile',
+      settings: 'Settings',
+      support: 'Support'
+    };
+
+    sidebarLinks.forEach(link => {
+      link.addEventListener('click', function(e) {
+        e.preventDefault();
+
+        // Remove active from all links
+        sidebarLinks.forEach(l => l.classList.remove('active'));
+        this.classList.add('active');
+
+        // Hide all tab contents
+        Object.values(tabContents).forEach(content => {
+          if (content) content.classList.remove('active');
+        });
+
+        // Show selected tab
+        const tabId = this.dataset.tab;
+        if (tabContents[tabId]) {
+          tabContents[tabId].classList.add('active');
+        }
+
+        // ✅ Update main title with tab name
+        if (tabId && tabTitles[tabId]) {
+          mainTitle.textContent = tabTitles[tabId];
+        }
+      });
+    });
+
+    // ============================================================
+    // PROFILE POPUP MENU
+    // ============================================================
+    const profileTrigger = document.getElementById('profileTrigger');
+    const profilePopup = document.getElementById('profilePopup');
+    const popupChevron = document.getElementById('popupChevron');
+    let isPopupOpen = false;
+
+    function togglePopup(e) {
+      e.stopPropagation();
+      isPopupOpen = !isPopupOpen;
+      profilePopup.classList.toggle('show', isPopupOpen);
+      popupChevron.style.transform = isPopupOpen ? 'rotate(180deg)' : 'rotate(0deg)';
+    }
+
+    function closePopup() {
+      isPopupOpen = false;
+      profilePopup.classList.remove('show');
+      popupChevron.style.transform = 'rotate(0deg)';
+    }
+
+    profileTrigger.addEventListener('click', togglePopup);
+
+    // Close popup when clicking outside
+    document.addEventListener('click', function(e) {
+      if (!profileTrigger.contains(e.target) && !profilePopup.contains(e.target)) {
+        closePopup();
+      }
+    });
+
+    // Close popup on Escape key
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape' && isPopupOpen) {
+        closePopup();
+      }
+    });
+
+    // Popup item actions
+    document.getElementById('viewProfileBtn').addEventListener('click', function() {
+      closePopup();
+      // Find and click the profile tab
+      const profileTab = document.querySelector('.sidebar-link[data-tab="profile"]');
+      if (profileTab) profileTab.click();
+    });
+
+    document.getElementById('accountSettingsBtn').addEventListener('click', function() {
+      closePopup();
+      const settingsTab = document.querySelector('.sidebar-link[data-tab="settings"]');
+      if (settingsTab) settingsTab.click();
+    });
+
+    // document.getElementById('signoutBtn').addEventListener('click', function() {
+    //   closePopup();
+    //   if (confirm('Are you sure you want to sign out?')) {
+    //     // Redirect to sign out endpoint
+    //     window.location.href = '/logout';
+    //   }
+    // });
+
+    // ============================================================
+    // CHARTS
+    // ============================================================
+    // Sales Chart
+    const salesCtx = document.getElementById('salesChart')?.getContext('2d');
+    if (salesCtx) {
+      new Chart(salesCtx, {
+        type: 'line',
+        data: {
+          labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+          datasets: [{
+            label: 'Sales ($)',
+            data: [1200, 1900, 1500, 2200, 2800, 2100, 2600],
+            borderColor: '#ED1B24',
+            backgroundColor: 'rgba(237, 27, 36, 0.05)',
+            fill: true,
+            tension: 0.4,
+            borderWidth: 2,
+            pointBackgroundColor: '#ED1B24',
+            pointBorderColor: 'white',
+            pointBorderWidth: 2,
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              display: false
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              grid: {
+                color: 'rgba(0,0,0,0.04)'
+              }
+            },
+            x: {
+              grid: {
+                display: false
+              }
+            }
+          }
+        }
+      });
+    }
+
+    // Order Status Chart
+    const orderCtx = document.getElementById('orderChart')?.getContext('2d');
+    if (orderCtx) {
+      new Chart(orderCtx, {
+        type: 'doughnut',
+        data: {
+          labels: ['Completed', 'Processing', 'Pending', 'Cancelled'],
+          datasets: [{
+            data: [1112, 124, 48, 23],
+            backgroundColor: ['#22c55e', '#3b82f6', '#f59e0b', '#ef4444'],
+            borderWidth: 0,
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'bottom',
+              labels: {
+                padding: 12,
+                usePointStyle: true,
+                pointStyle: 'circle'
+              }
+            }
+          },
+          cutout: '70%',
+        }
+      });
+    }
+
+    // ============================================================
+    // QUICK ACTIONS MODAL
+    // ============================================================
+    const quickActionsBtn = document.getElementById('quickActionsBtn');
+    const quickActionsModal = document.getElementById('quickActionsModal');
+
+    function openQuickActions() {
+      quickActionsModal.classList.remove('hidden');
+      quickActionsModal.style.display = 'flex';
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeQuickActions() {
+      quickActionsModal.classList.add('hidden');
+      quickActionsModal.style.display = 'none';
+      document.body.style.overflow = '';
+    }
+
+    quickActionsBtn.addEventListener('click', openQuickActions);
+
+    // Close on Escape
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        if (!quickActionsModal.classList.contains('hidden')) {
+          closeQuickActions();
+        }
+      }
+    });
+
+    // Quick action links
+    document.querySelectorAll('#quickActionsModal a').forEach(link => {
+      link.addEventListener('click', function(e) {
+        e.preventDefault();
+        closeQuickActions();
+        const text = this.querySelector('p')?.textContent || 'Action';
+        alert(`🚀 "${text}" — Coming soon!`);
+      });
+    });
+
+    $(document).ready(() => {
+      $('#sidebarOverlay').click(closeMobileSidebar);
+      $('#closeQuickActionsBtn').click(closeQuickActions);
+      $('#quickActionsModal .modal-overlay').click(closeQuickActions)
+    });
+  </script>
+
+</body>
+
+</html>

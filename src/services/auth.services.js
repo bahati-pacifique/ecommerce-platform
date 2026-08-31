@@ -292,7 +292,7 @@ class AuthService {
             };
         }
     }
-    async logout(userAccount) {
+    async signout(userAccount) {
         try {
             const session = await sessionModel.invalidateAllForUser(userAccount);
             return session;

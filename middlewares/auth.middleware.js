@@ -7,6 +7,7 @@ const { v4: uuidv4 } = require("uuid");
 
 const {
     clearAuthentication,
+    clearAuthRedirect,
     deny401,
     deny403,
     success200,
@@ -250,6 +251,9 @@ function authPass({ acceptedTypes }) {
 
         const portSuffix = isProduction ? '' : `:${process.env.PORT}`;
 
+        const protocal = sslUrlPrefix;
+        const domain = process.env.DOMAIN+portSuffix;
+
         const { accessToken, refreshToken } = decodeAuthCookies(req);
 
         if (accessToken) {
@@ -257,7 +261,6 @@ function authPass({ acceptedTypes }) {
             if (!uaOk) {
                 req.session.message = 'Some suspicious behaviour detected. Please log in to continue';
                 if (acceptsHtml(req)) {
-                    console.log(`${sslUrlPrefix}auth.${process.env.DOMAIN}${portSuffix}`)
                     return res.redirect(`${sslUrlPrefix}auth.${process.env.DOMAIN}${portSuffix}`)
                 } else {
                     return res.status(401).json({
@@ -286,7 +289,6 @@ function authPass({ acceptedTypes }) {
             //Validate account type
             if (acceptedTypes && !acceptedTypes.includes(accessToken.ac_type?.toLowerCase() || '')) {
 
-                console.log(acceptedTypes, accessToken.ac_type)
                 // if (acceptsHtml(req)) {
                 //     return res.render('no-access', {
                 //         user,
@@ -309,7 +311,10 @@ function authPass({ acceptedTypes }) {
                     return res.render('no-access', {
                         user,
                         accepted: acceptedTypes,
+                        account: accessToken.ac_type,
                         title: 'Access Restricted',
+                        domain,
+                        protocal,
                         message: `You don't currently have permission to access this page. 
                         Your account is signed in successfully, 
                         but your assigned role doesn't include access to this resource. `
@@ -320,6 +325,9 @@ function authPass({ acceptedTypes }) {
                         authenticated: false,
                         success: false,
                         accepted: acceptedTypes,
+                        account: accessToken.ac_type,
+                        domain,
+                        protocal,
                         message: `You don't currently have permission to access this page. 
                         Your account is signed in successfully, 
                         but your assigned role doesn't include access to this resource. `,
@@ -425,6 +433,9 @@ function authPass({ acceptedTypes }) {
                 return res.render('no-access', {
                     user,
                     accepted: acceptedTypes,
+                    account: user.account_category,
+                    domain,
+                    protocal,
                     title: 'Access Restricted',
                     message: `You don't currently have permission to access this page. 
                         Your account is signed in successfully, 
@@ -435,7 +446,11 @@ function authPass({ acceptedTypes }) {
                 return res.status(401).json({
                     authenticated: false,
                     success: false,
+                    account: user.account_category,
                     accepted: acceptedTypes,
+                    domain,
+                    protocal,
+                    title: 'Access Restricted',
                     message: `You don't currently have permission to access this page. 
                         Your account is signed in successfully, 
                         but your assigned role doesn't include access to this resource. `,
@@ -490,6 +505,8 @@ function authPass({ acceptedTypes }) {
             phoneNumber: user.phone_number
         }
 
+        req.domain = domain;
+        req.protocal = protocal;
         return next();
     }
 
@@ -668,7 +685,6 @@ async function validateAuthentication(req, res, next) {
     if (accessToken) {
         const uaOk = accessToken.ua === normalizeUA(req.get('User-Agent'));
 
-        console.log("access token")
         if (!uaOk) {
             req.user = null;
             return next();
@@ -707,7 +723,6 @@ async function validateAuthentication(req, res, next) {
 
     } else if (refreshToken) {
         //Rotate session
-        console.log("Refresh token")
         const userId = refreshToken.userId;
         const userAccount = refreshToken.accountId;
         const jwtId = refreshToken.jwtId;
@@ -806,4 +821,306 @@ async function validateAuthentication(req, res, next) {
     }
 }
 
-module.exports = { verifyPreAuth, authPass, passUser, validateAuthentication };
+
+/**
+ * 
+ * @param {object} {acceptedType} The type of authentication user require to get vaild authentication
+ * @returns attach user to request or null
+ */
+function validateAuthorizationAndPass(acceptedType) {
+    return async function (req, res, next) {
+
+        const isProduction = process.env.NODE_ENV === 'production';
+
+        const sslUrlPrefix = isProduction ? 'https://' : 'http://';
+
+        const portSuffix = isProduction ? '' : `:${process.env.PORT}`;
+
+        const { accessToken, refreshToken } = decodeAuthCookies(req);
+
+        if (accessToken) {
+            const uaOk = accessToken.ua === normalizeUA(req.get('User-Agent'));
+            if (!uaOk) {
+                //TODO implement: Log activity
+                req.session.message = 'Some suspicious behaviour detected. Please log in to continue';
+                return next();
+            }
+
+            const user = {
+                userId: accessToken.u_id,
+                userAccount: accessToken.ac,
+                type: accessToken.ac_type?.toLowerCase(),
+                role: accessToken.role,
+                username: accessToken.username,
+                email: accessToken.email,
+                name: accessToken.name,
+                phoneNumber: accessToken.phone_number
+            }
+
+            //Validate account type
+            if (acceptedType && acceptedType !== (accessToken.ac_type?.toLowerCase() || '')) {
+                //Set request User to null
+                req.user = null;
+                return next();
+            }
+
+            req.user = user;
+            return next();
+        }
+
+        if (!refreshToken) {
+            clearAuthentication(res);
+            return next();
+        }
+
+        const userId = refreshToken.userId;
+        const userAccount = refreshToken.accountId;
+        const jwtId = refreshToken.jwtId;
+
+        const uaOk = refreshToken.ua === normalizeUA(req.get('User-Agent'));
+
+        if (!uaOk) {
+            req.user = null;
+            return next();
+        }
+
+        const rawRefreshToken = req.cookies.c_t;
+
+        const validationResult = await authServices.sessionValidation({ userAccount, jwtId, rawRefreshToken, userId, ip: req.ip, ua: normalizeUA(req.get('User-Agent')) });
+
+        if (!validationResult.success) {
+            clearAuthentication(res);
+            req.user = null;
+            return next();
+        }
+
+        const user = validationResult.userAccount;
+        const sessionId = validationResult.sessionId;
+
+        if (!user) {
+            clearAuthentication(res);
+            req.user = null;
+            return next();
+        }
+
+        if (acceptedType && acceptedType !== user.account_category?.toLowerCase()) {
+            req.user = null;
+            return next();
+        }
+
+        const accessTokenJwtId = uuidv4();
+
+        const accessToken2 = signAccessToken({
+            jwtId: accessTokenJwtId,
+            u_id: user.user_id,
+            ac: user.user_account_id,
+            a_id: user.account_id,
+            account_code: user.account_code,
+            ac_type: user.account_category,
+            ac_title: user.account_title,
+            role: user.role,
+            username: user.username,
+            email: user.email,
+            name: user.names,
+            phone_number: user.phone_number,
+            ip: req.ip,
+            ua: normalizeUA(req.get('User-Agent'))
+        });
+
+        const refreshTokenJwtId = uuidv4();
+
+        const refreshToken2 = signRefreshToken({
+            jwtId: refreshTokenJwtId,
+            userId: user.user_id,
+            accountId: user.user_account_id,
+            ip: req.ip,
+            ua: normalizeUA(req.get('User-Agent'))
+        });
+
+        //Rotate session refresh token
+        await authServices.rotateRefreshToken(sessionId, refreshTokenJwtId, refreshToken2);
+
+        setAuthCookies(res, accessToken2, refreshToken2);
+
+        req.user = {
+            userId: user.u_id,
+            userAccount: user.ac,
+            type: user.ac_type,
+            role: user.role,
+            username: user.username,
+            email: user.email,
+            name: user.name,
+            phoneNumber: user.phone_number
+        }
+
+        return next();
+    }
+}
+
+
+/**
+ * This Function validate user's request current session before rendering pages such as registration, or login page
+ * @param {fallbackTo} Type fallback url where to redirect the user on successfull validation
+ * @param {acceptedType} Type of authentication user require to get vaild authentication
+ * @returns attach user to request or null
+ */
+function validateAuthWithRedirectTo({ fallbackTo, acceptedType }) {
+    return async function (req, res, next) {
+
+        const isProduction = process.env.NODE_ENV === 'production';
+
+        const sslUrlPrefix = isProduction ? 'https://' : 'http://';
+
+        const portSuffix = isProduction ? '' : `:${process.env.PORT}`;
+
+        const { accessToken, refreshToken } = decodeAuthCookies(req);
+
+        if (accessToken) {
+            const uaOk = accessToken.ua === normalizeUA(req.get('User-Agent'));
+            if (!uaOk) {
+                //AccessToken UA Verification Failed
+                //TODO implement: Log activity
+                return next();
+            }
+
+            const user = {
+                userId: accessToken.u_id,
+                userAccount: accessToken.ac,
+                type: accessToken.ac_type?.toLowerCase(),
+                role: accessToken.role,
+                username: accessToken.username,
+                email: accessToken.email,
+                name: accessToken.name,
+                phoneNumber: accessToken.phone_number
+            }
+
+            //Validate account type
+            if (acceptedType && acceptedType !== (accessToken.ac_type?.toLowerCase() || '')) {
+                //Set request User to null
+                req.user = user;
+                return next();
+            }
+
+            console.log(acceptedType, accessToken.ac_type)
+
+            req.user = user;
+            //The user is already authorized, no authorization required
+            if (acceptsHtml(req)) {
+                req.message = "You are already authorized";
+                return res.redirect(fallbackTo);
+            }
+
+            return res.json({
+                authorized: true,
+                authenticated: true,
+                message: "You are already authorized"
+            });
+        }
+
+        if (!refreshToken) {
+            clearAuthentication(res);
+            return next();
+        }
+
+        const userId = refreshToken.userId;
+        const userAccount = refreshToken.accountId;
+        const jwtId = refreshToken.jwtId;
+
+        const uaOk = refreshToken.ua === normalizeUA(req.get('User-Agent'));
+
+        if (!uaOk) {
+            req.user = null;
+            return next();
+        }
+
+        const rawRefreshToken = req.cookies.c_t;
+
+        const validationResult = await authServices.sessionValidation({ userAccount, jwtId, rawRefreshToken, userId, ip: req.ip, ua: normalizeUA(req.get('User-Agent')) });
+
+        if (!validationResult.success) {
+            clearAuthentication(res);
+            req.user = null;
+            return next();
+        }
+
+        const user = validationResult.userAccount;
+        const sessionId = validationResult.sessionId;
+
+        if (!user) {
+            clearAuthentication(res);
+            req.user = null;
+            return next();
+        }
+
+        if (acceptedType && acceptedType !== user.account_category?.toLowerCase()) {
+            req.user = user;
+            return next();
+        }
+
+        const accessTokenJwtId = uuidv4();
+
+        const accessToken2 = signAccessToken({
+            jwtId: accessTokenJwtId,
+            u_id: user.user_id,
+            ac: user.user_account_id,
+            a_id: user.account_id,
+            account_code: user.account_code,
+            ac_type: user.account_category,
+            ac_title: user.account_title,
+            role: user.role,
+            username: user.username,
+            email: user.email,
+            name: user.names,
+            phone_number: user.phone_number,
+            ip: req.ip,
+            ua: normalizeUA(req.get('User-Agent'))
+        });
+
+        const refreshTokenJwtId = uuidv4();
+
+        const refreshToken2 = signRefreshToken({
+            jwtId: refreshTokenJwtId,
+            userId: user.user_id,
+            accountId: user.user_account_id,
+            ip: req.ip,
+            ua: normalizeUA(req.get('User-Agent'))
+        });
+
+        //Rotate session refresh token
+        await authServices.rotateRefreshToken(sessionId, refreshTokenJwtId, refreshToken2);
+
+        setAuthCookies(res, accessToken2, refreshToken2);
+
+        req.user = {
+            userId: user.u_id,
+            userAccount: user.ac,
+            type: user.ac_type,
+            role: user.role,
+            username: user.username,
+            email: user.email,
+            name: user.name,
+            phoneNumber: user.phone_number
+        }
+
+        if (acceptsHtml(req)) {
+            req.message = "You are already authorized";
+            return res.redirect(fallbackTo);
+        }
+
+        return res.json({
+            authorized: true,
+            authenticated: true,
+            message: "You are already authorized"
+        });
+    }
+}
+
+
+module.exports = {
+    verifyPreAuth,
+    authPass,
+    passUser,
+    validateAuthentication,
+    validateAuthorizationAndPass,
+    validateAuthWithRedirectTo
+};

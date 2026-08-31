@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>COCOCE — Business Application</title>
+  <meta name="description" content="COCOCE — Admin portal, COCOCE Kigali Rwanda, Laptops, Desktops, Computer accessories, Smart tv, projectors, discover what you want about digital assets near you at Kigali">
+  <meta name="keywords" content="Laptops, Desktops, Memories, Storages, Servers, keyboards, Printers, Screens, Repair, Explore, Electronic, Digital, Kigali, Rwanda">
+  <meta name="author" content="COCOCE RW">
+
+  <meta property="og:image" content="https://cdn.cococe.rw/meta/cococe.png">
+  <meta property="og:url" content="https://www.cococe.rw">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Laptops, Printers, Accessories, Game consoles, Electronics, and much more, cococe, your wish our priority">
+  <meta property="og:description" content="COCOCE Kigali Rwanda, Laptops, Desktops, Computer accessories, Smart tv, projectors, discover what you want about digital assets near you at Kigali">
+  <meta property="og:logo" content="https://cdn.cococe.rw/meta/cococe.png" />
+
+  <meta name="twitter:card" content="https://cdn.cococe.rw/meta/cococe.png">
+  <meta property="twitter:domain" content="https://cococe.rw">
+  <meta property="twitter:url" content="https://cococe.rw">
+  <meta name="twitter:title" content="Laptops, Printers, Accessories, Game consoles, Electronics, and much more, cococe, your wish our priority">
+  <meta name="twitter:description" content="COCOCE Kigali Rwanda, Laptops, Desktops, Computer accessories, Smart tv, projectors, discover what you want about digital assets near you at Kigali">
+
+  <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.11.0/axios.min.js" integrity="sha512-h9644v03pHqrIHThkvXhB2PJ8zf5E9IyVnrSfZg8Yj8k4RsO4zldcQc4Bi9iVLUCCsqNY0b4WXVV4UB+wbWENA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+  <link rel="icon" href="/favicon.ico" type="image/x-icon">
+
+  <link rel="stylesheet" href="/styles/components/notification.css">
+  <link rel="stylesheet" href="/styles/components/main-snackbar.css">
+  <link rel="stylesheet" href="/styles/components/loaders.css">
+  <link rel="stylesheet" href="/styles/main.css">
+  <link rel="stylesheet" href="/styles/b-r.css">
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script>
+    const user = <%- locals.user ? JSON.stringify(locals.user) : 'null' %>;
+    const hasUser = !!user;
+
+    const protocal = "<%= locals.protocal %>";
+    const domainName = "<%= locals.domainName %>";
+  </script>
+
+</head>
+
+<body>
+
+  <nav class="bg-white border-b border-gray-100/60 px-4 md:px-6 py-3 sticky top-0 z-40 shadow-sm">
+    <div class="max-w-7xl mx-auto flex items-center justify-between">
+      <a href="/" class="flex items-center gap-2 flex-shrink-0">
+        <img src="/images/logos/business.png" alt="Logo-brand" class="max-w-[120px]">
+      </a>
+
+      <div class="hidden md:flex items-center gap-4">
+        <a href="/business-status" class="text-sm text-gray-500 hover:text-brand transition">Business status</a>
+        <a href="/dashboard" class="text-sm text-gray-500 hover:text-brand transition">Dashboard</a>
+        <a href="/pricing" class="text-sm text-gray-500 hover:text-brand transition" target="_blank">Pricing</a>
+        <a href="/applications" class="text-sm text-gray-500 hover:text-brand transition" target="_blank">My application</a>
+        <%if (locals.user) {%>
+        <form method="POST" action="<%= locals.protocal%>auth.<%=locals.domainName%>/signout" class="text-sm font-medium px-2 py-1 border border-brand rounded-lg bg-white hover:bg-black/3 text-gray-700 hover:text-brand transition">
+          <input type="hidden" name="host" value="<%= locals.protocal%>business.<%= locals.domainName%>">
+          <input type="hidden" name="redirectTo" value="<%= locals.protocal%>auth.<%= locals.domainName%>">
+          <button type="submit" class="flex items-center gap-1">
+            <span>I have Business Account</span>
+            <span class="font-extrabold"><i class="bi bi-arrow-right-short"></i></span>
+          </button>
+        </form>
+        <%} else {%>
+        <a href="<%= locals.authDomain %>" class="text-sm  text-slate-500 font-medium px-2 py-1 border border-brand rounded-lg bg-white text-gray-700 hover:text-brand transition">
+          Sign In <i class="bi bi-arrow-right"></i>
+        </a>
+        <%}%>
+      </div>
+
+      <div class="flex items-center gap-2 md:hidden">
+        <button class="mobile-nav-toggle" id="mobileNavToggle" aria-label="Toggle navigation">
+          <span class="bar"></span>
+          <span class="bar"></span>
+          <span class="bar"></span>
+        </button>
+      </div>
+    </div>
+
+    <div class="mobile-nav-dropdown md:hidden" id="mobileNavDropdown">
+      <a href="/business-status" class="flex items-center gap-3">
+        Business status
+      </a>
+      <a href="/dashboard" class="flex items-center gap-3">
+        Dashboard
+      </a>
+      <a href="/pricing" class="flex items-center gap-3" target="_blank">
+        Pricing
+      </a>
+      <%if (locals.user) {%>
+        <form method="POST" action="<%= locals.protocal%>auth.<%=locals.domainName%>/signout" class="text-sm font-medium px-2 py-1 text-brand transition">
+          <input type="hidden" name="host" value="<%= locals.protocal%>business.<%= locals.domainName%>">
+          <input type="hidden" name="redirectTo" value="<%= locals.protocal%>auth.<%= locals.domainName%>">
+          <button type="submit" class="flex items-center gap-1">
+            <span class="font-extrabold">
+              Business
+              <i class="bi bi-arrow-right-short"></i>
+            </span>
+          </button>
+        </form>
+        <%} else {%>
+        <a href="<%= locals.authDomain %>" class="text-sm font-medium px-2 py-1 text-brand transition">
+          Sign In <i class="bi bi-arrow-right"></i>
+        </a>
+        <%}%>
+    </div>
+  </nav>
+
+  <section class="hero-gradient border-b border-gray-100/60 py-6 md:py-10">
+    <div class="max-w-7xl mx-auto px-4 md:px-6">
+      <div class="flex flex-col md:flex-row items-center justify-between gap-6">
+        <div class="flex-1 text-center md:text-left">
+          <h1 class="text-xl md:text-2xl font-bold text-gray-900">
+            <span class="text-brand font-extrabold">COCOCE</span> Business Application
+          </h1>
+          <p class="text-gray-500 text-sm mt-1 max-w-lg">
+            Hi! Welcome to COCOCE Business — The Hub of Digital Vendors.
+          </p>
+        </div>
+        <div class="flex items-center gap-6 text-sm">
+          <div class="text-center">
+            <p class="text-2xl font-bold text-brand">500+</p>
+            <p class="text-xs text-gray-400">Active Vendors</p>
+          </div>
+          <div class="w-px h-10 bg-gray-200"></div>
+          <div class="text-center">
+            <p class="text-2xl font-bold text-brand">98%</p>
+            <p class="text-xs text-gray-400">Satisfaction</p>
+          </div>
+          <div class="w-px h-10 bg-gray-200"></div>
+          <div class="text-center">
+            <p class="text-2xl font-bold text-brand">24/7</p>
+            <p class="text-xs text-gray-400">Support</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <main class="flex-1 max-w-4xl mx-auto px-4 md:px-6 py-6">
+
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+
+      <div class="px-6 pt-6">
+        <div class="step-indicators">
+          
+          <div class="step-dot">
+            <div class="circle active" id="step1Circle">1</div>
+            <span class="label active" id="step1Label">User Identification</span>
+          </div>
+          <div class="step-line" id="stepLine1"></div>
+          
+          <div class="step-dot">
+            <div class="circle" id="step2Circle">2</div>
+            <span class="label" id="step2Label">Business Details</span>
+          </div>
+          <div class="step-line" id="stepLine2"></div>
+          
+          <div class="step-dot">
+            <div class="circle" id="step3Circle">3</div>
+            <span class="label" id="step3Label">Privacy & Agreement</span>
+          </div>
+        </div>
+      </div>
+
+      <form id="vendorRegistrationForm" class="p-6" novalidate>
+        
+        <div class="step-content active" id="step1">
+          <div class="section-title mb-4">
+            <span class="icon"><i class="fas fa-id-card"></i></span>
+            User Identification
+            <span class="text-xs text-gray-400 font-normal ml-2">Step 1 of 3</span>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="form-label">
+                ID Number <span class="required">*</span>
+              </label>
+              <input type="text" id="idNumber" placeholder="e.g., 19000..." class="form-input w-full px-4 py-2.5 rounded-xl border border-gray-200 text-gray-900 placeholder-gray-400 transition" value="<%= locals.user?.id_no ||  ''%>" required>
+        <p class="form-hint">Unique identification number</p>
+      </div>
+
+      <div>
+        <label class="form-label">
+          First Name <span class="required">*</span>
+        </label>
+        <input type="text" id="firstName" placeholder="e.g., John" class="form-input w-full px-4 py-2.5 rounded-xl border border-gray-200 text-gray-900 placeholder-gray-400 transition" required>
+      </div>
+
+      <div>
+        <label class="form-label">
+          Last Name <span class="required">*</span>
+        </label>
+        <input type="text" id="lastName" placeholder="e.g., Doe" class="form-input w-full px-4 py-2.5 rounded-xl border border-gray-200 text-gray-900 placeholder-gray-400 transition" required>
+      </div>
+
+      <div>
+        <label class="form-label">
+          Username <span class="required">*</span>
+          <span class="suggestion" id="usernameSuggestion">Suggested: <span id="suggestedUsername" class="text-brand cursor-pointer hover:underline"></span></span>
+        </label>
+        <div class="relative">
+          <input type="text" id="username" placeholder="e.g., johndoe" class="form-input w-full px-4 py-2.5 rounded-xl border border-gray-200 text-gray-900 placeholder-gray-400 transition" required>
+          <div id="usernameCheckIndicator" class="absolute right-3 top-1/2 -translate-y-1/2 hidden">
+            <i class="fas fa-spinner fa-spin fa-spin-fast text-brand hidden" id="usernameChecking"></i>
+          </div>
+        </div>
+        <div id="usernameStatus" class="username-status"></div>
+        <p class="form-hint">Choose a unique username. <span id="usernameHint" class="text-brand font-medium">Auto-suggested from your name</span></p>
+      </div>
+
+      <div>
+        <label class="form-label">
+          Email <span class="required">*</span>
+        </label>
+        <input type="email" id="email" placeholder="e.g., vendor@example.com" class="form-input w-full px-4 py-2.5 rounded-xl border border-gray-200 text-gray-900 placeholder-gray-400 transition" required>
+      </div>
+
+      <div>
+        <label class="form-label">
+          Phone Number <span class="required">*</span>
+        </label>
+        <input type="tel" id="phoneNumber" placeholder="e.g., +250 788 123 456" class="form-input w-full px-4 py-2.5 rounded-xl border border-gray-200 text-gray-900 placeholder-gray-400 transition" required>
+      </div>
+
+      <div>
+        <label class="form-label">
+          Password <span class="required">*</span>
+        </label>
+        <div class="relative">
+          <input type="password" id="password" placeholder="Min 8 characters" class="form-input w-full px-4 py-2.5 rounded-xl border border-gray-200 text-gray-900 placeholder-gray-400 transition pr-12" required minlength="8">
+          <button type="button" class="password-toggle" id="togglePassword">
+            <i class="fas fa-eye" id="passwordIcon"></i>
+          </button>
+        </div>
+        <p class="form-hint">Must be at least 8 characters with a mix of letters and numbers</p>
+      </div>
+
+      <div>
+        <label class="form-label">
+          Confirm Password <span class="required">*</span>
+        </label>
+        <div class="relative">
+          <input type="password" id="confirmPassword" placeholder="Confirm your password" class="form-input w-full px-4 py-2.5 rounded-xl border border-gray-200 text-gray-900 placeholder-gray-400 transition pr-12" required>
+          <button type="button" class="password-toggle" id="toggleConfirmPassword">
+            <i class="fas fa-eye" id="confirmPasswordIcon"></i>
+          </button>
+        </div>
+        <p class="form-hint" id="passwordMatchHint">Passwords must match</p>
+      </div>
+    </div>
+
+    <div class="flex justify-end mt-6">
+      <button type="button" class="btn-primary px-8 py-2.5 rounded-xl text-white font-medium next-step" data-next="step2" id="nextStep1">
+        Next Step <i class="fas fa-arrow-right ml-2"></i>
+      </button>
+    </div>
+    </div>
+    
+    <div class="step-content" id="step2">
+      <div class="section-title mb-4">
+        <span class="icon"><i class="fas fa-store"></i></span>
+        Business Information
+        <span class="text-xs text-gray-400 font-normal ml-2">Step 2 of 3</span>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="md:col-span-2">
+          <label class="form-label">
+            Business Name <span class="required">*</span>
+          </label>
+          <div class="flex flex-col gap-1">
+            <input type="text" id="businessName" placeholder="e.g., Tech Supplies Rwanda" class="form-input w-full px-4 py-2.5 rounded-xl border border-gray-200 text-gray-900 placeholder-gray-400 transition" required>
+            <span id="businessCheckingStatus" class="text-xs text-amber-800"></span>
+          </div>
+        </div>
+
+        <div class="md:col-span-2">
+          <label class="form-label">
+            Business Address
+          </label>
+          <input type="text" id="businessAddress" placeholder="e.g., KG 123 St, Kigali, Rwanda" class="form-input w-full px-4 py-2.5 rounded-xl border border-gray-200 text-gray-900 placeholder-gray-400 transition">
+        </div>
+
+        <div>
+          <label class="form-label">
+            TIN Number
+          </label>
+          <input type="text" id="tinNumber" placeholder="e.g., TIN-123456" class="form-input w-full px-4 py-2.5 rounded-xl border border-gray-200 text-gray-900 placeholder-gray-400 transition">
+        </div>
+
+        <div>
+          <label class="form-label">
+            VAT Number
+          </label>
+          <input type="text" id="vatNumber" placeholder="e.g., VAT-789012" class="form-input w-full px-4 py-2.5 rounded-xl border border-gray-200 text-gray-900 placeholder-gray-400 transition">
+        </div>
+
+        <div>
+          <label class="form-label">
+            Tax Registration Status
+          </label>
+          <input type="text" id="taxRegistered" placeholder="e.g., Registered" class="form-input w-full px-4 py-2.5 rounded-xl border border-gray-200 text-gray-900 placeholder-gray-400 transition">
+        </div>
+
+        <div>
+          <label class="form-label">
+            Tax Country
+          </label>
+          <input type="text" id="taxCountry" placeholder="e.g., Rwanda" class="form-input w-full px-4 py-2.5 rounded-xl border border-gray-200 text-gray-900 placeholder-gray-400 transition">
+        </div>
+      </div>
+
+      <!-- Business Classification -->
+      <div class="mt-6">
+        <div class="section-title mb-4">
+          <span class="icon"><i class="fas fa-tags"></i></span>
+          Business Classification
+          <span class="text-xs text-gray-400 font-normal ml-2">— To be verified</span>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="form-label">
+              Business Type <span class="required">*</span>
+            </label>
+            <select id="vendorType" class="form-input w-full px-4 py-2.5 rounded-xl border border-gray-200 text-gray-700 transition" required>
+              <option value="">Select business type</option>
+              <option value="retailer">Retailer</option>
+              <option value="wholesaler">Wholesaler</option>
+              <option value="distributor">Distributor</option>
+              <option value="manufacturer">Manufacturer</option>
+              <option value="supplier">Supplier</option>
+            </select>
+            <p class="form-hint">Select the type that best describes your business</p>
+          </div>
+
+          <div>
+            <label class="form-label">
+              Business Category
+            </label>
+            <select id="vendorCategory" class="form-input w-full px-4 py-2.5 rounded-xl border border-gray-200 text-gray-700 transition">
+              <option value="">Select a category</option>
+              <option value="internal">Internal</option>
+              <option value="external" selected>External</option>
+              <option value="preferred">Preferred</option>
+              <option value="standard">Standard</option>
+            </select>
+            <p class="form-hint">Select the category that best represents your relationship</p>
+          </div>
+        </div>
+
+        <div id="typeInfoCard" class="info-card hidden">
+          <div class="flex items-start gap-4">
+            <div class="info-icon">
+              <i class="fas fa-store"></i>
+            </div>
+            <div class="flex-1">
+              <div class="flex items-center gap-3">
+                <h4 id="infoTypeTitle" class="text-sm font-semibold text-gray-900">Retailer</h4>
+                <span class="info-tag popular">Popular</span>
+              </div>
+              <p id="infoTypeDescription" class="text-sm text-gray-500 mt-1">
+                Sells products directly to consumers. Retailers are the final link in the supply chain.
+              </p>
+              <div class="flex flex-wrap gap-3 mt-2" id="infoTypeTags">
+                <span class="text-xs text-gray-400"><i class="fas fa-check-circle text-green-500"></i> B2C</span>
+                <span class="text-xs text-gray-400"><i class="fas fa-check-circle text-green-500"></i> Direct sales</span>
+                <span class="text-xs text-gray-400"><i class="fas fa-check-circle text-green-500"></i> Consumer focus</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-3 p-3 bg-blue-50 rounded-xl border border-blue-100">
+          <div class="flex items-start gap-2">
+            <i class="fas fa-info-circle text-blue-500 mt-0.5"></i>
+            <div>
+              <p class="text-xs text-blue-700">
+                <strong>Tip:</strong> Select a type to see detailed information.
+                Your classification will be reviewed by our team for accuracy.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex flex-col md:flex-row gap-3 justify-between mt-6">
+        <button type="button" class="btn-secondary px-6 py-2.5 rounded-xl text-gray-700 font-medium prev-step" data-prev="step1">
+          <i class="fas fa-arrow-left mr-2"></i> Previous
+        </button>
+        <button type="button" class="btn-primary px-8 py-2.5 rounded-xl text-white font-medium next-step" data-next="step3" id="nextStep2">
+          Next Step <i class="fas fa-arrow-right ml-2"></i>
+        </button>
+      </div>
+    </div>
+    <div class="step-content" id="step3">
+      <div class="section-title mb-4">
+        <span class="icon"><i class="fas fa-shield-alt"></i></span>
+        Privacy & Agreement
+        <span class="text-xs text-gray-400 font-normal ml-2">Step 3 of 3</span>
+      </div>
+
+      <div class="space-y-6">
+        <div>
+          <div class="section-title mb-4 text-sm">
+            <span class="icon"><i class="fas fa-image"></i></span>
+            Profile Picture
+          </div>
+          <div class="flex flex-col items-center">
+            <div class="avatar-upload" id="avatarUpload">
+              <div class="placeholder" id="avatarPlaceholder">
+                <i class="fas fa-user-circle"></i>
+              </div>
+              <img id="avatarPreview" class="hidden" src="#" alt="Profile Preview">
+              <div class="overlay">
+                <span class="text-white text-sm font-medium flex flex-col items-center gap-1">
+                  <i class="fas fa-camera text-xl"></i>
+                  <span class="text-xs">Upload Photo</span>
+                </span>
+              </div>
+              <input type="file" id="user-profile-image" class="hidden" accept=".jpg">
+            </div>
+            <p class="text-xs text-gray-400 mt-2">JPG to 5MB</p>
+            <input type="hidden" id="profileImage" value="">
+          </div>
+        </div>
+
+        <div>
+          <div class="section-title mb-4 text-sm">
+            <span class="icon"><i class="bi bi-person-vcard"></i></span>
+            Photocopy of ID/Passport
+            <span class="text-brand text-xs ml-1">*</span>
+          </div>
+          <div class="w-full">
+            <label for="id-file-upload" class="group relative flex cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed border-slate-200 bg-white px-6 py-8 text-center transition-all duration-200 hover:border-brand/40 hover:bg-brand/[0.02] hover:shadow-sm w-full">
+              <div class="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-brand/10 text-brand transition-transform duration-200 group-hover:scale-105">
+                <i class="bi bi-cloud-arrow-up text-2xl"></i>
+              </div>
+              <h3 class="text-sm font-semibold text-slate-900">
+                Upload your ID/Passport photocopy
+              </h3>
+              <p class="mt-1 text-sm text-slate-500">
+                Drag & drop your file here, or
+                <span class="font-semibold text-brand">browse</span>
+              </p>
+              <p class="mt-3 text-xs text-slate-400">
+                JPG to 5MP
+              </p>
+              <input id="id-file-upload" type="file" class="sr-only" accept=".jpg" required />
+            </label>
+          </div>
+        </div>
+
+        <div class="space-y-3 mt-4">
+          <div class="agreement-item">
+            <div class="flex items-start gap-3">
+              <input type="checkbox" id="agreeTerms" class="mt-0.5" required>
+              <div>
+                <label for="agreeTerms" class="text-sm font-medium text-gray-800 cursor-pointer">
+                  I agree to the <a href="/terms" class="text-brand hover:underline" target="_blank">Terms of Service</a>
+                </label>
+                <p class="text-xs text-gray-500 mt-0.5">Read our terms and conditions carefully</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="agreement-item">
+            <div class="flex items-start gap-3">
+              <input type="checkbox" id="agreePrivacy" class="mt-0.5" required>
+              <div>
+                <label for="agreePrivacy" class="text-sm font-medium text-gray-800 cursor-pointer">
+                  I accept the <a href="/privacy" class="text-brand hover:underline" target="_blank">Privacy Policy</a>
+                </label>
+                <p class="text-xs text-gray-500 mt-0.5">How we handle your data</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="agreement-item">
+            <div class="flex items-start gap-3">
+              <input type="checkbox" id="agreeVendor" class="mt-0.5" required>
+              <div>
+                <label for="agreeVendor" class="text-sm font-medium text-gray-800 cursor-pointer">
+                  I confirm I am a legitimate business owner
+                </label>
+                <p class="text-xs text-gray-500 mt-0.5">You must be authorized to represent this business</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex justify-between mt-8 pt-4 border-t border-gray-100">
+        <button type="button" class="btn-secondary px-6 py-2.5 rounded-xl text-gray-700 font-medium prev-step" data-prev="step2">
+          <i class="fas fa-arrow-left mr-2"></i> Previous
+        </button>
+        <button type="submit" id="submitBtn" class="btn-primary px-8 py-2.5 rounded-xl text-white font-medium flex items-center gap-2">
+          <span id="submitText">Submit</span>
+        </button>
+      </div>
+    </div>
+
+    </form>
+    </div>
+
+    <div class="mt-4 bg-white rounded-2xl border border-gray-100 p-4 shadow-sm">
+      <div class="flex items-start gap-3">
+        <i class="fas fa-info-circle text-brand mt-0.5"></i>
+        <div>
+          <p class="text-sm font-medium text-gray-900">Vendor Registration Process</p>
+          <p class="text-xs text-gray-500 mt-0.5">
+            Once registered, your application will be reviewed by our team.
+            You will receive a confirmation email once your vendor account is approved.
+            All fields marked with <span class="text-brand">*</span> are required.
+          </p>
+        </div>
+      </div>
+    </div>
+    </main>
+
+    <footer class="bg-white border-t border-gray-100/60 mt-6">
+      <div class="max-w-7xl mx-auto px-4 md:px-6 py-6">
+        <div class="flex flex-col md:flex-row items-center justify-between gap-4 text-sm">
+          <div class="flex items-center gap-4">
+            <span class="text-lg font-black text-brand">COCOCE</span>
+            <span class="text-xs text-gray-400">© 2026 — Business Platform</span>
+          </div>
+          <div class="flex flex-wrap items-center gap-6 text-gray-400">
+            <a href="/privacy" class="hover:text-brand transition">Privacy</a>
+            <a href="/terms" class="hover:text-brand transition">Terms</a>
+            <a href="/support" class="hover:text-brand transition">Support</a>
+            <a href="tel:+250787195425" class="hover:text-brand transition"><i class="bi bi-telephone"></i> Help</a>
+            <span class="w-1.5 h-1.5 bg-green-500 rounded-full"></span>
+          </div>
+        </div>
+        <div class="text-center text-xs text-gray-400 mt-3">
+          <p>COCOCE Vendor Management — Empowering businesses since 2024</p>
+        </div>
+      </div>
+    </footer>
+
+    <div class="modal-backdrop" id="successModal">
+      <div class="modal-card">
+
+        <div class="modal-checkmark">
+          <i class="fas fa-check"></i>
+        </div>
+
+        <h3 class="modal-title">Application Submitted!</h3>
+        <p class="modal-message" id="modalMessage">
+          Your application has been received and is being reviewed.
+        </p>
+
+        <div class="modal-ref">
+          <div>
+            <p class="ref-label">Application Reference</p>
+            <p class="ref-number" id="modalRefNumber"></p>
+          </div>
+          <button class="ref-copy" id="copyRefBtn" title="Copy reference number">
+            <i class="bi bi-clipboard"></i>
+          </button>
+        </div>
+
+        <div class="modal-actions flex flex-col md:flex-row items-center gap-3">
+          <a class="btn-secondary" id="viewAppBtn">
+            <i class="fas fa-file-alt"></i> View Application
+          </a>
+          <a href="/" class="btn-primary" id="dashboardLink">
+            <i class="fas fa-home"></i> Go Home
+          </a>
+        </div>
+
+      </div>
+    </div>
+
+    <script src="/scripts/components/notification.js"></script>
+    <script src="/scripts/components/main-snackbar.js"></script>
+    <script src="/scripts/business-registration.js"></script>
+
+</body>
+
+</html>

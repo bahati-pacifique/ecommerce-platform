@@ -1,0 +1,1154 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>COCOCE — Vendor Registration</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js">
+    </script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            DEFAULT: '#ED1B24',
+                            dark: '#C9171F',
+                            light: '#FEE2E3',
+                            ultraLight: '#FFF5F5',
+                        },
+                        'bg-soft': '#FDFDFC',
+                    },
+                    fontFamily: {
+                        'sans': ['Inter', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto',
+                            'sans-serif'
+                        ],
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.3s ease-out forwards',
+                        'slide-down': 'slideDown 0.3s ease-out forwards',
+                        'pulse-slow': 'pulse 2s ease-in-out infinite',
+                        'float': 'float 4s ease-in-out infinite',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        },
+                        slideDown: {
+                            '0%': { opacity: '0', transform: 'translateY(-20px) scale(0.95)' },
+                            '100%': { opacity: '1', transform: 'translateY(0) scale(1)' },
+                        },
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0px)' },
+                            '50%': { transform: 'translateY(-10px)' },
+                        },
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&display=swap');
+
+        body {
+            background: #FDFDFC;
+            font-family: 'Inter', sans-serif;
+            scroll-behavior: smooth;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-input:focus {
+            border-color: #ED1B24;
+            box-shadow: 0 0 0 3px rgba(237, 27, 36, 0.1);
+            outline: none;
+        }
+
+        .form-input.error {
+            border-color: #ED1B24;
+            background: #FFF5F5;
+        }
+
+        .form-label {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #374151;
+            margin-bottom: 0.375rem;
+            display: block;
+        }
+
+        .form-label .required {
+            color: #ED1B24;
+            margin-left: 2px;
+        }
+
+        .form-hint {
+            font-size: 0.75rem;
+            color: #9CA3AF;
+            margin-top: 0.25rem;
+        }
+
+        .btn-primary {
+            background: #ED1B24;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary:hover {
+            background: #C9171F;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 20px rgba(237, 27, 36, 0.3);
+        }
+
+        .btn-primary:active {
+            transform: scale(0.96);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: white;
+            border: 1px solid #e5e7eb;
+            transition: all 0.2s ease;
+        }
+
+        .btn-secondary:hover {
+            background: #f9fafb;
+            border-color: #d1d5db;
+        }
+
+        .form-section {
+            border-bottom: 1px solid #f3f4f6;
+            padding-bottom: 1.5rem;
+        }
+
+        .form-section:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+        .section-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #1F2937;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .section-title .icon {
+            width: 2rem;
+            height: 2rem;
+            background: #FEE2E3;
+            border-radius: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ED1B24;
+            font-size: 0.875rem;
+        }
+
+        .hero-gradient {
+            background:
+                radial-gradient(ellipse at 30% 40%, rgba(237, 27, 36, 0.04) 0%, transparent 60%),
+                radial-gradient(ellipse at 70% 60%, rgba(237, 27, 36, 0.03) 0%, transparent 50%),
+                #FDFDFC;
+        }
+
+        .toast {
+            animation: slideDown 0.3s ease-out;
+        }
+
+        .user-search-item {
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .user-search-item:hover {
+            background: #FEE2E3;
+        }
+
+        .user-search-item.active {
+            background: #FEE2E3;
+            border-left-color: #ED1B24;
+        }
+
+        #userSearchDropdown {
+            animation: slideDown 0.2s ease-out;
+            scroll-behavior: smooth;
+        }
+
+        #userSearchDropdown::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        #userSearchDropdown::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        #userSearchDropdown::-webkit-scrollbar-thumb {
+            background: #ED1B24;
+            border-radius: 10px;
+        }
+
+        .footer-link {
+            transition: color 0.2s ease;
+        }
+
+        .footer-link:hover {
+            color: #ED1B24;
+        }
+
+        /* Type/Category Info Cards */
+        .info-card {
+            transition: all 0.3s ease;
+            border: 1px solid #e5e7eb;
+            background: white;
+            border-radius: 12px;
+            padding: 16px;
+            margin-top: 8px;
+        }
+
+        .info-card.visible {
+            animation: slideDown 0.3s ease-out;
+        }
+
+        .info-card .info-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: #FEE2E3;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ED1B24;
+            flex-shrink: 0;
+        }
+
+        .info-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 2px 10px;
+            border-radius: 20px;
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .info-tag.recommended {
+            background: #DCFCE7;
+            color: #16A34A;
+        }
+
+        .info-tag.popular {
+            background: #FEF3C7;
+            color: #D97706;
+        }
+
+        .info-tag.premium {
+            background: #FEE2E3;
+            color: #ED1B24;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ========== TOP NAVIGATION ========== -->
+    <nav class="bg-white border-b border-gray-100/60 px-4 md:px-6 py-3 sticky top-0 z-40 shadow-sm">
+        <div class="max-w-7xl mx-auto flex items-center justify-between">
+            <a href="/" class="flex items-center gap-2">
+                <span class="text-2xl font-black tracking-tighter text-brand">COCOCE</span>
+                <span class="text-[10px] font-medium text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">Vendor</span>
+            </a>
+            <div class="flex items-center gap-4">
+                <a href="/business" class="text-sm text-gray-500 hover:text-brand transition hidden sm:inline">Business</a>
+                <a href="/dashboard" class="text-sm text-gray-500 hover:text-brand transition hidden sm:inline">Dashboard</a>
+                <span class="text-xs text-gray-400 hidden md:inline">|</span>
+                <a href="/login" class="text-sm font-medium text-gray-700 hover:text-brand transition">Sign In</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ========== HERO BANNER ========== -->
+    <section class="hero-gradient border-b border-gray-100/60 py-8 md:py-12">
+        <div class="max-w-7xl mx-auto px-4 md:px-6">
+            <div class="flex flex-col md:flex-row items-center justify-between gap-6">
+                <div class="flex-1 text-center md:text-left">
+                    <div class="inline-flex items-center gap-2 px-3 py-1 bg-brand-light rounded-full border border-brand/10 text-xs font-medium text-brand mb-3">
+                        <i class="fas fa-truck"></i>
+                        Vendor Registration
+                    </div>
+                    <h1 class="text-2xl md:text-3xl font-bold text-gray-900">
+                        Add New Vendor
+                    </h1>
+                    <p class="text-gray-500 text-sm mt-1 max-w-lg">
+                        Register a new vendor in the COCOCE ecosystem. All vendors must be associated with an existing user account.
+                    </p>
+                </div>
+                <div class="flex items-center gap-6 text-sm">
+                    <div class="text-center">
+                        <p class="text-2xl font-bold text-brand">500+</p>
+                        <p class="text-xs text-gray-400">Active Vendors</p>
+                    </div>
+                    <div class="w-px h-10 bg-gray-200"></div>
+                    <div class="text-center">
+                        <p class="text-2xl font-bold text-brand">98%</p>
+                        <p class="text-xs text-gray-400">Satisfaction</p>
+                    </div>
+                    <div class="w-px h-10 bg-gray-200"></div>
+                    <div class="text-center">
+                        <p class="text-2xl font-bold text-brand">24/7</p>
+                        <p class="text-xs text-gray-400">Support</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== MAIN CONTENT ========== -->
+    <main class="flex-1 max-w-4xl mx-auto px-4 md:px-6 py-6">
+
+        <!-- Form Card -->
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+
+            <!-- Form Header -->
+            <div class="px-6 py-4 border-b border-gray-100 bg-gray-50/50 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 bg-brand-light rounded-lg flex items-center justify-center text-brand">
+                        <i class="fas fa-truck"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-sm font-semibold text-gray-900">Vendor Information</h2>
+                        <p class="text-xs text-gray-400">Fill in the vendor details below</p>
+                    </div>
+                </div>
+                <span class="text-xs text-gray-400">* Required fields</span>
+            </div>
+
+            <!-- Form -->
+            <form id="vendorForm" class="p-6 space-y-6" novalidate>
+
+                <!-- ======================================== -->
+                <!-- SECTION 1: USER & BUSINESS INFORMATION -->
+                <!-- ======================================== -->
+                <div class="form-section">
+                    <div class="section-title mb-4">
+                        <span class="icon"><i class="fas fa-user"></i></span>
+                        User & Business Information
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- User Selection (Searchable) -->
+                        <div class="md:col-span-2">
+                            <label class="form-label">
+                                User <span class="required">*</span>
+                            </label>
+                            <div class="relative" id="userSelector">
+                                <input type="text"
+                                       id="userSearchInput"
+                                       placeholder="Search for a user by name or email..."
+                                       class="form-input w-full px-4 py-2.5 rounded-xl border border-gray-200 text-gray-900 placeholder-gray-400 transition"
+                                       autocomplete="off">
+                                <input type="hidden" id="selectedUserId" value="">
+                                <button type="button"
+                                        id="clearUserBtn"
+                                        class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 hidden">
+                                    <i class="fas fa-times-circle"></i>
+                                </button>
+                                <div id="userSearchDropdown"
+                                     class="hidden absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-xl shadow-lg max-h-60 overflow-y-auto">
+                                    <div id="userSearchList" class="py-1"></div>
+                                    <div id="noUserResult" class="hidden px-4 py-3 text-sm text-gray-500 text-center">
+                                        No users found
+                                    </div>
+                                </div>
+                                <div id="selectedUserDisplay" class="hidden mt-2 flex items-center gap-3 px-3 py-2 bg-brand-light rounded-xl border border-brand/20">
+                                    <div class="w-8 h-8 rounded-full bg-brand/10 flex items-center justify-center text-brand font-semibold text-sm">
+                                        <span id="selectedUserInitials">JD</span>
+                                    </div>
+                                    <div>
+                                        <p id="selectedUserName" class="text-sm font-medium text-gray-900">John Doe</p>
+                                        <p id="selectedUserEmail" class="text-xs text-gray-500">john@example.com</p>
+                                    </div>
+                                    <button type="button" id="removeUserBtn" class="ml-auto text-gray-400 hover:text-brand transition">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                                <p class="form-hint">Start typing to search for a user</p>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="form-label">
+                                Business Name <span class="required">*</span>
+                            </label>
+                            <input type="text"
+                                   id="businessName"
+                                   placeholder="e.g., Tech Supplies Rwanda"
+                                   class="form-input w-full px-4 py-2.5 rounded-xl border border-gray-200 text-gray-900 placeholder-gray-400 transition"
+                                   required>
+                        </div>
+
+                        <div>
+                            <label class="form-label">
+                                Business Address
+                            </label>
+                            <input type="text"
+                                   id="businessAddress"
+                                   placeholder="e.g., KG 123 St, Kigali"
+                                   class="form-input w-full px-4 py-2.5 rounded-xl border border-gray-200 text-gray-900 placeholder-gray-400 transition">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ======================================== -->
+                <!-- SECTION 2: TAX INFORMATION -->
+                <!-- ======================================== -->
+                <div class="form-section">
+                    <div class="section-title mb-4">
+                        <span class="icon"><i class="fas fa-file-invoice"></i></span>
+                        Tax Information
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="form-label">
+                                TIN Number
+                            </label>
+                            <input type="text"
+                                   id="tinNumber"
+                                   placeholder="e.g., TIN-123456"
+                                   class="form-input w-full px-4 py-2.5 rounded-xl border border-gray-200 text-gray-900 placeholder-gray-400 transition">
+                        </div>
+
+                        <div>
+                            <label class="form-label">
+                                VAT Number
+                            </label>
+                            <input type="text"
+                                   id="vatNumber"
+                                   placeholder="e.g., VAT-789012"
+                                   class="form-input w-full px-4 py-2.5 rounded-xl border border-gray-200 text-gray-900 placeholder-gray-400 transition">
+                        </div>
+
+                        <div>
+                            <label class="form-label">
+                                Tax Registration Status
+                            </label>
+                            <input type="text"
+                                   id="taxRegistered"
+                                   placeholder="e.g., Registered"
+                                   class="form-input w-full px-4 py-2.5 rounded-xl border border-gray-200 text-gray-900 placeholder-gray-400 transition">
+                        </div>
+
+                        <div>
+                            <label class="form-label">
+                                Tax Country
+                            </label>
+                            <input type="text"
+                                   id="taxCountry"
+                                   placeholder="e.g., Rwanda"
+                                   class="form-input w-full px-4 py-2.5 rounded-xl border border-gray-200 text-gray-900 placeholder-gray-400 transition">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ======================================== -->
+                <!-- SECTION 3: VENDOR CLASSIFICATION WITH INFO -->
+                <!-- ======================================== -->
+                <div class="form-section">
+                    <div class="section-title mb-4">
+                        <span class="icon"><i class="fas fa-tags"></i></span>
+                        Business Classification
+                        <span class="text-xs text-gray-400 font-normal ml-2">(Select to learn more)</span>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Vendor Type -->
+                        <div>
+                            <label class="form-label">
+                                Business Type <span class="required">*</span>
+                            </label>
+                            <select id="vendorType" class="form-input w-full px-4 py-2.5 rounded-xl border border-gray-200 text-gray-700 transition" required>
+                                <option value="">Select business type</option>
+                                <option value="retailer">🛍️ Retailer</option>
+                                <option value="wholesaler">📦 Wholesaler</option>
+                                <option value="distributor">🚚 Distributor</option>
+                                <option value="manufacturer">🏭 Manufacturer</option>
+                                <option value="supplier">📋 Supplier</option>
+                            </select>
+                            <p class="form-hint">Select the type that best describes your business</p>
+                        </div>
+
+                        <!-- Vendor Category -->
+                        <div>
+                            <label class="form-label">
+                                Business Category
+                            </label>
+                            <select id="vendorCategory" class="form-input w-full px-4 py-2.5 rounded-xl border border-gray-200 text-gray-700 transition">
+                                <option value="">Select a category</option>
+                                <option value="internal">🏢 Internal</option>
+                                <option value="external">🌐 External</option>
+                                <option value="preferred">⭐ Preferred</option>
+                                <option value="standard">📋 Standard</option>
+                            </select>
+                            <p class="form-hint">Select the category that best represents your relationship</p>
+                        </div>
+                    </div>
+
+                    <!-- ======================================== -->
+                    <!-- DYNAMIC INFO CARDS -->
+                    <!-- ======================================== -->
+                    <div id="typeInfoCard" class="info-card hidden">
+                        <div class="flex items-start gap-4">
+                            <div class="info-icon">
+                                <i class="fas fa-store"></i>
+                            </div>
+                            <div class="flex-1">
+                                <div class="flex items-center gap-3">
+                                    <h4 id="infoTypeTitle" class="text-sm font-semibold text-gray-900">Retailer</h4>
+                                    <span class="info-tag popular">Popular</span>
+                                </div>
+                                <p id="infoTypeDescription" class="text-sm text-gray-500 mt-1">
+                                    Sells products directly to consumers. Retailers are the final link in the supply chain.
+                                </p>
+                                <div class="flex flex-wrap gap-3 mt-2">
+                                    <span class="text-xs text-gray-400"><i class="fas fa-check-circle text-green-500"></i> B2C</span>
+                                    <span class="text-xs text-gray-400"><i class="fas fa-check-circle text-green-500"></i> Direct sales</span>
+                                    <span class="text-xs text-gray-400"><i class="fas fa-check-circle text-green-500"></i> Consumer focus</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="categoryInfoCard" class="info-card hidden">
+                        <div class="flex items-start gap-4">
+                            <div class="info-icon">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <div class="flex-1">
+                                <div class="flex items-center gap-3">
+                                    <h4 id="infoCategoryTitle" class="text-sm font-semibold text-gray-900">Internal</h4>
+                                    <span class="info-tag recommended">Recommended</span>
+                                </div>
+                                <p id="infoCategoryDescription" class="text-sm text-gray-500 mt-1">
+                                    Vendor operates within the COCOCE ecosystem with full integration and support.
+                                </p>
+                                <div class="flex flex-wrap gap-3 mt-2">
+                                    <span class="text-xs text-gray-400"><i class="fas fa-check-circle text-green-500"></i> Full integration</span>
+                                    <span class="text-xs text-gray-400"><i class="fas fa-check-circle text-green-500"></i> Priority support</span>
+                                    <span class="text-xs text-gray-400"><i class="fas fa-check-circle text-green-500"></i> Featured listings</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-3 p-3 bg-blue-50 rounded-xl border border-blue-100">
+                        <div class="flex items-start gap-2">
+                            <i class="fas fa-info-circle text-blue-500 mt-0.5"></i>
+                            <div>
+                                <p class="text-xs text-blue-700">
+                                    <strong>Tip:</strong> Select a type and category to see detailed information.
+                                    Your classification will be reviewed by our team for accuracy.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ======================================== -->
+                <!-- FORM ACTIONS -->
+                <!-- ======================================== -->
+                <div class="flex flex-col sm:flex-row items-center justify-end gap-3 pt-4 border-t border-gray-100">
+                    <button type="button" id="cancelBtn" class="btn-secondary w-full sm:w-auto px-6 py-2.5 rounded-xl text-gray-700 font-medium">
+                        Cancel
+                    </button>
+                    <button type="reset" class="w-full sm:w-auto px-6 py-2.5 rounded-xl border border-gray-200 text-gray-600 hover:bg-gray-50 transition font-medium">
+                        Reset
+                    </button>
+                    <button type="submit" id="submitBtn" class="btn-primary w-full sm:w-auto px-6 py-2.5 rounded-xl text-white font-medium flex items-center justify-center gap-2">
+                        <i class="fas fa-save"></i>
+                        <span id="submitText">Register Vendor</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Info Note -->
+        <div class="mt-4 bg-white rounded-2xl border border-gray-100 p-4 shadow-sm">
+            <div class="flex items-start gap-3">
+                <i class="fas fa-info-circle text-brand mt-0.5"></i>
+                <div>
+                    <p class="text-sm font-medium text-gray-900">Vendor Registration Process</p>
+                    <p class="text-xs text-gray-500 mt-0.5">
+                        Once registered, the vendor will be in <strong>"pending"</strong> status until an admin reviews
+                        and activates the account. You will be notified when the vendor is approved.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- ========== FOOTER ========== -->
+    <footer class="bg-white border-t border-gray-100/60 mt-6">
+        <div class="max-w-7xl mx-auto px-4 md:px-6 py-6">
+            <div class="flex flex-col md:flex-row items-center justify-between gap-4 text-sm">
+                <div class="flex items-center gap-4">
+                    <span class="text-lg font-black text-brand">COCOCE</span>
+                    <span class="text-xs text-gray-400">© 2026 — Vendor Platform</span>
+                </div>
+                <div class="flex flex-wrap items-center gap-6 text-gray-400">
+                    <a href="#" class="footer-link">Privacy</a>
+                    <a href="#" class="footer-link">Terms</a>
+                    <a href="#" class="footer-link">Support</a>
+                    <a href="#" class="footer-link">Status</a>
+                    <span class="w-1.5 h-1.5 bg-green-500 rounded-full"></span>
+                </div>
+            </div>
+            <div class="text-center text-xs text-gray-400 mt-3">
+                <p>COCOCE Vendor Management — Empowering businesses since 2024</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ========== JAVASCRIPT ========== -->
+    <script>
+        $(document).ready(function() {
+
+            // ============================================================
+            // VENDOR TYPE & CATEGORY INFO DATA
+            // ============================================================
+            const vendorTypeInfo = {
+                retailer: {
+                    title: 'Retailer',
+                    icon: 'fa-store',
+                    description: 'Sells products directly to consumers. Retailers are the final link in the supply chain.',
+                    tags: ['B2C', 'Direct sales', 'Consumer focus'],
+                    badge: 'Popular',
+                    badgeClass: 'popular'
+                },
+                wholesaler: {
+                    title: 'Wholesaler',
+                    icon: 'fa-warehouse',
+                    description: 'Sells products in bulk to retailers, businesses, or other wholesalers. Typically operates B2B.',
+                    tags: ['B2B', 'Bulk sales', 'Trade focus'],
+                    badge: 'Professional',
+                    badgeClass: 'premium'
+                },
+                distributor: {
+                    title: 'Distributor',
+                    icon: 'fa-truck-fast',
+                    description: 'Distributes products from manufacturers to retailers or end-users. Manages logistics and supply chain.',
+                    tags: ['Logistics', 'Supply chain', 'B2B'],
+                    badge: 'Recommended',
+                    badgeClass: 'recommended'
+                },
+                manufacturer: {
+                    title: 'Manufacturer',
+                    icon: 'fa-industry',
+                    description: 'Produces goods and products. Manufacturers create the products that are sold through the supply chain.',
+                    tags: ['Production', 'Quality control', 'Innovation'],
+                    badge: 'Premium',
+                    badgeClass: 'premium'
+                },
+                supplier: {
+                    title: 'Supplier',
+                    icon: 'fa-handshake',
+                    description: 'Provides materials, components, or services to other businesses. Suppliers are critical in the supply chain.',
+                    tags: ['B2B', 'Materials', 'Services'],
+                    badge: 'Popular',
+                    badgeClass: 'popular'
+                }
+            };
+
+            const vendorCategoryInfo = {
+                internal: {
+                    title: 'Internal',
+                    icon: 'fa-building',
+                    description: 'Vendor operates within the COCOCE ecosystem with full integration and support.',
+                    tags: ['Full integration', 'Priority support', 'Featured listings'],
+                    badge: 'Recommended',
+                    badgeClass: 'recommended'
+                },
+                external: {
+                    title: 'External',
+                    icon: 'fa-globe',
+                    description: 'Vendor operates outside the COCOCE ecosystem but partners with us for specific services.',
+                    tags: ['External partnership', 'Limited integration', 'Standard support'],
+                    badge: 'Popular',
+                    badgeClass: 'popular'
+                },
+                preferred: {
+                    title: 'Preferred',
+                    icon: 'fa-star',
+                    description: 'High-trust vendor with proven track record. Preferred vendors receive special benefits and exposure.',
+                    tags: ['Trusted partner', 'Premium benefits', 'Exclusive features'],
+                    badge: 'Premium',
+                    badgeClass: 'premium'
+                },
+                standard: {
+                    title: 'Standard',
+                    icon: 'fa-clipboard',
+                    description: 'Regular vendor with standard services. Meets all basic requirements for partnership.',
+                    tags: ['Standard services', 'Basic support', 'Regular listing'],
+                    badge: 'Popular',
+                    badgeClass: 'popular'
+                }
+            };
+
+            // ============================================================
+            // SHOW INFO CARDS ON SELECTION
+            // ============================================================
+
+            $('#vendorType').on('change', function() {
+                const type = $(this).val();
+                const $card = $('#typeInfoCard');
+                const $title = $('#infoTypeTitle');
+                const $description = $('#infoTypeDescription');
+                const $tags = $('#infoTypeTags');
+
+                if (type && vendorTypeInfo[type]) {
+                    const info = vendorTypeInfo[type];
+                    $title.text(info.title);
+                    $description.text(info.description);
+
+                    // Update tags
+                    let tagsHtml = '';
+                    info.tags.forEach(tag => {
+                        tagsHtml +=
+                            `<span class="text-xs text-gray-400"><i class="fas fa-check-circle text-green-500"></i> ${tag}</span>`;
+                    });
+                    $tags.html(tagsHtml);
+
+                    // Update badge
+                    const $badge = $card.find('.info-tag');
+                    $badge.text(info.badge);
+                    $badge.removeClass('popular recommended premium');
+                    $badge.addClass(info.badgeClass);
+
+                    // Update icon
+                    $card.find('.info-icon i').removeClass().addClass(`fas ${info.icon}`);
+
+                    $card.removeClass('hidden');
+                    $card.addClass('visible');
+                } else {
+                    $card.addClass('hidden');
+                    $card.removeClass('visible');
+                }
+            });
+
+            $('#vendorCategory').on('change', function() {
+                const category = $(this).val();
+                const $card = $('#categoryInfoCard');
+                const $title = $('#infoCategoryTitle');
+                const $description = $('#infoCategoryDescription');
+                const $tags = $('#infoCategoryTags');
+
+                if (category && vendorCategoryInfo[category]) {
+                    const info = vendorCategoryInfo[category];
+                    $title.text(info.title);
+                    $description.text(info.description);
+
+                    // Update tags
+                    let tagsHtml = '';
+                    info.tags.forEach(tag => {
+                        tagsHtml +=
+                            `<span class="text-xs text-gray-400"><i class="fas fa-check-circle text-green-500"></i> ${tag}</span>`;
+                    });
+                    $tags.html(tagsHtml);
+
+                    // Update badge
+                    const $badge = $card.find('.info-tag');
+                    $badge.text(info.badge);
+                    $badge.removeClass('popular recommended premium');
+                    $badge.addClass(info.badgeClass);
+
+                    // Update icon
+                    $card.find('.info-icon i').removeClass().addClass(`fas ${info.icon}`);
+
+                    $card.removeClass('hidden');
+                    $card.addClass('visible');
+                } else {
+                    $card.addClass('hidden');
+                    $card.removeClass('visible');
+                }
+            });
+
+            // ============================================================
+            // MOCK USERS DATA
+            // ============================================================
+            const mockUsers = [
+                { id: '550e8400-e29b-41d4-a716-446655440000', name: 'John Doe', email: 'john@example.com', role: 'admin' },
+                { id: '550e8400-e29b-41d4-a716-446655440001', name: 'Jane Smith', email: 'jane@example.com', role: 'seller' },
+                { id: '550e8400-e29b-41d4-a716-446655440002', name: 'Alice Johnson', email: 'alice@example.com', role: 'member' },
+                { id: '550e8400-e29b-41d4-a716-446655440003', name: 'Bob Williams', email: 'bob@example.com', role: 'client' },
+                { id: '550e8400-e29b-41d4-a716-446655440004', name: 'Carol Brown', email: 'carol@example.com', role: 'customer' },
+                { id: '550e8400-e29b-41d4-a716-446655440005', name: 'David Wilson', email: 'david@example.com', role: 'seller' },
+                { id: '550e8400-e29b-41d4-a716-446655440006', name: 'Emma Davis', email: 'emma@example.com', role: 'member' },
+                { id: '550e8400-e29b-41d4-a716-446655440007', name: 'Frank Miller', email: 'frank@example.com', role: 'admin' },
+            ];
+
+            let selectedUser = null;
+            let allUsers = [...mockUsers];
+
+            // ============================================================
+            // USER SEARCH SELECTOR
+            // ============================================================
+
+            function renderUserList(users, searchTerm = '') {
+                const $list = $('#userSearchList');
+                const $noResult = $('#noUserResult');
+
+                if (!users || users.length === 0) {
+                    $list.addClass('hidden');
+                    $noResult.removeClass('hidden');
+                    return;
+                }
+
+                $list.removeClass('hidden');
+                $noResult.addClass('hidden');
+
+                let html = '';
+                users.forEach(user => {
+                    const isSelected = selectedUser && selectedUser.id === user.id;
+                    const highlightedName = searchTerm ? highlightText(user.name, searchTerm) : user.name;
+                    const highlightedEmail = searchTerm ? highlightText(user.email, searchTerm) : user.email;
+
+                    html += `
+                        <div class="user-search-item flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 border-l-2 border-transparent hover:border-brand ${isSelected ? 'active' : ''}"
+                             data-id="${user.id}"
+                             data-name="${user.name}"
+                             data-email="${user.email}"
+                             data-role="${user.role}">
+                            <div class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-gray-600 font-semibold text-xs flex-shrink-0">
+                                ${getInitials(user.name)}
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <p class="text-sm font-medium text-gray-900">${highlightedName}</p>
+                                <p class="text-xs text-gray-500 truncate">${highlightedEmail}</p>
+                            </div>
+                            <span class="text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-600 flex-shrink-0">${user.role}</span>
+                        </div>
+                    `;
+                });
+
+                $list.html(html);
+
+                $('.user-search-item').off('click').on('click', function() {
+                    const id = $(this).data('id');
+                    const name = $(this).data('name');
+                    const email = $(this).data('email');
+                    const role = $(this).data('role');
+                    selectUser({ id, name, email, role });
+                });
+            }
+
+            function getInitials(name) {
+                return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+            }
+
+            function highlightText(text, search) {
+                if (!search || search === '') return text;
+                const regex = new RegExp(`(${search.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+                return text.replace(regex, '<span class="bg-brand-light text-brand font-semibold">$1</span>');
+            }
+
+            function selectUser(user) {
+                selectedUser = user;
+                $('#selectedUserId').val(user.id);
+                $('#userSearchInput').val(user.name);
+                $('#selectedUserDisplay').removeClass('hidden');
+                $('#clearUserBtn').removeClass('hidden');
+                $('#selectedUserInitials').text(getInitials(user.name));
+                $('#selectedUserName').text(user.name);
+                $('#selectedUserEmail').text(user.email);
+                closeUserDropdown();
+                renderUserList(allUsers, $('#userSearchInput').val());
+            }
+
+            function deselectUser() {
+                selectedUser = null;
+                $('#selectedUserId').val('');
+                $('#userSearchInput').val('');
+                $('#selectedUserDisplay').addClass('hidden');
+                $('#clearUserBtn').addClass('hidden');
+                renderUserList(allUsers, '');
+            }
+
+            function openUserDropdown() {
+                if (allUsers.length === 0) return;
+                $('#userSearchDropdown').removeClass('hidden');
+            }
+
+            function closeUserDropdown() {
+                $('#userSearchDropdown').addClass('hidden');
+            }
+
+            $('#userSearchInput').on('focus', function() {
+                if (allUsers.length > 0) {
+                    openUserDropdown();
+                    renderUserList(allUsers, $(this).val());
+                }
+            });
+
+            $('#userSearchInput').on('input', function() {
+                const val = $(this).val();
+                if (val && val.trim() !== '') {
+                    const filtered = allUsers.filter(user =>
+                        user.name.toLowerCase().includes(val.toLowerCase()) ||
+                        user.email.toLowerCase().includes(val.toLowerCase())
+                    );
+                    renderUserList(filtered, val);
+                    openUserDropdown();
+                    $('#clearUserBtn').removeClass('hidden');
+                } else {
+                    renderUserList(allUsers, '');
+                    $('#clearUserBtn').addClass('hidden');
+                    if (!selectedUser) {
+                        openUserDropdown();
+                    }
+                }
+            });
+
+            $('#clearUserBtn').on('click', function() {
+                $('#userSearchInput').val('');
+                deselectUser();
+                $(this).addClass('hidden');
+                if (allUsers.length > 0) {
+                    openUserDropdown();
+                    renderUserList(allUsers, '');
+                }
+            });
+
+            $('#removeUserBtn').on('click', function() {
+                deselectUser();
+                $('#userSearchInput').focus();
+            });
+
+            $(document).on('click', function(e) {
+                if (!$(e.target).closest('#userSelector').length) {
+                    closeUserDropdown();
+                }
+            });
+
+            $('#userSearchInput').on('keydown', function(e) {
+                const $items = $('.user-search-item');
+                const $active = $items.filter('.active');
+
+                if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    if ($active.length === 0) {
+                        $items.first().addClass('active');
+                    } else {
+                        const next = $active.next('.user-search-item');
+                        if (next.length) {
+                            $active.removeClass('active');
+                            next.addClass('active');
+                            next[0].scrollIntoView({ block: 'nearest' });
+                        }
+                    }
+                }
+
+                if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    if ($active.length) {
+                        const prev = $active.prev('.user-search-item');
+                        if (prev.length) {
+                            $active.removeClass('active');
+                            prev.addClass('active');
+                            prev[0].scrollIntoView({ block: 'nearest' });
+                        }
+                    }
+                }
+
+                if (e.key === 'Enter' || e.key === 'Tab') {
+                    if ($active.length) {
+                        const id = $active.data('id');
+                        const name = $active.data('name');
+                        const email = $active.data('email');
+                        const role = $active.data('role');
+                        selectUser({ id, name, email, role });
+                        e.preventDefault();
+                    }
+                }
+
+                if (e.key === 'Escape') {
+                    closeUserDropdown();
+                    $(this).blur();
+                }
+            });
+
+            // ============================================================
+            // FORM SUBMISSION
+            // ============================================================
+
+            $('#vendorForm').on('submit', function(e) {
+                e.preventDefault();
+
+                let isValid = true;
+                const errors = [];
+
+                if (!selectedUser) {
+                    isValid = false;
+                    errors.push('Please select a user');
+                    $('#userSearchInput').addClass('error');
+                } else {
+                    $('#userSearchInput').removeClass('error');
+                }
+
+                const businessName = $('#businessName').val().trim();
+                if (!businessName) {
+                    isValid = false;
+                    errors.push('Business name is required');
+                    $('#businessName').addClass('error');
+                } else {
+                    $('#businessName').removeClass('error');
+                }
+
+                const vendorType = $('#vendorType').val();
+                if (!vendorType) {
+                    isValid = false;
+                    errors.push('Business type is required');
+                    $('#vendorType').addClass('error');
+                } else {
+                    $('#vendorType').removeClass('error');
+                }
+
+                if (!isValid) {
+                    showToast(errors.join('. '), 'error');
+                    return;
+                }
+
+                const formData = {
+                    userId: selectedUser.id,
+                    businessName: businessName,
+                    businessAddress: $('#businessAddress').val().trim() || null,
+                    tinNumber: $('#tinNumber').val().trim() || null,
+                    vatNumber: $('#vatNumber').val().trim() || null,
+                    taxRegistered: $('#taxRegistered').val().trim() || null,
+                    taxCountry: $('#taxCountry').val().trim() || null,
+                    type: $('#vendorType').val(),
+                    category: $('#vendorCategory').val() || null,
+                };
+
+                const $submitBtn = $('#submitBtn');
+                const $submitText = $('#submitText');
+                const originalText = $submitText.text();
+                $submitBtn.prop('disabled', true);
+                $submitText.text('Registering...');
+                $submitBtn.html('<i class="fas fa-spinner fa-spin mr-2"></i> Registering...');
+
+                setTimeout(() => {
+                    console.log('📦 Form Data:', formData);
+                    showToast('Vendor registered successfully! Status: Pending Approval', 'success');
+
+                    $submitBtn.prop('disabled', false);
+                    $submitText.text(originalText);
+                    $submitBtn.html(`<i class="fas fa-save"></i> ${originalText}`);
+
+                }, 1500);
+            });
+
+            // ============================================================
+            // CANCEL
+            // ============================================================
+
+            $('#cancelBtn').on('click', function() {
+                if (confirm('Are you sure you want to cancel? Any unsaved changes will be lost.')) {
+                    window.location.href = '/admin/vendors';
+                }
+            });
+
+            // ============================================================
+            // REMOVE ERROR ON FOCUS
+            // ============================================================
+
+            $('#userSearchInput').on('focus', function() {
+                $(this).removeClass('error');
+            });
+
+            $('#businessName').on('input', function() {
+                $(this).removeClass('error');
+            });
+
+            $('#vendorType').on('change', function() {
+                $(this).removeClass('error');
+            });
+
+            // ============================================================
+            // TOAST NOTIFICATION
+            // ============================================================
+
+            function showToast(message, type = 'success') {
+                const colors = {
+                    success: 'bg-green-500',
+                    error: 'bg-red-500',
+                    warning: 'bg-amber-500',
+                    info: 'bg-blue-500'
+                };
+                const icons = {
+                    success: 'fa-check-circle',
+                    error: 'fa-exclamation-circle',
+                    warning: 'fa-exclamation-triangle',
+                    info: 'fa-info-circle'
+                };
+
+                const existing = $('.toast-container');
+                if (existing.length) existing.remove();
+
+                const container = $('<div>')
+                    .addClass('toast-container fixed top-4 right-4 z-50 bg-white rounded-xl shadow-xl border border-gray-100 p-4 max-w-sm toast')
+                    .html(`
+                        <div class="flex items-start gap-3">
+                            <div class="w-8 h-8 rounded-full ${colors[type]} flex items-center justify-center flex-shrink-0">
+                                <i class="fas ${icons[type]} text-white text-sm"></i>
+                            </div>
+                            <div class="flex-1">
+                                <p class="text-sm font-semibold text-gray-900">${type.charAt(0).toUpperCase() + type.slice(1)}</p>
+                                <p class="text-xs text-gray-500 mt-0.5">${message}</p>
+                            </div>
+                            <button onclick="this.closest('.toast-container').remove()" class="text-gray-400 hover:text-gray-600">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    `);
+
+                $('body').append(container);
+
+                setTimeout(() => {
+                    container.fadeOut(300, function() {
+                        $(this).remove();
+                    });
+                }, 4000);
+            }
+
+            // ============================================================
+            // INITIAL RENDER
+            // ============================================================
+
+            renderUserList(allUsers, '');
+            console.log('🚀 Vendor Registration Form Loaded');
+            console.log('📋 Available Users:', allUsers.length);
+            console.log('ℹ️ Status will be set to "pending" by default');
+
+        });
+    </script>
+
+</body>
+
+</html>

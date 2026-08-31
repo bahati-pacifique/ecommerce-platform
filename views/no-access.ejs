@@ -153,7 +153,6 @@
       border-radius: 8px;
       font-size: 12px;
       font-weight: 600;
-      text-transform: uppercase;
       letter-spacing: 0.5px;
       background: #FEE2E3;
       color: #ED1B24;
@@ -242,6 +241,10 @@
   </style>
 </head>
 
+<script>
+  const domain = "<%=locals.protocal%>auth.<%=locals.domain%>/signout";
+</script>
+
 <body class="dots-bg">
 
   <nav class="px-4 md:px-10 py-3 border-b border-gray-100 bg-white/80 backdrop-blur-sm">
@@ -249,7 +252,7 @@
       <a href="/" class="relative inline-block group">
         <img src="/images/logos/cococe.png" alt="Logo-brand" class="max-w-[120px] md:max-w-[100px]">
       </a>
-      <span class="status-badge text-xs"><i class="bi bi-slash-circle"></i> <%=locals.title%></span>
+      <span class="status-badge text-xs">Hey <%=locals.user?.username%>, <small>You do not have access to this page!</small></span>
     </div>
   </nav>
 
@@ -297,7 +300,7 @@
                 </p>
 
                 <p class="font-semibold text-xs text-gray-900">
-                  <%= locals.user.account_category %> | <%= locals.user.role %>
+                  <%= locals.account %> | <%= locals.user.role %>
                 </p>
               </div>
 
@@ -358,9 +361,11 @@
           <i class="bi bi-person-plus mr-2"></i>
           Request Access
         </a>
-        <form action="/logout" method="post" class="btn-outline cursor-pointer">
+        <form action="<%=locals.protocal%>auth.<%=locals.domain%>/signout" method="post" class="btn-outline cursor-pointer">
+          <input type="hidden" value="<%=locals.user.userAccount%>" name="userAccount">
+          <input type="hidden" name="host" value="<%=locals.protocal%>business.<%=locals.domain%>/">
           <button type="submit">
-            <i class="bi bi-box-arrow-right mr-2"></i>Logout
+            Signout <i class="bi bi-box-arrow-right"></i>
           </button>
         </form>
 
@@ -392,9 +397,20 @@
         <span class="text-xs text-gray-400">© 2026 — Authorization Required</span>
       </div>
       <div class="footer-links">
-        <a href="/privacy" class="hover:text-brand transition">Privacy</a>
-        <a href="/terms" class="hover:text-brand transition">Terms</a>
-        <a href="mailto:support@cococe.rw" class="hover:text-brand transition">Support</a>
+        <a href="/privacy" class="hover:text-brand transition">
+          Privacy
+        </a>
+        <a href="/terms" class="hover:text-brand transition">
+          Terms
+        </a>
+        <a href="mailto:support@cococe.rw" class="hover:text-brand transition">
+          Support
+        </a>
+        <form action="" method="post">
+          <button type="submit" class="flex items-center gap-1 hover:text-brand hover:underline">
+            Signout <i class="bi bi-box-arrow-right"></i>
+          </button>
+        </form>
       </div>
     </div>
   </footer>

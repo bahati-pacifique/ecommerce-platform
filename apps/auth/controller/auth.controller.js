@@ -23,6 +23,7 @@ const {
     deny401,
     deny403
 } = require('../../../util/helpers');
+const authServices = require('../../../src/services/auth.services');
 
 // function isAllowedHost(hostname) {
 //     return (
@@ -128,7 +129,17 @@ function renderLoginPage(req, res) {
     if (!redirectTo.includes('admin')) {
         homeImageUrl = '/images/logos/cococe.png';
         heroMessage = `<h2 class="text-2xl text-gray-500 leading-tight pl-8">
-              <span class="flex items-center gap-2">Home of the <span class="text-3xl text-brand">Digital World</span></span>
+              <span class="flex items-center gap-2">Home of the <span class="text-3xl text-brand font-extrabold">Digital World</span></span>
+              <div class="bg-brand max-w-[140px] min-h-[4px] rounded-full mt-3"></div> 
+            </h2>`;
+    }
+
+    if (redirectTo.includes('business')) {
+        homeImageUrl = '/images/logos/business.png';
+        heroMessage = `<h2 class="text-2xl text-gray-500 leading-tight pl-8">
+              <span>
+                Welcome to <span class="text-3xl text-brand font-extrabold">COCOCE Business</span>, The Hub of <span class="text-black">Digital Vendors</span>. 
+              </span>
               <div class="bg-brand max-w-[140px] min-h-[4px] rounded-full mt-3"></div> 
             </h2>`;
     }
@@ -293,6 +304,7 @@ async function accountLogin(req, res) {
 
     if (!accountId || !preauthToken) {
         clearAuthentication(res);
+
         if (acceptsHtml(req)) {
             req.session.message = 'Please login to continue'
             return res.redirect(`${sslUrlPrefix}auth.${process.env.DOMAIN}`)
@@ -304,6 +316,7 @@ async function accountLogin(req, res) {
                 redirectTo
             })
         }
+
     }
 
     try {
@@ -455,9 +468,42 @@ async function accountLogin(req, res) {
     }
 };
 
+async function signout(req, res) {
+
+    const domain = `${req.protocol}://${req.get('host')}`;
+    const originalUrlHost = `${req.protocol}://${req.get('host')}${req.originalUrl}`;
+
+    try {
+
+        const userAccount = req.user?.userAccount || req.body?.userAccount;
+        const { host, redirectTo } = req.body;
+
+        if (host) {
+            const rPayload = {
+                redirectTo: host
+            }
+
+            const redirectToken = signRedirect(rPayload);
+            res.cookie('r', redirectToken);
+        }
+
+        await authServices.signout(userAccount);
+        clearAuthentication(res);
+
+        if (redirectTo) return res.redirect(redirectTo)
+        return res.redirect(host || domain);
+
+    } catch (error) {
+        console.log("signout(): ", error);
+        clearAuthentication(res);
+        return res.redirect(domain);
+    }
+}
+
 module.exports = {
     renderLoginPage,
     renderAccountSelection,
     login,
-    accountLogin
+    accountLogin,
+    signout
 }

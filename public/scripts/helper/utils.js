@@ -153,3 +153,18 @@ function generateSlug(title) {
         .replace(/[^a-z0-9]+/g, '-')
         .replace(/^-+|-+$/g, '');
 }
+
+function getInitials(name) {
+  if (!name) return '';
+  
+  const parts = name.trim().split(/\s+/);
+  
+  if (parts.length === 1 && parts[0].length >= 2) {
+    return parts[0].slice(0, 2).toUpperCase();
+  }
+  
+  return parts
+    .map(part => part.charAt(0).toUpperCase())
+    .slice(0, 2)
+    .join('');
+}

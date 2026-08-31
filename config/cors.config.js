@@ -6,16 +6,19 @@ const allowedOrigins = [
     'https://admin.cococe.rw',
     'https://api.cococe.rw',
     'https://auth.cococe.rw',
+    'https://business.cococe.rw',
     'https://cococe.onrender.com',
 
     `http://localapp.com:${port}`,
     `http://admin.localapp.com:${port}`,
     `http://auth.localapp.com:${port}`,
+    `http://business.localapp.com:${port}`,
     `http://api.localapp.com:${port}`,
 
     `http://localhost.com:${port}`,
     `http://admin.localhost.com:${port}`,
     `http://auth.localhost.com:${port}`,
+    `http://business.localhost.com:${port}`,
     `http://api.localhost.com:${port}`
 ];
 
@@ -23,7 +26,6 @@ module.exports = {
     origin: function (origin, callback) {
 
         //console.log(origin)
-
         //console.log("Origin:", origin);
 
         if (!origin || origin === 'null') {

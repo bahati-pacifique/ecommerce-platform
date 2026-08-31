@@ -10,7 +10,7 @@ const { administration, session } = require('../../../middlewares/authGuards');
 
 router.get('/', session, adminController.home);
 router.get('/dashboard', administration, adminController.renderDashboard);
-router.post('/logout', adminController.logout);
+router.post('/signout', adminController.signout);
 
 /* ================================ Batch insert ================================*/
 router.post('/product-metas/batch/', ProductMetaController.batchInsert);

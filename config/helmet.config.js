@@ -69,7 +69,7 @@ const isProduction = NODE_ENV === "production";
 const protocol = isProduction ? "https" : "http";
 const wsProtocol = isProduction ? "wss" : "ws";
 
-const domain = `${protocol}://*.${DOMAIN}`;
+const domain = isProduction ? `${protocol}://*.${DOMAIN}` : `${protocol}://*.${DOMAIN}:${PORT}`;
 const domainWithPort = `${protocol}://*.${DOMAIN}:${PORT}`;
 const wsDomainWithPort = `${wsProtocol}://*.${DOMAIN}:${PORT}`;
 
@@ -149,7 +149,12 @@ module.exports = {
                 "'self'",
                 "https://youtube.com",
                 "https://youtube-nocookie.com"
-            ]
+            ],
+
+            "form-action": [
+                "'self'", 
+                domain
+            ],
         }
     }
 };

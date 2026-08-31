@@ -4,384 +4,128 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <title>COCOCE Business — Enterprise Solutions</title>
-  <!-- Tailwind CSS -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Font Awesome -->
+  <title>COCOCE — Business</title>
+
+  <meta name="description" content="COCOCE — Admin portal, COCOCE Kigali Rwanda, Laptops, Desktops, Computer accessories, Smart tv, projectors, discover what you want about digital assets near you at Kigali">
+  <meta name="keywords" content="Laptops, Desktops, Memories, Storages, Servers, keyboards, Printers, Screens, Repair, Explore, Electronic, Digital, Kigali, Rwanda">
+  <meta name="author" content="COCOCE RW">
+
+  <meta property="og:image" content="https://cdn.cococe.rw/meta/cococe.png">
+  <meta property="og:url" content="https://www.cococe.rw">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Laptops, Printers, Accessories, Game consoles, Electronics, and much more, cococe, your wish our priority">
+  <meta property="og:description" content="COCOCE Kigali Rwanda, Laptops, Desktops, Computer accessories, Smart tv, projectors, discover what you want about digital assets near you at Kigali">
+  <meta property="og:logo" content="https://cdn.cococe.rw/meta/cococe.png" />
+
+  <meta name="twitter:card" content="https://cdn.cococe.rw/meta/cococe.png">
+  <meta property="twitter:domain" content="https://cococe.rw">
+  <meta property="twitter:url" content="https://cococe.rw">
+  <meta name="twitter:title" content="Laptops, Printers, Accessories, Game consoles, Electronics, and much more, cococe, your wish our priority">
+  <meta name="twitter:description" content="COCOCE Kigali Rwanda, Laptops, Desktops, Computer accessories, Smart tv, projectors, discover what you want about digital assets near you at Kigali">
+
+  <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.11.0/axios.min.js" integrity="sha512-h9644v03pHqrIHThkvXhB2PJ8zf5E9IyVnrSfZg8Yj8k4RsO4zldcQc4Bi9iVLUCCsqNY0b4WXVV4UB+wbWENA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+  <link rel="icon" href="/favicon.ico" type="image/x-icon">
+
+  <link rel="stylesheet" href="/styles/components/notification.css">
+  <link rel="stylesheet" href="/styles/components/main-snackbar.css">
+  <link rel="stylesheet" href="/styles/components/loaders.css">
+  <link rel="stylesheet" href="/styles/main.css">
+
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <!-- Google Fonts -->
+
   <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&display=swap" rel="stylesheet">
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            brand: {
-              DEFAULT: '#ED1B24',
-              dark: '#C9171F',
-              light: '#FEE2E3',
-              ultraLight: '#FFF5F5',
-            },
-            slate: {
-              50: '#F8FAFC',
-              100: '#F1F5F9',
-              200: '#E2E8F0',
-              300: '#CBD5E1',
-              400: '#94A3B8',
-              500: '#64748B',
-              600: '#475569',
-              700: '#334155',
-              800: '#1E293B',
-              900: '#0F172A',
-            }
-          },
-          fontFamily: {
-            'sans': ['Inter', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
-          },
-          animation: {
-            'float': 'float 6s ease-in-out infinite',
-            'fade-in': 'fadeIn 0.6s ease-out forwards',
-            'slide-up': 'slideUp 0.5s ease-out forwards',
-            'pulse-slow': 'pulse 3s ease-in-out infinite',
-            'shimmer': 'shimmer 3s ease-in-out infinite',
-            'border-pulse': 'borderPulse 2s ease-in-out infinite',
-          },
-          keyframes: {
-            float: {
-              '0%, 100%': {
-                transform: 'translateY(0px)'
-              },
-              '50%': {
-                transform: 'translateY(-12px)'
-              },
-            },
-            fadeIn: {
-              '0%': {
-                opacity: '0'
-              },
-              '100%': {
-                opacity: '1'
-              },
-            },
-            slideUp: {
-              '0%': {
-                opacity: '0',
-                transform: 'translateY(30px)'
-              },
-              '100%': {
-                opacity: '1',
-                transform: 'translateY(0)'
-              },
-            },
-            shimmer: {
-              '0%': {
-                backgroundPosition: '-200% center'
-              },
-              '100%': {
-                backgroundPosition: '200% center'
-              },
-            },
-            borderPulse: {
-              '0%, 100%': {
-                borderColor: 'rgba(237, 27, 36, 0.2)'
-              },
-              '50%': {
-                borderColor: 'rgba(237, 27, 36, 0.6)'
-              },
-            }
-          }
-        }
-      }
-    }
-  </script>
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&display=swap');
-
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    body {
-      background: #F8FAFC;
-      font-family: 'Inter', sans-serif;
-      scroll-behavior: smooth;
-      color: #0F172A;
-    }
-
-    /* Premium gradient backgrounds */
-    .bg-hero {
-      background:
-        radial-gradient(ellipse at 20% 50%, rgba(237, 27, 36, 0.04) 0%, transparent 60%),
-        radial-gradient(ellipse at 80% 50%, rgba(237, 27, 36, 0.04) 0%, transparent 60%),
-        #F8FAFC;
-    }
-
-    .bg-features {
-      background:
-        radial-gradient(ellipse at 30% 20%, rgba(237, 27, 36, 0.02) 0%, transparent 50%),
-        #FFFFFF;
-    }
-
-    /* Premium card styles */
-    .premium-card {
-      background: white;
-      border: 1px solid rgba(0, 0, 0, 0.04);
-      border-radius: 20px;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
-    }
-
-    .premium-card:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.06);
-      border-color: rgba(237, 27, 36, 0.1);
-    }
-
-    /* Button styles */
-    .btn-primary-premium {
-      background: #0F172A;
-      color: white;
-      padding: 12px 28px;
-      border-radius: 12px;
-      font-weight: 600;
-      font-size: 15px;
-      border: none;
-      cursor: pointer;
-      transition: all 0.25s ease;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      text-decoration: none;
-    }
-
-    .btn-primary-premium:hover {
-      background: #1E293B;
-      transform: translateY(-2px);
-      box-shadow: 0 8px 30px rgba(15, 23, 42, 0.15);
-    }
-
-    .btn-primary-premium:active {
-      transform: scale(0.96);
-    }
-
-    .btn-outline-premium {
-      background: transparent;
-      color: #0F172A;
-      padding: 12px 28px;
-      border-radius: 12px;
-      font-weight: 600;
-      font-size: 15px;
-      border: 1.5px solid #E2E8F0;
-      cursor: pointer;
-      transition: all 0.25s ease;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      text-decoration: none;
-    }
-
-    .btn-outline-premium:hover {
-      border-color: #0F172A;
-      background: #F8FAFC;
-      transform: translateY(-2px);
-    }
-
-    .btn-outline-premium:active {
-      transform: scale(0.96);
-    }
-
-    /* Feature icon wrapper */
-    .feature-icon {
-      width: 52px;
-      height: 52px;
-      border-radius: 16px;
-      background: #FEE2E3;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #ED1B24;
-      font-size: 22px;
-      transition: all 0.3s ease;
-    }
-
-    .premium-card:hover .feature-icon {
-      background: #ED1B24;
-      color: white;
-      transform: scale(1.05);
-    }
-
-    /* Stats counter */
-    .stat-number {
-      font-size: 2.5rem;
-      font-weight: 800;
-      line-height: 1;
-      color: #0F172A;
-      letter-spacing: -0.02em;
-    }
-
-    .stat-label {
-      font-size: 0.875rem;
-      color: #64748B;
-      font-weight: 500;
-      margin-top: 0.25rem;
-    }
-
-    /* Testimonial card */
-    .testimonial-card {
-      background: white;
-      border: 1px solid rgba(0, 0, 0, 0.04);
-      border-radius: 16px;
-      padding: 24px;
-      transition: all 0.3s ease;
-    }
-
-    .testimonial-card:hover {
-      border-color: rgba(237, 27, 36, 0.15);
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.04);
-    }
-
-    .testimonial-avatar {
-      width: 48px;
-      height: 48px;
-      border-radius: 50%;
-      background: #F1F5F9;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 600;
-      font-size: 18px;
-      color: #0F172A;
-      flex-shrink: 0;
-    }
-
-    /* Scrollbar */
-    ::-webkit-scrollbar {
-      width: 5px;
-    }
-
-    ::-webkit-scrollbar-track {
-      background: #f1f1f1;
-    }
-
-    ::-webkit-scrollbar-thumb {
-      background: #ED1B24;
-      border-radius: 10px;
-    }
-
-    /* Responsive adjustments */
-    @media (max-width: 640px) {
-      .stat-number {
-        font-size: 2rem;
-      }
-
-      .btn-primary-premium,
-      .btn-outline-premium {
-        width: 100%;
-        justify-content: center;
-      }
-    }
-  </style>
+  <link rel="stylesheet" href="/styles/by.css">
 </head>
 
 <body>
 
-  <!-- ========== NAVIGATION ========== -->
   <nav class="fixed top-0 w-full z-50 bg-white/80 backdrop-blur-lg border-b border-gray-100/60">
-    <div class="max-w-7xl mx-auto px-6 md:px-10">
-      <div class="flex items-center justify-between h-16">
-        <!-- Logo -->
-        <a href="/" class="flex items-center gap-2 group">
-          <span class="text-2xl font-black tracking-tighter text-brand">COCOCE</span>
-          <span class="text-[10px] font-medium text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full border border-slate-200/60">BUSINESS</span>
+    <div class="max-w-7xl mx-auto px-6 md:px-10 flex items-center flex-wrap">
+      <div class="flex items-center h-16">
+        <a href="/" class="flex items-center gap-2 group mr-auto">
+          <img src="/images/logos/business.png" alt="Logo-brand" class="max-w-[120px]">
         </a>
 
-        <!-- Desktop Navigation -->
         <div class="hidden md:flex items-center gap-8 text-sm font-medium text-slate-600">
           <a href="#features" class="hover:text-brand transition">Features</a>
           <a href="#solutions" class="hover:text-brand transition">Solutions</a>
           <a href="#testimonials" class="hover:text-brand transition">Testimonials</a>
           <a href="#pricing" class="hover:text-brand transition">Pricing</a>
         </div>
-
-        <!-- Right Actions -->
+      </div>
+      <div class="flex items-center gap-3 ml-auto">
+        <% if (!locals.user) {%>
+        <a href="<%=locals.authDomain%>" class="btn-outline-premium flex items-center gap-2" target="_blank">
+              Sign in <i class="bi bi-arrow-right"></i>
+            </a>
+        <%} else {%>
         <div class="flex items-center gap-3">
-          <a href="/login" class="text-sm font-medium text-slate-600 hover:text-brand transition">
-            Sign In
-          </a>
-          <a href="/register" class="btn-primary-premium text-sm py-2 px-5">
-            Get Started
-            <i class="fas fa-arrow-right text-xs"></i>
+          <span class="text-sm font-bold hidden md:block text-slate-600 transition">
+            Hi, <%=locals.user.username%>
+          </span>
+          <a href="/dashboard" class="btn-premium text-white rounded-lg text-sm py-2 px-5">
+            Go to Dashboard <i class="bi bi-arrow-right"></i>
           </a>
         </div>
-      </div>
+        <%}%>
+          
+        </div>
     </div>
   </nav>
 
-  <!-- ========== HERO SECTION ========== -->
-  <section class="bg-hero min-h-screen flex items-center pt-20 overflow-hidden">
+  <section class="hero min-h-screen flex items-center pt-20 overflow-hidden" style="background: url('/images/bg/brand-pattern.png'); background-repeat: no-repeat; background-size: cover;">
     <div class="max-w-7xl mx-auto px-6 md:px-10 py-12 md:py-20">
       <div class="grid lg:grid-cols-2 gap-12 items-center">
-        <!-- Left Content -->
         <div class="space-y-8 animate-fade-in">
-          <!-- Badge -->
-          <div class="inline-flex items-center gap-2 px-4 py-1.5 bg-white rounded-full border border-slate-200/60 shadow-sm text-sm font-medium text-slate-600">
-            <span class="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></span>
-            Empowering businesses since 2024
+          <div class="inline-flex items-center gap-2 px-4 py-1.5 bg-white/20 rounded-full border border-slate-200/60 shadow-sm text-sm font-medium text-slate-800">
+            <span class="w-2.5 h-2.5 bg-brand rounded animate-pulse"></span>
+            <span class="text-brand">In Businesses since 2014</span>
           </div>
 
-          <!-- Heading -->
           <h1 class="text-4xl md:text-6xl font-bold tracking-tight leading-tight">
-            Your Business
+            Business
             <span class="text-brand">Ecosystem</span>
-            <br>in One Platform
+            <br>One <span class="text-brand/60">Platform</span>
           </h1>
 
           <p class="text-lg text-slate-500 max-w-lg leading-relaxed">
             COCOCE Business provides vendors, stores, and partners with everything they need
-            to manage, grow, and scale their operations — all in one place.
+            to manage, grow, and scale the operations — all in one place.
           </p>
 
-          <!-- CTA Buttons -->
           <div class="flex flex-wrap gap-4">
+          <%if (!locals.user) {%>
             <a href="/register" class="btn-primary-premium">
-              Start Free Trial
+              Register
               <i class="fas fa-arrow-right text-xs"></i>
             </a>
-            <a href="#features" class="btn-outline-premium">
-              <i class="fas fa-play-circle"></i>
-              See How It Works
+            
+        <%} else {%>
+        <a href="/dashboard" class="btn-primary-premium">
+          <span class="hidden md:block">Go to Business Dashboard</span>
+          <span class="md:hidden">Go Dashboard</span>
+        </a>
+        <%}%>
+            <a href="/vending/pros" class="btn-outline-premium" target="_blank">
+              Explore more
             </a>
           </div>
 
-          <!-- Trust Badges -->
           <div class="flex flex-wrap items-center gap-6 pt-4 text-sm text-slate-400">
             <span class="flex items-center gap-1.5">
-              <i class="fas fa-check-circle text-green-500"></i>
-              No credit card required
-            </span>
-            <span class="flex items-center gap-1.5">
-              <i class="fas fa-shield-alt text-blue-500"></i>
-              256-bit encryption
-            </span>
-            <span class="flex items-center gap-1.5">
-              <i class="fas fa-clock text-amber-500"></i>
-              14-day free trial
+              Safe, Seamless, and Reliable Marketplace
             </span>
           </div>
         </div>
 
-        <!-- Right Content - Hero Visual -->
         <div class="relative flex justify-center lg:justify-end animate-slide-up">
           <div class="relative w-full max-w-md">
-            <!-- Main Card -->
             <div class="premium-card p-6 md:p-8 border-2 border-brand/10 shadow-xl">
-              <!-- Decorative element -->
               <div class="absolute -top-3 -right-3 w-16 h-16 bg-brand/10 rounded-full blur-xl"></div>
               <div class="absolute -bottom-3 -left-3 w-16 h-16 bg-brand/5 rounded-full blur-xl"></div>
 
-              <!-- Stats Preview -->
               <div class="relative">
                 <div class="flex items-center justify-between mb-6">
                   <div>
@@ -393,42 +137,43 @@
                   </div>
                 </div>
 
-                <!-- Stats Grid -->
                 <div class="grid grid-cols-3 gap-4">
                   <div class="bg-slate-50 rounded-xl p-3 text-center">
-                    <p class="text-2xl font-bold text-slate-900">$12.4k</p>
-                    <p class="text-xs text-slate-400">Revenue</p>
+                    <p class="text-2xl font-bold text-slate-900">120k</p>
+                    <p class="text-xs text-slate-400">Listings</p>
                   </div>
                   <div class="bg-slate-50 rounded-xl p-3 text-center">
-                    <p class="text-2xl font-bold text-slate-900">234</p>
+                    <p class="text-2xl font-bold text-slate-900">500K +</p>
                     <p class="text-xs text-slate-400">Orders</p>
                   </div>
                   <div class="bg-slate-50 rounded-xl p-3 text-center">
-                    <p class="text-2xl font-bold text-slate-900">4.8★</p>
-                    <p class="text-xs text-slate-400">Rating</p>
+                    <p class="text-2xl font-bold text-slate-900">4.8 <i class="bi bi-star"></i></p>
+                    <p class="text-xs text-slate-400">Vendors rating</p>
                   </div>
                 </div>
 
-                <!-- Recent Activity -->
                 <div class="mt-6 pt-6 border-t border-slate-100">
-                  <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Recent Activity</p>
                   <div class="space-y-3">
                     <div class="flex items-center gap-3">
-                      <span class="w-2 h-2 bg-green-500 rounded-full"></span>
-                      <p class="text-sm text-slate-600">New order #ORD-2341</p>
-                      <span class="text-xs text-slate-400 ml-auto">2 min ago</span>
+                      <span class="text-brand"><i class="bi bi-search"></i></span>
+                      <p class="text-sm text-slate-600">Listing SEO primary</p>
                     </div>
                     <div class="flex items-center gap-3">
-                      <span class="w-2 h-2 bg-blue-500 rounded-full"></span>
-                      <p class="text-sm text-slate-600">Product listing approved</p>
-                      <span class="text-xs text-slate-400 ml-auto">15 min ago</span>
+                      <span class="text-brand"><i class="bi bi-globe-americas-fill"></i></span>
+                      <p class="text-sm text-slate-600">Sell world wide</p>
+                    </div>
+                    <div class="flex items-center gap-3">
+                      <span class="text-brand"><i class="bi bi-shop"></i></span>
+                      <p class="text-sm text-slate-600">Supporting small sellers and wholesalers</p>
+                    </div>
+                    <div class="flex items-center gap-3 text-brand">
+                      <p class="text-xs">And much more benefits</p>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
 
-            <!-- Floating Badges -->
             <div class="absolute -top-4 -right-4 md:-top-6 md:-right-6 bg-white rounded-2xl shadow-xl border border-slate-100 px-4 py-3 animate-float">
               <div class="flex items-center gap-2">
                 <i class="fas fa-rocket text-brand"></i>
@@ -447,7 +192,6 @@
     </div>
   </section>
 
-  <!-- ========== STATS SECTION ========== -->
   <section class="py-16 bg-white border-y border-slate-100/60">
     <div class="max-w-7xl mx-auto px-6 md:px-10">
       <div class="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
@@ -456,8 +200,12 @@
           <p class="stat-label">Active Vendors</p>
         </div>
         <div>
+          <p class="stat-number">50K</p>
+          <p class="stat-label">Registered customers</p>
+        </div>
+        <div>
           <p class="stat-number">12.4k</p>
-          <p class="stat-label">Orders Processed</p>
+          <p class="stat-label">Weekly Orders</p>
         </div>
         <div>
           <p class="stat-number">98%</p>
@@ -471,10 +219,8 @@
     </div>
   </section>
 
-  <!-- ========== FEATURES SECTION ========== -->
   <section id="features" class="py-20 bg-features">
     <div class="max-w-7xl mx-auto px-6 md:px-10">
-      <!-- Section Header -->
       <div class="text-center max-w-3xl mx-auto mb-16">
         <span class="inline-block text-xs font-semibold text-brand bg-brand-light px-3 py-1 rounded-full uppercase tracking-wider">
           Features
@@ -483,57 +229,52 @@
           Everything You Need to <span class="text-brand">Succeed</span>
         </h2>
         <p class="text-slate-500 text-lg mt-4">
-          Powerful tools designed to help you manage, grow, and scale your business effortlessly.
+          Powerful tools designed to help you manage, grow, and scale business effortlessly.
         </p>
       </div>
 
-      <!-- Features Grid -->
       <div class="grid md:grid-cols-3 gap-6">
-        <!-- Feature 1 -->
         <div class="premium-card p-6">
           <div class="feature-icon mb-4">
             <i class="fas fa-store"></i>
           </div>
-          <h3 class="text-lg font-bold text-slate-900 mb-2">Vendor Management</h3>
+          <h3 class="text-lg font-bold text-slate-900 mb-2">Store Management</h3>
           <p class="text-sm text-slate-500 leading-relaxed">
-            Complete vendor profile management with verification, product listing, and performance tracking.
+            Seamless store management features simplify product listings—from data integrity to custom sales settings. 
+            Get your listings noticed by hundreds of customers with our SEO and AI-powered advertising tools and intelligent search settings.
           </p>
         </div>
 
-        <!-- Feature 2 -->
         <div class="premium-card p-6">
           <div class="feature-icon mb-4">
             <i class="fas fa-chart-simple"></i>
           </div>
           <h3 class="text-lg font-bold text-slate-900 mb-2">Analytics & Insights</h3>
           <p class="text-sm text-slate-500 leading-relaxed">
-            Real-time analytics, sales reports, and performance metrics to make data-driven decisions.
+            Real-Time Performance Tracking: Monitor daily sales, traffic trends, and conversion rates through a clean, intuitive dashboard.
           </p>
         </div>
 
-        <!-- Feature 3 -->
         <div class="premium-card p-6">
           <div class="feature-icon mb-4">
             <i class="fas fa-truck"></i>
           </div>
           <h3 class="text-lg font-bold text-slate-900 mb-2">Order Management</h3>
           <p class="text-sm text-slate-500 leading-relaxed">
-            Streamlined order processing, fulfillment tracking, and customer communication tools.
+            Centralized Dashboard: View, process, and manage all your customer orders in one single, organized place.
           </p>
         </div>
 
-        <!-- Feature 4 -->
         <div class="premium-card p-6">
           <div class="feature-icon mb-4">
             <i class="fas fa-cart-shopping"></i>
           </div>
           <h3 class="text-lg font-bold text-slate-900 mb-2">Product Catalog</h3>
           <p class="text-sm text-slate-500 leading-relaxed">
-            Easy product listing, inventory management, and catalog organization for your store.
+            Easy product listing, inventory management, and catalog organization for your single and multi-store operations.
           </p>
         </div>
 
-        <!-- Feature 5 -->
         <div class="premium-card p-6">
           <div class="feature-icon mb-4">
             <i class="fas fa-users"></i>
@@ -544,7 +285,6 @@
           </p>
         </div>
 
-        <!-- Feature 6 -->
         <div class="premium-card p-6">
           <div class="feature-icon mb-4">
             <i class="fas fa-shield"></i>
@@ -558,7 +298,6 @@
     </div>
   </section>
 
-  <!-- ========== SOLUTIONS SECTION ========== -->
   <section id="solutions" class="py-20 bg-white">
     <div class="max-w-7xl mx-auto px-6 md:px-10">
       <div class="grid lg:grid-cols-2 gap-12 items-center">
@@ -604,10 +343,12 @@
             </div>
           </div>
 
-          <a href="/register" class="btn-primary-premium mt-8">
-            Get Started
-            <i class="fas fa-arrow-right text-xs"></i>
-          </a>
+        <% if (!locals.user) {%>
+        <a href="/register" class="btn-primary-premium mt-8">
+          Get Started
+          <i class="fas fa-arrow-right text-xs"></i>
+        </a>
+        <%}%>
         </div>
 
         <div class="relative">
@@ -619,8 +360,8 @@
             <div class="space-y-4">
               <div>
                 <div class="flex justify-between text-sm mb-1">
-                  <span class="text-slate-600">Revenue</span>
-                  <span class="font-semibold text-slate-900">$48,234</span>
+                  <span class="text-slate-600">Sales</span>
+                  <span class="font-semibold text-slate-900">48,234</span>
                 </div>
                 <div class="w-full bg-slate-100 rounded-full h-2">
                   <div class="bg-brand rounded-full h-2" style="width: 78%"></div>
@@ -629,7 +370,7 @@
               <div>
                 <div class="flex justify-between text-sm mb-1">
                   <span class="text-slate-600">Orders</span>
-                  <span class="font-semibold text-slate-900">1,234</span>
+                  <span class="font-semibold text-slate-900">2,234</span>
                 </div>
                 <div class="w-full bg-slate-100 rounded-full h-2">
                   <div class="bg-brand rounded-full h-2" style="width: 65%"></div>
@@ -646,7 +387,6 @@
               </div>
             </div>
           </div>
-          <!-- Decorative badge -->
           <div class="absolute -bottom-4 -right-4 bg-brand rounded-2xl px-4 py-2 shadow-lg">
             <span class="text-white text-sm font-semibold flex items-center gap-2">
               <i class="fas fa-arrow-up"></i>
@@ -658,7 +398,6 @@
     </div>
   </section>
 
-  <!-- ========== TESTIMONIALS SECTION ========== -->
   <section id="testimonials" class="py-20 bg-slate-50/50">
     <div class="max-w-7xl mx-auto px-6 md:px-10">
       <div class="text-center max-w-3xl mx-auto mb-16">
@@ -676,9 +415,9 @@
       <div class="grid md:grid-cols-3 gap-6">
         <div class="testimonial-card">
           <div class="flex items-center gap-3 mb-3">
-            <div class="testimonial-avatar">JD</div>
+            <div class="testimonial-avatar">Kh</div>
             <div>
-              <p class="font-semibold text-slate-900">John Doe</p>
+              <p class="font-semibold text-slate-900">K. Khalifa</p>
               <p class="text-xs text-slate-400">Tech Supplies Rwanda</p>
             </div>
           </div>
@@ -696,10 +435,10 @@
 
         <div class="testimonial-card">
           <div class="flex items-center gap-3 mb-3">
-            <div class="testimonial-avatar">JS</div>
+            <div class="testimonial-avatar">MD</div>
             <div>
-              <p class="font-semibold text-slate-900">Jane Smith</p>
-              <p class="text-xs text-slate-400">Global Electronics Ltd</p>
+              <p class="font-semibold text-slate-900">M. Dieudone</p>
+              <p class="text-xs text-slate-400">PC Dealer</p>
             </div>
           </div>
           <div class="flex text-amber-400 text-sm mb-2">
@@ -716,10 +455,10 @@
 
         <div class="testimonial-card">
           <div class="flex items-center gap-3 mb-3">
-            <div class="testimonial-avatar">AJ</div>
+            <div class="testimonial-avatar">BP</div>
             <div>
-              <p class="font-semibold text-slate-900">Alice Johnson</p>
-              <p class="text-xs text-slate-400">Green Energy Solutions</p>
+              <p class="font-semibold text-slate-900">B. Pacifique</p>
+              <p class="text-xs text-slate-400">Core Chips</p>
             </div>
           </div>
           <div class="flex text-amber-400 text-sm mb-2">
@@ -730,15 +469,14 @@
             <i class="fas fa-star"></i>
           </div>
           <p class="text-sm text-slate-600 leading-relaxed">
-            "The analytics and reporting tools are game-changers. We can now track our performance in real-time and make data-driven decisions."
+            "COCOCE has created a seamless way to run a business. We can now track our performance, inventory, brands, and categories in real-time to make data-driven decisions. This has significantly reduced our operational effort, boosted our sales, and strengthened our data integrity."
           </p>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- ========== CTA SECTION ========== -->
-  <section class="py-20 bg-slate-900">
+  <section id="pricing" class="py-20 bg-slate-900">
     <div class="max-w-4xl mx-auto px-6 md:px-10 text-center">
       <h2 class="text-3xl md:text-4xl font-bold text-white">
         Ready to Grow Your Business?
@@ -747,22 +485,30 @@
         Join 500+ vendors already using COCOCE Business to manage and scale their operations.
       </p>
       <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mt-8">
-        <a href="/register" class="bg-white text-slate-900 px-8 py-3.5 rounded-xl font-semibold hover:bg-slate-100 transition flex items-center gap-2">
-          Start Free Trial
+
+        <% if (!locals.user) {%>
+        <a href="/register" class="btn-premium text-sm py-2 px-5">
+          Get Started
           <i class="fas fa-arrow-right text-xs"></i>
         </a>
-        <a href="/contact" class="border border-white/20 text-white px-8 py-3.5 rounded-xl font-semibold hover:bg-white/10 transition flex items-center gap-2">
+        <%} else {%>
+        <div class="flex items-center gap-3">
+          <a href="/dashboard" class="bg-white text-brand rounded-lg text-sm px-8 py-3.5 shadow-sm font-semibold hover:bg-white/50 transition flex items-center gap-2">
+            Go to Dashboard
+          </a>
+        </div>
+        <%}%>
+        <a href="mailto:sales@cococe.rw" class="border border-white/20 text-white px-8 py-3.5 rounded-xl font-semibold hover:bg-white/10 transition flex items-center gap-2">
           <i class="fas fa-headset"></i>
           Contact Sales
         </a>
       </div>
       <p class="text-slate-400 text-sm mt-4">
-        No credit card required. 14-day free trial.
+        Let makes things done the better way!
       </p>
     </div>
   </section>
 
-  <!-- ========== FOOTER ========== -->
   <footer class="bg-slate-950 text-slate-400 border-t border-slate-800/50">
     <div class="max-w-7xl mx-auto px-6 md:px-10 py-12">
       <div class="grid md:grid-cols-4 gap-8">
@@ -776,76 +522,49 @@
         <div>
           <h4 class="text-white font-semibold text-sm mb-3">Product</h4>
           <ul class="space-y-2 text-sm">
-            <li><a href="#" class="hover:text-white transition">Features</a></li>
-            <li><a href="#" class="hover:text-white transition">Pricing</a></li>
-            <li><a href="#" class="hover:text-white transition">Integrations</a></li>
-            <li><a href="#" class="hover:text-white transition">Changelog</a></li>
+            <li><a href="#features" class="hover:text-white transition">Features</a></li>
+            <li><a href="/pricing" class="hover:text-white transition">Pricing</a></li>
+            <li><a href="/integrations" class="hover:text-white transition">Integrations</a></li>
+            <li><a href="/changelogs" class="hover:text-white transition">Changelog</a></li>
           </ul>
         </div>
         <div>
           <h4 class="text-white font-semibold text-sm mb-3">Company</h4>
           <ul class="space-y-2 text-sm">
-            <li><a href="#" class="hover:text-white transition">About</a></li>
-            <li><a href="#" class="hover:text-white transition">Careers</a></li>
-            <li><a href="#" class="hover:text-white transition">Blog</a></li>
-            <li><a href="#" class="hover:text-white transition">Contact</a></li>
+            <li><a href="https://cococe.rw/about" class="hover:text-white transition">About</a></li>
+            <li><a href="https://cococe.rw/careers" class="hover:text-white transition">Careers</a></li>
+            <li><a href="https://cococe.rw/blog" class="hover:text-white transition">Blog</a></li>
+            <li><a href="https://cococe.rw/contact" class="hover:text-white transition">Contact</a></li>
           </ul>
         </div>
         <div>
           <h4 class="text-white font-semibold text-sm mb-3">Support</h4>
           <ul class="space-y-2 text-sm">
-            <li><a href="#" class="hover:text-white transition">Help Center</a></li>
-            <li><a href="#" class="hover:text-white transition">Documentation</a></li>
-            <li><a href="#" class="hover:text-white transition">Status</a></li>
-            <li><a href="#" class="hover:text-white transition">Community</a></li>
+            <li><a href="/help-center" class="hover:text-white transition">Help Center</a></li>
+            <li><a href="/docs" class="hover:text-white transition">Documentation</a></li>
+            <li><a href="/status" class="hover:text-white transition">Status</a></li>
+            <li><a href="/community" class="hover:text-white transition">Community</a></li>
           </ul>
         </div>
       </div>
       <div class="border-t border-slate-800/50 mt-8 pt-8 flex flex-col md:flex-row items-center justify-between gap-4 text-sm">
         <p>© 2026 COCOCE Business. All rights reserved.</p>
         <div class="flex gap-6">
-          <a href="#" class="hover:text-white transition">Privacy</a>
-          <a href="#" class="hover:text-white transition">Terms</a>
-          <a href="#" class="hover:text-white transition">Cookies</a>
+          <a href="/privacy" class="hover:text-white transition">Privacy</a>
+          <a href="/terms" class="hover:text-white transition">Terms</a>
+          <a href="/cookies-terms" class="hover:text-white transition">Cookies</a>
+          <form action="/signout">
+            <button class="flex items-center gap-2 hover:text-brand">
+              <span class="hidden md:block">Signout</span>
+              <i class="bi bi-arrow-right"></i>
+            </button>
+          </form>
         </div>
       </div>
     </div>
   </footer>
 
-  <!-- ========== JAVASCRIPT ========== -->
-  <script>
-    // Smooth scroll for anchor links
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-      anchor.addEventListener('click', function(e) {
-        const target = document.querySelector(this.getAttribute('href'));
-        if (target) {
-          e.preventDefault();
-          target.scrollIntoView({
-            behavior: 'smooth',
-            block: 'start'
-          });
-        }
-      });
-    });
-
-    // Intersection Observer for animations
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('animate-fade-in');
-        }
-      });
-    }, {
-      threshold: 0.1
-    });
-
-    document.querySelectorAll('.premium-card, .stat-number').forEach(el => {
-      observer.observe(el);
-    });
-
-    console.log('🚀 COCOCE Business Landing Page Loaded');
-    console.log('📊 Stats: 500+ Vendors, 12.4k Orders, 98% Satisfaction');
-  </script>
+  <script src="/scripts/by.js"></script>
 
 </body>
 

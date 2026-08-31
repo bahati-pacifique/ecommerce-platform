@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>COCOCE — Review Application</title>
+  <meta name="description" content="COCOCE — Admin portal, COCOCE Kigali Rwanda, Laptops, Desktops, Computer accessories, Smart tv, projectors, discover what you want about digital assets near you at Kigali">
+  <meta name="keywords" content="Laptops, Desktops, Memories, Storages, Servers, keyboards, Printers, Screens, Repair, Explore, Electronic, Digital, Kigali, Rwanda">
+  <meta name="author" content="COCOCE RW">
+
+  <meta property="og:image" content="https://cdn.cococe.rw/meta/cococe.png">
+  <meta property="og:url" content="https://www.cococe.rw">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Laptops, Printers, Accessories, Game consoles, Electronics, and much more, cococe, your wish our priority">
+  <meta property="og:description" content="COCOCE Kigali Rwanda, Laptops, Desktops, Computer accessories, Smart tv, projectors, discover what you want about digital assets near you at Kigali">
+  <meta property="og:logo" content="https://cdn.cococe.rw/meta/cococe.png" />
+
+  <meta name="twitter:card" content="https://cdn.cococe.rw/meta/cococe.png">
+  <meta property="twitter:domain" content="https://cococe.rw">
+  <meta property="twitter:url" content="https://cococe.rw">
+  <meta name="twitter:title" content="Laptops, Printers, Accessories, Game consoles, Electronics, and much more, cococe, your wish our priority">
+  <meta name="twitter:description" content="COCOCE Kigali Rwanda, Laptops, Desktops, Computer accessories, Smart tv, projectors, discover what you want about digital assets near you at Kigali">
+
+  <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.11.0/axios.min.js" integrity="sha512-h9644v03pHqrIHThkvXhB2PJ8zf5E9IyVnrSfZg8Yj8k4RsO4zldcQc4Bi9iVLUCCsqNY0b4WXVV4UB+wbWENA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+  <link rel="icon" href="/favicon.ico" type="image/x-icon">
+  <link href="/styles/main.css" rel="stylesheet">
+  <link rel="stylesheet" href="/styles/appl-review.css">
+</head>
+
+<script>
+  const identifier = "<%=locals.applicationIdentifier%>";
+  const protocal = "<%=locals.protocal%>";
+  const domainName = "<%=locals.domainName%>";
+</script>
+
+<body>
+
+  <header class="top-bar">
+
+    <div class="deco-circle deco-circle-1"></div>
+    <div class="deco-circle deco-circle-2"></div>
+    <div class="deco-circle deco-circle-3"></div>
+
+    <div class="brand-section">
+      <a href="/" class="brand">
+        <img src="/images/logos/business.png" alt="COCOCE Logo" class="max-h-[48px] md:max-h-[56px] w-auto">
+      </a>
+    </div>
+
+    <div class="top-bar-content">
+
+      <div class="hero-section">
+        <div class="hero-icon">
+          <i class="bi bi-search"></i>
+        </div>
+        <div class="hero-text">
+          <h1>Business Application Review</h1>
+          <p>Enter your reference number to check the status of your business application</p>
+        </div>
+      </div>
+
+      <form class="lookup-bar mb-2" id="lookupForm">
+        <div class="input-wrapper">
+          <i class="fas fa-hashtag"></i>
+          <input type="text" id="referenceInput" placeholder="Enter reference number e.g. VND-000000-0000" autocomplete="off" spellcheck="false" value="<%=locals.applicationIdentifier%>" required />
+        </div>
+        <button type="submit" class="btn-lookup" id="lookupBtn">
+          Continue <i class="bi bi-arrow-right"></i>
+        </button>
+      </form>
+
+      <div class="text-white text-lg" style="margin-top: 0.8rem;">
+        <span id="responseMessage"></span>
+      </div>
+
+    </div>
+  </header>
+
+  <main class="main-content">
+
+    <div class="how-it-works">
+
+      <h3 class="section-title">
+        How <span>It</span> Works
+      </h3>
+
+      <div class="steps-grid">
+
+        <div class="step-item py-3 bg-white p-6 rounded-lg shadow-md border border-gray-100">
+          <i class="fas fa-file-alt step-icon"></i>
+          <h4>Initiated</h4>
+          <p>A reference number was initiated on Business Application Confirmation</p>
+        </div>
+
+        <div class="step-item py-3 bg-white p-6 rounded-lg shadow-md border border-gray-100">
+          <div class="step-number">1</div>
+          <i class="fas fa-file-alt step-icon"></i>
+          <h4>Find Your Reference</h4>
+          <p>Locate your unique application reference number from your confirmation email.</p>
+        </div>
+
+        <div class="step-item py-3 bg-white p-6 rounded-lg shadow-md border border-gray-100">
+          <div class="step-number">2</div>
+          <i class="fas fa-keyboard step-icon"></i>
+          <h4>Enter Your Details</h4>
+          <p>Type your reference number into the search field above and click "Get Results".</p>
+        </div>
+
+        <div class="step-item py-3 bg-white p-6 rounded-lg shadow-md border border-gray-100">
+          <div class="step-number">3</div>
+          <i class="fas fa-eye step-icon"></i>
+          <h4>View Your Status</h4>
+          <p>Your application status and details will be displayed instantly from our secure database.</p>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="info-card-wrapper">
+      <div class="info-card">
+        <div class="flex items-start gap-4">
+          <div class="info-icon">
+            <i class="bi bi-question-lg"></i>
+          </div>
+          <div>
+            <h4 class="text-sm font-semibold text-[#0F172A] mb-1">Need help finding your reference?</h4>
+            <p class="text-sm text-[#64748B] leading-relaxed">
+              A reference was emailed to you when you created your application.
+              If you didn't receive it or lost it, please contact our support team:
+            </p>
+            <div class="contact-row">
+              <a href="tel:+250788888888" class="contact-item">
+                <i class="bi bi-telephone"></i>
+                <span>+250 788 888 888</span>
+              </a>
+              <a href="mailto:support@cococe.rw" class="contact-item">
+                <i class="bi bi-envelope-at"></i>
+                <span>support@cococe.rw</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="bg-white border-t border-gray-300 px-4 py-6 mt-6">
+    <div class="max-w-7xl mx-auto px-4 md:px-6 py-6">
+      <div class="flex items-center gap-4">
+        <span class="text-lg font-black text-brand">COCOCE</span>
+        <span class="text-xs text-gray-400">© 2026 — All rights reserved.</span>
+      </div>
+    </div>
+  </footer>
+
+  <div class="modal-backdrop" id="resultModal">
+    <div class="modal-card">
+
+      <div class="modal-header">
+        <h2><i class="fas fa-file-alt" style="color:#ED1B24; margin-right:8px;"></i>Application Details</h2>
+        <span class="status-badge" id="statusBadge">Pending</span>
+      </div>
+
+      <div class="modal-body" id="modalBody">
+        <div class="info-row">
+          <span class="label"><i class="fas fa-user"></i> Applicant Name</span>
+          <span class="value" id="applicantName">John Doe</span>
+        </div>
+        <div class="info-row">
+          <span class="label"><i class="fas fa-calendar-alt"></i> Application Date</span>
+          <span class="value" id="applicationDate">2026-08-30</span>
+        </div>
+        <div class="info-row">
+          <span class="label"><i class="fas fa-store"></i> Business Name</span>
+          <span class="value" id="businessName">TechNova Solutions</span>
+        </div>
+        <div class="info-row" style="background: rgba(237,27,36,0.04); border-color: rgba(237,27,36,0.1);">
+          <span class="label"><i class="fas fa-hashtag" style="color:#ED1B24;"></i> Reference</span>
+          <span class="value"><span class="ref-highlight" id="modalRefNumber">VND-202608-001234</span></span>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn-secondary" id="closeModalBtn">
+          <i class="fas fa-times"></i> Close
+        </button>
+        <a href="/dashboard" class="btn-primary">
+          <i class="fas fa-home"></i> Go to Dashboard
+        </a>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="toast" id="toast">
+    <i class="fas fa-check-circle"></i>
+    <span id="toastMessage">Copied to clipboard</span>
+  </div>
+
+  <script src="/scripts/helper/utils.js"></script>
+
+  <script src="/scripts/components/notification.js"></script>
+  <script src="/scripts/components/main-snackbar.js"></script>
+
+  <script src="/scripts/appl-review.js"></script>
+
+</body>
+
+</html>

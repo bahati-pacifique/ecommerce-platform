@@ -52,13 +52,13 @@ async function renderDashboard(req, res) {
     res.render('dashboard', { user, protocal, port, domain });
 }
 
-async function logout(req, res) {
+async function signout(req, res) {
 
     const { accessToken } = decodeAuthCookies(req);
 
     if (accessToken) {
         const userAccount = accessToken.ac;
-        await authServices.logout(userAccount);
+        await authServices.signout(userAccount);
     }
 
     clearAuthentication(res);
@@ -117,5 +117,5 @@ module.exports = {
     renderDashboard,
     renderLoginPage,
     renderAccountSelection,
-    logout
+    signout
 }

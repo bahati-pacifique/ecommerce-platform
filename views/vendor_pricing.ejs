@@ -1,0 +1,1456 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>COCOCE — Vendor Pricing</title>
+    <link rel="stylesheet" href="/styles/main.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #F8FAFC;
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            color: #0F172A;
+        }
+
+        .bg-premium {
+            background:
+                radial-gradient(ellipse at 20% 30%, rgba(237, 27, 36, 0.03) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 70%, rgba(237, 27, 36, 0.02) 0%, transparent 50%),
+                #F8FAFC;
+        }
+
+        /* ===== NAVIGATION ===== */
+        .nav-premium {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+
+        .nav-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 72px;
+        }
+
+        .nav-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .nav-left .logo {
+            height: 36px;
+            width: auto;
+        }
+
+        .nav-left .badge {
+            font-size: 10px;
+            font-weight: 600;
+            color: #94A3B8;
+            background: #F1F5F9;
+            padding: 2px 12px;
+            border-radius: 100px;
+            border: 1px solid #E2E8F0;
+            letter-spacing: 0.03em;
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .nav-right .link {
+            font-size: 14px;
+            color: #64748B;
+            text-decoration: none;
+            transition: color 0.2s ease;
+            font-weight: 500;
+        }
+
+        .nav-right .link:hover {
+            color: #0F172A;
+        }
+
+        .btn-nav {
+            background: #0F172A;
+            color: white;
+            padding: 8px 20px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 13px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+
+        .btn-nav:hover {
+            background: #1E293B;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 16px rgba(15, 23, 42, 0.12);
+        }
+
+        @media (max-width: 640px) {
+            .nav-inner {
+                padding: 0 16px;
+                height: 64px;
+            }
+            .nav-left .logo {
+                height: 28px;
+            }
+            .nav-left .badge {
+                font-size: 8px;
+                padding: 1px 8px;
+            }
+            .nav-right .link {
+                font-size: 13px;
+            }
+            .btn-nav {
+                padding: 6px 14px;
+                font-size: 12px;
+            }
+        }
+
+        /* ===== HERO SECTION ===== */
+        .hero-section {
+            padding: 48px 24px;
+            border-bottom: 1px solid #E2E8F0;
+        }
+
+        .hero-inner {
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 4px 16px;
+            background: #FEE2E3;
+            border-radius: 100px;
+            border: 1px solid rgba(237, 27, 36, 0.15);
+            font-size: 12px;
+            font-weight: 600;
+            color: #ED1B24;
+            margin-bottom: 16px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .hero-title {
+            font-size: 40px;
+            font-weight: 800;
+            color: #0F172A;
+            line-height: 1.15;
+            letter-spacing: -0.03em;
+            margin-bottom: 16px;
+        }
+
+        .hero-title .highlight {
+            color: #ED1B24;
+        }
+
+        .hero-subtitle {
+            font-size: 18px;
+            color: #64748B;
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        .hero-subtitle strong {
+            color: #0F172A;
+            font-weight: 600;
+        }
+
+        @media (max-width: 768px) {
+            .hero-section {
+                padding: 32px 16px;
+            }
+            .hero-title {
+                font-size: 30px;
+            }
+            .hero-subtitle {
+                font-size: 16px;
+            }
+            .hero-badge {
+                font-size: 10px;
+                padding: 3px 12px;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .hero-section {
+                padding: 24px 16px;
+            }
+            .hero-title {
+                font-size: 24px;
+            }
+            .hero-subtitle {
+                font-size: 14px;
+            }
+        }
+
+        /* ===== VENDOR TYPES EXPLANATION ===== */
+        .types-section {
+            padding: 48px 24px;
+            background: white;
+        }
+
+        .types-inner {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .types-header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .types-header h2 {
+            font-size: 28px;
+            font-weight: 700;
+            color: #0F172A;
+            margin-bottom: 8px;
+        }
+
+        .types-header p {
+            font-size: 16px;
+            color: #64748B;
+        }
+
+        .types-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
+        }
+
+        .type-card {
+            background: #F8FAFC;
+            border-radius: 16px;
+            padding: 20px 16px;
+            border: 1px solid #E2E8F0;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .type-card:hover {
+            transform: translateY(-4px);
+            border-color: #ED1B24;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.04);
+        }
+
+        .type-card .type-icon {
+            font-size: 32px;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .type-card .type-name {
+            font-size: 16px;
+            font-weight: 700;
+            color: #0F172A;
+            margin-bottom: 4px;
+        }
+
+        .type-card .type-desc {
+            font-size: 13px;
+            color: #64748B;
+            line-height: 1.5;
+        }
+
+        .type-card .type-badge {
+            display: inline-block;
+            margin-top: 8px;
+            padding: 2px 12px;
+            border-radius: 100px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .type-card .type-badge.internal {
+            background: #DCFCE7;
+            color: #16A34A;
+        }
+
+        .type-card .type-badge.preferred {
+            background: #FEF3C7;
+            color: #D97706;
+        }
+
+        .type-card .type-badge.external {
+            background: #DBEAFE;
+            color: #1D4ED8;
+        }
+
+        .type-card .type-badge.standard {
+            background: #F3F4F6;
+            color: #6B7280;
+        }
+
+        @media (max-width: 640px) {
+            .types-section {
+                padding: 32px 16px;
+            }
+            .types-header h2 {
+                font-size: 22px;
+            }
+            .types-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            .type-card {
+                padding: 16px 12px;
+            }
+            .type-card .type-icon {
+                font-size: 24px;
+            }
+            .type-card .type-name {
+                font-size: 14px;
+            }
+            .type-card .type-desc {
+                font-size: 12px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .types-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* ===== PRICING CARDS ===== */
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 24px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .pricing-card {
+            background: white;
+            border-radius: 20px;
+            border: 1px solid rgba(0, 0, 0, 0.04);
+            padding: 32px 24px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .pricing-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.06);
+            border-color: rgba(237, 27, 36, 0.1);
+        }
+
+        .pricing-card.featured {
+            border-color: #ED1B24;
+            box-shadow: 0 8px 40px rgba(237, 27, 36, 0.08);
+        }
+
+        .pricing-card.featured::before {
+            content: 'Most Popular';
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: #ED1B24;
+            color: white;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 4px 14px;
+            border-radius: 20px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .pricing-card .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 16px;
+            border-radius: 100px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .pricing-card .badge.internal {
+            background: #DCFCE7;
+            color: #16A34A;
+        }
+
+        .pricing-card .badge.external {
+            background: #DBEAFE;
+            color: #1D4ED8;
+        }
+
+        .pricing-card .badge.preferred {
+            background: #FEF3C7;
+            color: #D97706;
+        }
+
+        .pricing-card .badge.standard {
+            background: #F3F4F6;
+            color: #6B7280;
+        }
+
+        .pricing-card .plan-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #0F172A;
+            margin-top: 12px;
+        }
+
+        .pricing-card .plan-subtitle {
+            font-size: 14px;
+            color: #94A3B8;
+            margin-top: 2px;
+        }
+
+        .pricing-card .price {
+            margin-top: 16px;
+            font-size: 44px;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            color: #0F172A;
+            line-height: 1.2;
+        }
+
+        .pricing-card .price .currency {
+            font-size: 22px;
+            font-weight: 600;
+            color: #94A3B8;
+            vertical-align: top;
+            margin-right: 2px;
+        }
+
+        .pricing-card .price .percent {
+            font-size: 24px;
+            font-weight: 700;
+            color: #0F172A;
+            vertical-align: top;
+        }
+
+        .pricing-card .price .period {
+            font-size: 14px;
+            font-weight: 500;
+            color: #94A3B8;
+            display: block;
+            margin-top: 2px;
+        }
+
+        .pricing-card .price .zero {
+            font-size: 44px;
+            font-weight: 800;
+            color: #0F172A;
+        }
+
+        .pricing-card .commission-info {
+            margin-top: 8px;
+        }
+
+        .commission-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .commission-badge.zero {
+            background: #DCFCE7;
+            color: #16A34A;
+        }
+
+        .commission-badge.low {
+            background: #DBEAFE;
+            color: #1D4ED8;
+        }
+
+        .commission-badge.medium {
+            background: #FEF3C7;
+            color: #D97706;
+        }
+
+        .commission-badge.high {
+            background: #FEE2E3;
+            color: #ED1B24;
+        }
+
+        .commission-text {
+            font-size: 12px;
+            color: #94A3B8;
+            margin-top: 4px;
+        }
+
+        .pricing-card .feature-list {
+            flex: 1;
+            margin: 20px 0 24px;
+            list-style: none;
+            padding: 0;
+            width: 100%;
+            text-align: left;
+        }
+
+        .pricing-card .feature-list li {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 0;
+            font-size: 14px;
+            color: #475569;
+            border-bottom: 1px solid #F1F5F9;
+            justify-content: flex-start;
+        }
+
+        .pricing-card .feature-list li:last-child {
+            border-bottom: none;
+        }
+
+        .pricing-card .feature-list li .check {
+            color: #22C55E;
+            flex-shrink: 0;
+            font-size: 16px;
+            width: 20px;
+        }
+
+        .pricing-card .feature-list li .cross {
+            color: #ED1B24;
+            flex-shrink: 0;
+            font-size: 16px;
+            width: 20px;
+        }
+
+        .btn-primary-premium {
+            background: #0F172A;
+            color: white;
+            padding: 12px 28px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 14px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            text-decoration: none;
+            width: 100%;
+            margin-top: auto;
+        }
+
+        .btn-primary-premium:hover {
+            background: #1E293B;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(15, 23, 42, 0.12);
+        }
+
+        .btn-primary-premium.featured-btn {
+            background: #ED1B24;
+        }
+
+        .btn-primary-premium.featured-btn:hover {
+            background: #C9171F;
+            box-shadow: 0 8px 30px rgba(237, 27, 36, 0.25);
+        }
+
+        .btn-outline-premium {
+            background: transparent;
+            color: #0F172A;
+            padding: 12px 28px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 14px;
+            border: 1.5px solid #E2E8F0;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            text-decoration: none;
+            width: 100%;
+            margin-top: auto;
+        }
+
+        .btn-outline-premium:hover {
+            border-color: #0F172A;
+            background: #F8FAFC;
+            transform: translateY(-2px);
+        }
+
+        /* ===== COMPARISON TABLE ===== */
+        .comparison-table {
+            background: white;
+            border-radius: 16px;
+            border: 1px solid rgba(0, 0, 0, 0.04);
+            overflow: hidden;
+        }
+
+        .comparison-table table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        .comparison-table th {
+            text-align: center;
+            padding: 16px 20px;
+            background: #F8FAFC;
+            font-weight: 600;
+            color: #0F172A;
+            border-bottom: 1px solid #E2E8F0;
+        }
+
+        .comparison-table th:first-child {
+            text-align: left;
+        }
+
+        .comparison-table td {
+            text-align: center;
+            padding: 14px 20px;
+            border-bottom: 1px solid #F1F5F9;
+            color: #475569;
+        }
+
+        .comparison-table td:first-child {
+            text-align: left;
+            font-weight: 500;
+        }
+
+        .comparison-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .comparison-table .check {
+            color: #22C55E;
+        }
+
+        .comparison-table .cross {
+            color: #ED1B24;
+        }
+
+        /* ===== FAQ SECTION ===== */
+        .faq-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        .faq-item {
+            border-bottom: 1px solid #E2E8F0;
+            padding: 0;
+        }
+
+        .faq-item:last-child {
+            border-bottom: none;
+        }
+
+        .faq-item .question {
+            font-weight: 600;
+            color: #0F172A;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            cursor: pointer;
+            user-select: none;
+            padding: 18px 0;
+            width: 100%;
+            transition: color 0.2s ease;
+            background: none;
+            border: none;
+            font-size: 16px;
+            font-family: inherit;
+            text-align: left;
+        }
+
+        .faq-item .question:hover {
+            color: #ED1B24;
+        }
+
+        .faq-item .question .icon {
+            color: #ED1B24;
+            font-size: 18px;
+            flex-shrink: 0;
+            transition: transform 0.3s ease;
+        }
+
+        .faq-item .question .icon.rotated {
+            transform: rotate(180deg);
+        }
+
+        .faq-item .answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+                opacity 0.3s ease,
+                padding 0.3s ease;
+            opacity: 0;
+            padding: 0 0 0 0;
+            color: #64748B;
+            font-size: 14px;
+            line-height: 1.7;
+        }
+
+        .faq-item .answer.open {
+            max-height: 400px;
+            opacity: 1;
+            padding: 0 0 20px 0;
+        }
+
+        /* ===== CTA SECTION ===== */
+        .cta-section {
+            background: #0F172A;
+            padding: 56px 24px;
+        }
+
+        .cta-inner {
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .cta-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 12px;
+        }
+
+        .cta-subtitle {
+            font-size: 16px;
+            color: #94A3B8;
+            max-width: 600px;
+            margin: 0 auto 24px;
+            line-height: 1.6;
+        }
+
+        .cta-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .cta-btn-primary {
+            background: white;
+            color: #0F172A;
+            padding: 12px 32px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 15px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+
+        .cta-btn-primary:hover {
+            background: #F1F5F9;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(255, 255, 255, 0.12);
+        }
+
+        .cta-btn-secondary {
+            background: transparent;
+            color: white;
+            padding: 12px 32px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 15px;
+            border: 1.5px solid rgba(255, 255, 255, 0.2);
+            cursor: pointer;
+            transition: all 0.25s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+
+        .cta-btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(255, 255, 255, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .cta-note {
+            font-size: 13px;
+            color: #64748B;
+            margin-top: 16px;
+        }
+
+        @media (max-width: 640px) {
+            .cta-section {
+                padding: 40px 16px;
+            }
+            .cta-title {
+                font-size: 22px;
+            }
+            .cta-subtitle {
+                font-size: 14px;
+            }
+            .cta-btn-primary,
+            .cta-btn-secondary {
+                width: 100%;
+                justify-content: center;
+                padding: 14px 24px;
+                font-size: 14px;
+            }
+            .cta-buttons {
+                flex-direction: column;
+                width: 100%;
+                max-width: 320px;
+                margin: 0 auto;
+            }
+        }
+
+        /* ===== FOOTER ===== */
+        .footer-premium {
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-top: 1px solid #E2E8F0;
+            padding: 16px 24px;
+        }
+
+        .footer-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .footer-copy {
+            font-size: 13px;
+            color: #94A3B8;
+        }
+
+        .footer-links {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .footer-links a {
+            font-size: 13px;
+            color: #94A3B8;
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+
+        .footer-links a:hover {
+            color: #0F172A;
+        }
+
+        @media (max-width: 640px) {
+            .footer-premium {
+                padding: 16px;
+            }
+            .footer-inner {
+                flex-direction: column;
+                gap: 8px;
+                text-align: center;
+            }
+            .footer-links {
+                justify-content: center;
+                gap: 16px;
+            }
+            .footer-copy {
+                font-size: 12px;
+            }
+            .footer-links a {
+                font-size: 12px;
+            }
+        }
+
+        /* ===== RESPONSIVE ===== */
+        .container-centered {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        @media (max-width: 1024px) {
+            .pricing-grid {
+                grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+                gap: 20px;
+            }
+            .pricing-card {
+                padding: 24px 20px;
+            }
+            .pricing-card .price {
+                font-size: 36px;
+            }
+            .pricing-card .price .zero {
+                font-size: 36px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .pricing-grid {
+                grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+                gap: 16px;
+            }
+            .pricing-card .price {
+                font-size: 32px;
+            }
+            .pricing-card .price .zero {
+                font-size: 32px;
+            }
+            .comparison-table {
+                overflow-x: auto;
+            }
+            .comparison-table table {
+                font-size: 13px;
+                min-width: 600px;
+            }
+            .comparison-table th,
+            .comparison-table td {
+                padding: 12px 16px;
+            }
+            .faq-container {
+                padding: 0 16px;
+            }
+            .faq-item .question {
+                font-size: 15px;
+                padding: 16px 0;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .pricing-grid {
+                grid-template-columns: 1fr;
+                max-width: 420px;
+            }
+            .pricing-card {
+                padding: 20px 16px;
+            }
+            .pricing-card .price {
+                font-size: 28px;
+            }
+            .pricing-card .price .zero {
+                font-size: 28px;
+            }
+            .pricing-card .price .currency {
+                font-size: 18px;
+            }
+            .pricing-card .price .percent {
+                font-size: 18px;
+            }
+            .pricing-card.featured::before {
+                font-size: 8px;
+                padding: 3px 10px;
+                top: 8px;
+                right: 8px;
+            }
+            .container-centered {
+                padding: 0 16px;
+            }
+            .faq-item .question {
+                font-size: 14px;
+                padding: 14px 0;
+            }
+            .faq-item .answer {
+                font-size: 13px;
+            }
+            .faq-item .answer.open {
+                padding-bottom: 16px;
+            }
+        }
+
+        /* ===== SCROLLBAR ===== */
+        ::-webkit-scrollbar {
+            width: 5px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #F1F5F9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #ED1B24;
+            border-radius: 10px;
+        }
+
+        .text-balance {
+            text-wrap: balance;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ===== NAVIGATION ===== -->
+    <nav class="nav-premium">
+        <div class="nav-inner">
+            <div class="nav-left">
+                <a href="/">
+                    <img src="/images/logos/cococe.png" alt="COCOCE" class="logo">
+                </a>
+                <span class="badge">PRICING</span>
+            </div>
+            <div class="nav-right">
+                <a href="/dashboard" class="link hidden sm:inline">Dashboard</a>
+                <a href="/vendors/register" class="btn-nav">
+                    Become a Vendor
+                    <i class="fas fa-arrow-right text-xs"></i>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ===== HERO SECTION ===== -->
+    <section class="hero-section bg-premium">
+        <div class="hero-inner">
+            <div class="hero-badge">
+                <i class="fas fa-tag"></i>
+                Vendor Pricing
+            </div>
+            <h1 class="hero-title">
+                Choose Your <span class="highlight">Vendor Plan</span>
+            </h1>
+            <p class="hero-subtitle">
+                Select the vendor type that best fits your business model. Internal vendors enjoy
+                <strong>0% commission</strong> on successful orders.
+            </p>
+        </div>
+    </section>
+
+    <!-- ===== VENDOR TYPES EXPLANATION ===== -->
+    <section class="types-section">
+        <div class="types-inner">
+            <div class="types-header">
+                <h2>Understanding Vendor Types</h2>
+                <p>Each vendor type is designed for different business models and partnership levels</p>
+            </div>
+            <div class="types-grid">
+                <div class="type-card">
+                    <span class="type-icon">🏢</span>
+                    <div class="type-name">Internal Vendor</div>
+                    <div class="type-desc">Fully integrated partner within the COCOCE ecosystem. Complete access to all features and tools.</div>
+                    <span class="type-badge internal">0% Commission</span>
+                </div>
+                <div class="type-card">
+                    <span class="type-icon">⭐</span>
+                    <div class="type-name">Preferred Vendor</div>
+                    <div class="type-desc">Trusted partner with proven track record. Enhanced visibility and priority support.</div>
+                    <span class="type-badge preferred">5% Commission</span>
+                </div>
+                <div class="type-card">
+                    <span class="type-icon">🌐</span>
+                    <div class="type-name">External Vendor</div>
+                    <div class="type-desc">Partner operating outside the COCOCE ecosystem with standard integration and support.</div>
+                    <span class="type-badge external">10% Commission</span>
+                </div>
+                <div class="type-card">
+                    <span class="type-icon">📋</span>
+                    <div class="type-name">Standard Vendor</div>
+                    <div class="type-desc">Regular vendor with basic integration and standard support features.</div>
+                    <span class="type-badge standard">15% Commission</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== PRICING CARDS ===== -->
+    <section class="py-12 md:py-20">
+        <div class="container-centered">
+            <div class="pricing-grid">
+
+                <!-- Internal Vendor -->
+                <div class="pricing-card featured">
+                    <span class="badge internal">Internal</span>
+                    <h3 class="plan-title">Internal Vendor</h3>
+                    <p class="plan-subtitle">Fully integrated vendor</p>
+
+                    <div class="price">
+                        <span class="zero">0</span><span class="percent">%</span>
+                        <span class="period">commission</span>
+                    </div>
+
+                    <div class="commission-info">
+                        <span class="commission-badge zero">✓ 0% fee</span>
+                        <p class="commission-text">on every successful order</p>
+                    </div>
+
+                    <ul class="feature-list">
+                        <li><span class="check"><i class="fas fa-check-circle"></i></span> 0% commission fee</li>
+                        <li><span class="check"><i class="fas fa-check-circle"></i></span> Full COCOCE integration</li>
+                        <li><span class="check"><i class="fas fa-check-circle"></i></span> Priority support</li>
+                        <li><span class="check"><i class="fas fa-check-circle"></i></span> Featured listings</li>
+                        <li><span class="check"><i class="fas fa-check-circle"></i></span> Analytics dashboard</li>
+                        <li><span class="check"><i class="fas fa-check-circle"></i></span> Unlimited products</li>
+                    </ul>
+
+                    <a href="/vendors/register?type=internal" class="btn-primary-premium featured-btn">
+                        Get Started
+                        <i class="fas fa-arrow-right text-xs"></i>
+                    </a>
+                </div>
+
+                <!-- Preferred Vendor -->
+                <div class="pricing-card">
+                    <span class="badge preferred">Preferred</span>
+                    <h3 class="plan-title">Preferred Vendor</h3>
+                    <p class="plan-subtitle">Trusted partner</p>
+
+                    <div class="price">
+                        <span class="currency">$</span>4.99
+                        <span class="period">/ order</span>
+                    </div>
+
+                    <div class="commission-info">
+                        <span class="commission-badge low">5% commission</span>
+                        <p class="commission-text">per successful order</p>
+                    </div>
+
+                    <ul class="feature-list">
+                        <li><span class="check"><i class="fas fa-check-circle"></i></span> 5% commission fee</li>
+                        <li><span class="check"><i class="fas fa-check-circle"></i></span> Full COCOCE integration</li>
+                        <li><span class="check"><i class="fas fa-check-circle"></i></span> Priority support</li>
+                        <li><span class="check"><i class="fas fa-check-circle"></i></span> Featured listings</li>
+                        <li><span class="check"><i class="fas fa-check-circle"></i></span> Analytics dashboard</li>
+                        <li><span class="cross"><i class="fas fa-times-circle"></i></span> Limited product slots</li>
+                    </ul>
+
+                    <a href="/vendors/register?type=preferred" class="btn-primary-premium">
+                        Get Started
+                        <i class="fas fa-arrow-right text-xs"></i>
+                    </a>
+                </div>
+
+                <!-- External Vendor -->
+                <div class="pricing-card">
+                    <span class="badge external">External</span>
+                    <h3 class="plan-title">External Vendor</h3>
+                    <p class="plan-subtitle">External partnership</p>
+
+                    <div class="price">
+                        <span class="currency">$</span>9.99
+                        <span class="period">/ order</span>
+                    </div>
+
+                    <div class="commission-info">
+                        <span class="commission-badge medium">10% commission</span>
+                        <p class="commission-text">per successful order</p>
+                    </div>
+
+                    <ul class="feature-list">
+                        <li><span class="check"><i class="fas fa-check-circle"></i></span> 10% commission fee</li>
+                        <li><span class="check"><i class="fas fa-check-circle"></i></span> Limited integration</li>
+                        <li><span class="check"><i class="fas fa-check-circle"></i></span> Standard support</li>
+                        <li><span class="cross"><i class="fas fa-times-circle"></i></span> Regular listings</li>
+                        <li><span class="cross"><i class="fas fa-times-circle"></i></span> Basic analytics</li>
+                        <li><span class="check"><i class="fas fa-check-circle"></i></span> 50 product limit</li>
+                    </ul>
+
+                    <a href="/vendors/register?type=external" class="btn-primary-premium">
+                        Get Started
+                        <i class="fas fa-arrow-right text-xs"></i>
+                    </a>
+                </div>
+
+                <!-- Standard Vendor -->
+                <div class="pricing-card">
+                    <span class="badge standard">Standard</span>
+                    <h3 class="plan-title">Standard Vendor</h3>
+                    <p class="plan-subtitle">Regular vendor</p>
+
+                    <div class="price">
+                        <span class="currency">$</span>14.99
+                        <span class="period">/ order</span>
+                    </div>
+
+                    <div class="commission-info">
+                        <span class="commission-badge high">15% commission</span>
+                        <p class="commission-text">per successful order</p>
+                    </div>
+
+                    <ul class="feature-list">
+                        <li><span class="check"><i class="fas fa-check-circle"></i></span> 15% commission fee</li>
+                        <li><span class="check"><i class="fas fa-check-circle"></i></span> Basic integration</li>
+                        <li><span class="check"><i class="fas fa-check-circle"></i></span> Standard support</li>
+                        <li><span class="cross"><i class="fas fa-times-circle"></i></span> Regular listings</li>
+                        <li><span class="cross"><i class="fas fa-times-circle"></i></span> Basic analytics</li>
+                        <li><span class="cross"><i class="fas fa-times-circle"></i></span> 20 product limit</li>
+                    </ul>
+
+                    <a href="/vendors/register?type=standard" class="btn-outline-premium">
+                        Get Started
+                        <i class="fas fa-arrow-right text-xs"></i>
+                    </a>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== COMPARISON TABLE ===== -->
+    <section class="py-12 md:py-16 bg-white border-y border-slate-100/60">
+        <div class="container-centered">
+            <div class="text-center mb-10">
+                <h2 class="text-2xl md:text-3xl font-bold text-slate-900">Compare Vendor Plans</h2>
+                <p class="text-slate-500 text-sm mt-2">Detailed comparison of all vendor types and their benefits</p>
+            </div>
+
+            <div class="comparison-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Feature</th>
+                            <th>Internal</th>
+                            <th>Preferred</th>
+                            <th>External</th>
+                            <th>Standard</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Commission Rate</strong></td>
+                            <td><span class="commission-badge zero">0%</span></td>
+                            <td><span class="commission-badge low">5%</span></td>
+                            <td><span class="commission-badge medium">10%</span></td>
+                            <td><span class="commission-badge high">15%</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Commission Type</strong></td>
+                            <td>Per order</td>
+                            <td>Per order</td>
+                            <td>Per order</td>
+                            <td>Per order</td>
+                        </tr>
+                        <tr>
+                            <td>COCOCE Integration</td>
+                            <td><span class="check"><i class="fas fa-check-circle"></i></span></td>
+                            <td><span class="check"><i class="fas fa-check-circle"></i></span></td>
+                            <td><span class="check"><i class="fas fa-check-circle"></i></span></td>
+                            <td><span class="check"><i class="fas fa-check-circle"></i></span></td>
+                        </tr>
+                        <tr>
+                            <td>Priority Support</td>
+                            <td><span class="check"><i class="fas fa-check-circle"></i></span></td>
+                            <td><span class="check"><i class="fas fa-check-circle"></i></span></td>
+                            <td><span class="cross"><i class="fas fa-times-circle"></i></span></td>
+                            <td><span class="cross"><i class="fas fa-times-circle"></i></span></td>
+                        </tr>
+                        <tr>
+                            <td>Featured Listings</td>
+                            <td><span class="check"><i class="fas fa-check-circle"></i></span></td>
+                            <td><span class="check"><i class="fas fa-check-circle"></i></span></td>
+                            <td><span class="cross"><i class="fas fa-times-circle"></i></span></td>
+                            <td><span class="cross"><i class="fas fa-times-circle"></i></span></td>
+                        </tr>
+                        <tr>
+                            <td>Analytics Dashboard</td>
+                            <td><span class="check"><i class="fas fa-check-circle"></i></span></td>
+                            <td><span class="check"><i class="fas fa-check-circle"></i></span></td>
+                            <td><span class="check"><i class="fas fa-check-circle"></i></span></td>
+                            <td><span class="check"><i class="fas fa-check-circle"></i></span></td>
+                        </tr>
+                        <tr>
+                            <td>Product Limit</td>
+                            <td><strong>Unlimited</strong></td>
+                            <td>Limited</td>
+                            <td>50</td>
+                            <td>20</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== FAQ SECTION ===== -->
+    <section class="py-12 md:py-16">
+        <div class="faq-container">
+            <div class="text-center mb-10">
+                <h2 class="text-2xl md:text-3xl font-bold text-slate-900">Frequently Asked Questions</h2>
+                <p class="text-slate-500 text-sm mt-2">Everything you need to know about vendor pricing</p>
+            </div>
+
+            <div class="faq-item">
+                <button class="question" data-target="answer1">
+                    <span>How is the commission calculated?</span>
+                    <span class="icon"><i class="fas fa-chevron-down"></i></span>
+                </button>
+                <div id="answer1" class="answer">
+                    Commission is calculated as a percentage of the total order value (excluding shipping and taxes). For example, a $100 order with a 5% commission would incur a $5 fee. Internal vendors pay <strong>0% commission</strong> on every successful order.
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <button class="question" data-target="answer2">
+                    <span>What is the difference between Internal and External vendors?</span>
+                    <span class="icon"><i class="fas fa-chevron-down"></i></span>
+                </button>
+                <div id="answer2" class="answer">
+                    Internal vendors are fully integrated within the COCOCE ecosystem with <strong>0% commission</strong>, priority support, and unlimited product listings. External vendors are partners with limited integration and a <strong>10% commission</strong> fee per successful order.
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <button class="question" data-target="answer3">
+                    <span>Can I upgrade or downgrade my vendor plan?</span>
+                    <span class="icon"><i class="fas fa-chevron-down"></i></span>
+                </button>
+                <div id="answer3" class="answer">
+                    Yes, you can upgrade or downgrade your vendor plan at any time. Changes take effect immediately, and you'll be billed at the new commission rate for future transactions.
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <button class="question" data-target="answer4">
+                    <span>Are there any hidden fees?</span>
+                    <span class="icon"><i class="fas fa-chevron-down"></i></span>
+                </button>
+                <div id="answer4" class="answer">
+                    No. The commission structure is transparent. There are no setup fees, monthly fees, or hidden charges. You only pay when you make a successful sale at your chosen commission rate.
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <button class="question" data-target="answer5">
+                    <span>How do I become a Preferred Vendor?</span>
+                    <span class="icon"><i class="fas fa-chevron-down"></i></span>
+                </button>
+                <div id="answer5" class="answer">
+                    Preferred Vendor status is granted to internal vendors with a proven track record of excellent performance, high customer satisfaction, and consistent sales volume. Contact our team for more details.
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== CTA SECTION ===== -->
+    <section class="cta-section">
+        <div class="cta-inner">
+            <h2 class="cta-title">Ready to Start Selling?</h2>
+            <p class="cta-subtitle">
+                Join COCOCE today and choose the vendor plan that works best for your business.
+            </p>
+            <div class="cta-buttons">
+                <a href="/vendors/register" class="cta-btn-primary">
+                    Become a Vendor
+                    <i class="fas fa-arrow-right text-xs"></i>
+                </a>
+                <a href="/contact" class="cta-btn-secondary">
+                    <i class="fas fa-headset"></i>
+                    Contact Sales
+                </a>
+            </div>
+            <p class="cta-note">No hidden fees. Cancel anytime.</p>
+        </div>
+    </section>
+
+    <!-- ===== FOOTER ===== -->
+    <footer class="footer-premium">
+        <div class="footer-inner">
+            <span class="footer-copy">© 2026 COCOCE — Vendor Pricing</span>
+            <div class="footer-links">
+                <a href="#">Privacy</a>
+                <a href="#">Terms</a>
+                <a href="#">Support</a>
+                <a href="#">Status</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ===== SCRIPT ===== -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // FAQ Accordion
+            const faqQuestions = document.querySelectorAll('.faq-item .question');
+
+            faqQuestions.forEach(question => {
+                const targetId = question.dataset.target;
+                const answer = document.getElementById(targetId);
+                const icon = question.querySelector('.icon i');
+
+                if (answer) {
+                    answer.classList.remove('open');
+                    if (icon) {
+                        icon.className = 'fas fa-chevron-down';
+                    }
+                }
+
+                question.addEventListener('click', function() {
+                    const targetId = this.dataset.target;
+                    const answer = document.getElementById(targetId);
+                    const icon = this.querySelector('.icon i');
+
+                    if (answer) {
+                        answer.classList.toggle('open');
+                        if (icon) {
+                            icon.classList.toggle('rotated');
+                        }
+                    }
+                });
+            });
+
+            // Highlight pricing card from URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const type = urlParams.get('type');
+            if (type) {
+                const cards = document.querySelectorAll('.pricing-card');
+                cards.forEach(card => {
+                    const badge = card.querySelector('.badge');
+                    if (badge && badge.textContent.toLowerCase() === type.toLowerCase()) {
+                        card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        card.style.borderColor = '#ED1B24';
+                        card.style.boxShadow = '0 8px 40px rgba(237, 27, 36, 0.15)';
+                        setTimeout(() => {
+                            card.style.transition = 'all 0.5s ease';
+                        }, 100);
+                    }
+                });
+            }
+
+        });
+    </script>
+
+</body>
+
+</html>

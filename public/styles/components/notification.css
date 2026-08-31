@@ -37,7 +37,7 @@
     flex-direction: column;
     gap: 15px;
     width: 100%;
-    max-width: 400px;
+    max-width: 500px;
 }
 
 .top-right {
@@ -234,7 +234,7 @@
     padding: 15px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
     z-index: 9999;
-    max-width: 300px;
+    max-width: 400px;
     display: none;
 }
 

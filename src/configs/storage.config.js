@@ -21,5 +21,8 @@ module.exports = {
     files: '/var/www/cococe-storage/files',
 
     //Public profile & portfolios images
-    profiles: '/var/www/cococe-storage/files'
+    profiles: '/var/www/cococe-storage/images/users/profiles',
+    profileIds: '/var/www/cococe-storage/images/users/ids',
+
+    business: '/var/www/cococe-storage/business'
 };

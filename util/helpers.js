@@ -80,6 +80,22 @@ function clearAuthentication(res) {
 
 }
 
+function clearAuthRedirect(res) {
+
+  const cookieOptions = {
+    httpOnly: true,
+    domain: process.env.DOMAIN,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "Lax",
+  };
+
+  res.cookie('r', '', { maxAge: 0, path: '/' });
+
+  res.clearCookie("r", cookieOptions);
+  res.clearCookie("r");
+
+}
+
 function isSameOrigin(req) {
   const source = req.get('origin') || req.get('referer');
 
@@ -121,6 +137,7 @@ module.exports = {
   sameNetwork,
   normalizeUA,
   clearAuthentication,
+  clearAuthRedirect,
   safeRedirectPath,
   success200,
   deny401,

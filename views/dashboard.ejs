@@ -136,6 +136,8 @@
             <span class="icon"><i class="bi bi-info-circle"></i></span>
             <span class="link-text">Help & Support</span>
           </a>
+
+
         </nav>
 
         <div class="sidebar-footer">
@@ -172,8 +174,12 @@
             <span class="text-sm font-medium text-gray-700 hidden sm:block">Dashboard / <span id="currentTabLabel" class="text-brand">Home</span></span>
           </div>
 
-          <!-- Right: Top bar actions -->
           <div class="flex items-center gap-2">
+            <button class="p-2 rounded-lg hover:bg-gray-100 transition relative">
+              <span class="text-xl"><i class="bi bi-bell"></i></span>
+              <span class="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-brand rounded-full border-2 border-white"></span>
+            </button>
+             
             <button id="topBarModalTrigger" class="top-bar-btn flex items-center gap-2">
               <span>☰</span>
               <span class="hidden sm:inline">Quick Actions</span>
@@ -181,21 +187,20 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
               </svg>
             </button>
-            <button class="p-2 rounded-lg hover:bg-gray-100 transition relative">
-              <span class="text-xl"><i class="bi bi-bell"></i></span>
-              <span class="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-brand rounded-full border-2 border-white"></span>
-            </button>
+
+            <form action="/signout" method="post">
+              <button class="top-bar-btn flex items-center gap-2">
+                Signout <i class="bi bi-box-arrow-right"></i>
+              </button>
+            </form>
           </div>
         </div>
       </header>
 
-      <!-- Main Content Area -->
       <main class="p-4 md:p-6 flex-3 overflow-y-auto max-w-full">
 
-        <!-- Tab Content: Home -->
         <div id="tab-home" class="tab-content">
 
-          <!-- Stats Grid -->
           <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
             <div class="stat-card bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
               <div class="flex items-start justify-between">

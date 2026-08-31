@@ -157,6 +157,26 @@ class UserServices {
         return result;
     }
 
+    static async createUser(userInfo) {
+        const result = await UserModel.createUser(userInfo);
+
+        return result;
+    }
+
+    static async getRandomUserByAccountCategory(selectors){
+        return await UserModel.getRandomUserByAccountCategory(selectors)
+    }
+
+    static async checkUsername(username){
+        try {
+            const isAvailable = await UserModel.checkUsernameAvailable(username);
+            return isAvailable;
+        } catch (error) {
+            console.log("checkUsername(): ",error)
+            return null;
+        }
+    }
+
 }
 
 module.exports = UserServices;

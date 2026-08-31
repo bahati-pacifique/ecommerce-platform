@@ -1,0 +1,633 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap');
+@import url("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css");
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html,
+body {
+    height: 100%;
+    overflow: hidden;
+}
+
+body {
+    background: #FDFDFC;
+    font-family: 'Inter', sans-serif;
+    display: flex;
+    flex-direction: column;
+}
+
+/* ===== FULL PAGE GRADIENT BACKGROUND ===== */
+.page-wrapper {
+    background:
+        radial-gradient(ellipse at 20% 30%, rgba(237, 27, 36, 0.06) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 70%, rgba(237, 27, 36, 0.04) 0%, transparent 50%),
+        #FDFDFC;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex: 2;
+}
+
+/* Subtle pattern overlay */
+.page-wrapper::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+        radial-gradient(circle at 20px 20px, rgba(237, 27, 36, 0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+}
+
+/* Brand gradient accent shapes */
+.brand-shape {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(60px);
+    pointer-events: none;
+    opacity: 0.06;
+}
+
+.brand-shape-1 {
+    width: 300px;
+    height: 300px;
+    background: #ED1B24;
+    top: -10%;
+    right: -5%;
+    animation: floatShape 12s ease-in-out infinite;
+}
+
+.brand-shape-2 {
+    width: 200px;
+    height: 200px;
+    background: #ED1B24;
+    bottom: -5%;
+    left: -5%;
+    animation: floatShape 15s ease-in-out infinite reverse;
+}
+
+.brand-shape-3 {
+    width: 150px;
+    height: 150px;
+    background: #FEE2E3;
+    top: 40%;
+    left: 20%;
+    animation: floatShape 10s ease-in-out infinite 2s;
+}
+
+@keyframes floatShape {
+
+    0%,
+    100% {
+        transform: translate(0, 0) scale(1);
+    }
+
+    33% {
+        transform: translate(30px, -20px) scale(1.1);
+    }
+
+    66% {
+        transform: translate(-20px, 20px) scale(0.9);
+    }
+}
+
+/* ===== LEFT PANEL ===== */
+.left-panel {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    padding: 40px;
+    min-height: 100vh;
+}
+
+/* ===== LEFT CONTENT ===== */
+.left-content {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    color: #0F172A;
+    max-width: 440px;
+}
+
+/* ===== ANIMATED CHECKMARK WITH GREEN RINGS ===== */
+.checkmark-wrapper {
+    position: relative;
+    display: inline-block;
+    margin-bottom: 48px;
+}
+
+/* Ring 1 - Darkest green shade */
+.checkmark-wrapper .ring-1 {
+    position: absolute;
+    inset: -12px;
+    border-radius: 50%;
+    border: 2px solid rgba(34, 197, 94, 0.3);
+    animation: ringPulse1 2.5s ease-in-out infinite;
+}
+
+/* Ring 2 - Medium green shade */
+.checkmark-wrapper .ring-2 {
+    position: absolute;
+    inset: -24px;
+    border-radius: 50%;
+    border: 2px solid rgba(34, 197, 94, 0.15);
+    animation: ringPulse2 2.5s ease-in-out infinite 0.6s;
+}
+
+/* Ring 3 - Lightest green shade */
+.checkmark-wrapper .ring-3 {
+    position: absolute;
+    inset: -36px;
+    border-radius: 50%;
+    border: 2px solid rgba(34, 197, 94, 0.06);
+    animation: ringPulse3 2.5s ease-in-out infinite 1.2s;
+}
+
+@keyframes ringPulse1 {
+
+    0%,
+    100% {
+        transform: scale(1);
+        opacity: 0.7;
+    }
+
+    50% {
+        transform: scale(1.08);
+        opacity: 0.2;
+    }
+}
+
+@keyframes ringPulse2 {
+
+    0%,
+    100% {
+        transform: scale(1);
+        opacity: 0.6;
+    }
+
+    50% {
+        transform: scale(1.1);
+        opacity: 0.15;
+    }
+}
+
+@keyframes ringPulse3 {
+
+    0%,
+    100% {
+        transform: scale(1);
+        opacity: 0.5;
+    }
+
+    50% {
+        transform: scale(1.12);
+        opacity: 0.08;
+    }
+}
+
+.checkmark-icon {
+    width: 96px;
+    height: 96px;
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid rgba(34, 197, 94, 0.12);
+    transition: transform 0.4s ease;
+    animation: floatIcon 3s ease-in-out infinite;
+    box-shadow: 0 8px 40px rgba(34, 197, 94, 0.08);
+}
+
+.checkmark-icon:hover {
+    transform: scale(1.05);
+}
+
+.checkmark-icon i {
+    font-size: 56px;
+    color: #16A34A;
+}
+
+@keyframes floatIcon {
+
+    0%,
+    100% {
+        transform: translateY(0px);
+    }
+
+    50% {
+        transform: translateY(-8px);
+    }
+}
+
+.left-content h1 {
+    font-size: 32px;
+    font-weight: 700;
+    margin-bottom: 12px;
+}
+
+.left-content .message {
+    font-size: 15px;
+    color: #64748B;
+    line-height: 1.8;
+    max-width: 380px;
+    margin: 0 auto;
+}
+
+.left-content .message .highlight {
+    color: #ED1B24;
+    font-weight: 600;
+}
+
+/* Status dots */
+.status-dots {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 32px;
+}
+
+.status-dots .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: rgba(237, 27, 36, 0.15);
+    transition: all 0.3s ease;
+}
+
+.status-dots .dot.active {
+    background: #ED1B24;
+    width: 24px;
+    border-radius: 4px;
+    box-shadow: 0 0 20px rgba(237, 27, 36, 0.2);
+}
+
+.status-dots .dot.done {
+    background: rgba(237, 27, 36, 0.3);
+}
+
+/* ===== RIGHT PANEL ===== */
+.right-panel {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 48px;
+    min-height: 100vh;
+    flex: 1.2;
+}
+
+.right-panel::-webkit-scrollbar {
+    width: 0;
+    background: transparent;
+}
+
+.right-content {
+    max-width: 520px;
+    width: 100%;
+}
+
+.ref-card {
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-radius: 14px;
+    padding: 18px 24px;
+    border: 1px solid rgba(0, 0, 0, 0.04);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    transition: all 0.3s ease;
+    margin-bottom: 28px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06), 0 1px 4px rgba(0, 0, 0, 0.02);
+}
+
+.ref-card:hover {
+    border-color: #ED1B24;
+    box-shadow: 0 8px 40px rgba(237, 27, 36, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04);
+    transform: translateY(-2px);
+}
+
+.ref-card .ref-label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #94A3B8;
+}
+
+.ref-card .ref-number {
+    font-size: 18px;
+    font-weight: 700;
+    color: #0F172A;
+    font-family: 'SF Mono', 'Courier New', monospace;
+    letter-spacing: 0.02em;
+    word-break: break-all;
+}
+
+.ref-card .ref-copy {
+    background: none;
+    border: none;
+    color: #94A3B8;
+    cursor: pointer;
+    padding: 4px 10px;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+    font-size: 16px;
+}
+
+.ref-card .ref-copy:hover {
+    background: rgba(255, 255, 255, 0.8);
+    color: #0F172A;
+}
+
+.ref-card .ref-copy.copied {
+    color: #16A34A;
+}
+
+/* ===== BUTTONS ===== */
+.btn-group {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 4px;
+}
+
+.btn-primary-premium {
+    background: #ED1B24;
+    color: white;
+    padding: 16px 28px;
+    border-radius: 14px;
+    font-weight: 600;
+    font-size: 15px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    text-decoration: none;
+    width: 100%;
+}
+
+.btn-primary-premium:hover {
+    background: #C9171F;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(237, 27, 36, 0.25);
+}
+
+.btn-primary-premium.outline {
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    color: #0F172A;
+    border: 1.5px solid rgba(0, 0, 0, 0.06);
+}
+
+.btn-primary-premium.outline:hover {
+    border-color: #ED1B24;
+    color: #ED1B24;
+    background: rgba(255, 245, 245, 0.8);
+    transform: translateY(-2px);
+}
+
+/* ===== EMAIL NOTICE ===== */
+.email-notice {
+    background: rgba(239, 246, 255, 0.7);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(191, 219, 254, 0.4);
+    border-radius: 12px;
+    padding: 14px 20px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin-top: 24px;
+}
+
+.email-notice i {
+    color: #3B82F6;
+    font-size: 16px;
+    margin-top: 1px;
+}
+
+.email-notice .text {
+    font-size: 13px;
+    color: #1E40AF;
+}
+
+.email-notice .text strong {
+    font-weight: 600;
+}
+
+.email-notice .text .sub {
+    color: #3B82F6;
+    font-size: 12px;
+    display: block;
+    margin-top: 1px;
+}
+
+@media (max-width: 1024px) {
+    .right-panel {
+        padding: 32px 32px;
+        flex: 1;
+    }
+
+    .right-content {
+        max-width: 440px;
+    }
+}
+
+@media (max-width: 768px) {
+
+    html,
+    body {
+        overflow-y: auto;
+    }
+
+    .page-wrapper {
+        flex-direction: column;
+        min-height: 100vh;
+    }
+
+    .left-panel {
+        min-height: 280px;
+        padding: 30px 20px;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+    }
+
+    .checkmark-icon {
+        width: 72px;
+        height: 72px;
+    }
+
+    .checkmark-icon i {
+        font-size: 32px;
+    }
+
+    .checkmark-wrapper .ring-1 {
+        inset: -8px;
+    }
+
+    .checkmark-wrapper .ring-2 {
+        inset: -16px;
+    }
+
+    .checkmark-wrapper .ring-3 {
+        inset: -24px;
+    }
+
+    .left-content h1 {
+        font-size: 24px;
+    }
+
+    .left-content .message {
+        font-size: 13px;
+        max-width: 300px;
+    }
+
+    .right-panel {
+        min-height: auto;
+        padding: 24px 20px;
+    }
+
+    .right-content {
+        max-width: 100%;
+    }
+
+    .ref-card {
+        flex-wrap: wrap;
+        padding: 14px 18px;
+    }
+
+    .ref-card .ref-number {
+        font-size: 15px;
+    }
+
+    .checkmark-wrapper {
+        margin-bottom: 36px;
+    }
+
+    .btn-primary-premium {
+        padding: 14px 24px;
+        font-size: 14px;
+    }
+}
+
+@media (max-width: 480px) {
+    .left-panel {
+        min-height: 220px;
+        padding: 20px 16px;
+    }
+
+    .checkmark-icon {
+        width: 60px;
+        height: 60px;
+    }
+
+    .checkmark-icon i {
+        font-size: 26px;
+    }
+
+    .left-content h1 {
+        font-size: 20px;
+    }
+
+    .left-content .message {
+        font-size: 12px;
+        max-width: 260px;
+    }
+
+    .status-dots {
+        margin-top: 20px;
+    }
+
+    .ref-card .ref-number {
+        font-size: 13px;
+    }
+
+    .checkmark-wrapper {
+        margin-bottom: 28px;
+    }
+
+    .btn-primary-premium {
+        padding: 12px 20px;
+        font-size: 13px;
+    }
+
+    .right-panel {
+        padding: 20px 16px;
+    }
+
+    .ref-card {
+        padding: 12px 14px;
+    }
+
+    .email-notice {
+        padding: 12px 16px;
+    }
+}
+
+::-webkit-scrollbar {
+    width: 0;
+    background: transparent;
+}
+
+.footer {
+    flex-shrink: 0;
+    background: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border-top: 1px solid rgba(0, 0, 0, 0.03);
+    padding: 18px 40px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px 24px;
+    font-size: 13px;
+    color: #64748B;
+    position: relative;
+    z-index: 3;
+}
+
+.footer .footer-links {
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+}
+
+.footer .footer-links a {
+    color: #64748B;
+    text-decoration: none;
+    transition: color 0.2s;
+    font-weight: 500;
+    font-size: 13px;
+}
+
+.footer .footer-links a:hover {
+    color: #ED1B24;
+}
+
+.footer .footer-copy {
+    font-size: 13px;
+    color: #94A3B8;
+}
+
+.footer .footer-copy i {
+    color: #ED1B24;
+    margin: 0 4px;
+}

@@ -10,4 +10,6 @@ router.post('/login', authController.login);
 router.get('/account-selection', authGuards.accountValidation, authController.renderAccountSelection)
 router.post('/authenticate', authController.accountLogin);
 
+router.post('/signout', authController.signout);
+
 module.exports = router;

@@ -3,7 +3,7 @@ const bcrypt = require('bcrypt');
 
 class UserModel {
 
-    
+
     static async #findBy(column, value) {
         const { rows } = await db.query(
             `SELECT * FROM users WHERE ${column} = $1`,
@@ -22,38 +22,38 @@ class UserModel {
         return this.#findBy("id", id);
     }
 
-     /**
-     * Fetches a user by their system user legal ID number.
-     * @param {string} idNo - The internal system user legal ID number.
-     * @returns {user|null} Return th user data matched or null
-    */
+    /**
+    * Fetches a user by their system user legal ID number.
+    * @param {string} idNo - The internal system user legal ID number.
+    * @returns {user|null} Return th user data matched or null
+   */
     static getByIdNo(idNo) {
         return this.#findBy("id_no", idNo);
     }
 
-     /**
-     * Fetches a user by their system user email address.
-     * @param {string} email - The internal system user email.
-     * @returns {user|null} Return th user data matched or null
-    */
+    /**
+    * Fetches a user by their system user email address.
+    * @param {string} email - The internal system user email.
+    * @returns {user|null} Return th user data matched or null
+   */
     static getByEmail(email) {
         return this.#findBy("email", email);
     }
 
-     /**
-     * Fetches a user by their system user phone number.
-     * @param {string} phone - The internal system user phone number.
-     * @returns {user|null} Return th user data matched or null
-    */
+    /**
+    * Fetches a user by their system user phone number.
+    * @param {string} phone - The internal system user phone number.
+    * @returns {user|null} Return th user data matched or null
+   */
     static getByPhone(phone) {
         return this.#findBy("phone", phone);
     }
 
-     /**
-     * Fetches a user by their system user username identifier.
-     * @param {string} username - The internal system user's username.
-     * @returns {user|null} Return th user data matched or null
-    */
+    /**
+    * Fetches a user by their system user username identifier.
+    * @param {string} username - The internal system user's username.
+    * @returns {user|null} Return th user data matched or null
+   */
     static getByUsername(username) {
         return this.#findBy("username", username);
     }
@@ -74,6 +74,162 @@ class UserModel {
         );
 
         return rows[0].exists;
+    }
+
+    static async createUser({
+        f_name,
+        l_name,
+        phone_number,
+        email,
+        username,
+        id_no,
+        password,
+        provider = 'password',
+        provider_id = 1
+    }) {
+
+        // Validate required fields
+        if (!f_name) {
+            throw new Error('First name is required');
+        }
+
+        if (!l_name) {
+            throw new Error('Last name is required');
+        }
+
+        if (!email) {
+            throw new Error('Email is required');
+        }
+
+        if (!username) {
+            throw new Error('Username is required');
+        }
+
+        if (provider === 'password' && !password) {
+            throw new Error('Password is required');
+        }
+
+        // Validate authentication provider
+        const allowedProviders = ['password', 'google', 'github', 'apple', 'facebook'];
+
+        if (!allowedProviders.includes(provider)) {
+            throw new Error('Invalid authentication provider');
+        }
+
+        const client = await db.connect();
+
+        try {
+            await client.query('BEGIN');
+
+            /*
+             * Local authentication
+             */
+            if (provider === 'password') {
+
+                const hashedPassword = await bcrypt.hash(
+                    password,
+                    Number(process.env.BCRYPT_ROUNDS) || 12
+                );
+
+                /*
+                 * Create user
+                 */
+                const { rows: userRows } = await client.query(`
+                    INSERT INTO users (
+                        id_no,
+                        username,
+                        email,
+                        phone_number,
+                        f_name,
+                        l_name
+                    )
+                    VALUES ($1, $2, $3, $4, $5, $6)
+                    RETURNING *
+                `, [
+                    id_no,
+                    username,
+                    email,
+                    phone_number,
+                    f_name,
+                    l_name
+                ]);
+
+                if (!userRows[0]) {
+                    throw new Error(
+                        'Failed — Unable to create user'
+                    );
+                }
+
+                const user = userRows[0];
+
+                /*
+                 * Create authentication record
+                 */
+                const { rows: authenticationRows } = await client.query(`
+                INSERT INTO user_authentications (
+                    user_id,
+                    provider_id,
+                    provider_user_id,
+                    password_hash
+                )
+                VALUES ($1, $2, $3, $4)
+                RETURNING *
+            `, [
+                    user.id,
+                    provider_id,
+                    user.username,
+                    hashedPassword
+                ]);
+
+                if (!authenticationRows[0]) {
+                    throw new Error(
+                        'Failed — Unable to create authentication record'
+                    );
+                }
+
+                await client.query('COMMIT');
+
+                return user;
+            }
+
+            /*
+             * Social authentication
+             *
+             * Google/GitHub authentication should be implemented
+             * separately once the provider has authenticated the user.
+             */
+            throw new Error(
+                `Authentication provider "${provider}" is not implemented`
+            );
+
+        } catch (error) {
+
+            console.log(error)
+            await client.query('ROLLBACK');
+
+            /*
+             * unique constraint violation
+             */
+            if (error.code === '23505') {
+                const error = new Error('A user with this email, phone number, username, or ID already exists');
+                error.code = 23505;
+                throw error;
+            }
+
+            /*
+             * foreign key violation
+             */
+            if (error.code === '23503') {
+                const error = new Error('Invalid authentication provider or related record');
+                error.code = 23505;
+                throw error;
+            }
+
+            throw error;
+
+        } finally {
+            client.release();
+        }
     }
 
     /**
@@ -289,6 +445,58 @@ class UserModel {
         }
 
         return rows[0] || null;
+    }
+
+    static async getRandomUserByAccountCategory({ code = null, title = null } = {}) {
+        if (!code && !title) {
+            throw new Error('Account category code or title is required');
+        }
+
+        const conditions = [];
+        const values = [];
+        let paramIndex = 1;
+
+        if (code) {
+            conditions.push(`ac.code = $${paramIndex++}`);
+            values.push(code);
+        }
+
+        if (title) {
+            conditions.push(`ac.title = $${paramIndex++}`);
+            values.push(title);
+        }
+
+        const query = `
+                SELECT u.*
+                FROM users u
+                INNER JOIN user_accounts ua
+                    ON ua.user_id = u.id
+                INNER JOIN accounts a
+                    ON a.id = ua.account_id
+                INNER JOIN account_categories ac
+                    ON ac.id = a.category_id
+                WHERE u.status = 'active'
+                AND ${conditions.join(' AND ')}
+                ORDER BY RANDOM()
+                LIMIT 1
+        `;
+
+        const result = await db.query(query, values);
+
+        return result.rows[0] ?? null;
+    }
+
+    /**
+     * This function check if username can be used by another user
+     * @param {string} username to look for
+     * @returns false if the username already exist or true if it does not exist (Can be used by another user)
+     */
+    static async checkUsernameAvailable(username) {
+        const {rows} = await db.query(`
+                SELECT 1 FROM users WHERE LOWER(username) = LOWER($1)
+            `, [username]);
+
+            return rows.length === 0;
     }
 
 }
