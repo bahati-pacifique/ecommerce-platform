@@ -5,7 +5,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>COCOCE — Business</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <meta name="description" content="COCOCE — Admin portal, COCOCE Kigali Rwanda, Laptops, Desktops, Computer accessories, Smart tv, projectors, discover what you want about digital assets near you at Kigali">
   <meta name="keywords" content="Laptops, Desktops, Memories, Storages, Servers, keyboards, Printers, Screens, Repair, Explore, Electronic, Digital, Kigali, Rwanda">
   <meta name="author" content="COCOCE RW">
@@ -23,14 +22,159 @@
   <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.11.0/axios.min.js" integrity="sha512-h9644v03pHqrIHThkvXhB2PJ8zf5E9IyVnrSfZg8Yj8k4RsO4zldcQc4Bi9iVLUCCsqNY0b4WXVV4UB+wbWENA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
   <link rel="icon" href="/favicon.ico" type="image/x-icon">
+  <script src="https://unpkg.com/lucide@latest"></script>
+
   <link rel="stylesheet" href="/styles/components/notification.css">
   <link rel="stylesheet" href="/styles/components/main-snackbar.css">
   <link rel="stylesheet" href="/styles/components/loaders.css">
+  <link rel="stylesheet" href="/styles/components/animations.css">
+
+  <link rel="stylesheet" href="/styles/vd-categories.css">
+
   <link rel="stylesheet" href="/styles/main.css">
+  <link rel="stylesheet" href="/styles/bdsh.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&display=swap" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js">
-  </script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+  <style>
+    /* Enhanced search bar styling */
+    .search-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .search-wrapper {
+      position: relative;
+      flex: 1 1 260px;
+      max-width: 340px;
+    }
+
+    .search-wrapper .search-icon {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #94a3b8;
+      pointer-events: none;
+    }
+
+    .search-wrapper .search-clear {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #94a3b8;
+      cursor: pointer;
+      display: none;
+      padding: 4px;
+      border-radius: 50%;
+      line-height: 1;
+    }
+
+    .search-wrapper .search-clear:hover {
+      background: #f1f5f9;
+      color: #475569;
+    }
+
+    .search-wrapper .search-clear.visible {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 9px 32px 9px 38px;
+      border-radius: 12px;
+      border: 1px solid #e5e7eb;
+      background: #f9fafb;
+      font-size: 0.875rem;
+      color: #111827;
+      transition: all 0.15s ease;
+      outline: none;
+    }
+
+    .search-input:focus {
+      border-color: #ED1B24;
+      background: #ffffff;
+      box-shadow: 0 0 0 3px rgba(237, 27, 36, 0.08);
+    }
+
+    .search-input::placeholder {
+      color: #9ca3af;
+    }
+
+    .search-select {
+      padding: 9px 14px;
+      border-radius: 12px;
+      border: 1px solid #e5e7eb;
+      background: #f9fafb;
+      font-size: 0.8125rem;
+      color: #374151;
+      outline: none;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .search-select:focus {
+      border-color: #ED1B24;
+      background: #ffffff;
+      box-shadow: 0 0 0 3px rgba(237, 27, 36, 0.08);
+    }
+
+    .search-btn {
+      padding: 9px 18px;
+      border-radius: 12px;
+      background: #ED1B24;
+      color: #ffffff;
+      font-size: 0.8125rem;
+      font-weight: 500;
+      border: none;
+      cursor: pointer;
+      transition: background 0.15s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .search-btn:hover {
+      background: #c4161e;
+    }
+
+    .search-results-info {
+      font-size: 0.75rem;
+      color: #6b7280;
+      margin-left: auto;
+    }
+
+    /* Mobile filter toggle */
+    @media (max-width: 640px) {
+      .search-wrapper {
+        max-width: 100%;
+        flex: 1 1 100%;
+      }
+
+      .search-toolbar .search-select {
+        flex: 1 1 calc(50% - 5px);
+      }
+
+      .search-toolbar .search-btn {
+        flex: 1 1 100%;
+        justify-content: center;
+      }
+
+      .search-results-info {
+        flex: 1 1 100%;
+        text-align: right;
+        margin-left: 0;
+      }
+    }
+  </style>
+
   <%
       function getInitials(name) {
           if (!name) return '';
@@ -55,372 +199,13 @@
           return consonants.join('');
       }
     %>
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap');
-    @import url("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css");
+  <script>
+    const protocal = "<%=locals.protocal%>";
+    const domainName = "<%=locals.domainName%>";
+    const i = "<%=locals.user?.userId||locals?.user.user_id||locals?.user.id %>";
+    const u = "<%=locals.user?.username%>"
+  </script>
 
-    body {
-      background: #F8FAFC;
-      font-family: 'Inter', sans-serif;
-    }
-
-    .sidebar {
-      background: white;
-      border-right: 1px solid #e5e7eb;
-      height: 100vh;
-      position: sticky;
-      top: 0;
-      overflow-y: auto;
-      width: 264px;
-      flex-shrink: 0;
-      transition: width 0.3s ease;
-    }
-
-    .sidebar.collapsed {
-      width: 72px;
-    }
-
-    .sidebar.collapsed .sidebar-link .link-text,
-    .sidebar.collapsed .sidebar-brand .brand-text,
-    .sidebar.collapsed .sidebar-footer .user-info {
-      display: none;
-    }
-
-    .sidebar.collapsed .sidebar-link {
-      justify-content: center;
-      padding: 10px 14px;
-    }
-
-    .sidebar.collapsed .sidebar-footer {
-      padding: 12px 14px;
-    }
-
-    .sidebar-link {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 10px 16px;
-      border-radius: 12px;
-      color: #6B7280;
-      font-weight: 500;
-      font-size: 14px;
-      transition: all 0.2s ease;
-      cursor: pointer;
-      text-decoration: none;
-      white-space: nowrap;
-      overflow: hidden;
-    }
-
-    .sidebar-link:hover {
-      background: #F9FAFB;
-      color: #1F2937;
-    }
-
-    .sidebar-link.active {
-      background: #FEE2E3;
-      color: #ED1B24;
-      font-weight: 600;
-    }
-
-    .sidebar-link .icon {
-      font-size: 18px;
-      width: 24px;
-      text-align: center;
-      flex-shrink: 0;
-    }
-
-    .sidebar-link .badge {
-      margin-left: auto;
-      background: #ED1B24;
-      color: white;
-      font-size: 10px;
-      font-weight: 600;
-      padding: 2px 8px;
-      border-radius: 20px;
-      flex-shrink: 0;
-    }
-
-    .sidebar-link .badge.amber {
-      background: #F59E0B;
-    }
-
-    .sidebar-link .badge.green {
-      background: #22C55E;
-    }
-
-    /* Mobile sidebar overlay */
-    .sidebar-overlay {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.4);
-      z-index: 49;
-    }
-
-    .sidebar-overlay.active {
-      display: block;
-    }
-
-    @media (max-width: 1023px) {
-      .sidebar {
-        position: fixed;
-        left: 0;
-        top: 0;
-        bottom: 0;
-        z-index: 50;
-        transform: translateX(-100%);
-        transition: transform 0.3s ease;
-        box-shadow: 4px 0 20px rgba(0, 0, 0, 0.05);
-      }
-
-      .sidebar.mobile-open {
-        transform: translateX(0);
-      }
-
-      .sidebar-overlay.active {
-        display: block;
-      }
-
-      .sidebar.collapsed {
-        width: 280px !important;
-      }
-
-      .sidebar.collapsed .sidebar-link .link-text,
-      .sidebar.collapsed .sidebar-brand .brand-text,
-      .sidebar.collapsed .sidebar-footer .user-info {
-        display: inline !important;
-      }
-
-      .sidebar.collapsed .sidebar-link {
-        justify-content: flex-start !important;
-        padding: 10px 16px !important;
-      }
-    }
-
-    /* Stat cards */
-    .stat-card {
-      transition: all 0.3s ease;
-    }
-
-    .stat-card:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.06);
-    }
-
-    /* Tab content */
-    .tab-content {
-      display: none;
-    }
-
-    .tab-content.active {
-      display: block;
-    }
-
-    .tab-btn {
-      transition: all 0.2s ease;
-      position: relative;
-    }
-
-    .tab-btn.active {
-      color: #ED1B24;
-      font-weight: 600;
-      border-bottom: 2px solid #ED1B24;
-    }
-
-    .tab-btn:hover:not(.active) {
-      color: #1F2937;
-    }
-
-    /* Inventory items */
-    .inventory-item {
-      transition: all 0.2s ease;
-    }
-
-    .inventory-item:hover {
-      background: #f9fafb;
-      transform: translateX(4px);
-    }
-
-    /* Status badges */
-    .status-badge {
-      padding: 4px 12px;
-      border-radius: 20px;
-      font-size: 11px;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    .status-badge.active {
-      background: #DCFCE7;
-      color: #16A34A;
-    }
-
-    .status-badge.inactive {
-      background: #FEE2E3;
-      color: #ED1B24;
-    }
-
-    .status-badge.draft {
-      background: #FEF3C7;
-      color: #D97706;
-    }
-
-    .status-badge.pending {
-      background: #FEF3C7;
-      color: #D97706;
-    }
-
-    .status-badge.verified {
-      background: #DCFCE7;
-      color: #16A34A;
-    }
-
-    /* Chart container */
-    .chart-container {
-      position: relative;
-      height: 280px;
-    }
-
-    @media (max-width: 640px) {
-      .chart-container {
-        height: 220px;
-      }
-    }
-
-    /* Top bar */
-    .top-bar-btn {
-      transition: all 0.2s ease;
-      background: white;
-      border: 1px solid #e5e7eb;
-      padding: 8px 16px;
-      border-radius: 12px;
-      font-size: 13px;
-      font-weight: 500;
-      color: #4B5563;
-      cursor: pointer;
-    }
-
-    .top-bar-btn:hover {
-      background: #F9FAFB;
-      border-color: #D1D5DB;
-    }
-
-    /* Avatar upload */
-    .avatar-upload {
-      position: relative;
-      cursor: pointer;
-    }
-
-    .avatar-upload .overlay {
-      position: absolute;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.5);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      opacity: 0;
-      transition: opacity 0.3s ease;
-    }
-
-    .avatar-upload:hover .overlay {
-      opacity: 1;
-    }
-
-    /* Scrollbar */
-    ::-webkit-scrollbar {
-      width: 5px;
-    }
-
-    ::-webkit-scrollbar-track {
-      background: #f1f1f1;
-    }
-
-    ::-webkit-scrollbar-thumb {
-      background: #ED1B24;
-      border-radius: 10px;
-    }
-
-    .no-scrollbar::-webkit-scrollbar {
-      display: none;
-    }
-
-    .no-scrollbar {
-      -ms-overflow-style: none;
-      scrollbar-width: none;
-    }
-
-    .store-container div {
-      cursor: pointer;
-    }
-
-    /* ========== PROFILE POPUP MENU ========== */
-    .profile-popup {
-      position: absolute;
-      bottom: 70px;
-      left: 16px;
-      background: white;
-      border-radius: 12px;
-      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.12);
-      border: 1px solid #e5e7eb;
-      min-width: 200px;
-      padding: 8px 0;
-      z-index: 100;
-      opacity: 0;
-      transform: translateY(10px) scale(0.95);
-      pointer-events: none;
-      transition: all 0.2s ease;
-    }
-
-    .profile-popup.show {
-      opacity: 1;
-      transform: translateY(0) scale(1);
-      pointer-events: auto;
-    }
-
-    .profile-popup .popup-item {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 10px 16px;
-      color: #4B5563;
-      font-size: 14px;
-      font-weight: 500;
-      transition: all 0.15s ease;
-      cursor: pointer;
-      text-decoration: none;
-      border: none;
-      background: transparent;
-      width: 100%;
-      text-align: left;
-    }
-
-    .profile-popup .popup-item:hover {
-      background: #F9FAFB;
-      color: #1F2937;
-    }
-
-    .profile-popup .popup-item.danger {
-      color: #ED1B24;
-    }
-
-    .profile-popup .popup-item.danger:hover {
-      background: #FEE2E3;
-    }
-
-    .profile-popup .popup-divider {
-      height: 1px;
-      background: #e5e7eb;
-      margin: 4px 0;
-    }
-
-    .profile-popup .popup-item .icon {
-      width: 20px;
-      text-align: center;
-      font-size: 16px;
-    }
-  </style>
 </head>
 
 <body>
@@ -434,40 +219,50 @@
         </div>
         <nav class="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
           <a href="#" class="sidebar-link active" data-tab="overview" data-title="Dashboard">
-            <span class="icon">📊</span>
+            <span class="icon"><i data-lucide="layout-dashboard"></i></span>
             <span class="link-text">Overview</span>
           </a>
           <a href="#" class="sidebar-link" data-tab="stores" data-title="Stores">
-            <span class="icon">🏪</span>
-            <span class="link-text">Stores <span class="badge green">3</span></span>
+            <span class="icon"><i data-lucide="store"></i></span>
+            <span class="link-text">Stores</span>
 
           </a>
           <a href="#" class="sidebar-link" data-tab="inventory" data-title="Inventory">
-            <span class="icon">📦</span>
-            <span class="link-text">Inventory <span class="badge amber">12</span></span>
-
+            <span class="icon"><i data-lucide="shelving-unit"></i></span>
+            <span class="link-text">Inventory</span>
           </a>
           <a href="#" class="sidebar-link" data-tab="orders" data-title="Orders">
-            <span class="icon">🛒</span>
-            <span class="link-text">Orders <span class="badge">8</span></span>
-
+            <span class="icon"><i data-lucide="logs"></i></span>
+            <span class="link-text">Orders</span>
           </a>
           <a href="#" class="sidebar-link" data-tab="analytics" data-title="Analytics">
-            <span class="icon">📈</span>
+            <span class="icon"><i data-lucide="chart-no-axes-combined"></i></span>
             <span class="link-text">Analytics</span>
           </a>
+
+          <a href="#" class="sidebar-link" data-tab="category" data-title="categories">
+            <span class="icon"><i data-lucide="list-sort-descending"></i></span>
+            <span class="link-text">Categories</span>
+          </a>
+
           <a href="#" class="sidebar-link" data-tab="profile" data-title="Profile">
-            <span class="icon">👤</span>
+            <span class="icon"><i data-lucide="user-round"></i></span>
             <span class="link-text">Profile</span>
           </a>
+
           <a href="#" class="sidebar-link" data-tab="settings" data-title="Settings">
-            <span class="icon">⚙️</span>
+            <span class="icon"><i data-lucide="settings"></i></span>
             <span class="link-text">Settings</span>
           </a>
+          <a href="#" class="sidebar-link" data-tab="logs" data-title="Logs">
+            <span class="icon"><i data-lucide="rotate-ccw-clock"></i></span>
+            <span class="link-text">Logs</span>
+          </a>
           <a href="#" class="sidebar-link" data-tab="support" data-title="Support">
-            <span class="icon">❓</span>
+            <span class="icon"><i data-lucide="circle-question-mark"></i></span>
             <span class="link-text">Support</span>
           </a>
+
         </nav>
 
         <div class="sidebar-footer px-4 py-4 border-t border-gray-100 relative">
@@ -482,25 +277,25 @@
             <i class="fas fa-chevron-up text-xs text-gray-400 transition-transform" id="popupChevron"></i>
           </div>
 
-          <!-- Profile Popup Menu -->
           <div id="profilePopup" class="profile-popup">
             <button class="popup-item" id="viewProfileBtn">
-              <span class="icon">👤</span>
+              <span class="icon"><i data-lucide="user-round"></i></span>
               <span>View Profile</span>
             </button>
             <button class="popup-item" id="accountSettingsBtn">
-              <span class="icon">⚙️</span>
+              <span class="icon"><i data-lucide="settings"></i></span>
               <span>Account Settings</span>
             </button>
             <div class="popup-divider"></div>
             <form action="<%=locals.protocal%>auth.<%=locals.domain%>/signout" method="POST" class="popup-item danger">
               <input type="hidden" value="<%=locals.protocal%>business.<%=locals.domain%>" name="host">
-              <button type="submit">
+              <input type="hidden" name="userAccount" value="<=locals.user.userAccount%>">
+              <button type="submit" class="flex items-center gap-2">
                 <span class="icon">
-                  <i class="bi bi-box-arrow-right"></i>
+                  <i data-lucide="LogOut"></i>
                 </span>
                 <span>
-                  Sign Out
+                  Signout
                 </span>
               </button>
             </form>
@@ -527,16 +322,17 @@
           </div>
           <div class="flex items-center gap-2">
             <button class="top-bar-btn flex items-center gap-2" id="quickActionsBtn">
-              <span class="hidden sm:inline">Quick Actions</span>
+              <i class="bi bi-columns-gap"></i>
+              <span class="hidden md:block">Quick Actions</span>
             </button>
 
           </div>
         </div>
       </header>
 
-      <main class="p-4 md:p-6 max-w-full">
+      <main class="p-4 md:p-6 max-w-full h-screen">
 
-        <div id="tab-overview" class="tab-content active">
+        <div id="tab-overview" class="tab-content active px-3 py-4" style="overflow-y: auto;">
 
           <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
             <div class="stat-card bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
@@ -584,7 +380,6 @@
             </div>
           </div>
 
-          <!-- Charts -->
           <div class="grid md:grid-cols-2 gap-6 mb-6">
             <!-- Sales Chart -->
             <div class="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
@@ -597,7 +392,6 @@
               </div>
             </div>
 
-            <!-- Order Status Chart -->
             <div class="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
               <div class="flex items-center justify-between mb-4">
                 <h3 class="text-sm font-semibold text-gray-700">Order Status</h3>
@@ -673,129 +467,144 @@
           </div>
         </div>
 
-        <!-- ============================================================ -->
-        <!-- TAB: STORES -->
-        <!-- ============================================================ -->
-        <div id="tab-stores" class="tab-content">
-          <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+        <div id="tab-stores" class="tab-content relative">
+          <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 store-container">
             <div class="flex items-center justify-between mb-6">
               <div>
                 <h2 class="text-lg font-bold text-gray-900">Stores</h2>
-                <p class="text-sm text-gray-500">Manage your store locations and settings</p>
+                <p class="text-sm text-gray-500">Select store to manage</p>
               </div>
-              <button class="px-4 py-2 bg-brand text-white rounded-xl text-sm font-medium hover:bg-brand-dark transition flex items-center gap-2">
-                <i class="fas fa-plus"></i> Add Store
-              </button>
+              <div class="flex items-center gap-3">
+                <button id="storeRefreshBtn" class="bg-white hover:bg-black/10 px-4 py-2 bg-brand text-black rounded-xl text-sm font-medium">
+                  <i data-lucide="refresh-cw"></i>
+                </button>
+                <a href="/stores/<%=(locals.user?.vendor?.id).replaceAll('-','')%>/create" target="_blank" class="px-4 py-2 bg-brand text-white rounded-xl text-sm font-medium hover:bg-brand-dark transition flex items-center gap-2">
+                  <i class="bi bi-plus-lg"></i>
+                  <span class="hidden md:block">Create Store</span>
+                </a>
+              </div>
             </div>
 
-            <div class="grid md:grid-cols-2 gap-4 store-container">
-              <div class="border border-gray-200 rounded-xl p-4 hover:border-brand/30 transition">
-                <div class="flex items-start justify-between">
-                  <div>
-                    <h4 class="font-semibold text-gray-900">Main Store</h4>
-                    <p class="text-sm text-gray-500">Kigali, Rwanda</p>
-                    <p class="text-xs text-gray-400 mt-1">Products: 1,234 · Orders: 456</p>
-                  </div>
-                  <span class="status-badge active">Active</span>
-                </div>
-              </div>
-              <div class="border border-gray-200 rounded-xl p-4 hover:border-brand/30 transition">
-                <div class="flex items-start justify-between">
-                  <div>
-                    <h4 class="font-semibold text-gray-900">Branch Store</h4>
-                    <p class="text-sm text-gray-500">Musanze, Rwanda</p>
-                    <p class="text-xs text-gray-400 mt-1">Products: 567 · Orders: 234</p>
-                  </div>
-                  <span class="status-badge active">Active</span>
-                </div>
-              </div>
-              <div class="border border-gray-200 rounded-xl p-4 hover:border-brand/30 transition">
-                <div class="flex items-start justify-between">
-                  <div>
-                    <h4 class="font-semibold text-gray-900">Online Store</h4>
-                    <p class="text-sm text-gray-500">shop.cococe.com</p>
-                    <p class="text-xs text-gray-400 mt-1">Products: 890 · Orders: 345</p>
-                  </div>
-                  <span class="status-badge active">Active</span>
-                </div>
-              </div>
-              <div class="border border-gray-200 rounded-xl p-4 hover:border-brand/30 transition">
-                <div class="flex items-start justify-between">
-                  <div>
-                    <h4 class="font-semibold text-gray-900">Warehouse</h4>
-                    <p class="text-sm text-gray-500">Kigali Logistics Hub</p>
-                    <p class="text-xs text-gray-400 mt-1">Products: 2,345 · Inventory: 12,456</p>
-                  </div>
-                  <span class="status-badge pending">Pending</span>
-                </div>
-              </div>
-            </div>
+            <div class="grid md:grid-cols-2 gap-4" id="storeContainer"></div>
+
+            <h4 class="mt-3 text-xs text-slate-500">Click on store to go to dashboard</h4>
           </div>
+
+          <div class="abs-centered" id="storeLoader">
+            <svg version="1.1" x="0" y="0" width="150px" height="150px" viewBox="-10 -10 120 120" enable-background="new 0 0 200 200" xml:space="preserve">
+              <path class="c-loader" d="M0,50 A50,50,0 1 1 100,50 A50,50,0 1 1 0,50" />
+            </svg>
+          </div>
+
         </div>
 
-        <!-- ============================================================ -->
-        <!-- TAB: INVENTORY -->
-        <!-- ============================================================ -->
-        <div id="tab-inventory" class="tab-content">
-          <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+        <div id="tab-inventory" class="tab-content relative">
+          <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6" id="inventoryContainer">
             <div class="flex items-center justify-between mb-6">
               <div>
-                <h2 class="text-lg font-bold text-gray-900">Inventory</h2>
-                <p class="text-sm text-gray-500">Manage your products and stock levels</p>
+                <h2 class="text-xl font-bold text-gray-900">Inventories</h2>
+                <p class="text-sm text-gray-500">Inventories are store dependent</p>
               </div>
               <div class="flex gap-2">
-                <button class="px-4 py-2 bg-brand text-white rounded-xl text-sm font-medium hover:bg-brand-dark transition flex items-center gap-2">
-                  <i class="fas fa-plus"></i> Add Product
-                </button>
-                <button class="px-4 py-2 bg-white border border-gray-200 rounded-xl text-sm font-medium hover:bg-gray-50 transition">
-                  <i class="fas fa-download"></i>
+                <a href="/inventories/<%=locals.user.vendor?.id?.replaceAll('-','')%>/new-inventory" target="_blank" class="px-4 py-2 bg-brand text-white rounded-xl text-sm font-medium hover:bg-brand-dark transition flex items-center gap-2">
+                  <i data-lucide="plus"></i> Create Inventory
+                </a>
+                <button class="px-4 py-2 bg-white border border-gray-200 rounded-xl text-sm font-medium hover:bg-gray-50 transition" id="inventoryDataRefreshBtn">
+                  <i data-lucide="refresh-cw"></i>
                 </button>
               </div>
             </div>
 
-            <!-- Inventory Stats -->
-            <div class="grid grid-cols-3 gap-4 mb-6">
+            <div class="mt-4 bg-white border border-ink-200/70 rounded-xl shadow-soft px-4 py-6 flex flex-col items-center gap-3 overflow-hidden hidden" id="emptyInvContainer">
+              <h1 class="text-xl text-brand font-semibold flex flex-col items-center">
+                <i data-lucide="octagon-alert" height="48" width="48"></i>
+                You do no have any inventory added
+              </h1>
+              <h3 class="text-base text-gray-500 font-semibold">
+                Click "Create Inventory" button above to create your first inventory
+              </h3>
+            </div>
+
+            <div class="flex items-center my-4 inv-data-field">
+              <div class="flex-grow border-t border-gray-300"></div>
+              <span class="px-4 text-gray-500 font-medium text-sm">Inventories</span>
+              <div class="flex-grow border-t border-gray-300"></div>
+            </div>
+
+            <div class="grid grid-cols-3 gap-4 mb-6 inv-data-field" id="inventoryCountBadges">
               <div class="bg-gray-50 rounded-xl p-3 text-center">
-                <p class="text-2xl font-bold text-gray-900">3,847</p>
-                <p class="text-xs text-gray-500">Total Items</p>
+                <p class="text-base font-bold text-gray-800">TOTAL</p>
+                <p class="text-lg font-extrabold text-gray-800" id="total-invt">0</p>
               </div>
               <div class="bg-green-50 rounded-xl p-3 text-center">
-                <p class="text-2xl font-bold text-green-600">3,524</p>
-                <p class="text-xs text-gray-500">In Stock</p>
+                <p class="text-base font-bold text-green-600">ACTIVE</p>
+                <p class="text-lg font-extrabold text-green-600" id="active-invt">0</p>
               </div>
               <div class="bg-red-50 rounded-xl p-3 text-center">
-                <p class="text-2xl font-bold text-red-600">323</p>
-                <p class="text-xs text-gray-500">Low Stock</p>
+                <p class="text-base font-bold text-red-600">INACTIVE</p>
+                <p class="text-lg font-extrabold text-red-600" id="inactive-invt">0</p>
+              </div>
+              <div class="bg-amber-50 rounded-xl p-3 text-center">
+                <p class="text-base font-bold text-amber-600">DEFAULT</p>
+                <p class="text-lg font-extrabold text-gray-500 text-amber-600" id="def-invt">0</p>
               </div>
             </div>
 
-            <!-- Inventory Table -->
-            <div class="overflow-x-auto">
-              <table class="w-full">
+            <div class="flex items-center my-4 inv-data-field">
+              <div class="flex-grow border-t border-gray-300"></div>
+              <span class="px-4 text-gray-500 font-medium text-sm">Transactions</span>
+              <div class="flex-grow border-t border-gray-300"></div>
+            </div>
+
+            <div class="grid grid-cols-3 gap-4 mb-6 inv-data-field" id="inventoryTranstions"></div>
+
+            <div class="flex items-center my-4 inv-data-field">
+              <div class="flex-grow border-t border-gray-300"></div>
+              <span class="px-4 text-gray-500 font-medium text-sm">Stock</span>
+              <div class="flex-grow border-t border-gray-300"></div>
+            </div>
+
+            <div class="grid grid-cols-3 gap-4 mb-6 inv-data-field" id="inventoryStock"></div>
+
+            <div class="flex items-center my-4 inv-data-field">
+              <div class="flex-grow border-t border-gray-300"></div>
+              <span class="px-4 text-gray-500 font-medium text-sm">Units</span>
+              <div class="flex-grow border-t border-gray-300"></div>
+            </div>
+
+            <div class="grid grid-cols-3 gap-4 mb-6 inv-data-field" id="inventoryUnits"></div>
+
+            <div class="overflow-x-auto hidden inv-data-field" id="inventoryTabTableContainer">
+              <table class="w-full" id="inventoryTabTable">
                 <thead>
                   <tr class="bg-gray-50 border-b border-gray-100">
-                    <th class="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Product</th>
-                    <th class="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider hidden md:table-cell">SKU</th>
-                    <th class="text-center px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Stock</th>
-                    <th class="text-center px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider hidden lg:table-cell">Status</th>
-                    <th class="text-center px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
+                    <th class="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Title</th>
+                    <th class="text-center px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
+                    <th class="text-center px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider hidden lg:table-cell">Low stock</th>
+                    <th class="text-center px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider hidden lg:table-cell">Out. stock</th>
+                    <th class="text-center px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider hidden lg:table-cell">Avail</th>
+                    <th class="text-center px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider hidden lg:table-cell">Reserved</th>
+                    <th class="text-center px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider hidden lg:table-cell">Items</th>
+                    <th class="text-center px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider hidden lg:table-cell">Qty.</th>
                   </tr>
                 </thead>
-                <tbody>
-                  <tr class="border-b border-gray-50 hover:bg-gray-50 transition">
+                <tbody id="inventoryTableBody">
+                  <tr class="border-b border-gray-50 hover:bg-gray-50 transition inventory-row cursor-pointer" data-name="MacBook Pro 16&quot;" data-sku="MBP-16-2024" data-category="electronics" data-status="in-stock">
                     <td class="px-4 py-3">
-                      <p class="text-sm font-medium text-gray-900">MacBook Pro 16"</p>
-                      <p class="text-xs text-gray-400">Electronics</p>
+                      <p class="text-sm font-medium text-gray-900">In. title</p>
+                      <p class="text-xs text-gray-400">Store name</p>
                     </td>
-                    <td class="px-4 py-3 text-sm text-gray-500 hidden md:table-cell">MBP-16-2024</td>
-                    <td class="px-4 py-3 text-center text-sm font-semibold text-gray-900">45</td>
-                    <td class="px-4 py-3 text-center hidden lg:table-cell"><span class="status-badge active">In Stock</span></td>
-                    <td class="px-4 py-3 text-center">
-                      <button class="p-1.5 rounded-lg text-blue-600 hover:bg-blue-50 transition"><i class="fas fa-edit"></i></button>
-                      <button class="p-1.5 rounded-lg text-red-500 hover:bg-red-50 transition"><i class="fas fa-trash"></i></button>
+                    <td class="px-4 py-3 text-center text-sm text-gray-500 hidden md:table-cell">
+                      <span class="status-badge active">Status</span>
                     </td>
+                    <td class="px-4 py-3 text-center text-sm text-gray-500 hidden md:table-cell">Low stock</td>
+                    <td class="px-4 py-3 text-center text-sm text-gray-500 hidden md:table-cell">out_of_stock</td>
+                    <td class="px-4 py-3 text-center text-sm text-gray-500 hidden md:table-cell">Available</td>
+                    <td class="px-4 py-3 text-center text-sm text-gray-500 hidden md:table-cell">Reserved</td>
+                    <td class="px-4 py-3 text-center text-sm text-gray-500 hidden md:table-cell">Items</td>
+                    <td class="px-4 py-3 text-center text-sm text-gray-500 hidden md:table-cell">Quantity</td>
                   </tr>
-                  <tr class="border-b border-gray-50 hover:bg-gray-50 transition">
+                  <tr class="border-b border-gray-50 hover:bg-gray-50 transition inventory-row" data-name="iPhone 15 Pro Max" data-sku="IP15PM-2024" data-category="electronics" data-status="low-stock">
                     <td class="px-4 py-3">
                       <p class="text-sm font-medium text-gray-900">iPhone 15 Pro Max</p>
                       <p class="text-xs text-gray-400">Electronics</p>
@@ -808,7 +617,7 @@
                       <button class="p-1.5 rounded-lg text-red-500 hover:bg-red-50 transition"><i class="fas fa-trash"></i></button>
                     </td>
                   </tr>
-                  <tr class="border-b border-gray-50 hover:bg-gray-50 transition">
+                  <tr class="border-b border-gray-50 hover:bg-gray-50 transition inventory-row" data-name="Sony WH-1000XM5" data-sku="SONY-WH5" data-category="audio" data-status="in-stock">
                     <td class="px-4 py-3">
                       <p class="text-sm font-medium text-gray-900">Sony WH-1000XM5</p>
                       <p class="text-xs text-gray-400">Audio</p>
@@ -825,9 +634,8 @@
               </table>
             </div>
 
-            <!-- Pagination -->
-            <div class="flex flex-wrap items-center justify-between gap-3 mt-4 pt-3 border-t border-gray-100">
-              <p class="text-xs text-gray-500">Showing 1-3 of 1,234 items</p>
+            <div class="flex flex-wrap items-center justify-between gap-3 mt-4 pt-3 border-t border-gray-100 hidden">
+              <p class="text-xs text-gray-500" id="inventoryShowingText">Showing 1-3 of 1,234 items</p>
               <div class="flex items-center gap-2">
                 <button class="px-3 py-1 rounded-lg border border-gray-200 text-sm text-gray-600 hover:bg-gray-50 transition disabled:opacity-40 disabled:cursor-not-allowed">
                   <i class="fas fa-chevron-left"></i>
@@ -839,11 +647,32 @@
               </div>
             </div>
           </div>
+
+          <div id="inventoryLoadErrorContainer" class="bg-white flex flex-col items-center md:min-w-3xl gap-3 justify-center rounded-2xl border border-gray-100 shadow-sm p-6 text-center abs-centered hidden">
+            <h1 class="font-bold text-[32px] text-amber-800 text-center flex flex-col items-center">
+              <i data-lucide="circle-alert" width="84" height="84"></i>
+              Unable to load inventory data
+            </h1>
+            <h3 class="font-bold text-normal text-amber-500 mb-3" id="inventoryLoadErrorMsg">
+              Sorry, there was an error while fetching inventory data. Try to click refresh button
+            </h3>
+
+            <button id="inventoryErrorRefreshBtn" target="_blank" class="px-4 py-2 bg-brand text-white rounded-xl text-sm font-medium hover:bg-brand-dark transition flex items-center gap-2">
+              <i data-lucide="refresh-cw"></i>
+              <span class="hidden md:block">Reload</span>
+            </button>
+          </div>
+
+          <div class="abs-centered hidden" id="inventoryLoader">
+            <svg version="1.1" x="0" y="0" width="150px" height="150px" viewBox="-10 -10 120 120" enable-background="new 0 0 200 200" xml:space="preserve">
+              <path class="c-loader" d="M0,50 A50,50,0 1 1 100,50 A50,50,0 1 1 0,50" />
+            </svg>
+          </div>
+
         </div>
 
-        <!-- ============================================================ -->
-        <!-- TAB: ORDERS -->
-        <!-- ============================================================ -->
+
+
         <div id="tab-orders" class="tab-content">
           <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
             <div class="flex items-center justify-between mb-6">
@@ -852,17 +681,47 @@
                 <p class="text-sm text-gray-500">Track and manage all your orders</p>
               </div>
               <div class="flex gap-2">
-                <select class="px-3 py-2 rounded-xl border border-gray-200 bg-gray-50 text-sm text-gray-700 focus:outline-none focus:border-brand">
-                  <option>All Status</option>
-                  <option>Pending</option>
-                  <option>Processing</option>
-                  <option>Completed</option>
-                  <option>Cancelled</option>
+                <select class="search-select" id="ordersStatusFilter">
+                  <option value="">All Status</option>
+                  <option value="pending">Pending</option>
+                  <option value="processing">Processing</option>
+                  <option value="completed">Completed</option>
+                  <option value="cancelled">Cancelled</option>
                 </select>
                 <button class="px-4 py-2 bg-brand text-white rounded-xl text-sm font-medium hover:bg-brand-dark transition">
                   <i class="fas fa-filter"></i>
                 </button>
               </div>
+            </div>
+
+            <div class="search-toolbar">
+              <div class="search-wrapper">
+                <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="11" cy="11" r="8" />
+                  <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                </svg>
+                <input type="text" id="ordersSearchInput" class="search-input" placeholder="Search order ID, customer name or email...">
+                <span class="search-clear" id="ordersSearchClear" title="Clear">
+                  <i class="fas fa-times"></i>
+                </span>
+              </div>
+              <select class="search-select" id="ordersPaymentFilter">
+                <option value="">All Payments</option>
+                <option value="paid">Paid</option>
+                <option value="unpaid">Unpaid</option>
+                <option value="refunded">Refunded</option>
+              </select>
+              <select class="search-select" id="ordersDateFilter">
+                <option value="">All Dates</option>
+                <option value="today">Today</option>
+                <option value="7days">Last 7 days</option>
+                <option value="30days">Last 30 days</option>
+              </select>
+              <button class="search-btn" id="ordersSearchBtn">
+                <i class="fas fa-search"></i>
+                <span>Search</span>
+              </button>
+              <span class="search-results-info" id="ordersResultsInfo"></span>
             </div>
 
             <div class="overflow-x-auto">
@@ -877,8 +736,8 @@
                     <th class="text-center px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
                   </tr>
                 </thead>
-                <tbody>
-                  <tr class="border-b border-gray-50 hover:bg-gray-50 transition">
+                <tbody id="ordersTableBody">
+                  <tr class="border-b border-gray-50 hover:bg-gray-50 transition order-row" data-order="ord-2341" data-customer="John Doe" data-email="john@example.com" data-status="pending" data-payment="unpaid" data-date="2024-12-15">
                     <td class="px-4 py-3 text-sm font-mono text-gray-500">#ORD-2341</td>
                     <td class="px-4 py-3">
                       <p class="text-sm font-medium text-gray-900">John Doe</p>
@@ -892,7 +751,7 @@
                       <button class="p-1.5 rounded-lg text-blue-600 hover:bg-blue-50 transition"><i class="fas fa-edit"></i></button>
                     </td>
                   </tr>
-                  <tr class="border-b border-gray-50 hover:bg-gray-50 transition">
+                  <tr class="border-b border-gray-50 hover:bg-gray-50 transition order-row" data-order="ord-2340" data-customer="Jane Smith" data-email="jane@example.com" data-status="completed" data-payment="paid" data-date="2024-12-14">
                     <td class="px-4 py-3 text-sm font-mono text-gray-500">#ORD-2340</td>
                     <td class="px-4 py-3">
                       <p class="text-sm font-medium text-gray-900">Jane Smith</p>
@@ -906,15 +765,39 @@
                       <button class="p-1.5 rounded-lg text-blue-600 hover:bg-blue-50 transition"><i class="fas fa-edit"></i></button>
                     </td>
                   </tr>
+                  <tr class="border-b border-gray-50 hover:bg-gray-50 transition order-row" data-order="ord-2339" data-customer="Tech Supplies Rwanda" data-email="info@techsupplies.rw" data-status="cancelled" data-payment="refunded" data-date="2024-12-13">
+                    <td class="px-4 py-3 text-sm font-mono text-gray-500">#ORD-2339</td>
+                    <td class="px-4 py-3">
+                      <p class="text-sm font-medium text-gray-900">Tech Supplies Rwanda</p>
+                      <p class="text-xs text-gray-400">info@techsupplies.rw</p>
+                    </td>
+                    <td class="px-4 py-3 text-center hidden md:table-cell text-sm font-semibold text-gray-900">$560.00</td>
+                    <td class="px-4 py-3 text-center"><span class="status-badge inactive">Cancelled</span></td>
+                    <td class="px-4 py-3 text-center hidden lg:table-cell text-sm text-gray-500">2024-12-13</td>
+                    <td class="px-4 py-3 text-center">
+                      <button class="p-1.5 rounded-lg text-blue-600 hover:bg-blue-50 transition"><i class="fas fa-eye"></i></button>
+                      <button class="p-1.5 rounded-lg text-blue-600 hover:bg-blue-50 transition"><i class="fas fa-edit"></i></button>
+                    </td>
+                  </tr>
                 </tbody>
               </table>
+            </div>
+
+            <div class="flex flex-wrap items-center justify-between gap-3 mt-4 pt-3 border-t border-gray-100">
+              <p class="text-xs text-gray-500" id="ordersShowingText">Showing 1-3 of 1,284 items</p>
+              <div class="flex items-center gap-2">
+                <button class="px-3 py-1 rounded-lg border border-gray-200 text-sm text-gray-600 hover:bg-gray-50 transition disabled:opacity-40 disabled:cursor-not-allowed">
+                  <i class="fas fa-chevron-left"></i>
+                </button>
+                <span class="text-xs text-gray-500">Page 1 of 428</span>
+                <button class="px-3 py-1 rounded-lg border border-gray-200 text-sm text-gray-600 hover:bg-gray-50 transition disabled:opacity-40 disabled:cursor-not-allowed">
+                  <i class="fas fa-chevron-right"></i>
+                </button>
+              </div>
             </div>
           </div>
         </div>
 
-        <!-- ============================================================ -->
-        <!-- TAB: ANALYTICS -->
-        <!-- ============================================================ -->
         <div id="tab-analytics" class="tab-content">
           <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
             <h2 class="text-lg font-bold text-gray-900 mb-2">Analytics</h2>
@@ -946,62 +829,341 @@
         </div>
 
         <!-- ============================================================ -->
-        <!-- TAB: PROFILE -->
+        <!-- TAB: CATEGORIES -->
         <!-- ============================================================ -->
+        <div id="tab-categories" class="tab-content">
+          <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+
+            <!-- Header -->
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+              <div>
+                <h2 class="text-lg font-bold text-gray-900">Marketplace Categories</h2>
+                <p class="text-sm text-gray-500">Browse existing categories or request a new one for your store.</p>
+              </div>
+              <div class="flex items-center gap-2">
+                <button id="categoriesRefreshBtn" class="p-2.5 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition" title="Refresh categories">
+                  <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+                </button>
+                <button id="requestCategoryBtn" class="px-4 py-2 bg-brand text-white rounded-xl text-sm font-medium hover:bg-brand-dark transition flex items-center gap-2">
+                  <i data-lucide="plus" class="w-4 h-4"></i>
+                  <span class="hidden sm:inline">Request Category</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Stats -->
+            <div class="grid grid-cols-2 md:grid-cols-3 gap-3 mb-6">
+              <div class="bg-gray-50 rounded-xl p-3 text-center">
+                <p class="text-xl font-bold text-gray-900" id="catTotalCount">0</p>
+                <p class="text-xs text-gray-500">Available</p>
+              </div>
+              <div class="bg-amber-50 rounded-xl p-3 text-center">
+                <p class="text-xl font-bold text-amber-600" id="catPendingCount">0</p>
+                <p class="text-xs text-gray-500">Your Pending Requests</p>
+              </div>
+              <div class="bg-green-50 rounded-xl p-3 text-center col-span-2 md:col-span-1">
+                <p class="text-xl font-bold text-green-600" id="catApprovedCount">0</p>
+                <p class="text-xs text-gray-500">Approved Requests</p>
+              </div>
+            </div>
+
+            <!-- Search + view toggle -->
+            <div class="flex flex-wrap items-center gap-3 mb-5">
+              <div class="flex-1 min-w-[200px] relative">
+                <i data-lucide="search" class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                <input id="categorySearch" type="text" placeholder="Search categories..." class="w-full pl-10 pr-10 py-2.5 rounded-xl border border-gray-200 bg-white text-sm focus:outline-none focus:border-brand focus:ring-2 focus:ring-brand/10">
+                <button id="clearCategorySearch" class="hidden absolute right-2.5 top-1/2 -translate-y-1/2 p-1 rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-100">
+                  <i data-lucide="x" class="w-3.5 h-3.5"></i>
+                </button>
+              </div>
+
+              <div class="flex items-center gap-1 p-1 bg-gray-100 rounded-xl">
+                <button data-view="all" class="view-toggle px-3 py-1.5 rounded-lg text-xs font-medium text-gray-500 transition">
+                  All
+                </button>
+                <button data-view="mine" class="view-toggle px-3 py-1.5 rounded-lg text-xs font-medium text-gray-500 transition">
+                  My Requests
+                </button>
+              </div>
+            </div>
+
+            <!-- Loading -->
+            <div id="categoriesLoading" class="hidden py-10 text-center">
+              <div class="inline-flex items-center gap-3 text-gray-500">
+                <svg class="w-5 h-5 animate-spin" viewBox="0 0 24 24" fill="none">
+                  <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-opacity="0.25" stroke-width="3" />
+                  <path d="M22 12a10 10 0 0 0-10-10" stroke="currentColor" stroke-width="3" stroke-linecap="round" />
+                </svg>
+                Loading categories...
+              </div>
+            </div>
+
+            <!-- Error -->
+            <div id="categoriesError" class="hidden rounded-xl border border-red-200 bg-red-50 p-4 flex items-start gap-3">
+              <i data-lucide="alert-triangle" class="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5"></i>
+              <div class="flex-1 min-w-0">
+                <p class="text-sm font-semibold text-red-800">Failed to load categories</p>
+                <p id="categoriesErrorMsg" class="text-xs text-red-700 mt-0.5">Please try again.</p>
+              </div>
+              <button id="categoriesRetryBtn" class="px-3 py-1.5 rounded-lg bg-white border border-red-200 text-xs font-medium text-red-700 hover:bg-red-50">
+                Retry
+              </button>
+            </div>
+
+            <!-- Empty -->
+            <div id="categoriesEmpty" class="hidden py-12 text-center">
+              <div class="mx-auto w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center">
+                <i data-lucide="tags" class="w-5 h-5 text-gray-400"></i>
+              </div>
+              <h3 class="mt-3 text-sm font-semibold text-gray-900">No categories found</h3>
+              <p class="mt-1 text-xs text-gray-500" id="categoriesEmptyMsg">Try a different search or request a new category.</p>
+              <button id="categoriesEmptyRequestBtn" class="mt-4 inline-flex items-center gap-2 px-4 py-2 bg-brand text-white rounded-xl text-sm font-medium hover:bg-brand-dark transition">
+                <i data-lucide="plus" class="w-4 h-4"></i>
+                Request a Category
+              </button>
+            </div>
+
+            <div id="categoriesGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3"></div>
+
+            <!-- Pagination -->
+            <div id="categoriesPagination" class="hidden mt-5 pt-4 border-t border-gray-100">
+              <div class="flex flex-col sm:flex-row items-center justify-between gap-3">
+
+                <!-- Info -->
+                <p class="text-xs text-gray-500" id="catPaginationInfo">
+                  Showing 0–0 of 0
+                </p>
+
+                <!-- Controls -->
+                <div class="flex items-center gap-2">
+                  <button id="catPrevBtn" class="px-3 py-1.5 rounded-lg border border-gray-200 text-sm text-gray-600 hover:bg-gray-50 transition disabled:opacity-40 disabled:cursor-not-allowed">
+                    <i data-lucide="chevron-left" class="w-4 h-4"></i>
+                  </button>
+                  <span class="text-xs text-gray-500 min-w-[100px] text-center" id="catPageInfo">
+                    Page 1 of 1
+                  </span>
+                  <button id="catNextBtn" class="px-3 py-1.5 rounded-lg border border-gray-200 text-sm text-gray-600 hover:bg-gray-50 transition disabled:opacity-40 disabled:cursor-not-allowed">
+                    <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                  </button>
+                </div>
+
+                <!-- Per page -->
+                <div class="flex items-center gap-2">
+                  <label class="text-xs text-gray-500">Show:</label>
+                  <select id="catLimitSelect" class="px-2 py-1 rounded-lg border border-gray-200 text-sm text-gray-700 focus:outline-none focus:border-brand">
+                    <option value="10">10</option>
+                    <option value="20" selected>20</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <p class="mt-5 text-xs text-gray-400" id="categoriesFooterHint">
+              <span class="text-black">These are system verified product categories.</span>
+              <br>
+              Can't find what you need? Request a category and our team will review it.
+            </p>
+          </div>
+        </div>
+
+        <div id="requestCategoryModal" class="fixed inset-0 z-50 hidden items-center justify-center px-4">
+          <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" data-dismiss="request"></div>
+          <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
+            <div class="sticky top-0 bg-white border-b border-gray-100 px-6 py-4 flex items-center justify-between">
+              <h3 class="text-lg font-bold text-gray-900">Request a Category</h3>
+              <button id="closeRequestCategoryBtn" class="text-gray-400 hover:text-gray-600 transition">
+                <i data-lucide="x" class="w-5 h-5"></i>
+              </button>
+            </div>
+
+            <form id="requestCategoryForm" class="p-6 space-y-4" novalidate>
+              <div class="rounded-xl bg-blue-50 border border-blue-100 p-3 flex items-start gap-2.5">
+                <i data-lucide="info" class="w-4 h-4 text-blue-600 flex-shrink-0 mt-0.5"></i>
+                <p class="text-xs text-blue-800 leading-relaxed">
+                  Requests are reviewed by the COCOCE team. You'll be notified once approved.
+                </p>
+              </div>
+
+              <div class="field" data-field="category_title">
+                <label for="requestCategoryTitle" class="block text-sm font-medium text-gray-700 mb-1.5">
+                  Category name <span class="text-brand">*</span>
+                </label>
+                <input id="requestCategoryTitle" name="category_title" type="text" maxlength="255" autocomplete="off" placeholder="e.g. Smartwatches" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-brand focus:ring-2 focus:ring-brand/10">
+                <p class="field-msg hidden mt-1.5 text-xs text-red-600"></p>
+              </div>
+
+              <div class="field" data-field="reason">
+                <label for="requestCategoryReason" class="block text-sm font-medium text-gray-700 mb-1.5">
+                  Why do you need it? <span class="text-gray-400 font-normal">(optional)</span>
+                </label>
+                <textarea id="requestCategoryReason" name="reason" rows="3" placeholder="Describe the products you'd list under this category..." class="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-brand focus:ring-2 focus:ring-brand/10 resize-y min-h-[80px]"></textarea>
+              </div>
+
+              <!-- Inline submit error -->
+              <div id="requestCategoryError" class="hidden rounded-lg border border-red-200 bg-red-50 p-3 flex items-start gap-2">
+                <i data-lucide="alert-circle" class="w-4 h-4 text-red-600 flex-shrink-0 mt-0.5"></i>
+                <p id="requestCategoryErrorMsg" class="text-xs text-red-700"></p>
+              </div>
+
+              <div class="pt-2 flex flex-col-reverse sm:flex-row sm:justify-end gap-2">
+                <button type="button" id="cancelRequestCategoryBtn" class="w-full sm:w-auto px-4 py-2.5 rounded-xl border border-gray-200 text-sm font-medium text-gray-700 hover:bg-gray-50 transition">
+                  Cancel
+                </button>
+                <button type="submit" id="submitRequestCategoryBtn" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-brand text-white text-sm font-semibold hover:bg-brand-dark transition disabled:opacity-60 disabled:cursor-not-allowed">
+                  <span class="btn-label inline-flex items-center gap-2">
+                    <i data-lucide="send" class="w-4 h-4"></i> Submit Request
+                  </span>
+                  <span class="btn-loading hidden items-center gap-2">
+                    <svg class="w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none">
+                      <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-opacity="0.25" stroke-width="3" />
+                      <path d="M22 12a10 10 0 0 0-10-10" stroke="currentColor" stroke-width="3" stroke-linecap="round" />
+                    </svg>
+                    Submitting...
+                  </span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+
         <div id="tab-profile" class="tab-content">
           <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
             <div class="flex items-center justify-between mb-6">
               <div>
                 <h2 class="text-lg font-bold text-gray-900">Profile</h2>
-                <p class="text-sm text-gray-500">Manage your vendor profile and settings</p>
+                <p class="text-sm text-gray-500">Update vendor profile and settings</p>
               </div>
-              <span class="status-badge verified">Verified Vendor</span>
+              <span class="status-badge <%=locals.user?.vendor?.verification_status%>">
+                <%=locals.user?.vendor?.verification_status || 'Pending'%>
+              </span>
             </div>
 
-            <div class="grid md:grid-cols-3 gap-6">
-              <!-- Avatar -->
-              <div class="flex flex-col items-center">
-                <div class="avatar-upload relative">
-                  <img src="https://ui-avatars.com/api/?name=Admin+User&background=ED1B24&color=fff&size=128" alt="Profile" class="w-32 h-32 rounded-full border-4 border-gray-200 object-cover">
-                  <div class="overlay">
-                    <span class="text-white text-sm font-medium"><i class="fas fa-camera"></i></span>
-                  </div>
-                </div>
-                <button class="mt-3 text-sm text-brand hover:text-brand-dark transition font-medium">Change Photo</button>
-                <p class="text-xs text-gray-400 mt-1">JPG, PNG, GIF up to 5MB</p>
-              </div>
+            <form id="profileForm" class="space-y-6">
 
-              <!-- Profile Info -->
-              <div class="md:col-span-2 space-y-4">
-                <div class="grid md:grid-cols-2 gap-4">
-                  <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Business Name</label>
-                    <input type="text" value="Tech Supplies Rwanda" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-gray-900 focus:outline-none focus:border-brand focus:ring-2 focus:ring-brand/10">
+              <input type="hidden" id="userId" value="<%=locals.user?.id%>">
+              <input type="hidden" id="vendorId" value="<%=locals.user?.vendor?.id%>">
+
+              <div class="grid md:grid-cols-3 gap-8">
+
+                <div class="flex flex-col items-center space-y-4 relative">
+                  <div class="avatar-upload relative group cursor-pointer" id="avatarUpload">
+                    <img id="profileAvatar" src="https://cdn.cococe.rw/images/profiles/<%-locals.user.userId || locals.user.id || locals.user.user_id%>.jpg?v=<%-new Date().getTime()%>" alt="Profile image" class="w-48 h-48 rounded-full border-4 border-gray-200 object-cover transition group-hover:border-brand">
+                    <div class="overlay absolute inset-0 bg-black/50 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition">
+                      <span class="text-white text-sm font-medium">
+                        <i class="fas fa-camera text-2xl"></i>
+                      </span>
+                    </div>
+                    <input type="file" id="avatarInput" accept=".jpg" class="hidden">
                   </div>
+
+
+                  <p class="text-xs text-brand">Drag or click to select profile image. Accepted: JPG — ".jpg" images only</p>
+
+                  <button type="button" id="uploadProfileImgBtn" class="flex items-center gap-2 px-6 py-2.5 bg-brand text-white rounded-xl font-medium hover:bg-brand-dark transition disabled:opacity-50 disabled:cursor-not-allowed hidden">
+                    <i data-lucide="upload"></i> Save
+                  </button>
+                  <div id="avatarUploadProgress" class="hidden w-full">
+                    <div class="w-full bg-gray-200 rounded-full h-2">
+                      <div id="avatarProgressBar" class="bg-brand h-2 rounded-full transition-all" style="width: 0%"></div>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-1 text-center" id="avatarUploadStatus">Uploading...</p>
+                  </div>
+
+                  <button type="button" id="removeAvatarBtn" class="absolute top-0 right-4 flex items-center gap-2 px-6 py-2.5 bg-brand text-white rounded-xl font-medium hover:bg-brand-dark transition disabled:opacity-50 disabled:cursor-not-allowed hidden">
+                    <i data-lucide="trash"></i> Remove
+                  </button>
+
+                </div>
+
+                <div class="md:col-span-2 space-y-4">
                   <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                    <input type="email" value="admin@techsupplies.rw" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-gray-900 focus:outline-none focus:border-brand focus:ring-2 focus:ring-brand/10">
+                    <h3 class="text-sm font-semibold text-gray-500 mb-3">Business Information</h3>
+
+                    <div class="grid md:grid-cols-2 gap-4">
+                      <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">
+                          Business Name <span class="text-red-500">*</span>
+                        </label>
+                        <input id="vendorBusinessName" type="text" value="<%=locals.user?.vendor?.business_name || ''%>" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-gray-900 focus:outline-none focus:border-brand focus:ring-2 focus:ring-brand/10" disabled>
+                      </div>
+                      <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">
+                          Business Address
+                        </label>
+                        <input id="vendorBusinessAddress" type="text" value="<%=locals.user?.vendor?.business_address || ''%>" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-gray-900 focus:outline-none focus:border-brand focus:ring-2 focus:ring-brand/10">
+                      </div>
+                    </div>
+
+                    <div class="grid md:grid-cols-2 gap-4 mt-3">
+                      <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">
+                          TIN Number
+                        </label>
+                        <input id="vendorTin" type="text" value="<%=locals.user?.vendor?.tin_number || ''%>" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-gray-900 focus:outline-none focus:border-brand focus:ring-2 focus:ring-brand/10">
+                      </div>
+                      <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">
+                          VAT Number
+                        </label>
+                        <input id="vendorVatNumber" type="text" value="<%=locals.user?.vendor?.vat_number || ''%>" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-gray-900 focus:outline-none focus:border-brand focus:ring-2 focus:ring-brand/10">
+                      </div>
+                    </div>
+
+                    <div class="grid md:grid-cols-2 gap-4 mt-3">
+                      <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">
+                          Tax Country
+                        </label>
+                        <input id="vendorTaxCountry" type="text" value="<%=locals.user?.vendor?.tax_country || 'Rwanda'%>" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-gray-900 focus:outline-none focus:border-brand focus:ring-2 focus:ring-brand/10">
+                      </div>
+                      <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">
+                          Business Type
+                        </label>
+                        <select id="vendorType" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-gray-900 focus:outline-none focus:border-brand focus:ring-2 focus:ring-brand/10">
+                          <option value="retailer" <%=locals.user?.vendor?.type === 'retailer' ? 'selected' : ''%>>Retailer</option>
+                          <option value="distributor" <%=locals.user?.vendor?.type === 'distributor' ? 'selected' : ''%>>Distributor</option>
+                          <option value="manufacturer" <%=locals.user?.vendor?.type === 'manufacturer' ? 'selected' : ''%>>Manufacturer</option>
+                          <option value="supplier" <%=locals.user?.vendor?.type === 'supplier' ? 'selected' : ''%>>Supplier</option>
+                          <option value="dealer" <%=locals.user?.vendor?.type === 'dealer' ? 'selected' : ''%>>Dealer</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <div class="grid md:grid-cols-2 gap-4 mt-3">
+                      <div class="col-span-full">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">
+                          Tax Registered
+                        </label>
+                        <select id="vendorTaxRegistered" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-gray-900 focus:outline-none focus:border-brand focus:ring-2 focus:ring-brand/10">
+                          <option value="registered" <%=locals.user?.vendor?.tax_registered === 'registered' ? 'selected' : ''%>>Registered</option>
+                          <option value="not_registered" <%=locals.user?.vendor?.tax_registered === 'not_registered' ? 'selected' : ''%>>Not Registered</option>
+                        </select>
+                      </div>
+
+                    </div>
+                  </div>
+
+                  <div class="flex items-center gap-3 pt-4 mt-4 border-t border-gray-100">
+                    <button type="submit" id="saveProfileBtn" class="px-6 py-2.5 bg-brand text-white rounded-xl font-medium hover:bg-brand-dark transition disabled:opacity-50 disabled:cursor-not-allowed">
+                      <span id="saveProfileText">Save Changes</span>
+                      <span id="saveProfileLoader" class="hidden">
+                        <i class="fas fa-spinner fa-spin"></i> Saving...
+                      </span>
+                    </button>
+                    <button type="button" id="resetProfileBtn" class="px-6 py-2.5 bg-gray-100 text-gray-700 rounded-xl font-medium hover:bg-gray-200 transition">
+                      Reset
+                    </button>
+                    <span id="saveProfileMessage" class="text-sm hidden"></span>
                   </div>
                 </div>
-                <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-1">Business Address</label>
-                  <input type="text" value="KG 123 St, Kigali, Rwanda" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-gray-900 focus:outline-none focus:border-brand focus:ring-2 focus:ring-brand/10">
-                </div>
-                <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
-                  <textarea rows="2" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-gray-900 focus:outline-none focus:border-brand focus:ring-2 focus:ring-brand/10 resize-y">Leading supplier of tech products in Rwanda.</textarea>
-                </div>
-                <button class="px-6 py-2.5 bg-brand text-white rounded-xl font-medium hover:bg-brand-dark transition">
-                  Save Changes
-                </button>
               </div>
-            </div>
+            </form>
           </div>
         </div>
 
-        <!-- ============================================================ -->
-        <!-- TAB: SETTINGS -->
-        <!-- ============================================================ -->
         <div id="tab-settings" class="tab-content">
           <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
             <h2 class="text-lg font-bold text-gray-900 mb-2">Settings</h2>
@@ -1044,35 +1206,188 @@
           </div>
         </div>
 
-        <!-- ============================================================ -->
-        <!-- TAB: SUPPORT -->
-        <!-- ============================================================ -->
+
+        <div id="tab-logs" class="tab-content">
+          <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+              <div>
+                <h2 class="text-lg font-bold text-gray-900">Logs</h2>
+                <p class="text-sm text-gray-500">View and monitor all system activities</p>
+              </div>
+              <div class="flex items-center gap-3">
+                <button id="logsRefreshBtn" class="p-2.5 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition" title="Refresh logs">
+                  <i class="fas fa-sync-alt"></i>
+                </button>
+                <button id="logsExportBtn" class="px-4 py-2 bg-brand text-white rounded-xl text-sm font-medium hover:bg-brand-dark transition flex items-center gap-2">
+                  <i class="fas fa-download"></i>
+                  <span class="hidden sm:inline">Export</span>
+                </button>
+                <button id="logsClearBtn" class="px-4 py-2 bg-red-50 text-red-600 rounded-xl text-sm font-medium hover:bg-red-100 transition flex items-center gap-2">
+                  <i class="fas fa-trash"></i>
+                  <span class="hidden sm:inline">Clear All</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="flex flex-wrap items-center gap-3 mb-4 p-4 bg-gray-50 rounded-xl">
+              <div class="flex-1 min-w-[200px]">
+                <div class="relative">
+                  <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
+                  <input id="logsSearchInput" type="text" placeholder="Search logs..." class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 bg-white text-sm focus:outline-none focus:border-brand focus:ring-2 focus:ring-brand/10">
+                </div>
+              </div>
+
+              <div class="min-w-[140px]">
+                <select id="logsTypeFilter" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 bg-white text-sm text-gray-700 focus:outline-none focus:border-brand focus:ring-2 focus:ring-brand/10">
+                  <option value="all">All Types</option>
+                  <option value="info">Info</option>
+                  <option value="warning">Warning</option>
+                  <option value="error">Error</option>
+                  <option value="success">Success</option>
+                  <option value="debug">Debug</option>
+                </select>
+              </div>
+
+              <div class="min-w-[160px]">
+                <input id="logsDateFrom" type="date" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 bg-white text-sm text-gray-700 focus:outline-none focus:border-brand focus:ring-2 focus:ring-brand/10">
+              </div>
+              <span class="text-gray-400 text-sm">to</span>
+              <div class="min-w-[160px]">
+                <input id="logsDateTo" type="date" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 bg-white text-sm text-gray-700 focus:outline-none focus:border-brand focus:ring-2 focus:ring-brand/10">
+              </div>
+
+              <div class="min-w-[140px]">
+                <select id="logsUserFilter" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 bg-white text-sm text-gray-700 focus:outline-none focus:border-brand focus:ring-2 focus:ring-brand/10">
+                  <option value="all">All Users</option>
+                  <option value="system">System</option>
+                  <option value="admin">Admin</option>
+                  <option value="vendor">Vendor</option>
+                </select>
+              </div>
+
+              <button id="logsApplyFilters" class="px-4 py-2.5 bg-brand text-white rounded-xl text-sm font-medium hover:bg-brand-dark transition">
+                Apply Filters
+              </button>
+              <button id="logsResetFilters" class="px-4 py-2.5 bg-gray-100 text-gray-700 rounded-xl text-sm font-medium hover:bg-gray-200 transition">
+                Reset
+              </button>
+            </div>
+
+            <div class="grid grid-cols-2 md:grid-cols-5 gap-3 mb-6">
+              <div class="bg-gray-50 rounded-xl p-3 text-center">
+                <p class="text-xl font-bold text-gray-900" id="logsTotalCount">0</p>
+                <p class="text-xs text-gray-500">Total Logs</p>
+              </div>
+              <div class="bg-green-50 rounded-xl p-3 text-center">
+                <p class="text-xl font-bold text-green-600" id="logsInfoCount">0</p>
+                <p class="text-xs text-gray-500">Info</p>
+              </div>
+              <div class="bg-amber-50 rounded-xl p-3 text-center">
+                <p class="text-xl font-bold text-amber-600" id="logsWarningCount">0</p>
+                <p class="text-xs text-gray-500">Warnings</p>
+              </div>
+              <div class="bg-red-50 rounded-xl p-3 text-center">
+                <p class="text-xl font-bold text-red-600" id="logsErrorCount">0</p>
+                <p class="text-xs text-gray-500">Errors</p>
+              </div>
+              <div class="bg-blue-50 rounded-xl p-3 text-center">
+                <p class="text-xl font-bold text-blue-600" id="logsTodayCount">0</p>
+                <p class="text-xs text-gray-500">Today</p>
+              </div>
+            </div>
+
+            <div class="overflow-x-auto rounded-xl border border-gray-200">
+              <table class="w-full" id="logsTable">
+                <thead>
+                  <tr class="bg-gray-50 border-b border-gray-200">
+                    <th class="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider w-[50px]">#</th>
+                    <th class="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider w-[180px]">Timestamp</th>
+                    <th class="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider w-[100px]">Type</th>
+                    <th class="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Message</th>
+                    <th class="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider w-[120px]">User</th>
+                    <th class="text-center px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider w-[100px]">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="logsTableBody">
+                </tbody>
+              </table>
+            </div>
+
+            <div class="flex flex-wrap items-center justify-between gap-3 mt-4 pt-3 border-t border-gray-100">
+              <p class="text-xs text-gray-500" id="logsPaginationInfo">Showing 0-0 of 0 logs</p>
+              <div class="flex items-center gap-2">
+                <button id="logsPrevPage" class="px-3 py-1.5 rounded-lg border border-gray-200 text-sm text-gray-600 hover:bg-gray-50 transition disabled:opacity-40 disabled:cursor-not-allowed">
+                  <i class="fas fa-chevron-left"></i>
+                </button>
+                <span class="text-xs text-gray-500" id="logsPageInfo">Page 1 of 1</span>
+                <button id="logsNextPage" class="px-3 py-1.5 rounded-lg border border-gray-200 text-sm text-gray-600 hover:bg-gray-50 transition disabled:opacity-40 disabled:cursor-not-allowed">
+                  <i class="fas fa-chevron-right"></i>
+                </button>
+              </div>
+              <div class="flex items-center gap-2">
+                <label class="text-xs text-gray-500">Show:</label>
+                <select id="logsPerPage" class="px-2 py-1 rounded-lg border border-gray-200 text-sm text-gray-700 focus:outline-none focus:border-brand">
+                  <option value="10">10</option>
+                  <option value="25" selected>25</option>
+                  <option value="50">50</option>
+                  <option value="100">100</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="logDetailModal" class="fixed inset-0 z-50 hidden items-center justify-center px-4">
+          <div class="modal-overlay absolute inset-0 bg-black/40 backdrop-blur-sm"></div>
+          <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[80vh] overflow-y-auto animate-slide-down">
+            <div class="sticky top-0 bg-white border-b border-gray-100 px-6 py-4 flex items-center justify-between">
+              <h3 class="text-lg font-bold text-gray-900 flex items-center gap-2">
+                <span id="logDetailIcon"></span>
+                Log Details
+              </h3>
+              <button id="closeLogDetailBtn" class="text-gray-400 hover:text-gray-600 transition">
+                <i class="fas fa-times text-xl"></i>
+              </button>
+            </div>
+            <div class="p-6 space-y-4" id="logDetailContent">
+            </div>
+          </div>
+        </div>
+
         <div id="tab-support" class="tab-content">
           <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
             <h2 class="text-lg font-bold text-gray-900 mb-2">Support</h2>
             <p class="text-sm text-gray-500 mb-6">Get help with your business</p>
 
             <div class="grid md:grid-cols-3 gap-4">
-              <a href="#" class="p-4 border border-gray-200 rounded-xl hover:border-brand/30 transition text-center">
+              <a href="/pricing" target="_blank" class="p-4 border border-gray-200 rounded-xl hover:border-brand/30 transition text-center">
                 <div class="w-12 h-12 bg-brand-light rounded-xl flex items-center justify-center text-brand text-xl mx-auto mb-3">
-                  <i class="fas fa-file-alt"></i>
+                  <i data-lucide="hand-coins"></i>
                 </div>
-                <h4 class="font-medium text-gray-900">Documentation</h4>
-                <p class="text-sm text-gray-500">Guides & tutorials</p>
+                <h4 class="font-medium text-gray-900">Pricing</h4>
+                <p class="text-sm text-gray-500">View Business pricing</p>
               </a>
-              <a href="#" class="p-4 border border-gray-200 rounded-xl hover:border-brand/30 transition text-center">
+              <a href="mailto:sales@cococe.rw" class="p-4 border border-gray-200 rounded-xl hover:border-brand/30 transition text-center">
                 <div class="w-12 h-12 bg-brand-light rounded-xl flex items-center justify-center text-brand text-xl mx-auto mb-3">
-                  <i class="fas fa-envelope"></i>
+                  <i data-lucide="circle-question-mark"></i>
                 </div>
                 <h4 class="font-medium text-gray-900">Contact Support</h4>
                 <p class="text-sm text-gray-500">Email & chat</p>
               </a>
-              <a href="#" class="p-4 border border-gray-200 rounded-xl hover:border-brand/30 transition text-center">
+              <a href="/community/discussions" target="_blank" class="p-4 border border-gray-200 rounded-xl hover:border-brand/30 transition text-center">
                 <div class="w-12 h-12 bg-brand-light rounded-xl flex items-center justify-center text-brand text-xl mx-auto mb-3">
-                  <i class="fas fa-community"></i>
+                  <i data-lucide="messages-square"></i>
                 </div>
                 <h4 class="font-medium text-gray-900">Community</h4>
                 <p class="text-sm text-gray-500">Forum & discussions</p>
+              </a>
+              <a href="/docs" target="_blank" class="p-4 border border-gray-200 rounded-xl hover:border-brand/30 transition text-center">
+                <div class="w-12 h-12 bg-brand-light rounded-xl flex items-center justify-center text-brand text-xl mx-auto mb-3">
+                  <i data-lucide="file-stack"></i>
+                </div>
+                <h4 class="font-medium text-gray-900">Documentation</h4>
+                <p class="text-sm text-gray-500">Guides & tutorials</p>
               </a>
             </div>
           </div>
@@ -1095,7 +1410,6 @@
     </div>
   </div>
 
-  <!-- ========== QUICK ACTIONS MODAL ========== -->
   <div id="quickActionsModal" class="fixed inset-0 z-50 hidden items-center justify-center px-4">
     <div class="modal-overlay absolute inset-0 bg-black/40 backdrop-blur-sm"></div>
     <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[80vh] overflow-y-auto animate-slide-down">
@@ -1152,290 +1466,17 @@
     </div>
   </div>
 
-  <!-- ========== JAVASCRIPT ========== -->
+  <script src="/scripts/components/notification.js"></script>
+  <script src="/scripts/components/main-snackbar.js"></script>
+
+  <script src="/scripts/helper/utils.js"></script>
+  <script src="/scripts/vendor-profile.js"></script>
+  <script src="/scripts/vendor-logs.js"></script>
+  <script src="/scripts/vendor-inventory.js"></script>
+  <script src="/scripts/vd-categories.js"></script>
+  <script src="/scripts/bdsh.js"></script>
   <script>
-    // ============================================================
-    // SIDEBAR TOGGLE
-    // ============================================================
-    const sidebar = document.getElementById('sidebar');
-    const toggleBtn = document.getElementById('sidebarToggle');
-    const toggleIcon = document.getElementById('toggleIcon');
-    const toggleText = document.getElementById('toggleText');
-    let isCollapsed = false;
-
-    toggleBtn.addEventListener('click', function() {
-      isCollapsed = !isCollapsed;
-      sidebar.classList.toggle('collapsed', isCollapsed);
-      toggleIcon.className = isCollapsed ? 'fas fa-chevron-right' : 'fas fa-chevron-left';
-      toggleText.textContent = isCollapsed ? 'Expand' : 'Collapse';
-    });
-
-    // ============================================================
-    // MOBILE SIDEBAR
-    // ============================================================
-    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
-    const overlay = document.getElementById('sidebarOverlay');
-
-    function openMobileSidebar() {
-      sidebar.classList.add('mobile-open');
-      overlay.classList.add('active');
-      document.body.style.overflow = 'hidden';
-    }
-
-    function closeMobileSidebar() {
-      sidebar.classList.remove('mobile-open');
-      overlay.classList.remove('active');
-      document.body.style.overflow = '';
-    }
-
-    mobileMenuBtn.addEventListener('click', openMobileSidebar);
-
-    // Close sidebar on link click (mobile)
-    document.querySelectorAll('.sidebar-link').forEach(link => {
-      link.addEventListener('click', () => {
-        if (window.innerWidth < 1024) {
-          closeMobileSidebar();
-        }
-      });
-    });
-
-    // ============================================================
-    // TAB SWITCHING WITH TITLE UPDATE
-    // ============================================================
-    const sidebarLinks = document.querySelectorAll('.sidebar-link');
-    const tabContents = {
-      overview: document.getElementById('tab-overview'),
-      stores: document.getElementById('tab-stores'),
-      inventory: document.getElementById('tab-inventory'),
-      orders: document.getElementById('tab-orders'),
-      analytics: document.getElementById('tab-analytics'),
-      profile: document.getElementById('tab-profile'),
-      settings: document.getElementById('tab-settings'),
-      support: document.getElementById('tab-support'),
-    };
-
-    const mainTitle = document.getElementById('mainTitle');
-
-    // Tab titles mapping
-    const tabTitles = {
-      overview: 'Dashboard',
-      stores: 'Stores',
-      inventory: 'Inventory',
-      orders: 'Orders',
-      analytics: 'Analytics',
-      profile: 'Profile',
-      settings: 'Settings',
-      support: 'Support'
-    };
-
-    sidebarLinks.forEach(link => {
-      link.addEventListener('click', function(e) {
-        e.preventDefault();
-
-        // Remove active from all links
-        sidebarLinks.forEach(l => l.classList.remove('active'));
-        this.classList.add('active');
-
-        // Hide all tab contents
-        Object.values(tabContents).forEach(content => {
-          if (content) content.classList.remove('active');
-        });
-
-        // Show selected tab
-        const tabId = this.dataset.tab;
-        if (tabContents[tabId]) {
-          tabContents[tabId].classList.add('active');
-        }
-
-        // ✅ Update main title with tab name
-        if (tabId && tabTitles[tabId]) {
-          mainTitle.textContent = tabTitles[tabId];
-        }
-      });
-    });
-
-    // ============================================================
-    // PROFILE POPUP MENU
-    // ============================================================
-    const profileTrigger = document.getElementById('profileTrigger');
-    const profilePopup = document.getElementById('profilePopup');
-    const popupChevron = document.getElementById('popupChevron');
-    let isPopupOpen = false;
-
-    function togglePopup(e) {
-      e.stopPropagation();
-      isPopupOpen = !isPopupOpen;
-      profilePopup.classList.toggle('show', isPopupOpen);
-      popupChevron.style.transform = isPopupOpen ? 'rotate(180deg)' : 'rotate(0deg)';
-    }
-
-    function closePopup() {
-      isPopupOpen = false;
-      profilePopup.classList.remove('show');
-      popupChevron.style.transform = 'rotate(0deg)';
-    }
-
-    profileTrigger.addEventListener('click', togglePopup);
-
-    // Close popup when clicking outside
-    document.addEventListener('click', function(e) {
-      if (!profileTrigger.contains(e.target) && !profilePopup.contains(e.target)) {
-        closePopup();
-      }
-    });
-
-    // Close popup on Escape key
-    document.addEventListener('keydown', function(e) {
-      if (e.key === 'Escape' && isPopupOpen) {
-        closePopup();
-      }
-    });
-
-    // Popup item actions
-    document.getElementById('viewProfileBtn').addEventListener('click', function() {
-      closePopup();
-      // Find and click the profile tab
-      const profileTab = document.querySelector('.sidebar-link[data-tab="profile"]');
-      if (profileTab) profileTab.click();
-    });
-
-    document.getElementById('accountSettingsBtn').addEventListener('click', function() {
-      closePopup();
-      const settingsTab = document.querySelector('.sidebar-link[data-tab="settings"]');
-      if (settingsTab) settingsTab.click();
-    });
-
-    // document.getElementById('signoutBtn').addEventListener('click', function() {
-    //   closePopup();
-    //   if (confirm('Are you sure you want to sign out?')) {
-    //     // Redirect to sign out endpoint
-    //     window.location.href = '/logout';
-    //   }
-    // });
-
-    // ============================================================
-    // CHARTS
-    // ============================================================
-    // Sales Chart
-    const salesCtx = document.getElementById('salesChart')?.getContext('2d');
-    if (salesCtx) {
-      new Chart(salesCtx, {
-        type: 'line',
-        data: {
-          labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-          datasets: [{
-            label: 'Sales ($)',
-            data: [1200, 1900, 1500, 2200, 2800, 2100, 2600],
-            borderColor: '#ED1B24',
-            backgroundColor: 'rgba(237, 27, 36, 0.05)',
-            fill: true,
-            tension: 0.4,
-            borderWidth: 2,
-            pointBackgroundColor: '#ED1B24',
-            pointBorderColor: 'white',
-            pointBorderWidth: 2,
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: {
-              display: false
-            }
-          },
-          scales: {
-            y: {
-              beginAtZero: true,
-              grid: {
-                color: 'rgba(0,0,0,0.04)'
-              }
-            },
-            x: {
-              grid: {
-                display: false
-              }
-            }
-          }
-        }
-      });
-    }
-
-    // Order Status Chart
-    const orderCtx = document.getElementById('orderChart')?.getContext('2d');
-    if (orderCtx) {
-      new Chart(orderCtx, {
-        type: 'doughnut',
-        data: {
-          labels: ['Completed', 'Processing', 'Pending', 'Cancelled'],
-          datasets: [{
-            data: [1112, 124, 48, 23],
-            backgroundColor: ['#22c55e', '#3b82f6', '#f59e0b', '#ef4444'],
-            borderWidth: 0,
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: {
-              position: 'bottom',
-              labels: {
-                padding: 12,
-                usePointStyle: true,
-                pointStyle: 'circle'
-              }
-            }
-          },
-          cutout: '70%',
-        }
-      });
-    }
-
-    // ============================================================
-    // QUICK ACTIONS MODAL
-    // ============================================================
-    const quickActionsBtn = document.getElementById('quickActionsBtn');
-    const quickActionsModal = document.getElementById('quickActionsModal');
-
-    function openQuickActions() {
-      quickActionsModal.classList.remove('hidden');
-      quickActionsModal.style.display = 'flex';
-      document.body.style.overflow = 'hidden';
-    }
-
-    function closeQuickActions() {
-      quickActionsModal.classList.add('hidden');
-      quickActionsModal.style.display = 'none';
-      document.body.style.overflow = '';
-    }
-
-    quickActionsBtn.addEventListener('click', openQuickActions);
-
-    // Close on Escape
-    document.addEventListener('keydown', function(e) {
-      if (e.key === 'Escape') {
-        if (!quickActionsModal.classList.contains('hidden')) {
-          closeQuickActions();
-        }
-      }
-    });
-
-    // Quick action links
-    document.querySelectorAll('#quickActionsModal a').forEach(link => {
-      link.addEventListener('click', function(e) {
-        e.preventDefault();
-        closeQuickActions();
-        const text = this.querySelector('p')?.textContent || 'Action';
-        alert(`🚀 "${text}" — Coming soon!`);
-      });
-    });
-
-    $(document).ready(() => {
-      $('#sidebarOverlay').click(closeMobileSidebar);
-      $('#closeQuickActionsBtn').click(closeQuickActions);
-      $('#quickActionsModal .modal-overlay').click(closeQuickActions)
-    });
+    lucide.createIcons();
   </script>
 
 </body>

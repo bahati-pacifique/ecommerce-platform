@@ -1,0 +1,62 @@
+/* Category card */
+.category-card {
+    transition: all .15s ease;
+    border: 1px solid #E2E8F0;
+    background: #fff;
+}
+
+.category-card:hover {
+    border-color: #FCA5A5;
+    background: #FFFBFA;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px -12px rgba(15, 23, 42, 0.15);
+}
+
+/* Status pill */
+.cat-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 999px;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.cat-pill.pending {
+    background: #FEF3C7;
+    color: #B45309;
+}
+
+.cat-pill.approved {
+    background: #DCFCE7;
+    color: #15803D;
+}
+
+.cat-pill.rejected {
+    background: #FEE2E2;
+    color: #B91C1C;
+}
+
+/* View toggle active */
+.view-toggle.active {
+    background: #fff;
+    color: #0F172A;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08);
+}
+
+/* Search highlight */
+.cat-highlight {
+    background: #FEF3C7;
+    border-radius: 3px;
+    padding: 0 2px;
+}
+
+/* Field error */
+.field-error input,
+.field-error textarea {
+    border-color: #DC2626;
+    background: #FEF2F2;
+}

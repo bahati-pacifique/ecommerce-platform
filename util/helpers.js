@@ -1,5 +1,10 @@
 const UAParser = require('ua-parser-js');
 
+/**
+ * 
+ * @param {*} req Client request
+ * @returns true if request accept html otherwise false
+ */
 function acceptsHtml(req) {
   const acceptsHtml = req.accepts(['html', 'json']) === 'html';
   const isAjax = req.xhr || req.get('X-Requested-With') === 'XMLHttpRequest';
@@ -22,7 +27,7 @@ function normalizeUA(userAgent) {
 
 function deny401(req, res, { message = "Please login to continue", details, originalUrl = req.originalUrl } = {}) {
   if (acceptsHtml(req)) {
-    return res.status(401).render("admin-login", { originalUrl, message, details });
+    return res.status(401).render("auth", { originalUrl, message, details });
   }
   return res.status(401).json(
     {
@@ -39,7 +44,7 @@ function deny401(req, res, { message = "Please login to continue", details, orig
 function deny403(req, res, { message = "Access denied", details, originalUrl = req.originalUrl } = {}) {
 
   if (acceptsHtml(req)) {
-    return res.status(403).render("admin-login", { originalUrl, message, details });
+    return res.status(403).render("auth", { originalUrl, message, details });
   }
 
   return res.status(403).json({ authenticated: false, originalUrl, success: false, message });
@@ -48,7 +53,7 @@ function deny403(req, res, { message = "Access denied", details, originalUrl = r
 function deny500(req, res, { message = "Internal Server Error", details, originalUrl = req.originalUrl } = {}) {
 
   if (acceptsHtml(req)) {
-    return res.status(500).render("admin-login", { originalUrl, message, details });
+    return res.status(500).render("auth", { originalUrl, message, details });
   }
 
   return res.status(403).json({ authenticated: false, originalUrl, success: false, message });

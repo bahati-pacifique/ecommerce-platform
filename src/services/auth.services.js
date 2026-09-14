@@ -1,34 +1,23 @@
 const authModel = require('../models/auth.model');
+const { Vendor } = require('../../src/models/vendor.model');
 const sessionModel = require('../models/session.model');
-const { 
-    normalizeUA, 
-    setPreauth, 
-    signPreAuth, 
-    signAccessToken, 
-    signRefreshToken, 
-    decodePreauthToken, 
+const {
+    normalizeUA,
+    setPreauth,
+    signPreAuth,
+    signAccessToken,
+    signRefreshToken,
+    decodePreauthToken,
     sameNetwork,
-    setAuthCookies, 
+    setAuthCookies,
     decodeAuthCookies
- } = require('../../util/authTokens');
+} = require('../../util/authTokens');
 
 const bcrypt = require('bcrypt');
 
 class AuthService {
 
     async login(username, email, ip, password, agent) {
-
-        // if (!username && !email) {
-        //     throw new Error('Username or email is required');
-        // }
-
-        // if (!password) {
-        //     throw new Error(`Can't signin without password`);
-        // }
-
-        // if (!agent) {
-        //     throw new Error(`Sorry — Something went wrong`)
-        // }
 
         let user, identifier;
 
@@ -39,7 +28,7 @@ class AuthService {
             user = await authModel.getUserByUsernameOrEmail(identifier);
 
             if (!user) {
-                throw new Error(`Account not found`);
+                throw new Error(`Account not found — This might be a temporary error, you may try again`);
             }
 
             const match = await bcrypt.compare(password, user.password_hash);
@@ -65,7 +54,7 @@ class AuthService {
                 preauth
             };
         } catch (error) {
-            console.log(error);
+            console.log("login() ", error);
             if (error.code === '23505' && error.constraint === 'uniq_unused_preauth_per_user' && user) {
 
                 const preauth = await authModel.getUnusedPreauthByUser(user.id);
@@ -153,9 +142,9 @@ class AuthService {
             }
 
             const sessionAccount = session.userAccount;
-            const sessionIp = session.ipAddress;
+            //const sessionIp = session.ipAddress;
             const sessionAgent = session.userAgent;
-            const sessionTimezone = session.timezone;
+            //const sessionTimezone = session.timezone;
 
             const okAgent = sessionAgent === tokenPayloads.ua;
 
@@ -175,6 +164,19 @@ class AuthService {
                 }
             }
 
+            if (user.account_category === 'Business') {
+                //Retrive user's vendor info
+                try {
+                    const vendorResult = await Vendor.getVendorByUserId(user.user_id);
+                    if (vendorResult) {
+                        user.vendor = vendorResult;
+                    }
+                } catch (error) {
+                    console.log('Error getting vendor: ', error);
+                }
+
+            }
+
             return {
                 success: true,
                 userAccount: user,
@@ -192,7 +194,7 @@ class AuthService {
 
     async getUserAccounts(userId) {
         try {
-            const accounts = await authModel.getUserAccounts(userId, {onlyValid: true});
+            const accounts = await authModel.getUserAccounts(userId, { onlyValid: true });
             return accounts;
         } catch (error) {
             console.log(error);
@@ -202,8 +204,6 @@ class AuthService {
     }
 
     async validateLogin(preAuthId, userId, accountId, req) {
-
-        console.log(preAuthId, userId, accountId)
 
         if (!preAuthId || !userId || !accountId) return {
             success: false,
@@ -250,6 +250,18 @@ class AuthService {
             await authModel.setUserAccountActiveStatus('user_account', accountId);
             await authModel.expirePreauthForUser(userId);
 
+            if (userAccount.account_category === 'Business') {
+                
+                try {
+                    const vendorResult = await Vendor.getVendorByUserId(userAccount.user_id);
+                    if (vendorResult) {
+                        userAccount.vendor = vendorResult;
+                    }
+                } catch (error) {
+                    console.log('Error getting vendor: ', error);
+                }
+
+            }
             return {
                 success: true,
                 authenticated: true,

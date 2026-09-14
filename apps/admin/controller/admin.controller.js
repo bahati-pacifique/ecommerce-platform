@@ -4,6 +4,18 @@ const { decodeAuthCookies } = require('../../../util/authTokens');
 const { clearAuthentication, acceptsHtml } = require('../../../util/helpers');
 const authServices = require('../../../src/services/auth.services');
 
+const isProduction = process.env.NODE_ENV === 'production';
+
+const sslUrlPrefix = isProduction ? 'https://' : 'http://';
+
+const portSuffix = isProduction ? '' : `:${process.env.PORT}`;
+
+const domain = `${sslUrlPrefix}business.${process.env.DOMAIN}${portSuffix}`;
+const authDomain = `${sslUrlPrefix}auth.${process.env.DOMAIN}${portSuffix}?r=${domain}/dashboard`;
+
+const protocal = sslUrlPrefix;
+const domainName = `${process.env.DOMAIN}${portSuffix}`;
+
 async function home(req, res) {
     // try {
     //     await mockService.testConnection();
@@ -40,16 +52,30 @@ async function renderAccountSelection(req, res) {
 
 async function renderDashboard(req, res) {
 
-    const isProduction = process.env.NODE_ENV === 'production';
+    //const isProduction = process.env.NODE_ENV === 'production';
 
-    const domain = process.env.DOMAIN;
+    //const domain = process.env.DOMAIN;
 
-    const protocal = isProduction ? "https://" : "http://"
-    const port = isProduction ? '' : process.env.PORT;
+    //const protocal = isProduction ? "https://" : "http://"
+    //const port = isProduction ? '' : process.env.PORT;
 
     const user = req.user || {};
 
-    res.render('dashboard', { user, protocal, port, domain });
+    res.render('dashboard', { user, protocal, domainName });
+}
+
+async function renderBusinessApplications(req, res) {
+    const user = req.user;
+
+    const referenceNumber = req.params.reference_number;
+
+    if (referenceNumber) {
+        req.session.referenceNumber = referenceNumber;
+        return res.redirect('/vendor/applications');
+    }
+
+    if (req.session.referenceNumber) return res.render('vendor-applications', { protocal, domainName, user, referenceNumber: req.session.referenceNumber });
+    return res.render('vendor-applications', { protocal, domainName, user });
 }
 
 async function signout(req, res) {
@@ -74,10 +100,9 @@ async function signout(req, res) {
 
 }
 
-
-const axios = require('axios');
-const fs = require('fs');
-const path = require('path');
+// const axios = require('axios');
+// const fs = require('fs');
+// const path = require('path');
 
 // async function downloadImage() {
 //     const url = 'https://res.cloudinary.com/dfv97pfcq/image/upload/v1717404221/cococe/cococe/p6nxkogue1wlimtlaohz.png';
@@ -115,6 +140,7 @@ const path = require('path');
 module.exports = {
     home,
     renderDashboard,
+    renderBusinessApplications,
     renderLoginPage,
     renderAccountSelection,
     signout

@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>COCOCE — Store Creation</title>
+  <meta name="description" content="COCOCE — Store creation">
+  <meta name="author" content="COCOCE RW">
+  <meta name="keywords" content="Laptops, Desktops, Memories, Storages, Servers, keyboards, Printers, Screens, Repair, Explore, Electronic, Digital, Kigali, Rwanda">
+  <meta property="og:image" content="https://cdn.cococe.rw/meta/cococe.png">
+  <meta property="og:url" content="https://www.cococe.rw">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Laptops, Printers, Accessories, Game consoles, Electronics, and much more, cococe, your wish our priority">
+  <meta property="og:description" content="COCOCE Kigali Rwanda, Laptops, Desktops, Computer accessories, Smart tv, projectors, discover what you want about digital assets near you at Kigali">
+  <meta property="og:logo" content="https://cdn.cococe.rw/meta/cococe.png" />
+  <meta name="twitter:card" content="https://cdn.cococe.rw/meta/cococe.png">
+  <meta property="twitter:domain" content="https://cococe.rw">
+  <meta property="twitter:url" content="https://cococe.rw">
+  <meta name="twitter:title" content="Laptops, Printers, Accessories, Game consoles, Electronics, and much more, cococe, your wish our priority">
+  <meta name="twitter:description" content="COCOCE Kigali Rwanda, Laptops, Desktops, Computer accessories, Smart tv, projectors, discover what you want about digital assets near you at Kigali">
+
+  <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.11.0/axios.min.js" integrity="sha512-h9644v03pHqrIHThkvXhB2PJ8zf5E9IyVnrSfZg8Yj8k4RsO4zldcQc4Bi9iVLUCCsqNY0b4WXVV4UB+wbWENA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+  <link rel="icon" href="/favicon.ico" type="image/x-icon">
+
+  <link rel="stylesheet" href="/styles/main.css">
+  <link rel="stylesheet" href="/styles/components/notification.css">
+  <link rel="stylesheet" href="/styles/components/main-snackbar.css">
+  <link rel="stylesheet" href="/styles/components/loaders.css">
+  <script>
+    const protocal = "<%=locals.protocal%>";
+    const domainName = "<%=locals.domainName%>";
+  </script>
+
+  <link rel="icon" href="/favicon.ico" type="image/x-icon">
+  <script src="https://code.jquery.com/jquery-4.0.0.js" integrity="sha256-9fsHeVnKBvqh3FB2HYu7g2xseAZ5MlN6Kz/qnkASV8U=" crossorigin="anonymous"></script>
+
+  <link rel="stylesheet" href="/styles/store-creation.css">
+</head>
+
+<body>
+
+  <header class="top-bar">
+    <a href="/" class="brand">
+      <img src="/images/logos/business.png" alt="COCOCE">
+    </a>
+
+    <div class="flex items-center gap-4 flex-wrap">
+      <div class="admin-badge cursor-pointer">
+        <div class="avatar">
+          <i class="bi bi-person"></i>
+        </div>
+        <span class="hidden md:block"><%= locals.user.username %></span>
+      </div>
+
+      <div class="signout-form">
+        <form action="<%=locals.protocal%>auth.<%=locals.domainName%>/signout" method="post">
+          <input type="hidden" value="<%=locals.user.userAccount%>" name="userAccount">
+          <input type="hidden" name="host" value="<%=locals.protocal%>business.<%=locals.domainName%>/">
+          <button type="submit" class="flex items-center gap-2 bg-white/20 hover:bg-white/30 text-white shadow-sm rounded-full px-4 py-2 text-sm transition-all">
+            <span class="hidden md:block">Signout</span> <i class="bi bi-arrow-right"></i>
+          </button>
+        </form>
+      </div>
+    </div>
+  </header>
+
+  <div class="page-header">
+    <div class="header-content">
+      <div>
+        <h1>
+          <span class="text-gray-500">Store Creation</span>
+        </h1>
+        <div class="breadcrumb">
+          <p>
+            <a href="/stores/docs/terms" class="text-brand hover:underline"><i class="bi bi-shield-fill-check"></i> Terms and conditions</a> apply
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <section class="form-section">
+    <div class="form-container">
+      <h2 class="form-title">
+        <i class="bi bi-info-circle"></i> Store Information
+      </h2>
+      <p class="form-subtitle">Fill in the details below to create a new store.</p>
+
+      <form id="storeForm" novalidate>
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="storeName">
+              <i class="bi bi-tag"></i> Store Name <span class="required">*</span>
+            </label>
+            <input type="text" id="storeName" name="name" placeholder="Enter store name" value="<%=locals.user.vendor?.business_name%>" required />
+            <div class="error-message" id="nameError"><i class="bi bi-exclamation-circle"></i> Store name is required</div>
+            <span class="mt-1 text-gray-500 text-xs" id="nameCheckingResponse"></span>
+          </div>
+
+          <div class="form-group">
+            <label for="storeSlug">
+              <i class="bi bi-link-45deg"></i> Slug <span class="required">*</span>
+              <span class="hint">(URL-friendly identifier)</span>
+            </label>
+            <div class="input-wrapper">
+              <input type="text" id="storeSlug" name="slug" placeholder="e.g. my-store" required />
+            </div>
+            <span class="text-xs" id="slugPreview"></span>
+            <div class="error-message" id="slugError"><i class="bi bi-exclamation-circle"></i> Slug is required</div>
+          </div>
+
+          <div class="form-group full-width">
+            <label for="storeDescription">
+              <i class="bi bi-file-text"></i> Description
+            </label>
+            <textarea id="storeDescription" name="description" rows="4" placeholder="Describe your store, what products or services you offer..." maxlength="500"></textarea>
+            <div class="char-count" id="charCount">0 / 500</div>
+          </div>
+
+          <div class="form-group full-width">
+            <label for="storeAvatar">
+              <i class="bi bi-image"></i> Store Avatar / Logo
+            </label>
+            <div class="avatar-upload">
+              <div class="avatar-preview" id="avatarPreview">
+                <div class="placeholder">
+                  <i class="bi bi-shop"></i>
+                  <span>No image</span>
+                </div>
+                <button class="remove-image" id="removeAvatarBtn" type="button">
+                  <i class="bi bi-x-lg"></i>
+                </button>
+              </div>
+              <div class="upload-controls">
+                <div class="file-input-wrapper">
+                  <button class="btn-upload" type="button">
+                    <i class="bi bi-cloud-upload"></i> Choose Image
+                  </button>
+                  <input type="file" id="storeAvatar" name="avatar" accept=".png" />
+                </div>
+                <span class="file-name" id="fileName"><i class="bi bi-file-earmark"></i> No file selected</span>
+                <span class="file-name" style="color: #94A3B8; font-size: 11px;">
+                  <i class="bi bi-info-circle"></i>.png (Square image, max 2MB)
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="storePhone">
+              <i class="bi bi-telephone"></i> Phone Number
+            </label>
+            <input type="text" id="storePhone" name="phone_number" placeholder="+250 788 000 000" value="<%=locals.user.phoneNumber%>" />
+          </div>
+
+          <div class="form-group">
+            <label for="storeEmail">
+              <i class="bi bi-envelope"></i> Email
+            </label>
+            <input type="email" id="storeEmail" name="email" placeholder="store@example.com" value="<%=locals.user.email%>" />
+            <div class="error-message" id="emailError"><i class="bi bi-exclamation-circle"></i> Please enter a valid email</div>
+          </div>
+
+          <div class="form-group full-width">
+            <label for="storeAddress">
+              <i class="bi bi-geo-alt"></i> Physical Address
+            </label>
+            <input type="text" id="storeAddress" name="physical_address" placeholder="KN 5 St, Kigali, Rwanda" value="<%=locals.user.vendor?.business_address%>" />
+          </div>
+
+          <div class="form-group full-width">
+            <label>
+              <i class="bi bi-input-cursor"></i> Meta Data
+              <span class="hint">(Key-value pairs)</span>
+            </label>
+            <div class="meta-container">
+              <div class="meta-header">
+                <span class="meta-title"><i class="bi bi-database"></i> Store Metadata</span>
+                <span class="meta-count" id="metaCount">0 items</span>
+              </div>
+              <div class="meta-body" id="metaBody">
+                <div class="meta-empty" id="metaEmpty">
+                  <i class="bi bi-database-slash"></i>
+                  No meta data added yet
+                  <br>
+                  <span style="font-size: 12px;">Click "Add Meta" to add key-value pairs</span>
+                </div>
+              </div>
+              <div class="meta-footer">
+                <button class="btn-add-meta" id="addMetaBtn" type="button">
+                  <i class="bi bi-plus-circle"></i> Add Meta
+                </button>
+              </div>
+            </div>
+            <div class="meta-helper" style="margin-top: 6px;">
+              <span class="meta-hint" style="font-size: 12px; color: #94A3B8;">
+                <i class="bi bi-info-circle"></i>
+                Add custom metadata like opening hours, social links, etc.
+              </span>
+              <span class="meta-hint" style="font-size: 12px; color: #94A3B8;">
+                <span class="example" id="exampleMetaBtn" style="color: #ED1B24; cursor: pointer;">
+                  <i class="bi bi-arrow-counterclockwise"></i> Load examples
+                </span>
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div class="text-sm mt-3 w-full flex items-center justify-end">
+          <p class="text-gray-500">By creating store you accept to store's <a href="/stores/docs/terms/" class="text-brand hover:underline" target="_blank">Terms and Condition</a></p>
+        </div>
+        <div class="form-actions">
+          <button type="submit" class="btn-primary" id="submitBtn">
+            <i class="bi bi-upload"></i> Submit
+          </button>
+          <a href="/dashboard" class="btn-secondary">
+            <i class="bi bi-x-lg"></i> Cancel
+          </a>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <footer class="py-6 px-4 bg-white border-t border-gray-100 mt-auto">
+    <div class="flex flex-col md:flex-row justify-between items-center gap-2 text-xs text-gray-400">
+      <span>© 2026 <span class="text-brand font-bold">COCOCE Business</span> — All Rights Reserved</span>
+      <div class="flex gap-6">
+        <a href="/stores/docs/terms/" class="hover:text-brand transition">Terms</a>
+        <a href="/stores/docs" class="hover:text-brand transition">Docs</a>
+        <a href="mailto:support@cococe.rw" class="hover:text-brand transition">Support</a>
+      </div>
+    </div>
+  </footer>
+
+  <div class="modal-backdrop" id="successModal">
+    <div class="modal-card">
+      <div class="modal-checkmark">
+        <i class="bi bi-check-lg"></i>
+      </div>
+      <h2><i class="bi bi-check-circle-fill" style="color: #16A34A;"></i> Store Created!</h2>
+      <p class="modal-message">Your store has been created successfully.</p>
+
+      <div class="modal-details" id="modalDetails">
+        <p>
+          Please navigate to the vendor dashboard and select a store to manage your operations. Thank you for your cooperation.
+        </p>
+      </div>
+
+
+      <div class="modal-actions">
+        <a href="/dashboard" class="btn-primary">
+          Go to Dashboard <i class="bi bi-arrow-right"></i>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast">
+    <i class="bi bi-check-circle-fill"></i>
+    <span id="toastMessage">Success</span>
+  </div>
+
+  <script src="/scripts/helper/utils.js"></script>
+  <script src="/scripts/components/notification.js"></script>
+  <script src="/scripts/components/main-snackbar.js"></script>
+
+  <script src="/scripts/store-creation.js"></script>
+
+</body>
+
+</html>

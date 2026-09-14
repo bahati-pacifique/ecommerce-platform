@@ -383,6 +383,240 @@ class MailServices {
         return response;
     }
 
+    static async sendVendorApplicationDenyEmail({ to, denyStatus, name, businessName, referenceNumber, portalUrl }) {
+
+        let text = `
+                We have reviewed your application. Unfortunately,
+                your application was not approved for the following reason: ${denyStatus}.
+                <br>
+                Our team may contact you using the contact information
+                provided in your application if further clarification is required.
+            `.trim();
+
+        const html = await renderEmail.renderEmail(
+            "business-application-deny",
+            {
+                firstName: name,
+                businessName: businessName,
+                denyStatus,
+                referenceNumber,
+                portalUrl: portalUrl || `https://business.cococe.rw/business/applications/${vendor.reference_number}`
+            }
+        );
+
+        const emailLog = {
+            recipient_email: to,
+            email_type: "Business Application Notification",
+            title: "Business Application Notification",
+            body_html: html,
+            body_text: text,
+            status: denyStatus
+        };
+
+        let response;
+
+        try {
+
+            response = await transporter.sendMail({
+                from: {
+                    name: process.env.MAIL_BUSINESS_NAME,
+                    address: process.env.MAIL_FROM
+                },
+                to,
+                subject: 'Business Application Notification',
+                text,
+                html
+            });
+
+            emailLog.status = "sent";
+            emailLog.sent_at = new Date();
+            emailLog.provider_message_id = response.messageId;
+
+        } catch (error) {
+            console.error("Unable to send email:", error);
+            emailLog.status = "failed";
+            emailLog.error_message = error.message;
+        }
+
+        try {
+            LogsModel.createEmailLog(emailLog);
+            console.log("Email log registered!");
+        } catch (error) {
+            console.error(
+                "Unable to register email log:",
+                error
+            );
+        }
+
+
+        return response;
+    }
+
+    static async sendVendorApplicationApprovalEmail({ to, firstName, lastName, username, businessName, portalUrl }) {
+
+        let text = `
+                    Hello ${firstName} ${lastName},
+
+                    Thank you for your application to COCOCE Business.
+
+                    We're pleased to let you know that your application to COCOCE Business has been successfully approved.
+
+                    Business Details
+
+                    Business Name: ${businessName}
+                    Username: ${username}
+
+                    You can now access the COCOCE Business portal:
+                    ${portalUrl}
+
+                    If you have any questions, contact us by email at sales@cococe.rw or call +250 787 195 425.
+
+                    Thank you for joining COCOCE Business. We look forward to working with you.
+
+                    Kind regards,
+                    COCOCE Business
+
+                    If you did not submit this application or believe this message was sent to you in error, please contact COCOCE Business Support:
+                    https://admin.cococe.rw/support
+
+                `.trim();
+
+        const html = await renderEmail.renderEmail(
+            "business-application-approval",
+            {
+                firstName: firstName,
+                lastName: lastName,
+                businessName: businessName,
+                usernaName: username,
+                portalUrl: portalUrl || `https://business.cococe.rw/`
+            }
+        );
+
+        const emailLog = {
+            recipient_email: to,
+            email_type: "Business Application Approval",
+            title: "Business Application Approval",
+            body_html: html,
+            body_text: text,
+            status: 'approved'
+        };
+
+        let response;
+
+        try {
+
+            response = await transporter.sendMail({
+                from: {
+                    name: process.env.MAIL_BUSINESS_NAME,
+                    address: process.env.MAIL_FROM
+                },
+                to,
+                subject: 'Business Application Notification',
+                text,
+                html
+            });
+
+            emailLog.status = "sent";
+            emailLog.sent_at = new Date();
+            emailLog.provider_message_id = response.messageId;
+
+        } catch (error) {
+            console.error("Unable to send email:", error);
+            emailLog.status = "failed";
+            emailLog.error_message = error.message;
+        }
+
+        try {
+            LogsModel.createEmailLog(emailLog);
+            console.log("Email log registered!");
+        } catch (error) {
+            console.error(
+                "Unable to register email log:",
+                error
+            );
+        }
+
+
+        return response;
+    }
+
+    static async sendStoreCreationEmailEmail({ to, storeName, firstName, businessName, portalUrl }) {
+
+        let text = `
+                    Hello ${ firstName },
+
+                    Store "${ storeName }" has been created under your business "${ businessName }".
+
+                    You can now manage your store from your COCOCE Business dashboard:
+
+                    ${ portalUrl }
+
+                    If you have any questions, please contact us by email at [sales@cococe.rw] or call +250 787 195 425.
+
+                    If you did not create this store or believe this message was sent to you in error, please contact us at [sales@cococe.rw](mailto:sales@cococe.rw).
+
+                    COCOCE Business
+                    © 2026 COCOCE. All rights reserved.
+
+                `.trim();
+
+        const html = await renderEmail.renderEmail(
+            "store-creation-notification",
+            {
+                firstName,
+                storeName,
+                businessName,
+                portalUrl: portalUrl || `https://business.cococe.rw/`
+            }
+        );
+
+        const emailLog = {
+            recipient_email: to,
+            email_type: "Store creation",
+            title: "Store creation notification",
+            body_html: html,
+            body_text: text
+        };
+
+        let response;
+
+        try {
+
+            response = await transporter.sendMail({
+                from: {
+                    name: process.env.MAIL_BUSINESS_NAME,
+                    address: process.env.MAIL_FROM
+                },
+                to,
+                subject: 'Store creation notification',
+                text,
+                html
+            });
+
+            emailLog.status = "sent";
+            emailLog.sent_at = new Date();
+            emailLog.provider_message_id = response.messageId;
+
+        } catch (error) {
+            console.error("Unable to send email:", error);
+            emailLog.status = "failed";
+            emailLog.error_message = error.message;
+        }
+
+        try {
+            LogsModel.createEmailLog(emailLog);
+            console.log("Email log registered!");
+        } catch (error) {
+            console.error(
+                "Unable to register email log:",
+                error
+            );
+        }
+
+
+        return response;
+    }
+
     static async simplTest() {
         try {
 

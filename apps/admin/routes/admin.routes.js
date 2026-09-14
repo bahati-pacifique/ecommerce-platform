@@ -67,5 +67,7 @@ router.delete('/attribute-values/:id', administration, ProductMetaController.har
 router.patch('/vendors/v/:id', VendorController.updateVendorVerificationStatus);
 router.patch('/vendors/s/:id', VendorController.updateVendorStatus);
 router.get('/vendors/', VendorController.getVendors);
+router.get('/vendor/applications', administration, adminController.renderBusinessApplications);
+router.get('/vendor/applications/:reference_number', administration, adminController.renderBusinessApplications);
 
 module.exports = router;

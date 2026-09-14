@@ -218,10 +218,9 @@ class Vendor {
                 SELECT
                     va.*,
                     u.email,
-                    u.first_name,
-                    u.last_name,
-                    u.phone,
-                    u.avatar_url
+                    u.f_name,
+                    u.l_name,
+                    u.phone_number
                 FROM vendor_applications va
                 LEFT JOIN users u
                     ON va.user_id = u.id
@@ -264,11 +263,8 @@ class Vendor {
         const query = includeUser
             ? `
                 SELECT
-                    va.id,
-                    va.business_name,
-                    va.reference_number,
+                    va.*,
                     INITCAP(REPLACE(va.status, '_', ' ')) AS status_label,
-                    va.submitted_at,
                     u.id AS applicant_id,
                     u.email,
                     CONCAT_WS(' ', u.f_name, u.l_name) AS names
@@ -338,6 +334,15 @@ class Vendor {
 
             const application = applicationResult.rows[0];
 
+            const userResult = await client.query(`
+                    SELECT * FROM users WHERE id = $1
+                `, [application.user_id]);
+
+            const user = userResult.rows[0] || null;
+
+            if (!user) {
+                throw new Error('Failed — User not found');
+            }
 
             // ------------------------------------------------
             // Application must be under review
@@ -367,10 +372,29 @@ class Vendor {
                 );
             }
 
+            //Assign user Business account
 
-            // ------------------------------------------------
-            // Create vendor
-            // ------------------------------------------------
+            //Get Business account
+
+            const { rows: businessAccounts } = await client.query(`
+                    SELECT ct.id AS category_id, ct.title, a.id AS account_id FROM accounts a INNER JOIN
+                    account_categories ct ON a.category_id = ct.id WHERE ct.title = 'Business' LIMIT 1;
+                `);
+
+            if (!businessAccounts[0]) {
+                throw new Error('Assign account failed');
+            }
+
+            const accountId = businessAccounts[0].account_id;
+
+            //Assign to user account
+            const userId = application.user_id;
+
+
+            await client.query(
+                `INSERT INTO user_accounts(user_id, account_id, role) VALUES($1, $2, 'High') RETURNING *`,
+                [userId, accountId]
+            );
 
             const vendorResult = await client.query(`
                 INSERT INTO vendors (
@@ -444,7 +468,8 @@ class Vendor {
 
             return {
                 application: updatedApplicationResult.rows[0],
-                vendor
+                vendor,
+                user
             };
 
         } catch (error) {
@@ -482,10 +507,9 @@ class Vendor {
             SELECT
                 va.*,
                 u.email,
-                u.first_name,
-                u.last_name,
-                u.phone,
-                u.avatar_url
+                u.f_name,
+                u.l_name,
+                u.phone_number
             FROM vendor_applications va
             LEFT JOIN users u
                 ON va.user_id = u.id
@@ -516,7 +540,7 @@ class Vendor {
      * @param {string} data.applicationId
      * @param {string} data.status
      * @param {string} data.reviewerId
-     * @param {string|null} data.rejectionReason
+     * @param {string|null} data.rejectionStatus
      *
      * @returns {Promise<Object>}
      */
@@ -546,13 +570,14 @@ class Vendor {
             !rejectionReason?.trim()
         ) {
             throw new Error(
-                'A rejection reason is required when rejecting an application'
+                'A rejection reason/status is required when rejecting an application'
             );
         }
 
-        if (status !== 'rejected') {
-            rejectionReason = null;
-        }
+        // Event record rejection reason
+        //if (status !== 'rejected') {
+        //     rejectionStatus = null;
+        // }
 
         const query = `
             UPDATE vendor_applications
@@ -578,7 +603,7 @@ class Vendor {
             throw new Error('Vendor application not found');
         }
 
-        return result.rows[0];
+        return result.rows[0] ?? null;
     }
 
 
@@ -606,7 +631,7 @@ class Vendor {
         status = null,
         search = null,
         includeUser = false,
-        sortBy = 'created_at',
+        sortBy = 'submitted_at',
         sortOrder = 'DESC'
     } = {}) {
 
@@ -624,14 +649,14 @@ class Vendor {
             'type',
             'category',
             'status',
-            'created_at',
+            'submitted_at',
             'updated_at',
             'reviewed_at'
         ];
 
         const sortField = validSortFields.includes(sortBy)
             ? sortBy
-            : 'created_at';
+            : 'submitted_at';
 
         const order =
             String(sortOrder).toUpperCase() === 'ASC'
@@ -734,10 +759,9 @@ class Vendor {
             ? `
                 va.*,
                 u.email,
-                u.first_name,
-                u.last_name,
-                u.phone,
-                u.avatar_url
+                u.f_name,
+                u.l_name,
+                u.phone_number
             `
             : 'va.*';
 
@@ -846,10 +870,9 @@ class Vendor {
                 SELECT
                     v.*,
                     u.email,
-                    u.first_name,
-                    u.last_name,
-                    u.phone,
-                    u.avatar_url
+                    u.f_name,
+                    u.l_name,
+                    u.phone_number,
                 FROM vendors v
                 LEFT JOIN users u
                     ON v.user_id = u.id
@@ -890,10 +913,9 @@ class Vendor {
                 SELECT
                     v.*,
                     u.email,
-                    u.first_name,
-                    u.last_name,
-                    u.phone,
-                    u.avatar_url
+                    u.f_name,
+                    u.l_name,
+                    u.phone_number
                 FROM vendors v
                 LEFT JOIN users u
                     ON v.user_id = u.id
@@ -1075,10 +1097,9 @@ class Vendor {
             ? `
                 v.*,
                 u.email,
-                u.first_name,
-                u.last_name,
-                u.phone,
-                u.avatar_url
+                u.f_name,
+                u.l_name,
+                u.phone_number
             `
             : 'v.*';
 
@@ -1265,10 +1286,9 @@ class Vendor {
         }
 
 
-        updates.push('updated_at = NOW()');
+        //updates.push('updated_at = NOW()'); Handled in trigger
 
         values.push(id);
-
 
         const query = `
             UPDATE vendors

@@ -20,6 +20,7 @@ const {
     signRedirect,
     decodeRedirect,
     setAuthCookies,
+    clearAuthCookie,
     normalizeUA,
     decodeAccessToken,
     decodeRefreshToken,
@@ -30,7 +31,6 @@ const {
 } = require('../util/authTokens');
 
 const authServices = require('../src/services/auth.services');
-const { email } = require('../util/validator');
 
 // function checkAuthentication({ acceptedTypes } = {}) {
 
@@ -252,7 +252,7 @@ function authPass({ acceptedTypes }) {
         const portSuffix = isProduction ? '' : `:${process.env.PORT}`;
 
         const protocal = sslUrlPrefix;
-        const domain = process.env.DOMAIN+portSuffix;
+        const domain = process.env.DOMAIN + portSuffix;
 
         const { accessToken, refreshToken } = decodeAuthCookies(req);
 
@@ -281,7 +281,8 @@ function authPass({ acceptedTypes }) {
                 username: accessToken.username,
                 email: accessToken.email,
                 name: accessToken.name,
-                phoneNumber: accessToken.phone_number
+                phoneNumber: accessToken.phone_number,
+                vendor: accessToken.vendor
             }
 
             req.user = user;
@@ -412,21 +413,6 @@ function authPass({ acceptedTypes }) {
             return deny403(req, res, { message: validationResult.message || 'Something went wrong, please login' });
         }
 
-        // if (acceptedTypes && !acceptedTypes.includes(user.account_type)) {
-        //     req.session.message = 'etected. Please log in to continue';
-        //     if (acceptsHtml(req)) {
-        //         return res.redirect(`${sslUrlPrefix}auth.${process.env.DOMAIN}`)
-        //     } else {
-        //         return res.status(401).json({
-        //             authenticated: false,
-        //             success: false,
-        //             message: 'Please login to continue',
-        //             redirectTo: `${sslUrlPrefix}auth.${process.env.DOMAIN}`
-        //         })
-        //     }
-        //     //return deny401(req, res, { message: 'You do not have access to the requested page. Login with valid account' });
-        // }
-
         if (acceptedTypes && !acceptedTypes.includes(user.account_category?.toLowerCase())) {
 
             if (acceptsHtml(req)) {
@@ -440,8 +426,7 @@ function authPass({ acceptedTypes }) {
                     message: `You don't currently have permission to access this page. 
                         Your account is signed in successfully, 
                         but your assigned role doesn't include access to this resource. `
-                })
-                //return res.redirect(`${sslUrlPrefix}auth.${process.env.DOMAIN}${portSuffix}`)
+                });
             } else {
                 return res.status(401).json({
                     authenticated: false,
@@ -457,8 +442,21 @@ function authPass({ acceptedTypes }) {
                     redirectTo: `${sslUrlPrefix}auth.${process.env.DOMAIN}:${portSuffix}`
                 })
             }
-            //return deny401(req, res, { message: 'Access Denied', details: 'Sorry, you do not have access to the requested page. Please login with valid account to continue' });
         }
+
+        // sessionValidation already attach vendor to user
+        //if (user.account_category === 'Business') {
+        //     //Retrive user's vendor info and attach to accesstoken
+        //     try {
+        //         const vendorResult = await Vendor.getVendorByUserId(user.user_id);
+        //         if (vendorResult) {
+        //             user.vendor = vendorResult.id;
+        //         }
+        //     } catch (error) {
+        //         console.log('Error getting vendor: ', error);
+        //     }
+
+        // }
 
         const accessTokenJwtId = uuidv4();
 
@@ -476,6 +474,7 @@ function authPass({ acceptedTypes }) {
             name: user.names,
             phone_number: user.phone_number,
             ip: req.ip,
+            vendor: user.vendor,
             ua: normalizeUA(req.get('User-Agent'))
         });
 
@@ -502,7 +501,8 @@ function authPass({ acceptedTypes }) {
             username: user.username,
             email: user.email,
             name: user.name,
-            phoneNumber: user.phone_number
+            phoneNumber: user.phone_number,
+            vendor: user.vendor
         }
 
         req.domain = domain;
@@ -522,9 +522,9 @@ async function passUser(req, res, next) {
 
     const isProduction = process.env.NODE_ENV === 'production';
 
-    const sslUrlPrefix = isProduction ? 'https://' : 'http://';
+    // const sslUrlPrefix = isProduction ? 'https://' : 'http://';
 
-    const portSuffix = isProduction ? '' : `:${process.env.PORT}`;
+    // const portSuffix = isProduction ? '' : `:${process.env.PORT}`;
 
     // const redirectPayload = decodeRedirect(req.cookies.r);
 
@@ -549,7 +549,8 @@ async function passUser(req, res, next) {
             account_code: accessToken.account_code,
             email: accessToken.email,
             userId: accessToken.u_id,
-            phoneNumber: accessToken.phone_number
+            phoneNumber: accessToken.phone_number,
+            vendor: accessToken.vendor
         }
 
         req.user = user;
@@ -589,6 +590,20 @@ async function passUser(req, res, next) {
             return next();
         }
 
+        //sessionValidation already attach vendor to user
+        // if (user.account_category === 'Business') {
+        //     //Retrive user's vendor info and attach to accesstoken
+        //     try {
+        //         const vendorResult = await Vendor.getVendorByUserId(user.user_id);
+        //         if (vendorResult) {
+        //             user.vendor = vendorResult.id;
+        //         }
+        //     } catch (error) {
+        //         console.log('Error getting vendor: ', error);
+        //     }
+
+        // }
+
         const accessTokenJwtId = uuidv4();
 
         const accessToken2 = signAccessToken({
@@ -605,6 +620,7 @@ async function passUser(req, res, next) {
             name: user.names,
             phone_number: user.phone_number,
             ip: req.ip,
+            vendor: user.vendor,
             ua: normalizeUA(req.get('User-Agent'))
         });
 
@@ -664,7 +680,8 @@ async function validateAuthentication(req, res, next) {
     const redirect = redirectPayload?.redirectTo || req.session.redirectTo || req.query.r || `${sslUrlPrefix}${process.env.DOMAIN}${portSuffix}`;
 
     if (!allowRedirect(redirect)) {
-
+        //Kill req.cookies.r
+        clearAuthCookie(res, 'r');
         const redirectTo = isProduction ? `https://${process.env.DOMAIN}` : `http://${process.env.DOMAIN}:${process.env.PORT}`;
 
         //TODO Implement: Log activity
@@ -679,6 +696,8 @@ async function validateAuthentication(req, res, next) {
         });
 
     }
+
+
 
     const { accessToken, refreshToken } = decodeAuthCookies(req);
 
@@ -751,6 +770,19 @@ async function validateAuthentication(req, res, next) {
             return next();
         }
 
+        // if (user.account_category === 'Business') {
+        //     //Retrive user's vendor info and attach to accesstoken
+        //     try {
+        //         const vendorResult = await Vendor.getVendorByUserId(user.user_id);
+        //         if (vendorResult) {
+        //             user.vendor = vendorResult.id;
+        //         }
+        //     } catch (error) {
+        //         console.log('Error getting vendor: ', error);
+        //     }
+
+        // }
+
         const accessTokenJwtId = uuidv4();
 
         const accessToken2 = signAccessToken({
@@ -767,6 +799,7 @@ async function validateAuthentication(req, res, next) {
             name: user.names,
             phone_number: user.phone_number,
             ip: req.ip,
+            vendor: user.vendor,
             ua: normalizeUA(req.get('User-Agent'))
         });
 
@@ -793,7 +826,9 @@ async function validateAuthentication(req, res, next) {
             username: user.username,
             email: user.email,
             name: user.name,
-            phoneNumber: user.phone_number
+            vendor: user.vendor,
+            phoneNumber: user.phone_number,
+            vendor: user.vendor
         }
 
         let to = redirect;
@@ -854,7 +889,8 @@ function validateAuthorizationAndPass(acceptedType) {
                 username: accessToken.username,
                 email: accessToken.email,
                 name: accessToken.name,
-                phoneNumber: accessToken.phone_number
+                phoneNumber: accessToken.phone_number,
+                vendor: accessToken.vendor
             }
 
             //Validate account type
@@ -908,6 +944,18 @@ function validateAuthorizationAndPass(acceptedType) {
             return next();
         }
 
+        // if (user.account_category === 'Business') {
+        //     //Retrive user's vendor info and attach to accesstoken
+        //     try {
+        //         const vendorResult = await Vendor.getVendorByUserId(user.user_id);
+        //         if (vendorResult) {
+        //             user.vendor = vendorResult.id;
+        //         }
+        //     } catch (error) {
+        //         console.log('Error getting vendor: ', error);
+        //     }
+
+        // }
         const accessTokenJwtId = uuidv4();
 
         const accessToken2 = signAccessToken({
@@ -924,6 +972,7 @@ function validateAuthorizationAndPass(acceptedType) {
             name: user.names,
             phone_number: user.phone_number,
             ip: req.ip,
+            vendor: user.vendor,
             ua: normalizeUA(req.get('User-Agent'))
         });
 
@@ -950,7 +999,8 @@ function validateAuthorizationAndPass(acceptedType) {
             username: user.username,
             email: user.email,
             name: user.name,
-            phoneNumber: user.phone_number
+            phoneNumber: user.phone_number,
+            vendor: user.vendor
         }
 
         return next();
@@ -991,7 +1041,8 @@ function validateAuthWithRedirectTo({ fallbackTo, acceptedType }) {
                 username: accessToken.username,
                 email: accessToken.email,
                 name: accessToken.name,
-                phoneNumber: accessToken.phone_number
+                phoneNumber: accessToken.phone_number,
+                vendor: accessToken.vendor
             }
 
             //Validate account type
@@ -1001,9 +1052,8 @@ function validateAuthWithRedirectTo({ fallbackTo, acceptedType }) {
                 return next();
             }
 
-            console.log(acceptedType, accessToken.ac_type)
-
             req.user = user;
+
             //The user is already authorized, no authorization required
             if (acceptsHtml(req)) {
                 req.message = "You are already authorized";
@@ -1057,6 +1107,18 @@ function validateAuthWithRedirectTo({ fallbackTo, acceptedType }) {
             return next();
         }
 
+        // if (user.account_category === 'Business') {
+        //     //Retrive user's vendor info and attach to accesstoken
+        //     try {
+        //         const vendorResult = await Vendor.getVendorByUserId(user.user_id);
+        //         if (vendorResult) {
+        //             user.vendor = vendorResult.id;
+        //         }
+        //     } catch (error) {
+        //         console.log('Error getting vendor: ', error);
+        //     }
+
+        // }
         const accessTokenJwtId = uuidv4();
 
         const accessToken2 = signAccessToken({
@@ -1073,6 +1135,7 @@ function validateAuthWithRedirectTo({ fallbackTo, acceptedType }) {
             name: user.names,
             phone_number: user.phone_number,
             ip: req.ip,
+            vendor: user.vendor,
             ua: normalizeUA(req.get('User-Agent'))
         });
 
@@ -1099,7 +1162,8 @@ function validateAuthWithRedirectTo({ fallbackTo, acceptedType }) {
             username: user.username,
             email: user.email,
             name: user.name,
-            phoneNumber: user.phone_number
+            phoneNumber: user.phone_number,
+            vendor: user.vendor
         }
 
         if (acceptsHtml(req)) {

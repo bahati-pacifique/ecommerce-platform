@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>COCOCE — Business Applications</title>
+  <meta name="description" content="COCOCE — Business Application Admin Review Portal">
+  <meta name="description" content="COCOCE — Admin portal, COCOCE Kigali Rwanda, Laptops, Desktops, Computer accessories, Smart tv, projectors, discover what you want about digital assets near you at Kigali">
+  <meta name="keywords" content="Laptops, Desktops, Memories, Storages, Servers, keyboards, Printers, Screens, Repair, Explore, Electronic, Digital, Kigali, Rwanda">
+  <meta name="author" content="COCOCE RW">
+
+  <meta property="og:image" content="https://cdn.cococe.rw/meta/cococe.png">
+  <meta property="og:url" content="https://www.cococe.rw">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Laptops, Printers, Accessories, Game consoles, Electronics, and much more, cococe, your wish our priority">
+  <meta property="og:description" content="COCOCE Kigali Rwanda, Laptops, Desktops, Computer accessories, Smart tv, projectors, discover what you want about digital assets near you at Kigali">
+  <meta property="og:logo" content="https://cdn.cococe.rw/meta/cococe.png" />
+
+  <meta name="twitter:card" content="https://cdn.cococe.rw/meta/cococe.png">
+  <meta property="twitter:domain" content="cococe.rw">
+  <meta property="twitter:url" content="https://cococe.rw">
+  <meta name="twitter:title" content="Laptops, Printers, Accessories, Game consoles, Electronics, and much more, cococe, your wish our priority">
+  <meta name="twitter:description" content="COCOCE Kigali Rwanda, Laptops, Desktops, Computer accessories, Smart tv, projectors, discover what you want about digital assets near you at Kigali">
+
+  <link rel="icon" href="/favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.11.0/axios.min.js" integrity="sha512-h9644v03pHqrIHThkvXhB2PJ8zf5E9IyVnrSfZg8Yj8k4RsO4zldcQc4Bi9iVLUCCsqNY0b4WXVV4UB+wbWENA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="https://code.jquery.com/jquery-4.0.0.js" integrity="sha256-9fsHeVnKBvqh3FB2HYu7g2xseAZ5MlN6Kz/qnkASV8U=" crossorigin="anonymous"></script>
+
+  <link rel="stylesheet" href="/styles/components/notification.css">
+  <link rel="stylesheet" href="/styles/components/main-snackbar.css">
+  <link rel="stylesheet" href="/styles/components/loaders.css">
+
+  <link rel="stylesheet" href="/styles/main.css">
+  <script>
+    const protocal = "<%=locals.protocal%>";
+    const domainName = "<%=locals.domainName%>";
+    const referenceNumber = "<%=locals.referenceNumber%>";
+  </script>
+
+  <link rel="stylesheet" href="/styles/vendor-applications.css">
+</head>
+
+<body>
+
+  <header class="top-bar">
+    <a href="/" class="brand">
+      <img src="/images/logos/administration.png" alt="COCOCE">
+    </a>
+
+    <div class="flex items-center gap-4 flex-wrap" style="margin-left: auto;">
+      <div class="admin-badge">
+        <div class="avatar">
+          <i class="fas fa-user"></i>
+        </div>
+        <span class="hidden md:block"><%=locals.user?.username || 'Admin'%></span>
+      </div>
+
+      <div class="signout-form">
+        <form action="<%=locals.protocal%>auth.<%=locals.domainName%>/signout" method="post">
+          <input type="hidden" name="host" value="<%=locals.protocal%>admin.<%=locals.domainName%>">
+          <input type="hidden" name="userAccount" value="<%=locals.user.userAccount%>">
+          <button type="submit" class="flex items-center gap-2 bg-brand hover:bg-brand-dark text-white shadow-sm rounded-full" style="padding: 4px 8px;">
+            <span class="hidden md:block">Signout</span> <i class="bi bi-arrow-right"></i>
+          </button>
+        </form>
+      </div>
+    </div>
+  </header>
+
+  <div class="page-header">
+    <div class="header-content">
+      <h1>
+        <i class="fas fa-clipboard-list" style="color:#ED1B24;"></i>
+        Applications
+        <span class="badge-count" id="appCount">0</span>
+      </h1>
+
+      <div class="header-actions">
+        <div class="search-box">
+          <i class="fas fa-search"></i>
+          <input type="text" id="searchInput" placeholder="Search applications..." autocomplete="off" />
+        </div>
+
+        <button class="btn-filter active" data-filter="all">
+          <i class="bi bi-list"></i> All
+          <span class="count" id="countAll">0</span>
+        </button>
+        <button class="btn-filter" data-filter="missing_requirement">
+          <i class="bi bi-question-lg"></i> Missing Req.
+          <span class="count" id="countPending">0</span>
+        </button>
+        <button class="btn-filter" data-filter="under_review">
+          <i class="bi bi-hourglass"></i> Reviewing
+          <span class="count" id="countReviewing">0</span>
+        </button>
+        <button class="btn-filter" data-filter="approved">
+          <i class="bi bi-check-circle"></i> Approved
+          <span class="count" id="countApproved">0</span>
+        </button>
+        <button class="btn-filter" data-filter="rejected">
+          <i class="bi bi-ban"></i> Rejected
+          <span class="count" id="countRejected">0</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <section class="table-section">
+    <div class="table-container">
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>Reference Number</th>
+              <th>Applicant</th>
+              <th>Business</th>
+              <th>Type</th>
+              <th>Status</th>
+              <th>Submitted</th>
+              <th style="text-align:center;">Action</th>
+            </tr>
+          </thead>
+          <tbody id="applicationsTableBody"></tbody>
+        </table>
+      </div>
+
+      <div class="loading-spinner hidden" id="loadingState">
+        <i class="fas fa-spinner"></i>
+        <span>Loading applications...</span>
+      </div>
+
+      <div class="empty-state hidden" id="emptyState">
+        <i class="bi bi-inbox"></i>
+        <h3>No applications found</h3>
+        <p>Try adjusting your search or filter criteria</p>
+      </div>
+
+      <div class="pagination hidden" id="pagination">
+        <div class="info">
+          Showing <strong id="showingStart">0</strong> - <strong id="showingEnd">0</strong> of <strong id="totalItems">0</strong> applications
+        </div>
+        <div class="controls" id="paginationControls">
+          <button id="prevPage" disabled>
+            <i class="fas fa-chevron-left"></i> Previous
+          </button>
+          <button id="nextPage">
+            Next <i class="fas fa-chevron-right"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="modal-backdrop" id="reviewModal">
+    <div class="modal-card relative">
+
+      <div class="modal-header">
+        <h2><i class="fas fa-file-alt" style="color:#ED1B24; margin-right:8px;"></i>Review Application</h2>
+        <button class="modal-close" id="closeModalBtn">
+          <i class="bi bi-x-lg text-lg"></i>
+        </button>
+      </div>
+
+      <div class="modal-body" id="modalBody">
+        <div class="detail-row">
+          <span class="label"><i class="fas fa-hashtag" style="color:#ED1B24;"></i> Reference</span>
+          <span class="value ref-highlight" id="modalRefNumber"></span>
+        </div>
+        <div class="detail-row">
+          <span class="label"><i class="fas fa-user"></i> Applicant</span>
+          <span class="value" id="modalApplicantName"></span>
+        </div>
+        <div class="detail-row">
+          <span class="label"><i class="fas fa-envelope"></i> Email</span>
+          <span class="value" id="modalEmail"></span>
+        </div>
+        <div class="detail-row">
+          <span class="label"><i class="fas fa-phone"></i> Phone</span>
+          <span class="value" id="modalPhone"></span>
+        </div>
+        <div class="detail-row">
+          <span class="label"><i class="fas fa-store"></i> Business</span>
+          <span class="value" id="modalBusinessName"></span>
+        </div>
+        <div class="detail-row">
+          <span class="label"><i class="fas fa-map-marker-alt"></i> Address</span>
+          <span class="value" id="modalBusinessAddress"></span>
+        </div>
+
+        <div class="detail-row">
+          <span class="label"><i class="fas fa-id-card"></i> TIN / VAT</span>
+          <span class="value" id="modalTaxInfo"></span>
+        </div>
+        <div class="detail-row">
+          <span class="label"><i class="fas fa-tag"></i> Type / Category</span>
+          <span class="value" id="modalTypeCategory"></span>
+        </div>
+        <div class="detail-row">
+          <span class="label"><i class="fas fa-calendar-alt"></i> Submitted</span>
+          <span class="value" id="modalSubmittedAt"></span>
+        </div>
+        <div class="detail-row">
+          <span class="label"><i class="fas fa-info-circle"></i> Status</span>
+          <span class="value" id="modalStatus"></span>
+        </div>
+        <div class="detail-row" style="background: rgba(237,27,36,0.04); border-color: rgba(237,27,36,0.1);">
+          <span class="label"><i class="fas fa-edit" style="color:#ED1B24;"></i> App ID</span>
+          <span class="value" id="modalAppId" style="font-family:'SF Mono','Courier New',monospace;font-size:13px;"></span>
+        </div>
+
+
+        <div class="image-section">
+
+          <div class="image-card">
+            <div class="image-label">
+              <i class="fas fa-camera"></i> Photo Passport
+            </div>
+            <div class="image-wrapper" id="photoPassportWrapper">
+            </div>
+            <div class="image-actions">
+              <button class="view-image-btn" data-type="photo"><i class="fas fa-eye"></i> View</button>
+              <button class="download-image-btn" data-type="photo"><i class="fas fa-download"></i> Download</button>
+            </div>
+          </div>
+
+          <div class="image-card">
+            <div class="image-label">
+              <i class="fas fa-id-card"></i> ID / Passport Copy
+            </div>
+            <div class="image-wrapper" id="idCopyWrapper">
+            </div>
+            <div class="image-actions">
+              <button class="view-image-btn" data-type="id"><i class="fas fa-eye"></i> View</button>
+              <button class="download-image-btn" data-type="id"><i class="fas fa-download"></i> Download</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="text-amber-800 text-lg flex gap-2 bg-amber-800/5 mb-3 px-4 py-3 rounded">
+        <i class="bi bi-exclamation-triangle"></i>
+        <span>Please review the application data, vendor terms & privacy carefully before taking any actions.</span>
+      </div>
+      <div class="modal-actions">
+        <button class="btn-primary approve" id="approveBtn">
+          <i class="bi bi-check2-all text-lg"></i> Approve
+        </button>
+
+        <button class="btn-primary reject" id="rejectBtn">
+          <i class="bi bi-ban text-lg"></i> Reject
+        </button>
+
+        <button class="btn-primary review" id="missingRequirement">
+          <i class="bi bi-question-lg text-lg"></i> Incomplete
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="confirm-modal-backdrop" id="confirmModal">
+    <div class="confirm-modal-card">
+      <div class="confirm-modal-header">
+        <div class="icon-warning">
+          <i class="fas fa-exclamation-triangle"></i>
+        </div>
+        <h2>Confirm Approval</h2>
+      </div>
+
+      <div class="confirm-modal-body">
+        <p>
+          You are about to <span class="highlight-text">approve</span> this application.
+          This will grant and assign the user with a <strong>Business account</strong> on the system.
+        </p>
+        <div class="info-box">
+          <p>
+            <strong>⚠️ Important:</strong> Please make sure you have verified the user's documents and confirmed their identity.
+            This action is irreversible and will provide the user with full business account access.
+          </p>
+        </div>
+        <div class="mt-2">
+          <p>
+            A confirmation email will be sent to the applicant email.
+          </p>
+        </div>
+        <p style="margin-top: 12px; font-size: 13px; color: #94A3B8;">
+          <i class="fas fa-info-circle"></i> Application ID: <strong id="confirmAppId">24</strong>
+        </p>
+      </div>
+
+      <div class="confirm-modal-actions">
+        <button class="btn-confirm cancel-confirm" id="cancelConfirmBtn">
+          Cancel
+        </button>
+        <button class="btn-confirm approve-confirm" id="approveConfirmBtn">
+          Yes, Approve
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="confirm-modal-backdrop" id="loaderModal">
+    <div class="confirm-modal-card relative">
+      <div class="abs-centered" id="modalLoader">
+        <svg version="1.1" x="0" y="0" width="150px" height="150px" viewBox="-10 -10 120 120" enable-background="new 0 0 200 200" xml:space="preserve">
+          <path class="c-loader" d="M0,50 A50,50,0 1 1 100,50 A50,50,0 1 1 0,50" />
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast">
+    <i class="fas fa-check-circle"></i>
+    <span id="toastMessage">Copied to clipboard</span>
+  </div>
+
+  <script src="/scripts/helper/utils.js"></script>
+  <script src="/scripts/components/notification.js"></script>
+  <script src="/scripts/components/main-snackbar.js"></script>
+  <script src="/scripts/vendor-applications.js"></script>
+
+</body>
+
+</html>

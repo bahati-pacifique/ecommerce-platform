@@ -15,6 +15,18 @@ async function getProductActiveCategories(req, res) {
     }
 }
 
+async function getProductActiveCategoriesPaginated(req, res) {
+    try {
+
+        const { page, limit } = req.query;
+        const result = await ProductMetaServices.getActiveCategoriesPaginated(page, limit);
+
+        return res.json(result);
+    } catch (error) {
+        return formatError('getProductActiveCategories()', 500, error, 'Failed — Internal Server Error', res);
+    }
+}
+
 async function getProductActiveFamilies(req, res) {
     try {
         const result = await ProductMetaServices.getActiveFamilies();
@@ -295,15 +307,173 @@ async function checkVendorApplication(req, res) {
     try {
         const { identifier } = req.params;
         const application = await VendorServices.getVendorApplication(identifier, { includeUser: true });
-        return res.status(!application ? 404 : 200).json(application || {message: "Application not found — Please check id or reference number"})
+        return res.status(!application ? 404 : 200).json(application || { message: "Application not found — Please check id or reference number" })
     } catch (error) {
         console.log("checkVendorApplication()", error);
-        return res.status(500).json({message: "Failed — Internal Server Error"});
+        return res.status(500).json({ message: "Failed — Internal Server Error" });
+    }
+}
+
+async function getBusinessApplications(req, res) {
+    try {
+        const { page, limit } = req.query;
+
+        const result = await VendorServices.getVendorApplications({ page, limit, includeUser: true });
+        //TODO implement: Log action
+        return res.json(result)
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ message: error.message || 'Failed — Internal Server Error' })
+    }
+}
+
+async function rejectBusinessApplication(req, res) {
+    try {
+        const reviewerId = req.user.userId || req.user?.id || req.user?.user_id;
+
+        const applicationId = req.params.id
+
+        const {
+            userEmail,
+            firstName,
+            referenceNumber,
+            businessName,
+            rejectionReason = "Application or applicant data does not meet vendor requirements",
+            status = "missing_requirement"
+        } = req.body;
+
+        const rejectResult = await VendorServices.updateVendorApplicationStatus({ applicationId, status, reviewerId, rejectionReason });
+
+        if (rejectResult) {
+            try {
+                await EmailServices.sendVendorApplicationDenyEmail({
+                    to: userEmail,
+                    denyStatus: rejectionReason,
+                    name: firstName,
+                    businessName,
+                    referenceNumber,
+                    portalUrl: `http://business.cococe.rw/applications/${referenceNumber}`
+                })
+            } catch (error) {
+                console.log(error);
+            }
+        }
+
+        return res.json(rejectResult);
+
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            message: "Failed — Internal Error"
+        })
+    }
+}
+
+async function approveBusinessApplication(req, res) {
+    try {
+        const reviewerId = req.user.userId || req.user?.id || req.user?.user_id;
+        const applicationId = req.params.id;
+
+        const approvalResult = await VendorServices.approveVendorApplication({ applicationId, reviewerId });
+
+
+        if (approvalResult && approvalResult.vendor) {
+            try {
+                await EmailServices.sendVendorApplicationApprovalEmail({
+                    to: approvalResult.user?.email,
+                    firstName: approvalResult.user?.f_name,
+                    lastName: approvalResult.user?.l_name,
+                    username: approvalResult.user?.username,
+                    businessName: approvalResult.vendor.business_name,
+                    portalUrl: `http://business.cococe.rw/`
+                })
+            } catch (error) {
+                console.log(error);
+            }
+        }
+
+        return res.json(approvalResult);
+
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            message: error.message || "Unable to approve application — Internal Error"
+        })
+    }
+}
+
+async function uploadUserProfileAvatar(req, res) {
+    try {
+        const avatar = req.files.avatar;
+        const user = req.user;
+
+        const ext = avatar.name.split('.').pop();
+        avatar.name = `${user.userId || user.id || user.user_id}.${ext}`;
+
+        const result = await FileServices.uploadProfileImage(avatar);
+        console.log(result)
+        if (result) {
+            //TODO register user system log
+            //LOG MESSAGE: "A new profile image was upladed by (${user.userId} ${user.username})"
+        }
+        return res.json({ success: true, message: 'Profile image uploaded' });
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({ success: false, message: 'Failed — Internal Server Error' })
+    }
+}
+
+async function updateVendorProfile(req, res) {
+    try {
+        const payload = req.body;
+
+        if (Object.keys(payload).length === 0) {
+            return res.status(400).json({
+                success: false,
+                message: 'No fields provided'
+            });
+        }
+
+        const vendor = req.user.vendor;
+
+        const result = await VendorServices.updateVendor(vendor.id, payload);
+
+        //TODO: implement log activity
+
+        return res.json(result)
+
+    } catch (error) {
+        console.log('updateVendorProfile():', error);
+        res.status(500).json({ message: 'Failed — Internal Server Error' })
+    }
+}
+
+async function removeUserProfileImage(req, res) {
+    try {
+
+        const user = req.user;
+
+        const result = await FileServices.removeFile(`/images/users/profiles/${user.userId || user.user_id || user.id}.jpg`);
+        if (result) {
+            //TODO implement log activity
+            //Log msg: Profile image removed
+
+            return res.json({ success: true, message: 'Profile image removed successfully' })
+
+        }
+
+        return res.json({ success: false, message: 'Failed — Internal Server Error' })
+
+    } catch (error) {
+        console.log('removeUserProfileImage():', error);
+        res.status(500).json({ message: 'Failed — Internal Server Error' });
     }
 }
 
 module.exports = {
     getProductActiveCategories,
+    getProductActiveCategoriesPaginated,
     getProductActiveFamilies,
     getActiveBrands,
     getActiveAttributes,
@@ -314,5 +484,11 @@ module.exports = {
     getRandomUserByAccountCategory,
     checkUsername,
     checkBusinessUsername,
-    checkVendorApplication
+    checkVendorApplication,
+    getBusinessApplications,
+    rejectBusinessApplication,
+    approveBusinessApplication,
+    uploadUserProfileAvatar,
+    updateVendorProfile,
+    removeUserProfileImage
 }

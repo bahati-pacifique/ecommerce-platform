@@ -87,10 +87,9 @@
                     </Section>
 
 
-                    <!-- CTA -->
                     <Section class="mt-7 text-center">
 
-                        <a :href="`https://admin.cococe.rw/dashboard/vendor/applications/${referenceNumber}`"
+                        <a :href="`https://admin.cococe.rw/dashboard/vendor/applications?rf=${referenceNumber}`"
                             class="inline-block rounded-md bg-brand px-6 py-3 text-sm font-bold text-white no-underline">
                             Review Application
                         </a>

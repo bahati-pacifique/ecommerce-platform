@@ -23,6 +23,6 @@ module.exports = {
     //Public profile & portfolios images
     profiles: '/var/www/cococe-storage/images/users/profiles',
     profileIds: '/var/www/cococe-storage/images/users/ids',
-
+    
     business: '/var/www/cococe-storage/business'
 };

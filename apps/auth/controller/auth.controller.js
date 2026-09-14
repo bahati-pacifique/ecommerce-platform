@@ -82,7 +82,6 @@ const authServices = require('../../../src/services/auth.services');
 
 function renderLoginPage(req, res) {
 
-
     const sessionMsg = req.session.message;
     delete req.session.message;
     //delete req.session.redirectTo;
@@ -204,6 +203,7 @@ async function login(req, res) {
 
 
     } catch (error) {
+        console.log('auth.controller login()', error);
         return deny401(req, res, { message: error.message || 'Something Went Wrong' })
     }
 }
@@ -373,6 +373,7 @@ async function accountLogin(req, res) {
         if (!result.success) {
 
             req.session.message = result.message || 'Failed — Unable to authenticate';
+
             if (acceptsHtml(req)) {
                 return res.redirect(`${sslUrlPrefix}auth.${process.env.DOMAIN}`)
             } else {
@@ -383,7 +384,6 @@ async function accountLogin(req, res) {
                     redirectTo: `${sslUrlPrefix}auth.${process.env.DOMAIN}${portSuffix}`
                 })
             }
-            //return deny401(req, res, { message: result.message, originalUrl: '/login' });
         }
 
         // ---- AUTH SUCCESS ----
@@ -398,6 +398,7 @@ async function accountLogin(req, res) {
             ac_type: result.userAccount.account_category?.toLowerCase(),
             ac_title: result.userAccount.account_title,
             role: result.userAccount.role,
+            vendor: result.userAccount.vendor,
             username: result.userAccount.username,
             email: result.userAccount.email,
             name: result.userAccount.names,

@@ -1,6 +1,8 @@
 const storage = require('../configs/storage.config');
 
 const path = require('path');
+//import { rm } from 'node:fs/promises';
+const { unlink } = require('node:fs/promises');
 
 class FileServices {
     /**
@@ -9,9 +11,6 @@ class FileServices {
      * @returns {string} The generated unique filename
      */
     static async uploadProfileImage(file) {
-        // Create a unique file name using a timestamp to prevent overwriting files
-        // const fileExtension = path.extname(file.name);
-        // const uniqueFileName = `${Date.now()}-${Math.round(Math.random() * 1E9)}${fileExtension}`;
 
         const fileName = file.name;
 
@@ -24,9 +23,30 @@ class FileServices {
         await file.mv(destination);
 
         //TODO implement Log activity
-        console.log('User profile image uploaded')
 
         return destination;
+    }
+
+    /**
+    * Removes a file from the storage directory.
+    * 
+    * @param {string} relativePath file's relative path
+    * @returns {Promise<boolean>} returns true if file was removed, otherwise throw an error
+    */
+    static async removeFile(relativePath) {
+
+        const destination = path.join(
+            storage.root,
+            relativePath
+        );
+
+        try {
+            await unlink(destination);
+            return true;
+        } catch (error) {
+            console.error(`Error deleting file: ${error.message}`);
+            throw new Error(`Error deleting file: ${error.message}`)
+        }
     }
 
     /**
@@ -35,10 +55,7 @@ class FileServices {
      * @returns {string} The final saved file name
      */
     static async uploadUserPhotoId(file) {
-        
-        const fileExtension = path.extname(file.name);
 
-        // Name the file exactly after the user's ID
         const fileName = file.name;
 
         const destination = path.join(
@@ -50,6 +67,24 @@ class FileServices {
         await file.mv(destination);
 
         console.log('User id copy image uploaded')
+
+        // Return the final file name so the controller can save it to the DB
+        return destination;
+    }
+
+    static async uploadStoreAvatar(file) {
+
+        const fileName = file.name;
+
+        const destination = path.join(
+            storage.business,
+            'images',
+            'stores',
+            fileName
+        );
+
+        // Save the file
+        await file.mv(destination);
 
         // Return the final file name so the controller can save it to the DB
         return destination;

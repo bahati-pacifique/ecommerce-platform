@@ -40,6 +40,10 @@ class ProductMetaService {
         return await ProductMetaModel.getActiveCategories();
     }
 
+    static async getActiveCategoriesPaginated(page, limit) {
+        return await ProductMetaModel.getActiveCategoriesPaginated(page, limit);
+    }
+
     /**
      * 
      * @param {string|uuid} id Category identifier

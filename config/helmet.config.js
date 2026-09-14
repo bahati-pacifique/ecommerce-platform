@@ -86,6 +86,7 @@ module.exports = {
 
             "connect-src": [
                 "'self'",
+                "https://cdn.cococe.rw",
                 isProduction ? domain : domainWithPort,
                 isProduction ? `${wsProtocol}://*.${DOMAIN}` : wsDomainWithPort
             ],

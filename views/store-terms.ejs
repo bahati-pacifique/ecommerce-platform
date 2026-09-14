@@ -1,0 +1,1517 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>COCOCE Business - Store Terms</title>
+  <link rel="stylesheet" href="/styles/main.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+
+<body class="bg-gray-50 font-sans text-gray-700 antialiased">
+
+  <header class="sticky top-0 z-50 border-b border-gray-200 bg-white/95 backdrop-blur">
+
+    <nav class="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+
+      <a href="#" class="flex items-center gap-2.5">
+        <img src="/images/logos/business.png" alt="COCOCE Business" class="h-12">
+      </a>
+
+      <div class="hidden items-center gap-7 text-sm font-medium text-gray-600 md:flex">
+
+        <%if (locals.user) {%>
+        <a href="/<%=locals.user.vendor.id%>/dashboard" class="transition hover:text-brand">
+          Dashboard
+        </a>
+        <a href="/pricing" class="transition hover:text-brand">
+          Pricing
+        </a>
+        <%}%>
+
+        <a href="/stores/faqs" class="transition hover:text-brand">
+            Faqs
+        </a>
+
+        <a href="mailto:sales@cococe.rw" class="transition hover:text-brand">
+            Contact
+        </a>
+
+        </div>
+
+        <div class="flex items-center gap-4">
+            <button
+                type="button"
+                aria-label="Account"
+                class="flex h-9 w-9 items-center justify-center rounded-full bg-gray-100 text-gray-500 transition hover:bg-gray-200 hover:text-brand">
+                <i class="fas fa-user text-sm"></i>
+            </button>
+        </div>
+
+    </nav>
+
+</header>
+
+
+<section class="border-b border-gray-200 bg-white">
+
+    <div class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
+
+        <div class="mb-6 flex items-center gap-2 text-sm text-gray-500">
+
+            <a href="/store/docs" class="transition hover:text-brand" target="_blank">
+                Docs
+            </a>
+            <i class="fas fa-chevron-right text-[10px] text-gray-400"></i>
+            <span class="text-gray-700">
+                Store Terms
+            </span>
+
+        </div>
+
+        <div class="max-w-3xl">
+
+            <h1 class="text-3xl font-bold tracking-tight text-gray-950 sm:text-4xl lg:text-5xl">
+                Store Terms & Conditions
+            </h1>
+
+            <p class="mt-5 max-w-2xl text-base leading-7 text-gray-600 sm:text-lg">
+                These terms explain the rules and responsibilities that apply to vendors
+                operating stores on the <span class="text-brand font-bold">COCOCE Marketplace</span>.
+            </p>
+
+            <div class="mt-6 flex flex-wrap items-center gap-x-6 gap-y-3 text-sm text-gray-500">
+
+                <div class="flex items-center gap-2">
+
+                    <i class="far fa-calendar text-gray-400"></i>
+
+                    <span>
+                        Last updated
+                        <strong class="font-medium text-gray-700">
+                            September 4, 2026
+                        </strong>
+                    </span>
+
+                </div>
+
+                <div class="flex items-center gap-2">
+
+                    <i class="far fa-clock text-gray-400"></i>
+
+                    <span>
+                        Estimated reading time: 10 minutes
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<main class="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8 lg:py-14">
+
+    <div class="grid grid-cols-1 gap-10 lg:grid-cols-[240px_minmax(0,1fr)]">
+
+        <aside class="lg:sticky lg:top-24 lg:self-start">
+
+            <div class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
+
+                <div class="mb-4 flex items-center gap-2">
+
+                    <i class="fas fa-list text-sm text-brand"></i>
+
+                    <h2 class="text-sm font-semibold text-gray-900">
+                        Contents
+                    </h2>
+
+                </div>
+
+
+                <nav class="space-y-1 text-sm">
+
+                    <a href="#section-1"
+                       class="block rounded-lg px-3 py-2 text-gray-600 transition hover:bg-gray-50 hover:text-brand">
+                        About Marketplace Stores
+                    </a>
+
+                    <a href="#section-2"
+                       class="block rounded-lg px-3 py-2 text-gray-600 transition hover:bg-gray-50 hover:text-brand">
+                        Eligibility
+                    </a>
+
+                    <a href="#section-3"
+                       class="block rounded-lg px-3 py-2 text-gray-600 transition hover:bg-gray-50 hover:text-brand">
+                        Store Ownership
+                    </a>
+
+                    <a href="#section-4"
+                       class="block rounded-lg px-3 py-2 text-gray-600 transition hover:bg-gray-50 hover:text-brand">
+                        Store Branding
+                    </a>
+
+                    <a href="#section-5"
+                       class="block rounded-lg px-3 py-2 text-gray-600 transition hover:bg-gray-50 hover:text-brand">
+                        Product Listings
+                    </a>
+
+                    <a href="#section-6"
+                       class="block rounded-lg px-3 py-2 text-gray-600 transition hover:bg-gray-50 hover:text-brand">
+                        Product Authenticity
+                    </a>
+
+                    <a href="#section-7"
+                       class="block rounded-lg px-3 py-2 text-gray-600 transition hover:bg-gray-50 hover:text-brand">
+                        Pricing
+                    </a>
+
+                    <a href="#section-8"
+                       class="block rounded-lg px-3 py-2 text-gray-600 transition hover:bg-gray-50 hover:text-brand">
+                        Inventory
+                    </a>
+
+                    <a href="#section-9"
+                       class="block rounded-lg px-3 py-2 text-gray-600 transition hover:bg-gray-50 hover:text-brand">
+                        Orders & Fulfillment
+                    </a>
+
+                    <a href="#section-10"
+                       class="block rounded-lg px-3 py-2 text-gray-600 transition hover:bg-gray-50 hover:text-brand">
+                        Order Cancellations
+                    </a>
+
+                    <a href="#section-11"
+                       class="block rounded-lg px-3 py-2 text-gray-600 transition hover:bg-gray-50 hover:text-brand">
+                        Returns & Refunds
+                    </a>
+
+                    <a href="#section-12"
+                       class="block rounded-lg px-3 py-2 text-gray-600 transition hover:bg-gray-50 hover:text-brand">
+                        Customer Communication
+                    </a>
+
+                    <a href="#section-13"
+                       class="block rounded-lg px-3 py-2 text-gray-600 transition hover:bg-gray-50 hover:text-brand">
+                        Fees & Commissions
+                    </a>
+
+                    <a href="#section-14"
+                       class="block rounded-lg px-3 py-2 text-gray-600 transition hover:bg-gray-50 hover:text-brand">
+                        Payments & Payouts
+                    </a>
+
+                    <a href="#section-15"
+                       class="block rounded-lg px-3 py-2 text-gray-600 transition hover:bg-gray-50 hover:text-brand">
+                        Taxes
+                    </a>
+
+                    <a href="#section-16"
+                       class="block rounded-lg px-3 py-2 text-gray-600 transition hover:bg-gray-50 hover:text-brand">
+                        Prohibited Activities
+                    </a>
+
+                    <a href="#section-17"
+                       class="block rounded-lg px-3 py-2 text-gray-600 transition hover:bg-gray-50 hover:text-brand">
+                        Reviews & Ratings
+                    </a>
+
+                    <a href="#section-18"
+                       class="block rounded-lg px-3 py-2 text-gray-600 transition hover:bg-gray-50 hover:text-brand">
+                        Intellectual Property
+                    </a>
+
+                    <a href="#section-19"
+                       class="block rounded-lg px-3 py-2 text-gray-600 transition hover:bg-gray-50 hover:text-brand">
+                        Store Performance
+                    </a>
+
+                    <a href="#section-20"
+                       class="block rounded-lg px-3 py-2 text-gray-600 transition hover:bg-gray-50 hover:text-brand">
+                        Suspension & Termination
+                    </a>
+
+                    <a href="#section-21"
+                       class="block rounded-lg px-3 py-2 text-gray-600 transition hover:bg-gray-50 hover:text-brand">
+                        Marketplace Changes
+                    </a>
+
+                    <a href="#section-22"
+                       class="block rounded-lg px-3 py-2 text-gray-600 transition hover:bg-gray-50 hover:text-brand">
+                        Vendor Responsibility
+                    </a>
+
+                    <a href="#section-23"
+                       class="block rounded-lg px-3 py-2 text-gray-600 transition hover:bg-gray-50 hover:text-brand">
+                        Vendor Relationship
+                    </a>
+
+                    <a href="#section-24"
+                       class="block rounded-lg px-3 py-2 text-gray-600 transition hover:bg-gray-50 hover:text-brand">
+                        Changes to Terms
+                    </a>
+
+                    <a href="#section-25"
+                       class="block rounded-lg px-3 py-2 text-gray-600 transition hover:bg-gray-50 hover:text-brand">
+                        Other Policies
+                    </a>
+
+                    <a href="#section-26"
+                       class="block rounded-lg px-3 py-2 text-gray-600 transition hover:bg-gray-50 hover:text-brand">
+                        Contact & Support
+                    </a>
+
+                </nav>
+
+            </div>
+
+        </aside>
+
+        <article class="min-w-0 overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
+
+            <div class="border-b border-gray-200 bg-gray-50/70 px-6 py-7 sm:px-10">
+
+                <div class="flex gap-4">
+
+                    <div class="hidden h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-brand/10 text-brand sm:flex">
+                        <i class="fas fa-store"></i>
+                    </div>
+
+                    <div>
+
+                        <h2 class="text-lg font-semibold text-gray-900">
+                            Store Terms and Conditions
+                        </h2>
+
+                        <p class="mt-1 text-sm leading-6 text-gray-500">
+                            Please read these terms carefully before creating or operating
+                            a store on the Cococe marketplace.
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="px-6 py-8 sm:px-10 lg:px-12">
+
+                <div class="prose prose-gray max-w-none">
+
+                    <section id="section-1" class="scroll-mt-28 border-b border-gray-100 pb-8">
+
+                        <div class="flex gap-4">
+
+                            <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gray-100 text-xs font-bold text-gray-500">
+                                01
+                            </span>
+
+                            <div class="flex-1">
+
+                                <h2 class="m-0 text-xl font-semibold tracking-tight text-gray-900">
+                                    About Marketplace Stores
+                                </h2>
+
+                                <div class="mt-4 space-y-4 text-[15px] leading-7 text-gray-600">
+
+                                    <p>
+                                        Our platform operates as a multi-vendor marketplace
+                                        that allows approved vendors to create and manage one
+                                        or more stores through which products may be offered
+                                        to customers.
+                                    </p>
+
+                                    <p>
+                                        A store represents a vendor's commercial presence on
+                                        the marketplace. Unless expressly stated otherwise,
+                                        the vendor operating the store is responsible for the
+                                        products, product information, pricing, inventory,
+                                        order fulfillment, warranties, customer service, and
+                                        other obligations associated with products sold through
+                                        that store.
+                                    </p>
+
+                                    <p>
+                                        The marketplace provides the technology and services
+                                        that facilitate transactions between vendors and
+                                        customers but does not become the manufacturer, owner,
+                                        or supplier of a vendor's products solely by allowing
+                                        those products to be listed on the platform.
+                                    </p>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </section>
+
+                    <section id="section-2" class="scroll-mt-28 border-b border-gray-100 py-8">
+
+                        <div class="flex gap-4">
+
+                            <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gray-100 text-xs font-bold text-gray-500">
+                                02
+                            </span>
+
+                            <div class="flex-1">
+
+                                <h2 class="m-0 text-xl font-semibold text-gray-900">
+                                    Eligibility to Operate a Store
+                                </h2>
+
+                                <div class="mt-4 space-y-4 text-[15px] leading-7 text-gray-600">
+
+                                    <p>
+                                        A store may only be operated by a registered and
+                                        authorized vendor. Vendors must provide accurate,
+                                        complete, and current information requested during
+                                        registration, verification, or store creation.
+                                    </p>
+
+                                    <p>
+                                        We may require additional verification before
+                                        approving a vendor, activating a store, enabling
+                                        certain selling features, or processing vendor
+                                        payouts.
+                                    </p>
+
+                                    <p>
+                                        Vendors are responsible for maintaining all
+                                        registrations, licenses, permits, tax registrations,
+                                        or other authorizations required to lawfully conduct
+                                        their business.
+                                    </p>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </section>
+
+                    <section id="section-3" class="scroll-mt-28 border-b border-gray-100 py-8">
+
+                        <div class="flex gap-4">
+
+                            <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gray-100 text-xs font-bold text-gray-500">
+                                03
+                            </span>
+
+                            <div class="flex-1">
+
+                                <h2 class="m-0 text-xl font-semibold text-gray-900">
+                                    Store Ownership and Management
+                                </h2>
+
+                                <div class="mt-4 space-y-4 text-[15px] leading-7 text-gray-600">
+
+                                    <p>
+                                        Each store must be associated with an approved vendor
+                                        account. Vendors are responsible for all activities
+                                        performed through their stores and any accounts
+                                        authorized to manage those stores.
+                                    </p>
+
+                                    <p>
+                                        Vendors must keep store information accurate and up
+                                        to date, including the store name, description,
+                                        contact information, branding, shipping information,
+                                        return policies, and other information displayed to
+                                        customers.
+                                    </p>
+
+                                    <p>
+                                        A vendor may operate multiple stores where permitted
+                                        by the marketplace. We may impose limits on the
+                                        number of stores, store categories, or products that
+                                        a vendor may maintain.
+                                    </p>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </section>
+
+                    <section id="section-4" class="scroll-mt-28 border-b border-gray-100 py-8">
+
+                        <div class="flex gap-4">
+
+                            <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gray-100 text-xs font-bold text-gray-500">
+                                04
+                            </span>
+
+                            <div class="flex-1">
+
+                                <h2 class="m-0 text-xl font-semibold text-gray-900">
+                                    Store Names, Branding, and Identity
+                                </h2>
+
+                                <div class="mt-4 space-y-4 text-[15px] leading-7 text-gray-600">
+
+                                    <p>
+                                        Store names, logos, descriptions, images, and other
+                                        branding elements must not be misleading, unlawful,
+                                        offensive, deceptive, or infringe the intellectual
+                                        property or other rights of third parties.
+                                    </p>
+
+                                    <p>
+                                        Vendors must not impersonate another business, brand,
+                                        organization, individual, or marketplace store.
+                                    </p>
+
+                                    <p>
+                                        We may reject, modify, restrict, or require the
+                                        removal of store branding that violates these terms
+                                        or creates a risk of customer confusion, fraud,
+                                        infringement, or abuse.
+                                    </p>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </section>
+
+                    <section id="section-5" class="scroll-mt-28 border-b border-gray-100 py-8">
+
+                        <div class="flex gap-4">
+
+                            <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gray-100 text-xs font-bold text-gray-500">
+                                05
+                            </span>
+
+                            <div class="flex-1">
+
+                                <h2 class="m-0 text-xl font-semibold text-gray-900">
+                                    Product Listings
+                                </h2>
+
+                                <div class="mt-4 space-y-4 text-[15px] leading-7 text-gray-600">
+
+                                    <p>
+                                        Vendors are responsible for ensuring that all product
+                                        listings are accurate, lawful, and sufficiently
+                                        detailed for customers to make informed purchasing
+                                        decisions.
+                                    </p>
+
+                                    <p>
+                                        Product listings should accurately describe relevant
+                                        characteristics, including where applicable:
+                                    </p>
+
+                                    <ul class="space-y-2 pl-5">
+
+                                        <li class="relative pl-2">
+                                            Product name and brand
+                                        </li>
+
+                                        <li class="relative pl-2">
+                                            Product description and specifications
+                                        </li>
+
+                                        <li class="relative pl-2">
+                                            Available variants, colors, sizes, or configurations
+                                        </li>
+
+                                        <li class="relative pl-2">
+                                            Product condition
+                                        </li>
+
+                                        <li class="relative pl-2">
+                                            Price and applicable charges
+                                        </li>
+
+                                        <li class="relative pl-2">
+                                            Inventory availability
+                                        </li>
+
+                                        <li class="relative pl-2">
+                                            Product images
+                                        </li>
+
+                                        <li class="relative pl-2">
+                                            Warranty information
+                                        </li>
+
+                                        <li class="relative pl-2">
+                                            Delivery or shipping information
+                                        </li>
+
+                                        <li class="relative pl-2">
+                                            Other information required by applicable law
+                                            or marketplace policy
+                                        </li>
+
+                                    </ul>
+
+                                    <p>
+                                        Vendors must not use false specifications, misleading
+                                        images, inaccurate availability information, deceptive
+                                        discounts, fake reviews, or other practices intended
+                                        to mislead customers.
+                                    </p>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </section>
+
+                    <section id="section-6" class="scroll-mt-28 border-b border-gray-100 py-8">
+
+                        <div class="flex gap-4">
+
+                            <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gray-100 text-xs font-bold text-gray-500">
+                                06
+                            </span>
+
+                            <div class="flex-1">
+
+                                <h2 class="m-0 text-xl font-semibold text-gray-900">
+                                    Product Authenticity and Quality
+                                </h2>
+
+                                <div class="mt-4 space-y-4 text-[15px] leading-7 text-gray-600">
+
+                                    <p>
+                                        Vendors may only offer products they are legally
+                                        entitled to sell. Products must comply with applicable
+                                        quality, safety, labeling, certification, and consumer
+                                        protection requirements.
+                                    </p>
+
+                                    <p>
+                                        Counterfeit, pirated, stolen, illegally imported,
+                                        unsafe, recalled, or otherwise unlawful products are
+                                        prohibited.
+                                    </p>
+
+                                    <p>
+                                        We may request documentation demonstrating the
+                                        authenticity, origin, authorization, certification,
+                                        or legal sale of a product.
+                                    </p>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </section>
+
+                    <section id="section-7" class="scroll-mt-28 border-b border-gray-100 py-8">
+
+                        <div class="flex gap-4">
+
+                            <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gray-100 text-xs font-bold text-gray-500">
+                                07
+                            </span>
+
+                            <div class="flex-1">
+
+                                <h2 class="m-0 text-xl font-semibold text-gray-900">
+                                    Pricing
+                                </h2>
+
+                                <div class="mt-4 space-y-4 text-[15px] leading-7 text-gray-600">
+
+                                    <p>
+                                        Vendors are generally responsible for setting the
+                                        prices of products offered through their stores,
+                                        subject to marketplace rules and applicable law.
+                                    </p>
+
+                                    <p>
+                                        Prices must be displayed accurately and must not
+                                        involve artificial inflation, deceptive reference
+                                        pricing, misleading discounts, hidden mandatory
+                                        charges, or other unfair pricing practices.
+                                    </p>
+
+                                    <p>
+                                        Where taxes, shipping charges, service fees, or other
+                                        amounts apply, these may be displayed separately as
+                                        permitted by the marketplace checkout process and
+                                        applicable law.
+                                    </p>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </section>
+
+                    <section id="section-8" class="scroll-mt-28 border-b border-gray-100 py-8">
+
+                        <div class="flex gap-4">
+
+                            <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gray-100 text-xs font-bold text-gray-500">
+                                08
+                            </span>
+
+                            <div class="flex-1">
+
+                                <h2 class="m-0 text-xl font-semibold text-gray-900">
+                                    Inventory and Availability
+                                </h2>
+
+                                <div class="mt-4 space-y-4 text-[15px] leading-7 text-gray-600">
+
+                                    <p>
+                                        Vendors are responsible for maintaining accurate
+                                        inventory information. Products should not be presented
+                                        as available where the vendor knows or reasonably
+                                        should know that the products cannot be fulfilled.
+                                    </p>
+
+                                    <p>
+                                        Repeated cancellations caused by inaccurate stock
+                                        information may result in reduced store visibility,
+                                        selling restrictions, temporary suspension, or other
+                                        marketplace action.
+                                    </p>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </section>
+
+                    <section id="section-9" class="scroll-mt-28 border-b border-gray-100 py-8">
+
+                        <div class="flex gap-4">
+
+                            <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gray-100 text-xs font-bold text-gray-500">
+                                09
+                            </span>
+
+                            <div class="flex-1">
+
+                                <h2 class="m-0 text-xl font-semibold text-gray-900">
+                                    Orders and Fulfillment
+                                </h2>
+
+                                <div class="mt-4 space-y-4 text-[15px] leading-7 text-gray-600">
+
+                                    <p>
+                                        When a customer places a valid order, the vendor is
+                                        responsible for processing and fulfilling that order
+                                        within the applicable handling and delivery periods.
+                                    </p>
+
+                                    <p>
+                                        Vendors must package products appropriately, provide
+                                        accurate shipping information where applicable, and
+                                        use reasonable efforts to ensure products reach
+                                        customers safely and within the communicated delivery
+                                        period.
+                                    </p>
+
+                                    <p>
+                                        Vendors must not request that customers complete
+                                        marketplace orders outside the platform where doing
+                                        so is intended to avoid marketplace fees, customer
+                                        protections, transaction monitoring, or other
+                                        platform requirements.
+                                    </p>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </section>
+
+                    <section id="section-10" class="scroll-mt-28 border-b border-gray-100 py-8">
+
+                        <div class="flex gap-4">
+
+                            <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gray-100 text-xs font-bold text-gray-500">
+                                10
+                            </span>
+
+                            <div class="flex-1">
+
+                                <h2 class="m-0 text-xl font-semibold text-gray-900">
+                                    Order Cancellations
+                                </h2>
+
+                                <div class="mt-4 space-y-4 text-[15px] leading-7 text-gray-600">
+
+                                    <p>
+                                        Vendors should avoid cancelling confirmed orders
+                                        except where cancellation is reasonably necessary,
+                                        such as because of inventory errors, suspected fraud,
+                                        product safety concerns, or other legitimate
+                                        circumstances.
+                                    </p>
+
+                                    <p>
+                                        We may monitor vendor cancellation rates and take
+                                        appropriate action where repeated cancellations
+                                        negatively affect customers or marketplace reliability.
+                                    </p>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </section>
+
+                    <section id="section-11" class="scroll-mt-28 border-b border-gray-100 py-8">
+
+                        <div class="flex gap-4">
+
+                            <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gray-100 text-xs font-bold text-gray-500">
+                                11
+                            </span>
+
+                            <div class="flex-1">
+
+                                <h2 class="m-0 text-xl font-semibold text-gray-900">
+                                    Returns, Refunds, and Customer Claims
+                                </h2>
+
+                                <div class="mt-4 space-y-4 text-[15px] leading-7 text-gray-600">
+
+                                    <p>
+                                        Vendors must comply with the marketplace return and
+                                        refund policies as well as any mandatory customer
+                                        rights provided under applicable law.
+                                    </p>
+
+                                    <p>
+                                        Vendors are responsible for responding promptly and
+                                        reasonably to claims involving defective products,
+                                        incorrect products, damaged products, missing items,
+                                        authenticity concerns, warranty claims, delivery
+                                        problems, and other order-related issues.
+                                    </p>
+
+                                    <p>
+                                        Where marketplace dispute-resolution procedures apply,
+                                        vendors agree to cooperate with those procedures and
+                                        provide requested evidence within the applicable
+                                        deadlines.
+                                    </p>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </section>
+
+                    <section id="section-12" class="scroll-mt-28 border-b border-gray-100 py-8">
+
+                        <div class="flex gap-4">
+
+                            <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gray-100 text-xs font-bold text-gray-500">
+                                12
+                            </span>
+
+                            <div class="flex-1">
+
+                                <h2 class="m-0 text-xl font-semibold text-gray-900">
+                                    Customer Communication
+                                </h2>
+
+                                <div class="mt-4 space-y-4 text-[15px] leading-7 text-gray-600">
+
+                                    <p>
+                                        Vendors must communicate with customers professionally
+                                        and only for legitimate purposes related to marketplace
+                                        transactions, customer support, or other permitted
+                                        activities.
+                                    </p>
+
+                                    <p>
+                                        Vendors must not use customer information for
+                                        unsolicited marketing, harassment, fraud, data
+                                        harvesting, or purposes unrelated to the customer's
+                                        interaction with the marketplace.
+                                    </p>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </section>
+
+                    <section id="section-13" class="scroll-mt-28 border-b border-gray-100 py-8">
+
+                        <div class="flex gap-4">
+
+                            <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gray-100 text-xs font-bold text-gray-500">
+                                13
+                            </span>
+
+                            <div class="flex-1">
+
+                                <h2 class="m-0 text-xl font-semibold text-gray-900">
+                                    Marketplace Fees and Commissions
+                                </h2>
+
+                                <div class="mt-4 space-y-4 text-[15px] leading-7 text-gray-600">
+
+                                    <p>
+                                        The marketplace may charge vendors commissions,
+                                        transaction fees, subscription fees, advertising
+                                        charges, payment-processing fees, service fees, or
+                                        other charges associated with operating a store.
+                                    </p>
+
+                                    <p>
+                                        Applicable charges may depend on the product category,
+                                        vendor plan, promotional program, payment method,
+                                        store status, or other factors.
+                                    </p>
+
+                                    <p>
+                                        Current fees will be communicated through the vendor
+                                        dashboard, marketplace fee schedule, agreement, or
+                                        other appropriate notice.
+                                    </p>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </section>
+
+                    <section id="section-14" class="scroll-mt-28 border-b border-gray-100 py-8">
+
+                        <div class="flex gap-4">
+
+                            <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gray-100 text-xs font-bold text-gray-500">
+                                14
+                            </span>
+
+                            <div class="flex-1">
+
+                                <h2 class="m-0 text-xl font-semibold text-gray-900">
+                                    Vendor Payments and Payouts
+                                </h2>
+
+                                <div class="mt-4 space-y-4 text-[15px] leading-7 text-gray-600">
+
+                                    <p>
+                                        Amounts payable to vendors may be subject to applicable
+                                        marketplace commissions, transaction fees, refunds,
+                                        chargebacks, taxes, reserves, adjustments, penalties,
+                                        or other authorized deductions.
+                                    </p>
+
+                                    <p>
+                                        Payouts may be temporarily withheld where reasonably
+                                        necessary to investigate suspected fraud, customer
+                                        disputes, chargebacks, legal obligations, security
+                                        incidents, policy violations, or other risks.
+                                    </p>
+
+                                    <p>
+                                        Vendors are responsible for ensuring that payout and
+                                        banking information supplied to the marketplace is
+                                        accurate and belongs to an authorized recipient.
+                                    </p>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </section>
+
+                    <section id="section-15" class="scroll-mt-28 border-b border-gray-100 py-8">
+
+                        <div class="flex gap-4">
+
+                            <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gray-100 text-xs font-bold text-gray-500">
+                                15
+                            </span>
+
+                            <div class="flex-1">
+
+                                <h2 class="m-0 text-xl font-semibold text-gray-900">
+                                    Taxes
+                                </h2>
+
+                                <div class="mt-4 space-y-4 text-[15px] leading-7 text-gray-600">
+
+                                    <p>
+                                        Vendors are responsible for determining and complying
+                                        with their applicable tax obligations, including
+                                        registration, reporting, invoicing, collection, and
+                                        payment requirements, except where the marketplace is
+                                        legally required to calculate, collect, withhold, or
+                                        remit taxes on their behalf.
+                                    </p>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </section>
+
+                    <section id="section-16" class="scroll-mt-28 border-b border-gray-100 py-8">
+
+                        <div class="flex gap-4">
+
+                            <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gray-100 text-xs font-bold text-gray-500">
+                                16
+                            </span>
+
+                            <div class="flex-1">
+
+                                <h2 class="m-0 text-xl font-semibold text-gray-900">
+                                    Prohibited Store Activities
+                                </h2>
+
+                                <div class="mt-4 space-y-4 text-[15px] leading-7 text-gray-600">
+
+                                    <p>
+                                        Vendors must not use their stores or marketplace
+                                        services to engage in fraudulent, abusive, deceptive,
+                                        illegal, or harmful conduct.
+                                    </p>
+
+                                    <p>
+                                        Prohibited activities include, without limitation:
+                                    </p>
+
+                                    <ul class="space-y-2 pl-5">
+
+                                        <li>Creating fake orders or transactions</li>
+                                        <li>Manipulating ratings, reviews, sales figures, or search rankings</li>
+                                        <li>Operating duplicate stores to evade restrictions</li>
+                                        <li>Selling prohibited or unlawful products</li>
+                                        <li>Using misleading product descriptions or imagery</li>
+                                        <li>Infringing intellectual property rights</li>
+                                        <li>Misusing customer information</li>
+                                        <li>Attempting to bypass marketplace fees</li>
+                                        <li>Interfering with marketplace systems or security</li>
+                                        <li>Engaging in payment fraud or money laundering</li>
+                                        <li>Encouraging customers to circumvent marketplace protections</li>
+
+                                    </ul>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </section>
+
+                    <section id="section-17" class="scroll-mt-28 border-b border-gray-100 py-8">
+
+                        <div class="flex gap-4">
+
+                            <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gray-100 text-xs font-bold text-gray-500">
+                                17
+                            </span>
+
+                            <div class="flex-1">
+
+                                <h2 class="m-0 text-xl font-semibold text-gray-900">
+                                    Reviews and Ratings
+                                </h2>
+
+                                <div class="mt-4 space-y-4 text-[15px] leading-7 text-gray-600">
+
+                                    <p>
+                                        Customers may be permitted to rate stores, vendors,
+                                        products, and transactions. Vendors must not manipulate
+                                        reviews or ratings through fake transactions,
+                                        incentives conditioned on positive feedback,
+                                        harassment, threats, or other deceptive practices.
+                                    </p>
+
+                                    <p>
+                                        Vendors may respond to reviews where marketplace
+                                        functionality allows, but responses must remain
+                                        professional and comply with marketplace communication
+                                        standards.
+                                    </p>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </section>
+
+                    <section id="section-18" class="scroll-mt-28 border-b border-gray-100 py-8">
+
+                        <div class="flex gap-4">
+
+                            <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gray-100 text-xs font-bold text-gray-500">
+                                18
+                            </span>
+
+                            <div class="flex-1">
+
+                                <h2 class="m-0 text-xl font-semibold text-gray-900">
+                                    Intellectual Property
+                                </h2>
+
+                                <div class="mt-4 space-y-4 text-[15px] leading-7 text-gray-600">
+
+                                    <p>
+                                        Vendors retain ownership of intellectual property they
+                                        lawfully own. By uploading store logos, product images,
+                                        descriptions, videos, or other content, vendors grant
+                                        the marketplace a non-exclusive license to host,
+                                        reproduce, display, distribute, format, and otherwise
+                                        use that content as reasonably necessary to operate,
+                                        market, and promote the marketplace and the vendor's
+                                        products.
+                                    </p>
+
+                                    <p>
+                                        Vendors represent that they have the necessary rights
+                                        and permissions to use and provide all content uploaded
+                                        through their stores.
+                                    </p>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </section>
+
+                    <section id="section-19" class="scroll-mt-28 border-b border-gray-100 py-8">
+
+                        <div class="flex gap-4">
+
+                            <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gray-100 text-xs font-bold text-gray-500">
+                                19
+                            </span>
+
+                            <div class="flex-1">
+
+                                <h2 class="m-0 text-xl font-semibold text-gray-900">
+                                    Store Performance
+                                </h2>
+
+                                <div class="mt-4 space-y-4 text-[15px] leading-7 text-gray-600">
+
+                                    <p>
+                                        We may evaluate stores using performance indicators
+                                        such as order completion rates, fulfillment times,
+                                        cancellation rates, dispute rates, customer feedback,
+                                        refund rates, policy violations, product quality
+                                        concerns, and other relevant marketplace metrics.
+                                    </p>
+
+                                    <p>
+                                        Store performance may affect search visibility,
+                                        eligibility for promotions, selling limits, payout
+                                        schedules, marketplace privileges, or continued
+                                        access to selling services.
+                                    </p>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </section>
+
+                    <section id="section-20" class="scroll-mt-28 border-b border-gray-100 py-8">
+
+                        <div class="flex gap-4">
+
+                            <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gray-100 text-xs font-bold text-gray-500">
+                                20
+                            </span>
+
+                            <div class="flex-1">
+
+                                <h2 class="m-0 text-xl font-semibold text-gray-900">
+                                    Store Suspension and Termination
+                                </h2>
+
+                                <div class="mt-4 space-y-4 text-[15px] leading-7 text-gray-600">
+
+                                    <p>
+                                        We may restrict, suspend, deactivate, or terminate a
+                                        store where we reasonably believe the vendor has
+                                        violated marketplace policies, created legal or
+                                        security risks, engaged in fraudulent activity,
+                                        repeatedly failed customers, or otherwise harmed the
+                                        integrity of the marketplace.
+                                    </p>
+
+                                    <p>
+                                        Depending on the circumstances, actions may include:
+                                    </p>
+
+                                    <ul class="space-y-2 pl-5">
+
+                                        <li>Removing individual product listings</li>
+                                        <li>Limiting new listings</li>
+                                        <li>Reducing store visibility</li>
+                                        <li>Temporarily disabling sales</li>
+                                        <li>Placing funds in reserve</li>
+                                        <li>Suspending the store</li>
+                                        <li>Terminating the store</li>
+                                        <li>Terminating the associated vendor account</li>
+
+                                    </ul>
+
+                                    <p>
+                                        Where appropriate, vendors may be given an opportunity
+                                        to appeal certain enforcement decisions through
+                                        available marketplace procedures.
+                                    </p>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </section>
+
+                    <section id="section-21" class="scroll-mt-28 border-b border-gray-100 py-8">
+
+                        <div class="flex gap-4">
+
+                            <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gray-100 text-xs font-bold text-gray-500">
+                                21
+                            </span>
+
+                            <div class="flex-1">
+
+                                <h2 class="m-0 text-xl font-semibold text-gray-900">
+                                    Marketplace Changes
+                                </h2>
+
+                                <div class="mt-4 space-y-4 text-[15px] leading-7 text-gray-600">
+
+                                    <p>
+                                        We may introduce, modify, replace, suspend, or
+                                        discontinue marketplace features, store functionality,
+                                        seller programs, categories, fee structures, policies,
+                                        or technical requirements.
+                                    </p>
+
+                                    <p>
+                                        Where changes materially affect vendors, reasonable
+                                        notice may be provided through the marketplace, vendor
+                                        dashboard, email, or another appropriate communication
+                                        method.
+                                    </p>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </section>
+
+                    <section id="section-22" class="scroll-mt-28 border-b border-gray-100 py-8">
+
+                        <div class="flex gap-4">
+
+                            <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gray-100 text-xs font-bold text-gray-500">
+                                22
+                            </span>
+
+                            <div class="flex-1">
+
+                                <h2 class="m-0 text-xl font-semibold text-gray-900">
+                                    Vendor Responsibility
+                                </h2>
+
+                                <div class="mt-4 space-y-4 text-[15px] leading-7 text-gray-600">
+
+                                    <p>
+                                        Vendors are responsible for their stores, products,
+                                        employees, representatives, contractors, customer
+                                        communications, fulfillment operations, legal
+                                        compliance, and business activities conducted through
+                                        the marketplace.
+                                    </p>
+
+                                    <p>
+                                        Vendors agree to cooperate reasonably with marketplace
+                                        investigations, customer disputes, payment
+                                        investigations, regulatory requests, and enforcement
+                                        processes concerning their stores or transactions.
+                                    </p>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </section>
+
+                    <section id="section-23" class="scroll-mt-28 border-b border-gray-100 py-8">
+
+                        <div class="flex gap-4">
+
+                            <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gray-100 text-xs font-bold text-gray-500">
+                                23
+                            </span>
+
+                            <div class="flex-1">
+
+                                <h2 class="m-0 text-xl font-semibold text-gray-900">
+                                    Relationship Between the Marketplace and Vendors
+                                </h2>
+
+                                <div class="mt-4 space-y-4 text-[15px] leading-7 text-gray-600">
+
+                                    <p>
+                                        Unless expressly agreed otherwise in writing, vendors
+                                        operate as independent businesses. Nothing in these
+                                        Store Terms creates an employment, partnership, joint
+                                        venture, franchise, or agency relationship between the
+                                        marketplace and a vendor.
+                                    </p>
+
+                                    <p>
+                                        Vendors are not authorized to make commitments,
+                                        warranties, or representations on behalf of the
+                                        marketplace.
+                                    </p>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </section>
+
+                    <section id="section-24" class="scroll-mt-28 border-b border-gray-100 py-8">
+
+                        <div class="flex gap-4">
+
+                            <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gray-100 text-xs font-bold text-gray-500">
+                                24
+                            </span>
+
+                            <div class="flex-1">
+
+                                <h2 class="m-0 text-xl font-semibold text-gray-900">
+                                    Changes to These Store Terms
+                                </h2>
+
+                                <div class="mt-4 space-y-4 text-[15px] leading-7 text-gray-600">
+
+                                    <p>
+                                        We may update these Store Terms from time to time to
+                                        reflect changes in marketplace services, business
+                                        practices, legal requirements, security standards, or
+                                        seller programs.
+                                    </p>
+
+                                    <p>
+                                        Continued operation of a store after updated terms
+                                        become effective constitutes acceptance of the revised
+                                        Store Terms, subject to applicable law.
+                                    </p>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </section>
+
+                    <section id="section-25" class="scroll-mt-28 border-b border-gray-100 py-8">
+
+                        <div class="flex gap-4">
+
+                            <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gray-100 text-xs font-bold text-gray-500">
+                                25
+                            </span>
+
+                            <div class="flex-1">
+
+                                <h2 class="m-0 text-xl font-semibold text-gray-900">
+                                    Other Marketplace Policies
+                                </h2>
+
+                                <div class="mt-4 space-y-4 text-[15px] leading-7 text-gray-600">
+
+                                    <p>
+                                        These Store Terms should be read together with other
+                                        applicable marketplace policies, including our general
+                                        Terms of Service, Privacy Policy, Vendor Terms, Product
+                                        Listing Policy, Return and Refund Policy, Prohibited
+                                        Products Policy, Intellectual Property Policy, and
+                                        any category-specific seller requirements.
+                                    </p>
+
+                                    <p>
+                                        If a conflict exists between these Store Terms and a
+                                        more specific marketplace policy governing a particular
+                                        service or activity, the more specific policy may apply
+                                        to that service or activity.
+                                    </p>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </section>
+
+                    <section id="section-26" class="scroll-mt-28 pt-8">
+
+                        <div class="flex gap-4">
+
+                            <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gray-100 text-xs font-bold text-gray-500">
+                                26
+                            </span>
+
+                            <div class="flex-1">
+
+                                <h2 class="m-0 text-xl font-semibold text-gray-900">
+                                    Contact and Support
+                                </h2>
+
+                                <div class="mt-4 space-y-4 text-[15px] leading-7 text-gray-600">
+
+                                    <p>
+                                        Vendors who have questions about these Store Terms,
+                                        store restrictions, marketplace policies, or
+                                        enforcement actions should contact marketplace
+                                        support through the available vendor support channels.
+                                    </p>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </section>
+
+
+                </div>
+
+            </div>
+
+            <div class="border-t border-gray-200 bg-gray-50 px-6 py-7 sm:px-10 lg:px-12">
+
+                <div class="flex gap-4">
+
+                    <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand/10 text-brand">
+
+                        <i class="fas fa-check"></i>
+
+                    </div>
+
+
+                    <div>
+
+                        <h3 class="text-sm font-semibold text-gray-900">
+                            Your continued use of the marketplace
+                        </h3>
+
+                        <p class="mt-1 text-sm leading-6 text-gray-600">
+                            By creating or continuing to operate a store on the marketplace,
+                            the vendor acknowledges that they have read, understood, and
+                            agreed to these Store Terms and Conditions.
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+        </article>
+
+    </div>
+
+</main>
+
+<footer class="border-t border-gray-200 bg-white">
+
+    <div class="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+
+        <div class="flex flex-col items-center justify-between gap-5 sm:flex-row">
+
+
+            <div class="flex flex-wrap justify-center gap-x-6 gap-y-2 text-sm text-gray-500">
+
+                <a href="/docs/privacy" class="transition hover:text-brand" target="_blank">
+                    Privacy
+                </a>
+
+                <a href="/docs/vendor-terms" class="transition hover:text-brand" target="_blank">
+                    Vendor terms
+                </a>
+
+                <a href="/faqs" class="transition hover:text-brand" target="_blank">
+                    faqs
+                </a>
+
+                <a href="/support" class="transition hover:text-brand" target="_blank">
+                    Help center
+                </a>
+
+            </div>
+
+
+            <p class="text-sm text-gray-400">
+                © 2026 <a class="text-brand hover:underline cursor-pointer font-bold" href="/">COCOCE</a>. All rights reserved.
+            </p>
+
+        </div>
+
+    </div>
+
+</footer>
+
+
+</body>
+</html>

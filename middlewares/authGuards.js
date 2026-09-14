@@ -217,7 +217,7 @@ module.exports = {
     dashboard: authPass({
         acceptedTypes: [
             ROLES.ADMIN, ROLES.DEV, ROLES.DEVELOPMENT, ROLES.ENGINEER,
-            ROLES.QA, ROLES.MODERATOR, ROLES.SELLER, ROLES.HR,
+            ROLES.QA, ROLES.MODERATOR, ROLES.SELLER, ROLES.HR, ROLES.BUSINESS,
             ROLES.TECHNICAL, ROLES.STORE, ROLES.SUPER_ADMIN
         ]
     }),

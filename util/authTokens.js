@@ -152,6 +152,11 @@ function clearAuthCookies(res) {
     res.clearCookie('p_auth');
 }
 
+function clearAuthCookie(res, key = 'r'){
+    res.cookie(`${key}`, '', { maxAge: 0, path: '/' });
+    res.clearCookie(`${key}`);
+}
+
 // function normalizeUA(userAgent) {
 //     if (!userAgent) return 'UnknownClient';
 
@@ -226,6 +231,7 @@ module.exports = {
     setAuthCookies,
     setPreauth,
     clearAuthCookies,
+    clearAuthCookie,
     normalizeUA,
     allowRedirect,
     sameNetwork

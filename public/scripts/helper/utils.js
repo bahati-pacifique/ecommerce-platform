@@ -155,16 +155,50 @@ function generateSlug(title) {
 }
 
 function getInitials(name) {
-  if (!name) return '';
-  
-  const parts = name.trim().split(/\s+/);
-  
-  if (parts.length === 1 && parts[0].length >= 2) {
-    return parts[0].slice(0, 2).toUpperCase();
-  }
-  
-  return parts
-    .map(part => part.charAt(0).toUpperCase())
-    .slice(0, 2)
-    .join('');
+    if (!name) return '';
+
+    const parts = name.trim().split(/\s+/);
+
+    if (parts.length === 1 && parts[0].length >= 2) {
+        return parts[0].slice(0, 2).toUpperCase();
+    }
+
+    return parts
+        .map(part => part.charAt(0).toUpperCase())
+        .slice(0, 2)
+        .join('');
+}
+
+// /**
+//  * Explicitly check if given direct url file exists
+//  * @param {string} url direct file url
+//  * @returns 
+//  */
+// async function checkFile(url) {
+//     try {
+//         const response = await fetch(url, { method: 'HEAD' });
+//         return response.ok;
+//     } catch (error) {
+//         return false;
+//     }
+// }
+
+/**
+ * Check whether a direct URL points to an accessible file.
+ *
+ * @param {string} url Direct file URL.
+ * @returns {Promise<boolean>} True when the server responds with 2xx.
+ */
+async function checkFile(url) {
+    try {
+        const response = await fetch(url, {
+            method: 'HEAD',
+            cache: 'no-store'
+        });
+
+        return response.ok;
+    } catch (error) {
+        console.warn('File check failed:', url, error);
+        return false;
+    }
 }

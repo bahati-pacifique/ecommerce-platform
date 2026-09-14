@@ -121,6 +121,17 @@ class VendorService {
      * Get vendor applications with filtering and pagination.
      *
      * @param {Object} options
+     * {
+        page = 1,
+        limit = 20,
+        type = null,
+        category = null,
+        status = null,
+        search = null,
+        includeUser = false,
+        sortBy = 'created_at',
+        sortOrder = 'DESC'
+    }
      * @returns {Promise<Object>}
      */
     static async getVendorApplications(options = {}) {

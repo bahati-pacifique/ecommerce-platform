@@ -240,6 +240,59 @@ class ProductMetaModel {
         return rows;
     }
 
+        /**
+     * Get active categories with pagination
+     *
+     * @param {number} page
+     * @param {number} limit
+     * @returns {Promise<Object>}
+     */
+    static async getActiveCategoriesPaginated(page = 1, limit = 20) {
+        page = Math.max(1, Number(page));
+        limit = Math.max(1, Number(limit));
+
+        const offset = (page - 1) * limit;
+
+        const countQuery = `
+        SELECT COUNT(*)::int AS total
+        FROM categories
+        WHERE status = 'active'
+    `;
+
+        const dataQuery = `
+        SELECT
+            id,
+            title,
+            slug,
+            description,
+            COALESCE(updated_at, created_at) AS last_updates
+        FROM categories
+        WHERE status = 'active'
+        ORDER BY title ASC
+        LIMIT $1 OFFSET $2
+    `;
+
+        const [countResult, dataResult] = await Promise.all([
+            db.query(countQuery),
+            db.query(dataQuery, [limit, offset])
+        ]);
+
+        const total = countResult.rows[0].total;
+        const totalPages = Math.ceil(total / limit);
+
+        return {
+            data: dataResult.rows,
+            pagination: {
+                page,
+                limit,
+                total,
+                total_pages: totalPages,
+                has_next_page: page < totalPages,
+                has_previous_page: page > 1
+            }
+        };
+    }
+
     /**
      * Updating category according to provided fields
      * @param {number} id system category unique identifier
