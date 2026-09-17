@@ -93,7 +93,7 @@ class ProductMetaModel {
 
 
     /**
-     * Create new product category
+     * Create new product category On admin level
      * @param {string} title category title
      * @param {string} slug category slug identifier
      * @param {string} description category details/description
@@ -104,6 +104,22 @@ class ProductMetaModel {
             INSERT INTO categories(title, slug, description) 
             VALUES ($1, $2, $3) RETURNING *;
             `, [title, slug, description]);
+
+        return rows[0] ?? null
+    }
+
+    /**
+     * Create new product category on vendor level
+     * @param {string} title category title
+     * @param {string} slug category slug identifier
+     * @param {string} description category details/description
+     * @returns {object|null} created category or null
+     */
+    static async insertProductCategory(title, slug, description, req_reason, req_by) {
+        const { rows } = await db.query(`
+            INSERT INTO categories(title, slug, description, status, requested_reason, requested_by, requested_at) 
+            VALUES ($1, $2, $3, 'requested', $4, $5, NOW()) RETURNING *;
+            `, [title, slug, description, req_reason, req_by]);
 
         return rows[0] ?? null
     }
@@ -201,7 +217,13 @@ class ProductMetaModel {
         values.push(offset);
 
         const { rows: categories } = await db.query(`
-            SELECT *
+            SELECT 
+            id, 
+            slug,
+            title, 
+            description, 
+            status,
+            COALESCE(updated_at, created_at) AS last_updates
             FROM categories
             ${whereClause}
             ORDER BY id DESC
@@ -211,6 +233,7 @@ class ProductMetaModel {
 
         const totalPages = Math.ceil(total / limit);
 
+        console.log(categories)
         return {
             categories,
             pagination: {
@@ -220,6 +243,69 @@ class ProductMetaModel {
                 totalPages,
                 hasPrevPage: page > 1,
                 hasNextPage: page < totalPages
+            }
+        };
+    }
+
+    /**
+     * Search categories with pagination
+     *
+     * @param {string} searchKey
+     * @param {number} page
+     * @param {number} limit
+     * @returns {Promise<Object>}
+     */
+    static async searchCategory(searchKey, page = 1, limit = 20) {
+
+        page = Math.max(1, Number(page));
+        limit = Math.max(1, Number(limit));
+
+        const offset = (page - 1) * limit;
+        const search = `%${searchKey.trim()}%`;
+
+        const countQuery = `
+                SELECT COUNT(*)::int AS total
+                FROM categories
+                WHERE status = 'active'
+                AND (
+                    title ILIKE $1
+                    OR description ILIKE $1
+                )
+            `;
+
+        const dataQuery = `
+            SELECT
+                id,
+                title,
+                description,
+                COALESCE(updated_at, created_at) AS last_updates
+            FROM categories
+            WHERE status = 'active'
+            AND (
+                title ILIKE $1
+                OR description ILIKE $1
+            )
+            ORDER BY title ASC
+            LIMIT $2 OFFSET $3
+        `;
+
+        const [countResult, dataResult] = await Promise.all([
+            db.query(countQuery, [search]),
+            db.query(dataQuery, [search, limit, offset])
+        ]);
+
+        const total = countResult.rows[0].total;
+        const totalPages = Math.ceil(total / limit);
+
+        return {
+            categories: dataResult.rows,
+            pagination: {
+                page,
+                limit,
+                total,
+                totalPages,
+                hasNextPage: page < totalPages,
+                hasPreviousPage: page > 1
             }
         };
     }
@@ -240,41 +326,79 @@ class ProductMetaModel {
         return rows;
     }
 
-        /**
-     * Get active categories with pagination
-     *
-     * @param {number} page
-     * @param {number} limit
-     * @returns {Promise<Object>}
+
+    /**
+     * Querying paginated categories by requester
+     * @param {*} page query page
+     * @param {*} limit query limit
+     * @param {*} status query status
+     * @param {*} requesterId view owner
+     * @returns paginated result array
      */
-    static async getActiveCategoriesPaginated(page = 1, limit = 20) {
+    static async getCategoriesPaginated(
+        page = 1,
+        limit = 20,
+        status = 'active',
+        requesterId = null
+    ) {
         page = Math.max(1, Number(page));
         limit = Math.max(1, Number(limit));
 
         const offset = (page - 1) * limit;
 
+        const conditions = [];
+        const params = [];
+
+        // Status
+        params.push(status);
+        conditions.push(`status = $${params.length}`);
+
+        // Requester
+        if (requesterId) {
+            params.push(requesterId);
+            conditions.push(`requested_by = $${params.length}`);
+        }
+
+        const whereClause = `WHERE ${conditions.join(' AND ')}`;
+
+        // Pagination parameters
+        const limitParam = params.length + 1;
+        const offsetParam = params.length + 2;
+
+        params.push(limit, offset);
+
         const countQuery = `
-        SELECT COUNT(*)::int AS total
-        FROM categories
-        WHERE status = 'active'
-    `;
+            SELECT COUNT(*)::int AS total
+            FROM categories
+            ${whereClause}
+        `;
 
         const dataQuery = `
-        SELECT
+            SELECT
             id,
             title,
             slug,
             description,
+            status,
+            requested_by,
+            requested_at,
+            verified_by,
+            verified_at,
             COALESCE(updated_at, created_at) AS last_updates
-        FROM categories
-        WHERE status = 'active'
-        ORDER BY title ASC
-        LIMIT $1 OFFSET $2
-    `;
+
+            FROM categories
+
+            ${whereClause}
+
+            ORDER BY title ASC
+
+            LIMIT $${limitParam}
+            OFFSET $${offsetParam}
+        `;
 
         const [countResult, dataResult] = await Promise.all([
-            db.query(countQuery),
-            db.query(dataQuery, [limit, offset])
+            db.query(countQuery, params.slice(0, -2)),
+            db.query(dataQuery, params)
         ]);
 
         const total = countResult.rows[0].total;
@@ -282,6 +406,7 @@ class ProductMetaModel {
 
         return {
             data: dataResult.rows,
+
             pagination: {
                 page,
                 limit,
@@ -338,7 +463,7 @@ class ProductMetaModel {
 
 
     /**
-     * Create new product family
+     * Create new product family on admin level
      * @param {number} categoryId 
      * @param {string} title 
      * @param {string} slug
@@ -353,6 +478,35 @@ class ProductMetaModel {
                 FROM inserted_family fm 
                 LEFT JOIN categories ct ON ct.id = fm.category_id;
             `, [categoryId, title, slug, description]);
+
+        return rows[0] ?? null;
+    }
+
+    /**
+     * Create new product family on vendor level
+     * @param {number} categoryId 
+     * @param {string} title 
+     * @param {string} slug
+     * @param {string} description 
+     * @returns {object|null} Created family or null
+     */
+    static async insertProductFamily(categoryId, title, slug, description, req_reason, req_by) {
+
+        const { rows } = await db.query(`
+                WITH inserted_family AS 
+                (INSERT INTO families(category_id, 
+                    title, 
+                    slug, 
+                    description, 
+                    status, 
+                    requested_reason,
+                    requested_by,
+                    requested_at) VALUES($1, $2, $3, $4, 'requested', $5, $6, NOW())
+                RETURNING *)
+                SELECT fm.*, ct.title AS category
+                FROM inserted_family fm 
+                LEFT JOIN categories ct ON ct.id = fm.category_id;
+            `, [categoryId, title, slug, description, req_reason, req_by]);
 
         return rows[0] ?? null;
     }
@@ -419,9 +573,18 @@ class ProductMetaModel {
 
         const { rows: families } = await db.query(`
             SELECT
-                fm.*,
-                ct.id AS category_id,
-                ct.title AS category
+            fm.id,
+            fm.title,
+            fm.slug,
+            fm.description,
+            fm.status,
+            fm.requested_by,
+            fm.requested_at,
+            fm.verified_by,
+            fm.verified_at,
+            COALESCE(fm.updated_at, fm.created_at) AS last_updates,
+            ct.id AS category_id,
+            ct.title AS category_title
             FROM families fm
             LEFT JOIN categories ct
                 ON ct.id = fm.category_id
@@ -442,6 +605,269 @@ class ProductMetaModel {
                 totalPages,
                 hasPrevPage: page > 1,
                 hasNextPage: page < totalPages
+            }
+        };
+    }
+
+    /**
+     * Search families with pagination
+     *
+     * @param {string} searchKey
+     * @param {number} page
+     * @param {number} limit
+     * @returns {Promise<Object>}
+     */
+    static async searchFamily(
+        searchKey,
+        page = 1,
+        limit = 100
+    ) {
+
+        console.log("SRCH", searchKey);
+
+        page = Math.max(1, Number(page));
+        limit = Math.max(1, Number(limit));
+
+        const offset = (page - 1) * limit;
+
+        const search = `%${searchKey.trim()}%`;
+
+        const countQuery = `
+        SELECT
+            COUNT(*)::int AS total
+
+        FROM families
+
+        WHERE
+            status IN ('active', 'requested')
+
+            AND (
+                title ILIKE $1
+                OR description ILIKE $1
+            )
+    `;
+
+        const dataQuery = `
+        SELECT
+            id,
+            title,
+            description,
+            COALESCE(
+                updated_at,
+                created_at
+            ) AS last_updates
+
+        FROM families
+
+        WHERE
+            status IN ('active', 'requested')
+
+            AND (
+                title ILIKE $1
+                OR description ILIKE $1
+            )
+
+        ORDER BY
+            title ASC
+
+        LIMIT $2
+        OFFSET $3
+    `;
+
+        const [
+            countResult,
+            dataResult
+        ] = await Promise.all([
+
+            db.query(
+                countQuery,
+                [search]
+            ),
+
+            db.query(
+                dataQuery,
+                [
+                    search,
+                    limit,
+                    offset
+                ]
+            )
+
+        ]);
+
+        const total = countResult.rows[0].total;
+
+        const totalPages = Math.ceil(
+            total / limit
+        );
+
+        console.log(dataResult.rows);
+
+        return {
+
+            families: dataResult.rows,
+
+            pagination: {
+
+                page,
+
+                limit,
+
+                total,
+
+                totalPages,
+
+                hasNextPage:
+                    page < totalPages,
+
+                hasPreviousPage:
+                    page > 1
+            }
+        };
+    }
+
+    /**
+     * Querying paginated families by requester
+     *
+     * @param {*} page query page
+     * @param {*} limit query limit
+     * @param {*} status query status
+     * @param {*} requesterId view owner
+     * @returns paginated result
+     */
+    static async getProductFamiliesPaginatedRequested(
+        page = 1,
+        limit = 20,
+        status = 'active',
+        requesterId = null
+    ) {
+
+        page = Math.max(1, Number(page));
+        limit = Math.max(1, Number(limit));
+
+        const offset = (page - 1) * limit;
+
+        const conditions = [];
+        const params = [];
+
+        // Status
+        params.push(status);
+
+        conditions.push(
+            `fm.status = $${params.length}`
+        );
+
+        // Requester
+        if (requesterId) {
+
+            params.push(requesterId);
+
+            conditions.push(
+                `fm.requested_by = $${params.length}`
+            );
+        }
+
+        const whereClause = `
+            WHERE ${conditions.join(' AND ')}
+        `;
+
+        // Pagination parameters
+        const limitParam = params.length + 1;
+        const offsetParam = params.length + 2;
+
+        params.push(limit, offset);
+
+        const countQuery = `
+            SELECT
+                COUNT(*)::int AS total
+
+            FROM families fm
+
+            ${whereClause}
+        `;
+
+        const dataQuery = `
+            SELECT
+
+                fm.id,
+
+                fm.title,
+
+                fm.slug,
+
+                fm.description,
+
+                fm.status,
+
+                ct.title AS category_title,
+
+                fm.requested_by,
+
+                fm.requested_at,
+
+                fm.verified_by,
+
+                fm.verified_at,
+
+                COALESCE(
+                    fm.updated_at,
+                    fm.created_at
+                ) AS last_updates
+
+            FROM families fm
+
+            LEFT JOIN categories ct
+                ON ct.id = fm.category_id
+
+            ${whereClause}
+
+            ORDER BY
+                fm.title ASC
+
+            LIMIT $${limitParam}
+
+            OFFSET $${offsetParam}
+        `;
+
+        const [countResult, dataResult] = await Promise.all([
+
+            db.query(
+                countQuery,
+                params.slice(0, -2)
+            ),
+
+            db.query(
+                dataQuery,
+                params
+            )
+
+        ]);
+
+        const total = countResult.rows[0].total;
+
+        const totalPages = Math.ceil(
+            total / limit
+        );
+
+        return {
+
+            data: dataResult.rows,
+
+            pagination: {
+
+                page,
+
+                limit,
+
+                total,
+
+                total_pages: totalPages,
+
+                has_next_page:
+                    page < totalPages,
+
+                has_previous_page:
+                    page > 1
             }
         };
     }
@@ -530,7 +956,7 @@ class ProductMetaModel {
         return result;
     }
 
-    static async getActiveFamilies() {
+    static async getActiveProductFamilies() {
         const { rows } = await db.query(`SELECT 
             id, 
             title, 
@@ -559,6 +985,22 @@ class ProductMetaModel {
             INSERT INTO brands(title, slug, logo_url, website, description, meta) 
             VALUES ($1, $2, $3, $4, $5, $6) RETURNING *;
             `, [title, slug, logo_url || null, website || null, description, meta || null]);
+
+        return rows[0] ?? null;
+    }
+
+    /**
+     * //Vendor level
+     * @param {string} title brand title
+     * @param {string} slug brand slug identifier
+     * @param {string} description brand details/description
+     * @returns {object|null} created brand or null
+     */
+    static async insertProductBrand({ title, slug, logo_url, website, description, meta, req_reason, req_by }) {
+        const { rows } = await db.query(`
+            INSERT INTO brands(title, slug, logo_url, website, description, meta, status, requested_reason, requested_by) 
+            VALUES ($1, $2, $3, $4, $5, $6, 'requested', $7, $8) RETURNING *;
+            `, [title, slug, logo_url || null, website || null, description, meta || null, req_reason, req_by]);
 
         return rows[0] ?? null;
     }
@@ -759,6 +1201,14 @@ class ProductMetaModel {
         return rows[0] ?? null;
     }
 
+    static async insertAttribute({ title, description, display_order, req_reason, req_by }) {
+        const { rows } = await db.query(`
+            INSERT INTO attributes(title, description, display_order, status, requested_reason, requested_by) 
+            VALUES ($1, $2, $3, 'requested', $4, $5) RETURNING *;
+            `, [title, description, display_order || null, req_reason, req_by]);
+
+        return rows[0] ?? null;
+    }
 
     static async removeAttribute(id) {
         const result = await this.#setStatus('deleted', id, 'attributes');
@@ -874,7 +1324,7 @@ class ProductMetaModel {
         }
 
         if (display_order) {
-            updates.push(`description = $${index++}`);
+            updates.push(`display_order = $${index++}`);
             values.push(display_order);
         }
 

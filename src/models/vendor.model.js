@@ -1663,7 +1663,613 @@ class Vendor {
 
         return rows.length === 0;
     }
+
+    /**
+     * Get order dashboard data for a vendor
+     *
+     * Aggregates orders across all stores owned by the vendor.
+     *
+     * @param {string} vendorId
+     * @returns {Promise<Object>}
+     */
+    static async getOrderVendorDashboardData(vendorId) {
+
+        const query = `
+        WITH vendor_stores AS (
+            SELECT
+                id,
+                name
+            FROM stores
+            WHERE vendor_id = $1
+        ),
+
+        order_stats AS (
+            SELECT
+                COUNT(so.id)::int AS total_orders,
+
+                COALESCE(
+                    SUM(so.subtotal),
+                    0
+                ) AS subtotal,
+
+                COALESCE(
+                    SUM(so.discount),
+                    0
+                ) AS discount,
+
+                COALESCE(
+                    SUM(so.tax),
+                    0
+                ) AS tax,
+
+                COALESCE(
+                    SUM(so.shipping_fee),
+                    0
+                ) AS shipping_fee,
+
+                COALESCE(
+                    SUM(so.total),
+                    0
+                ) AS total_revenue,
+
+                COUNT(so.id) FILTER (
+                    WHERE so.status = 'pending'
+                )::int AS pending_orders,
+
+                COUNT(so.id) FILTER (
+                    WHERE so.status = 'processing'
+                )::int AS processing_orders,
+
+                COUNT(so.id) FILTER (
+                    WHERE so.status = 'shipped'
+                )::int AS shipped_orders,
+
+                COUNT(so.id) FILTER (
+                    WHERE so.status = 'delivered'
+                )::int AS delivered_orders,
+
+                COUNT(so.id) FILTER (
+                    WHERE so.status = 'cancelled'
+                )::int AS cancelled_orders,
+
+                COUNT(so.id) FILTER (
+                    WHERE so.created_at >= NOW() - INTERVAL '24 hours'
+                )::int AS orders_last_24_hours,
+
+                COUNT(so.id) FILTER (
+                    WHERE so.created_at >= NOW() - INTERVAL '7 days'
+                )::int AS orders_last_7_days,
+
+                COUNT(so.id) FILTER (
+                    WHERE so.created_at >= NOW() - INTERVAL '30 days'
+                )::int AS orders_last_30_days
+
+            FROM store_orders so
+
+            INNER JOIN vendor_stores vs
+                ON vs.id = so.store_id
+        ),
+
+        store_order_stats AS (
+            SELECT
+                vs.id AS store_id,
+                vs.name AS store_name,
+
+                COUNT(so.id)::int AS total_orders,
+
+                COALESCE(
+                    SUM(so.subtotal),
+                    0
+                ) AS subtotal,
+
+                COALESCE(
+                    SUM(so.discount),
+                    0
+                ) AS discount,
+
+                COALESCE(
+                    SUM(so.tax),
+                    0
+                ) AS tax,
+
+                COALESCE(
+                    SUM(so.shipping_fee),
+                    0
+                ) AS shipping_fee,
+
+                COALESCE(
+                    SUM(so.total),
+                    0
+                ) AS total_revenue,
+
+                COUNT(so.id) FILTER (
+                    WHERE so.status = 'pending'
+                )::int AS pending_orders,
+
+                COUNT(so.id) FILTER (
+                    WHERE so.status = 'processing'
+                )::int AS processing_orders,
+
+                COUNT(so.id) FILTER (
+                    WHERE so.status = 'shipped'
+                )::int AS shipped_orders,
+
+                COUNT(so.id) FILTER (
+                    WHERE so.status = 'delivered'
+                )::int AS delivered_orders,
+
+                COUNT(so.id) FILTER (
+                    WHERE so.status = 'cancelled'
+                )::int AS cancelled_orders
+
+            FROM vendor_stores vs
+
+            LEFT JOIN store_orders so
+                ON so.store_id = vs.id
+
+            GROUP BY
+                vs.id,
+                vs.name
+        )
+
+        SELECT
+            json_build_object(
+
+                'summary',
+                json_build_object(
+
+                    'total_orders',
+                    order_stats.total_orders,
+
+                    'pending',
+                    order_stats.pending_orders,
+
+                    'processing',
+                    order_stats.processing_orders,
+
+                    'shipped',
+                    order_stats.shipped_orders,
+
+                    'delivered',
+                    order_stats.delivered_orders,
+
+                    'cancelled',
+                    order_stats.cancelled_orders,
+
+                    'orders_last_24_hours',
+                    order_stats.orders_last_24_hours,
+
+                    'orders_last_7_days',
+                    order_stats.orders_last_7_days,
+
+                    'orders_last_30_days',
+                    order_stats.orders_last_30_days,
+
+                    'subtotal',
+                    order_stats.subtotal,
+
+                    'discount',
+                    order_stats.discount,
+
+                    'tax',
+                    order_stats.tax,
+
+                    'shipping_fee',
+                    order_stats.shipping_fee,
+
+                    'total_revenue',
+                    order_stats.total_revenue
+                ),
+
+                'stores',
+                COALESCE(
+                    (
+                        SELECT json_agg(
+                            json_build_object(
+
+                                'store_id',
+                                sos.store_id,
+
+                                'store_name',
+                                sos.store_name,
+
+                                'total_orders',
+                                sos.total_orders,
+
+                                'pending',
+                                sos.pending_orders,
+
+                                'processing',
+                                sos.processing_orders,
+
+                                'shipped',
+                                sos.shipped_orders,
+
+                                'delivered',
+                                sos.delivered_orders,
+
+                                'cancelled',
+                                sos.cancelled_orders,
+
+                                'subtotal',
+                                sos.subtotal,
+
+                                'discount',
+                                sos.discount,
+
+                                'tax',
+                                sos.tax,
+
+                                'shipping_fee',
+                                sos.shipping_fee,
+
+                                'total_revenue',
+                                sos.total_revenue
+
+                            )
+                            ORDER BY sos.total_revenue DESC
+                        )
+                        FROM store_order_stats sos
+                    ),
+                    '[]'::json
+                )
+
+            ) AS dashboard
+
+        FROM order_stats;
+    `;
+
+        const { rows } = await db.query(
+            query,
+            [vendorId]
+        );
+
+        return rows[0]?.dashboard || {
+            summary: {
+                total_orders: 0,
+                pending: 0,
+                processing: 0,
+                shipped: 0,
+                delivered: 0,
+                cancelled: 0,
+                orders_last_24_hours: 0,
+                orders_last_7_days: 0,
+                orders_last_30_days: 0,
+                subtotal: 0,
+                discount: 0,
+                tax: 0,
+                shipping_fee: 0,
+                total_revenue: 0
+            },
+
+            stores: []
+        };
+    }
+
+    /**
+     * Get order dashboard data for a vendor.
+     *
+     * Aggregates orders across all stores owned by the vendor.
+     *
+     * @param {string} vendorId
+     * @param {string} period - '7d', '30d', or 'all'
+     * @returns {Promise<Object>}
+     */
+    static async getOrderVendorDashboardDataTimeFrames(
+        vendorId,
+        period = '7d'
+    ) {
+
+        const allowedPeriods = ['7d', '30d', 'all'];
+
+        if (!allowedPeriods.includes(period)) {
+            throw new Error(
+                "Invalid period. Use '7d', '30d', or 'all'."
+            );
+        }
+
+        let dateCondition = '';
+
+        if (period === '7d') {
+
+            dateCondition = `
+            AND so.created_at >= NOW() - INTERVAL '7 days'
+        `;
+
+        } else if (period === '30d') {
+
+            dateCondition = `
+            AND so.created_at >= NOW() - INTERVAL '30 days'
+        `;
+
+        }
+
+        const query = `
+        WITH vendor_stores AS (
+
+            SELECT
+                id,
+                name
+
+            FROM stores
+
+            WHERE vendor_id = $1
+        ),
+
+        order_stats AS (
+
+            SELECT
+
+                COUNT(so.id)::int AS total_orders,
+
+                COALESCE(
+                    SUM(so.subtotal),
+                    0
+                ) AS subtotal,
+
+                COALESCE(
+                    SUM(so.discount),
+                    0
+                ) AS discount,
+
+                COALESCE(
+                    SUM(so.tax),
+                    0
+                ) AS tax,
+
+                COALESCE(
+                    SUM(so.shipping_fee),
+                    0
+                ) AS shipping_fee,
+
+                COALESCE(
+                    SUM(so.total),
+                    0
+                ) AS total_order_value,
+
+                COUNT(so.id) FILTER (
+                    WHERE so.status = 'pending'
+                )::int AS pending_orders,
+
+                COUNT(so.id) FILTER (
+                    WHERE so.status = 'processing'
+                )::int AS processing_orders,
+
+                COUNT(so.id) FILTER (
+                    WHERE so.status = 'shipped'
+                )::int AS shipped_orders,
+
+                COUNT(so.id) FILTER (
+                    WHERE so.status = 'delivered'
+                )::int AS delivered_orders,
+
+                COUNT(so.id) FILTER (
+                    WHERE so.status = 'cancelled'
+                )::int AS cancelled_orders
+
+            FROM store_orders so
+
+            INNER JOIN vendor_stores vs
+                ON vs.id = so.store_id
+
+            WHERE TRUE
+
+                ${dateCondition}
+        ),
+
+        store_order_stats AS (
+
+            SELECT
+
+                vs.id AS store_id,
+
+                vs.name AS store_name,
+
+                COUNT(so.id)::int AS total_orders,
+
+                COALESCE(
+                    SUM(so.subtotal),
+                    0
+                ) AS subtotal,
+
+                COALESCE(
+                    SUM(so.discount),
+                    0
+                ) AS discount,
+
+                COALESCE(
+                    SUM(so.tax),
+                    0
+                ) AS tax,
+
+                COALESCE(
+                    SUM(so.shipping_fee),
+                    0
+                ) AS shipping_fee,
+
+                COALESCE(
+                    SUM(so.total),
+                    0
+                ) AS total_order_value,
+
+                COUNT(so.id) FILTER (
+                    WHERE so.status = 'pending'
+                )::int AS pending_orders,
+
+                COUNT(so.id) FILTER (
+                    WHERE so.status = 'processing'
+                )::int AS processing_orders,
+
+                COUNT(so.id) FILTER (
+                    WHERE so.status = 'shipped'
+                )::int AS shipped_orders,
+
+                COUNT(so.id) FILTER (
+                    WHERE so.status = 'delivered'
+                )::int AS delivered_orders,
+
+                COUNT(so.id) FILTER (
+                    WHERE so.status = 'cancelled'
+                )::int AS cancelled_orders
+
+            FROM vendor_stores vs
+
+            LEFT JOIN store_orders so
+                ON so.store_id = vs.id
+
+                ${dateCondition}
+
+            GROUP BY
+                vs.id,
+                vs.name
+        )
+
+        SELECT
+
+            json_build_object(
+
+                'period',
+                $2::text,
+
+                'summary',
+                json_build_object(
+
+                    'total_orders',
+                    order_stats.total_orders,
+
+                    'pending',
+                    order_stats.pending_orders,
+
+                    'processing',
+                    order_stats.processing_orders,
+
+                    'shipped',
+                    order_stats.shipped_orders,
+
+                    'delivered',
+                    order_stats.delivered_orders,
+
+                    'cancelled',
+                    order_stats.cancelled_orders,
+
+                    'subtotal',
+                    order_stats.subtotal,
+
+                    'discount',
+                    order_stats.discount,
+
+                    'tax',
+                    order_stats.tax,
+
+                    'shipping_fee',
+                    order_stats.shipping_fee,
+
+                    'total_order_value',
+                    order_stats.total_order_value
+
+                ),
+
+                'stores',
+
+                COALESCE(
+
+                    (
+                        SELECT
+
+                            json_agg(
+
+                                json_build_object(
+
+                                    'store_id',
+                                    sos.store_id,
+
+                                    'store_name',
+                                    sos.store_name,
+
+                                    'total_orders',
+                                    sos.total_orders,
+
+                                    'pending',
+                                    sos.pending_orders,
+
+                                    'processing',
+                                    sos.processing_orders,
+
+                                    'shipped',
+                                    sos.shipped_orders,
+
+                                    'delivered',
+                                    sos.delivered_orders,
+
+                                    'cancelled',
+                                    sos.cancelled_orders,
+
+                                    'subtotal',
+                                    sos.subtotal,
+
+                                    'discount',
+                                    sos.discount,
+
+                                    'tax',
+                                    sos.tax,
+
+                                    'shipping_fee',
+                                    sos.shipping_fee,
+
+                                    'total_order_value',
+                                    sos.total_order_value
+
+                                )
+
+                                ORDER BY
+                                    sos.total_order_value DESC
+
+                            )
+
+                        FROM store_order_stats sos
+                    ),
+
+                    '[]'::json
+
+                )
+
+            ) AS dashboard
+
+        FROM order_stats;
+    `;
+
+        const { rows } = await db.query(
+            query,
+            [
+                vendorId,
+                period
+            ]
+        );
+
+        return rows[0]?.dashboard || {
+
+            period,
+
+            summary: {
+                total_orders: 0,
+                pending: 0,
+                processing: 0,
+                shipped: 0,
+                delivered: 0,
+                cancelled: 0,
+                subtotal: 0,
+                discount: 0,
+                tax: 0,
+                shipping_fee: 0,
+                total_order_value: 0
+            },
+
+            stores: []
+        };
+    }
 }
+
+
 
 module.exports = {
     Vendor,

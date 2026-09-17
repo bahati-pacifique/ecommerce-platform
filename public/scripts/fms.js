@@ -81,15 +81,16 @@ function renderFamiliesTable() {
                 </td>
                 <td class="px-4 py-3 text-center">
                     <div class="flex items-center justify-center gap-2">
+                        <button class="p-1.5 font-medium text-sm rounded-lg text-green-800 hover:bg-green-100 transition family-activate-btn ${(['requested', 'deleted', 'disabled'].includes(fam.status)) ? '' : 'hidden'}" title="Activate" data-id="${fam.id}">
+                            <i class="bi bi-check-lg"></i>
+                        </button>
                         <button class="p-1.5 rounded-lg text-blue-600 hover:bg-blue-50 transition family-edit-btn" title="Edit" data-id="${fam.id}">
                             <i class="fas fa-edit"></i>
                         </button>
-                        <button class="p-1.5 rounded-lg text-brand hover:bg-brand-light transition family-delete-btn ${fam.status === "deleted" ? 'hidden' : ''}" title="Delete" data-id="${fam.id}">
+                        <button class="p-1.5 rounded-lg text-brand hover:bg-brand-light transition family-delete-btn ${!['active'].includes(fam.status) ? 'hidden' : ''}" title="Delete" data-id="${fam.id}">
                             <i class="fas fa-trash"></i>
                         </button>
-                        <button class="p-1.5 font-medium text-sm rounded-lg text-green-800 hover:bg-green-100 transition family-activate-btn ${(['deleted', 'disabled'].includes(fam.status)) ? '' : 'hidden'}" title="Delete" data-id="${fam.id}">
-                            <i class="bi bi-arrow-counterclockwise"></i>
-                        </button>
+                        
                     </div>
                 </td>
             </tr>
@@ -600,10 +601,7 @@ const fetchCategoriesForSelector = async () => {
             </div>
         `);
 
-        const sfx = !!t ? `:${t}` : '';
-        const url = `${p}api.${d}${sfx}/`;
-
-        const response = await axios.get(`${url}categories`, { withCredentials: true });
+        const response = await axios.get(`${protocal}api.${domainName}/categories`, { withCredentials: true });
         allCategoriesForSelector = response.data || [];
         renderCategoryList(allCategoriesForSelector);
 

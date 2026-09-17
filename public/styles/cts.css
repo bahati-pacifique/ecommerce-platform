@@ -29,7 +29,7 @@
     color: #ED1B24;
 }
 
-.status-badge.draft {
+.status-badge.draft, .status-badge.requested {
     background: #FEF3C7;
     color: #D97706;
 }

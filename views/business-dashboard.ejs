@@ -29,8 +29,6 @@
   <link rel="stylesheet" href="/styles/components/loaders.css">
   <link rel="stylesheet" href="/styles/components/animations.css">
 
-  <link rel="stylesheet" href="/styles/vd-categories.css">
-
   <link rel="stylesheet" href="/styles/main.css">
   <link rel="stylesheet" href="/styles/bdsh.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -245,6 +243,16 @@
             <span class="link-text">Categories</span>
           </a>
 
+          <a href="#" class="sidebar-link" data-tab="families" data-title="families">
+            <span class="icon"><i data-lucide="circle-pile"></i></span>
+            <span class="link-text">Families</span>
+          </a>
+
+          <a href="#" class="sidebar-link" data-tab="brands" data-title="brands">
+            <span class="icon"><i data-lucide="component"></i></span>
+            <span class="link-text">Brands</span>
+          </a>
+
           <a href="#" class="sidebar-link" data-tab="profile" data-title="Profile">
             <span class="icon"><i data-lucide="user-round"></i></span>
             <span class="link-text">Profile</span>
@@ -267,7 +275,8 @@
 
         <div class="sidebar-footer px-4 py-4 border-t border-gray-100 relative">
           <div id="profileTrigger" class="flex items-center gap-3 cursor-pointer hover:bg-gray-50 rounded-lg p-2 transition">
-            <div class="w-8 h-8 rounded-full bg-brand-light flex items-center justify-center text-brand font-bold text-sm flex-shrink-0">
+            <img id="footerProfileAvatar" src="https://cdn.cococe.rw/images/profiles/<%-locals.user.userId || locals.user.id || locals.user.user_id%>.jpg?v=<%-new Date().getTime()%>" alt="Profile image" class="w-8 h-8 rounded-full border-1 border-gray-200 object-cover transition group-hover:border-brand">
+            <div class="w-8 h-8 rounded-full bg-brand-light flex items-center justify-center text-brand font-bold text-sm flex-shrink-0 hidden">
               <%-getInitials(locals.user?.username || '')%>
             </div>
             <div class="user-info flex-1 min-w-0">
@@ -671,9 +680,7 @@
 
         </div>
 
-
-
-        <div id="tab-orders" class="tab-content">
+        <!-- <div id="tab-orders" class="tab-content">
           <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
             <div class="flex items-center justify-between mb-6">
               <div>
@@ -683,7 +690,7 @@
               <div class="flex gap-2">
                 <select class="search-select" id="ordersStatusFilter">
                   <option value="">All Status</option>
-                  <option value="pending">Pending</option>
+                  <option value="pending">Pending</optfion>
                   <option value="processing">Processing</option>
                   <option value="completed">Completed</option>
                   <option value="cancelled">Cancelled</option>
@@ -796,6 +803,173 @@
               </div>
             </div>
           </div>
+        </div> -->
+
+        <!-- ============================================================ -->
+        <!-- TAB: ORDERS  (Vendor Order Dashboard) -->
+        <!-- ============================================================ -->
+        <div id="tab-orders" class="tab-content">
+          <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+
+            <!-- Header -->
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+              <div>
+                <h2 class="text-lg font-bold text-gray-900">Orders</h2>
+                <p class="text-sm text-gray-500">Performance across all your stores.</p>
+              </div>
+              <div class="flex items-center gap-2">
+                <div class="flex items-center gap-1 p-1 bg-gray-100 rounded-xl" id="ordersRangeToggle">
+                  <button data-range="7d" class="range-btn px-3 py-1.5 rounded-lg text-xs font-medium text-gray-500 transition">7d</button>
+                  <button data-range="30d" class="range-btn px-3 py-1.5 rounded-lg text-xs font-medium text-gray-500 transition active">30d</button>
+                  <button data-range="all" class="range-btn px-3 py-1.5 rounded-lg text-xs font-medium text-gray-500 transition">All</button>
+                </div>
+                <button id="ordersRefreshBtn" class="p-2.5 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition" title="Refresh">
+                  <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+                </button>
+              </div>
+            </div>
+
+            <div id="ordersLoading" class="hidden py-12 text-center">
+              <div class="inline-flex items-center gap-3 text-gray-500">
+                <svg class="w-5 h-5 animate-spin" viewBox="0 0 24 24" fill="none">
+                  <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-opacity="0.25" stroke-width="3" />
+                  <path d="M22 12a10 10 0 0 0-10-10" stroke="currentColor" stroke-width="3" stroke-linecap="round" />
+                </svg>
+                Loading order data...
+              </div>
+            </div>
+
+            <div id="ordersError" class="hidden rounded-xl border border-red-200 bg-red-50 p-4 flex items-start gap-3">
+              <i data-lucide="alert-triangle" class="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5"></i>
+              <div class="flex-1 min-w-0">
+                <p class="text-sm font-semibold text-red-800">Failed to load orders</p>
+                <p id="ordersErrorMsg" class="text-xs text-red-700 mt-0.5">Please try again.</p>
+              </div>
+              <button id="ordersRetryBtn" class="px-3 py-1.5 rounded-lg bg-white border border-red-200 text-xs font-medium text-red-700 hover:bg-red-50">
+                Retry
+              </button>
+            </div>
+
+            <div id="ordersContent" class="hidden space-y-6">
+
+              <div>
+                <p class="text-[11px] uppercase tracking-wider font-semibold text-gray-400 mb-3">Summary</p>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                  <div class="rounded-xl border border-gray-100 bg-white p-4">
+                    <div class="flex items-start justify-between">
+                      <div>
+                        <p class="text-xs text-gray-500 font-medium">Total Orders</p>
+                        <p id="kpiTotalOrders" class="text-2xl font-bold text-gray-900 mt-1">—</p>
+                        <p id="kpiOrdersDelta" class="text-xs text-gray-400 mt-1">—</p>
+                      </div>
+                      <div class="w-9 h-9 rounded-lg bg-brand-light text-brand flex items-center justify-center">
+                        <i data-lucide="shopping-bag" class="w-4 h-4"></i>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="rounded-xl border border-gray-100 bg-white p-4">
+                    <div class="flex items-start justify-between">
+                      <div>
+                        <p class="text-xs text-gray-500 font-medium">Total Revenue</p>
+                        <p id="kpiRevenue" class="text-2xl font-bold text-gray-900 mt-1">—</p>
+                        <p id="kpiRevenueHint" class="text-xs text-gray-400 mt-1">—</p>
+                      </div>
+                      <div class="w-9 h-9 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                        <i data-lucide="banknote" class="w-4 h-4"></i>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="rounded-xl border border-gray-100 bg-white p-4">
+                    <div class="flex items-start justify-between">
+                      <div>
+                        <p class="text-xs text-gray-500 font-medium">Avg. Order Value</p>
+                        <p id="kpiAov" class="text-2xl font-bold text-gray-900 mt-1">—</p>
+                        <p class="text-xs text-gray-400 mt-1">per delivered order</p>
+                      </div>
+                      <div class="w-9 h-9 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center">
+                        <i data-lucide="trending-up" class="w-4 h-4"></i>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="rounded-xl border border-gray-100 bg-white p-4">
+                    <div class="flex items-start justify-between">
+                      <div>
+                        <p class="text-xs text-gray-500 font-medium">Active Stores</p>
+                        <p id="kpiStores" class="text-2xl font-bold text-gray-900 mt-1">—</p>
+                        <p class="text-xs text-gray-400 mt-1">with orders</p>
+                      </div>
+                      <div class="w-9 h-9 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center">
+                        <i data-lucide="store" class="w-4 h-4"></i>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- ==================== STATUS + MONEY ==================== -->
+              <div class="grid md:grid-cols-2 gap-6">
+
+                <!-- Status breakdown -->
+                <div class="rounded-xl border border-gray-100 p-5">
+                  <p class="text-[11px] uppercase tracking-wider font-semibold text-gray-400 mb-3">By Status</p>
+                  <div class="space-y-2.5" id="statusBreakdown">
+                    <!-- populated -->
+                  </div>
+                </div>
+
+                <!-- Money breakdown -->
+                <div class="rounded-xl border border-gray-100 p-5">
+                  <p class="text-[11px] uppercase tracking-wider font-semibold text-gray-400 mb-3">Revenue Breakdown</p>
+                  <dl class="space-y-2.5" id="moneyBreakdown">
+                    <!-- populated -->
+                  </dl>
+                </div>
+              </div>
+
+              <!-- ==================== VELOCITY ==================== -->
+              <div>
+                <p class="text-[11px] uppercase tracking-wider font-semibold text-gray-400 mb-3">Velocity</p>
+                <div class="grid grid-cols-3 gap-3">
+                  <div class="rounded-xl border border-gray-100 p-4">
+                    <p class="text-xs text-gray-500">Last 24h</p>
+                    <p id="velocity24" class="text-lg font-bold text-gray-900 mt-1">—</p>
+                  </div>
+                  <div class="rounded-xl border border-gray-100 p-4">
+                    <p class="text-xs text-gray-500">Last 7 days</p>
+                    <p id="velocity7" class="text-lg font-bold text-gray-900 mt-1">—</p>
+                  </div>
+                  <div class="rounded-xl border border-gray-100 p-4">
+                    <p class="text-xs text-gray-500">Last 30 days</p>
+                    <p id="velocity30" class="text-lg font-bold text-gray-900 mt-1">—</p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- ==================== PER-STORE ==================== -->
+              <div>
+                <div class="flex items-center justify-between mb-3">
+                  <p class="text-[11px] uppercase tracking-wider font-semibold text-gray-400">By Store</p>
+                  <span id="storesCount" class="text-xs text-gray-400">—</span>
+                </div>
+
+                <div id="storesGrid" class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <!-- populated -->
+                </div>
+
+                <div id="storesEmpty" class="hidden rounded-xl border border-dashed border-gray-200 p-8 text-center">
+                  <div class="mx-auto w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center">
+                    <i data-lucide="store" class="w-5 h-5 text-gray-400"></i>
+                  </div>
+                  <p class="mt-3 text-sm font-semibold text-gray-900">No store data yet</p>
+                  <p class="mt-1 text-xs text-gray-500">Once orders arrive, per-store breakdowns appear here.</p>
+                </div>
+              </div>
+
+            </div>
+          </div>
         </div>
 
         <div id="tab-analytics" class="tab-content">
@@ -828,13 +1002,9 @@
           </div>
         </div>
 
-        <!-- ============================================================ -->
-        <!-- TAB: CATEGORIES -->
-        <!-- ============================================================ -->
         <div id="tab-categories" class="tab-content">
           <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
 
-            <!-- Header -->
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
               <div>
                 <h2 class="text-lg font-bold text-gray-900">Marketplace Categories</h2>
@@ -851,7 +1021,6 @@
               </div>
             </div>
 
-            <!-- Stats -->
             <div class="grid grid-cols-2 md:grid-cols-3 gap-3 mb-6">
               <div class="bg-gray-50 rounded-xl p-3 text-center">
                 <p class="text-xl font-bold text-gray-900" id="catTotalCount">0</p>
@@ -867,7 +1036,6 @@
               </div>
             </div>
 
-            <!-- Search + view toggle -->
             <div class="flex flex-wrap items-center gap-3 mb-5">
               <div class="flex-1 min-w-[200px] relative">
                 <i data-lucide="search" class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
@@ -887,19 +1055,17 @@
               </div>
             </div>
 
-            <!-- Loading -->
             <div id="categoriesLoading" class="hidden py-10 text-center">
               <div class="inline-flex items-center gap-3 text-gray-500">
                 <svg class="w-5 h-5 animate-spin" viewBox="0 0 24 24" fill="none">
                   <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-opacity="0.25" stroke-width="3" />
                   <path d="M22 12a10 10 0 0 0-10-10" stroke="currentColor" stroke-width="3" stroke-linecap="round" />
                 </svg>
-                Loading categories...
+                Loading product categories...
               </div>
             </div>
 
-            <!-- Error -->
-            <div id="categoriesError" class="hidden rounded-xl border border-red-200 bg-red-50 p-4 flex items-start gap-3">
+            <div id="categoriesError" class="hidden rounded-xl mt-3 mb-3 border border-red-200 bg-red-50 p-4 flex items-start gap-3">
               <i data-lucide="alert-triangle" class="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5"></i>
               <div class="flex-1 min-w-0">
                 <p class="text-sm font-semibold text-red-800">Failed to load categories</p>
@@ -925,16 +1091,14 @@
 
             <div id="categoriesGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3"></div>
 
-            <!-- Pagination -->
             <div id="categoriesPagination" class="hidden mt-5 pt-4 border-t border-gray-100">
               <div class="flex flex-col sm:flex-row items-center justify-between gap-3">
 
                 <!-- Info -->
                 <p class="text-xs text-gray-500" id="catPaginationInfo">
-                  Showing 0–0 of 0
+                  Showing 0-0 of 0
                 </p>
 
-                <!-- Controls -->
                 <div class="flex items-center gap-2">
                   <button id="catPrevBtn" class="px-3 py-1.5 rounded-lg border border-gray-200 text-sm text-gray-600 hover:bg-gray-50 transition disabled:opacity-40 disabled:cursor-not-allowed">
                     <i data-lucide="chevron-left" class="w-4 h-4"></i>
@@ -947,7 +1111,6 @@
                   </button>
                 </div>
 
-                <!-- Per page -->
                 <div class="flex items-center gap-2">
                   <label class="text-xs text-gray-500">Show:</label>
                   <select id="catLimitSelect" class="px-2 py-1 rounded-lg border border-gray-200 text-sm text-gray-700 focus:outline-none focus:border-brand">
@@ -968,17 +1131,216 @@
           </div>
         </div>
 
-        <div id="requestCategoryModal" class="fixed inset-0 z-50 hidden items-center justify-center px-4">
-          <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" data-dismiss="request"></div>
-          <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
-            <div class="sticky top-0 bg-white border-b border-gray-100 px-6 py-4 flex items-center justify-between">
-              <h3 class="text-lg font-bold text-gray-900">Request a Category</h3>
-              <button id="closeRequestCategoryBtn" class="text-gray-400 hover:text-gray-600 transition">
+        <div id="tab-families" class="tab-content">
+
+          <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+              <div>
+                <h2 class="text-lg font-bold text-gray-900">Marketplace Product Families</h2>
+                <p class="text-sm text-gray-500">Browse existing categories or request a new families for your store.</p>
+              </div>
+              <div class="flex items-center gap-2">
+                <button id="familiesRefreshBtn" class="p-2.5 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition" title="Refresh families">
+                  <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+                </button>
+                <button id="requestFamilyBtn" class="px-4 py-2 bg-brand text-white rounded-xl text-sm font-medium hover:bg-brand-dark transition flex items-center gap-2">
+                  <i data-lucide="plus" class="w-4 h-4"></i>
+                  <span class="hidden sm:inline">Request Family</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 md:grid-cols-3 gap-3 mb-6">
+              <div class="bg-gray-50 rounded-xl p-3 text-center">
+                <p class="text-xl font-bold text-gray-900" id="famTotalCount">0</p>
+                <p class="text-xs text-gray-500">Available</p>
+              </div>
+              <div class="bg-amber-50 rounded-xl p-3 text-center">
+                <p class="text-xl font-bold text-amber-600" id="famPendingCount">0</p>
+                <p class="text-xs text-gray-500">Your Pending Requests</p>
+              </div>
+              <div class="bg-green-50 rounded-xl p-3 text-center col-span-2 md:col-span-1">
+                <p class="text-xl font-bold text-green-600" id="famApprovedCount">0</p>
+                <p class="text-xs text-gray-500">Approved Requests</p>
+              </div>
+            </div>
+
+            <div class="flex flex-wrap items-center gap-3 mb-5">
+              <div class="flex-1 min-w-[200px] relative">
+                <i data-lucide="search" class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                <input id="familySearch" type="text" placeholder="Search categories..." class="w-full pl-10 pr-10 py-2.5 rounded-xl border border-gray-200 bg-white text-sm focus:outline-none focus:border-brand focus:ring-2 focus:ring-brand/10">
+                <button id="clearFamilySearch" class="hidden absolute right-2.5 top-1/2 -translate-y-1/2 p-1 rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-100">
+                  <i data-lucide="x" class="w-3.5 h-3.5"></i>
+                </button>
+              </div>
+
+              <div class="flex items-center gap-1 p-1 bg-gray-100 rounded-xl">
+                <button data-view="all" class="family-view-toggle px-3 py-1.5 rounded-lg text-xs font-medium text-gray-500 transition">
+                  All
+                </button>
+                <button data-view="mine" class="family-view-toggle px-3 py-1.5 rounded-lg text-xs font-medium text-gray-500 transition">
+                  My Requests
+                </button>
+              </div>
+            </div>
+
+            <div id="familiesLoading" class="hidden py-10 text-center">
+              <div class="inline-flex items-center gap-3 text-gray-500">
+                <svg class="w-5 h-5 animate-spin" viewBox="0 0 24 24" fill="none">
+                  <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-opacity="0.25" stroke-width="3" />
+                  <path d="M22 12a10 10 0 0 0-10-10" stroke="currentColor" stroke-width="3" stroke-linecap="round" />
+                </svg>
+                Loading product families...
+              </div>
+            </div>
+
+            <div id="familiesError" class="hidden rounded-xl mt-3 mb-3 border border-red-200 bg-red-50 p-4 flex items-start gap-3">
+              <i data-lucide="alert-triangle" class="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5"></i>
+              <div class="flex-1 min-w-0">
+                <p class="text-sm font-semibold text-red-800">Failed to load families</p>
+                <p id="familiesErrorMsg" class="text-xs text-red-700 mt-0.5">Please try again.</p>
+              </div>
+              <button id="familiesRetryBtn" class="px-3 py-1.5 rounded-lg bg-white border border-red-200 text-xs font-medium text-red-700 hover:bg-red-50">
+                Retry
+              </button>
+            </div>
+
+            <div id="familiesEmpty" class="hidden py-12 text-center">
+              <div class="mx-auto w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center">
+                <i data-lucide="tags" class="w-5 h-5 text-gray-400"></i>
+              </div>
+              <h3 class="mt-3 text-sm font-semibold text-gray-900">No families found</h3>
+              <p class="mt-1 text-xs text-gray-500" id="familiesEmptyMsg">Try a different search or request a new family.</p>
+              <button id="familiesEmptyRequestBtn" class="mt-4 inline-flex items-center gap-2 px-4 py-2 bg-brand text-white rounded-xl text-sm font-medium hover:bg-brand-dark transition">
+                <i data-lucide="plus" class="w-4 h-4"></i>
+                Request a Family
+              </button>
+            </div>
+
+            <div id="familiesGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3"></div>
+
+            <div id="familiesPagination" class="hidden mt-5 pt-4 border-t border-gray-100">
+              <div class="flex flex-col sm:flex-row items-center justify-between gap-3">
+
+                <p class="text-xs text-gray-500" id="famPaginationInfo">
+                  Showing 0-0 of 0
+                </p>
+
+                <div class="flex items-center gap-2">
+                  <button id="famPrevBtn" class="px-3 py-1.5 rounded-lg border border-gray-200 text-sm text-gray-600 hover:bg-gray-50 transition disabled:opacity-40 disabled:cursor-not-allowed">
+                    <i data-lucide="chevron-left" class="w-4 h-4"></i>
+                  </button>
+                  <span class="text-xs text-gray-500 min-w-[100px] text-center" id="famPageInfo">
+                    Page 1 of 1
+                  </span>
+                  <button id="famNextBtn" class="px-3 py-1.5 rounded-lg border border-gray-200 text-sm text-gray-600 hover:bg-gray-50 transition disabled:opacity-40 disabled:cursor-not-allowed">
+                    <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                  </button>
+                </div>
+
+                <div class="flex items-center gap-2">
+                  <label class="text-xs text-gray-500">Show:</label>
+                  <select id="famLimitSelect" class="px-2 py-1 rounded-lg border border-gray-200 text-sm text-gray-700 focus:outline-none focus:border-brand">
+                    <option value="10">10</option>
+                    <option value="20" selected>20</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <p class="mt-5 text-xs text-gray-400" id="familiesFooterHint">
+              <span class="text-black">These are system verified product categories.</span>
+              <br> Can't find what you need? Request a family and our team will review it.
+            </p>
+
+          </div>
+
+        </div>
+
+        <div id="tab-brands" class="tab-content">
+
+          <h1>Brands</h1>
+
+        </div>
+
+        <div id="detailModal" role="dialog" aria-modal="true" aria-labelledby="detailTitle" class="fixed inset-0 z-50 hidden items-center justify-center px-4">
+          <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" data-dismiss="category-detail"></div>
+          <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[85vh] flex flex-col overflow-hidden">
+
+            <div class="flex items-start justify-between gap-3 px-6 py-5 border-b border-gray-100">
+              <div class="flex items-center gap-3 min-w-0">
+                <div class="w-11 h-11 rounded-xl bg-brand-light text-brand flex items-center justify-center flex-shrink-0">
+                  <i data-lucide="tag" class="w-5 h-5"></i>
+                </div>
+                <div class="min-w-0">
+                  <h3 id="detailTitle" class="text-base font-bold text-gray-900 truncate">Title</h3>
+                  <p id="detailMeta" class="text-xs text-gray-400 mt-0.5">—</p>
+                </div>
+              </div>
+              <button id="closeDetailBtn" class="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition flex-shrink-0">
                 <i data-lucide="x" class="w-5 h-5"></i>
               </button>
             </div>
 
-            <form id="requestCategoryForm" class="p-6 space-y-4" novalidate>
+            <div class="flex-1 overflow-y-auto px-6 py-5 space-y-5">
+
+
+              <div>
+                <p class="text-[11px] uppercase tracking-wider font-semibold text-gray-400 mb-2">Description</p>
+                <p id="detailDescription" class="text-sm text-gray-700 leading-relaxed whitespace-pre-line">
+                  —
+                </p>
+              </div>
+
+              <div>
+                <p class="text-[11px] uppercase tracking-wider font-semibold text-gray-400 mb-2">Details</p>
+                <dl class="rounded-xl border border-gray-200 divide-y divide-gray-200 overflow-hidden">
+                  <div class="flex items-center justify-between px-4 py-2.5">
+                    <dt class="text-xs text-gray-500">ID</dt>
+                    <dd id="detailId" class="text-xs font-mono text-gray-800">—</dd>
+                  </div>
+                  <div class="flex items-center justify-between px-4 py-2.5">
+                    <dt class="text-xs text-gray-500">Last updated</dt>
+                    <dd id="detailUpdated" class="text-xs text-gray-800">—</dd>
+                  </div>
+                  <div id="detailListingsRow" class="hidden flex items-center justify-between px-4 py-2.5">
+                    <dt class="text-xs text-gray-500">Listings</dt>
+                    <dd id="detailListings" class="text-xs text-gray-800">—</dd>
+                  </div>
+                </dl>
+              </div>
+
+              <!-- Your request status (if any) -->
+              <div id="detailRequestSection" class="hidden">
+                <p class="text-[11px] uppercase tracking-wider font-semibold text-gray-400 mb-2">Your request</p>
+                <div id="detailRequest" class="rounded-xl border p-3.5 flex items-start gap-3"></div>
+              </div>
+
+            </div>
+
+            <div class="px-6 py-4 border-t border-gray-100 bg-gray-50 flex flex-col-reverse sm:flex-row sm:justify-end gap-2">
+              <button id="detailCloseFooterBtn" class="w-full sm:w-auto px-4 py-2.5 rounded-xl border border-gray-200 bg-white text-sm font-medium text-gray-700 hover:bg-gray-100 transition">
+                Close
+              </button>
+            </div>
+
+          </div>
+        </div>
+
+        <div id="requestModal" class="fixed inset-0 z-50 hidden items-center justify-center px-4">
+          <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" data-dismiss="request"></div>
+          <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
+            <div class="sticky top-0 bg-white border-b border-gray-100 px-6 py-4 flex items-center justify-between">
+              <h3 class="text-lg font-bold text-gray-900">Request</h3>
+              <button id="closeRequestBtn" class="text-gray-400 hover:text-gray-600 transition">
+                <i data-lucide="x" class="w-5 h-5"></i>
+              </button>
+            </div>
+
+            <form id="requestForm" class="p-6 space-y-4" novalidate>
               <div class="rounded-xl bg-blue-50 border border-blue-100 p-3 flex items-start gap-2.5">
                 <i data-lucide="info" class="w-4 h-4 text-blue-600 flex-shrink-0 mt-0.5"></i>
                 <p class="text-xs text-blue-800 leading-relaxed">
@@ -986,42 +1348,33 @@
                 </p>
               </div>
 
-              <div class="field" data-field="category_title">
+              <div class="field" data-field="_title">
                 <label for="requestCategoryTitle" class="block text-sm font-medium text-gray-700 mb-1.5">
                   Category name <span class="text-brand">*</span>
                 </label>
-                <input id="requestCategoryTitle" name="category_title" type="text" maxlength="255" autocomplete="off" placeholder="e.g. Smartwatches" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-brand focus:ring-2 focus:ring-brand/10">
+                <input id="requestTitle" name="_title" type="text" maxlength="255" autocomplete="off" placeholder="e.g. Smartwatches" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-brand focus:ring-2 focus:ring-brand/10">
                 <p class="field-msg hidden mt-1.5 text-xs text-red-600"></p>
               </div>
 
               <div class="field" data-field="reason">
-                <label for="requestCategoryReason" class="block text-sm font-medium text-gray-700 mb-1.5">
+                <label for="requestReason" class="block text-sm font-medium text-gray-700 mb-1.5">
                   Why do you need it? <span class="text-gray-400 font-normal">(optional)</span>
                 </label>
-                <textarea id="requestCategoryReason" name="reason" rows="3" placeholder="Describe the products you'd list under this category..." class="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-brand focus:ring-2 focus:ring-brand/10 resize-y min-h-[80px]"></textarea>
+                <textarea id="requestReason" name="reason" rows="3" placeholder="Describe the products you'd list under this category..." class="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-brand focus:ring-2 focus:ring-brand/10 resize-y min-h-[80px]"></textarea>
               </div>
 
               <!-- Inline submit error -->
-              <div id="requestCategoryError" class="hidden rounded-lg border border-red-200 bg-red-50 p-3 flex items-start gap-2">
+              <div id="requestError" class="hidden rounded-lg border border-red-200 bg-red-50 p-3 flex items-start gap-2">
                 <i data-lucide="alert-circle" class="w-4 h-4 text-red-600 flex-shrink-0 mt-0.5"></i>
-                <p id="requestCategoryErrorMsg" class="text-xs text-red-700"></p>
+                <p id="requestErrorMsg" class="text-xs text-red-700"></p>
               </div>
 
               <div class="pt-2 flex flex-col-reverse sm:flex-row sm:justify-end gap-2">
-                <button type="button" id="cancelRequestCategoryBtn" class="w-full sm:w-auto px-4 py-2.5 rounded-xl border border-gray-200 text-sm font-medium text-gray-700 hover:bg-gray-50 transition">
+                <button type="button" id="cancelRequestBtn" class="w-full sm:w-auto px-4 py-2.5 rounded-xl border border-gray-200 text-sm font-medium text-gray-700 hover:bg-gray-50 transition">
                   Cancel
                 </button>
-                <button type="submit" id="submitRequestCategoryBtn" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-brand text-white text-sm font-semibold hover:bg-brand-dark transition disabled:opacity-60 disabled:cursor-not-allowed">
-                  <span class="btn-label inline-flex items-center gap-2">
-                    <i data-lucide="send" class="w-4 h-4"></i> Submit Request
-                  </span>
-                  <span class="btn-loading hidden items-center gap-2">
-                    <svg class="w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none">
-                      <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-opacity="0.25" stroke-width="3" />
-                      <path d="M22 12a10 10 0 0 0-10-10" stroke="currentColor" stroke-width="3" stroke-linecap="round" />
-                    </svg>
-                    Submitting...
-                  </span>
+                <button type="submit" id="submitRequestBtn" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-brand text-white text-sm font-semibold hover:bg-brand-dark transition disabled:opacity-60 disabled:cursor-not-allowed">
+                  Submit Request
                 </button>
               </div>
             </form>
@@ -1474,6 +1827,8 @@
   <script src="/scripts/vendor-logs.js"></script>
   <script src="/scripts/vendor-inventory.js"></script>
   <script src="/scripts/vd-categories.js"></script>
+  <script src="/scripts/vd-families.js"></script>
+  <script src="/scripts/vd-order-dashboard.js"></script>
   <script src="/scripts/bdsh.js"></script>
   <script>
     lucide.createIcons();

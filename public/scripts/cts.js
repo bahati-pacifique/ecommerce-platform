@@ -80,10 +80,13 @@ function renderCategoryTable() {
                 </td>
                 <td class="px-4 py-3 text-center">
                     <div class="flex items-center justify-center gap-2">
+                        <button class="p-1.5 rounded-lg text-black-100 hover:bg-black/5 transition category-validate-btn ${cat.status === "requested" ? '' : 'hidden'}" title="Validated" data-id="${cat.id}">
+                            <i class="fa-solid fa-check"></i>
+                        </button>
                         <button class="p-1.5 rounded-lg text-black-100 hover:bg-black/5 transition category-edit-btn" title="Edit" data-id="${cat.id}">
                             <i class="fas fa-edit"></i>
                         </button>
-                        <button class="p-1.5 rounded-lg text-brand hover:bg-brand-light transition category-delete-btn ${cat.status === "deleted" ? 'hidden' : ''}" title="Delete" data-id="${cat.id}">
+                        <button class="p-1.5 rounded-lg text-brand hover:bg-brand-light transition category-delete-btn ${cat.status === "active" ? '' : 'hidden'}" title="Delete" data-id="${cat.id}">
                             <i class="fas fa-trash"></i>
                         </button>
                         <button class="p-1.5 font-medium text-sm rounded-lg text-green-800 hover:bg-green-100 transition category-activate-btn ${(['deleted', 'disabled'].includes(cat.status)) ? '' : 'hidden'}" title="Delete" data-id="${cat.id}">
@@ -100,6 +103,11 @@ function renderCategoryTable() {
     $('.category-edit-btn').off('click').on('click', function () {
         const id = parseInt($(this).data('id'));
         openEditModal(id);
+    });
+
+    $('.category-validate-btn').off('click').on('click', function () {
+        const id = parseInt($(this).data('id'));
+        activateCategory(id, this);
     });
 
     $('.category-delete-btn').off('click').on('click', function () {
@@ -226,8 +234,7 @@ async function fetchCategories(page = 1, isRefesh = false) {
             withCredentials: true
         });
 
-        let categories = [];
-        let pagination = {};
+
 
         allCategories = response.data.categories || [];
         paginationData = response.data.pagination || {
@@ -236,6 +243,8 @@ async function fetchCategories(page = 1, isRefesh = false) {
             currentPage: 1,
             limit: 5
         };
+
+        console.log(allCategories)
 
         if (currentSearchTerm && currentSearchTerm !== '') {
             filteredCategories = allCategories.filter(cat => {

@@ -19,7 +19,7 @@ async function getProductActiveCategoriesPaginated(req, res) {
     try {
 
         const { page, limit } = req.query;
-        const result = await ProductMetaServices.getActiveCategoriesPaginated(page, limit);
+        const result = await ProductMetaServices.getAllProductCategories(page, limit);
 
         return res.json(result);
     } catch (error) {
@@ -27,13 +27,75 @@ async function getProductActiveCategoriesPaginated(req, res) {
     }
 }
 
+async function getProductCategoriesPaginated(req, res) {
+    try {
+
+        const status = req.params.status;
+        const { page, limit, } = req.query;
+
+        const requesterId = req.user.userId || req.user.id || req.user.user_id;
+        const result = await ProductMetaServices.getCategoriesPaginated(page, limit, status, requesterId);
+
+        return res.json(result);
+    } catch (error) {
+        return formatError('getProductActiveCategories()', 500, error, 'Failed — Internal Server Error', res);
+    }
+}
+
+async function searchCategories(req, res) {
+    try {
+        const { key, page, limit } = req.query;
+        const result = await ProductMetaServices.searchCategory(key, page, limit);
+
+        return res.json(result);
+    } catch (error) {
+        return formatError('searchCategories()', 500, error, 'Failed — Internal Server Error', res);
+    }
+}
+
 async function getProductActiveFamilies(req, res) {
     try {
-        const result = await ProductMetaServices.getActiveFamilies();
+        const result = await ProductMetaServices.getActiveProductFamilies();
 
         return res.json(result);
     } catch (error) {
         return formatError('getProductActiveFamilies()', 500, error, 'Failed — Internal Server Error', res);
+    }
+}
+
+async function searchFamilies(req, res) {
+    try {
+        const { key, page, limit } = req.query;
+        const result = await ProductMetaServices.searchProductFamilies(key, page, limit);
+
+        return res.json(result);
+    } catch (error) {
+        return formatError('searchCategories()', 500, error, 'Failed — Internal Server Error', res);
+    }
+}
+
+async function getProductFamilies(req, res) {
+    try {
+        const result = await ProductMetaServices.getProductFamilies();
+
+        return res.json(result);
+    } catch (error) {
+        return formatError('getProductFamilies()', 500, error, 'Failed — Internal Server Error', res);
+    }
+}
+
+async function getProductFamiliesPaginatedRequested(req, res) {
+    try {
+
+        const status = req.params.status || 'active';
+        const { page, limit } = req.query;
+
+        const requesterId = req.user?.userId || req.user?.id || req.user?.user_id || null;
+        const result = await ProductMetaServices.getProductFamiliesWithRequested(page, limit, status, requesterId);
+
+        return res.json(result);
+    } catch (error) {
+        return formatError('getProductFamiliesPaginatedRequested()', 500, error, 'Failed — Internal Server Error', res);
     }
 }
 
@@ -472,9 +534,18 @@ async function removeUserProfileImage(req, res) {
 }
 
 module.exports = {
+
     getProductActiveCategories,
     getProductActiveCategoriesPaginated,
+    getProductCategoriesPaginated,
+    searchCategories,
+
+    searchFamilies,
+
+    getProductFamilies,
     getProductActiveFamilies,
+    getProductFamiliesPaginatedRequested,
+
     getActiveBrands,
     getActiveAttributes,
     getActiveAttributeValues,

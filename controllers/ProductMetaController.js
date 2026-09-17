@@ -32,6 +32,27 @@ async function createProductCategory(req, res) {
     }
 }
 
+async function insertProductCategory(req, res) {
+    const userId = req.user.userId || req.user.user_id || req.user.id;
+    let { title, slug = '', description, reason } = req.body;
+    if (!slug && title) slug = title.toLowerCase().replaceAll(" ", "-");
+    try {
+
+        if (!title) return res.status(400).json({
+            message: "Failed — Category title is required"
+        });
+
+        const category = await ProductMetaServices.insertProductCategory(title, slug, description, reason, userId);
+
+        return res.json(category);
+
+    } catch (error) {
+        let message = 'Failed — Internal Server Error';
+        if (error.code == 23505) message = `${title} category already exists`;
+        return formatError('createProductCategory()', 500, error, message, res);
+    }
+}
+
 async function getProductCategories(req, res) {
     try {
         const { page, limit, status } = req.query;
@@ -98,7 +119,7 @@ async function updatedProductCategory(req, res) {
         return res.status(updated ? 201 : 404).json(updated || { message: "Failed — Not found" });
 
     } catch (error) {
-        return formatError('updateProductCategory()', 500, error, 'Failed — Internal Server Error', res);
+        return formatError('updateProductCategory()', 500, error, !error.code ? error.message :'Failed — Internal Server Error', res);
     }
 }
 
@@ -121,6 +142,31 @@ async function createProductFamily(req, res) {
         if (error.code === '23503') message = `Failed — Category does not exists`;
 
         return formatError('createProductFamily()', 500, error, message, res);
+    }
+}
+
+async function insertProductFamily(req, res) {
+    
+    const userId = req.user.userId || req.user.user_id || req.user.id;
+
+    let { category_id = null, title, slug = null, description, reason } = req.body;
+
+    if (!slug && title) slug = title.toLowerCase().replaceAll(" ", "-");
+
+    try {
+
+        if (!title) return res.status(400).json({
+            message: "Failed — Category title is required"
+        });
+
+        const family = await ProductMetaServices.insertProductFamily(category_id, title, slug, description, reason, userId);
+
+        return res.json(family);
+
+    } catch (error) {
+        let message = 'Failed — Internal Server Error';
+        if (error.code == 23505) message = `${title} category already exists`;
+        return formatError('createProductCategory()', 500, error, message, res);
     }
 }
 
@@ -208,6 +254,20 @@ async function createBrand(req, res) {
     }
 }
 
+async function insertBrand(req, res) {
+    const { title } = req.body;
+    try {
+        const newBrand = await ProductMetaServices.insertBrand(req.body);
+        return res.status(newBrand ? 201 : 500).json(newBrand);
+    } catch (error) {
+        console.log(error);
+        let message = 'Failed — Internal Server Error';
+        if (error.code == '23505') message = `${title} brand already exists`;
+
+        return formatError('createBrand()', 400, error, message, res);
+    }
+}
+
 async function getBrandById(req, res) {
     try {
         const brand = await ProductMetaServices.getBrandById(req.params.id);
@@ -284,6 +344,17 @@ async function createAttribute(req, res) {
     }
 }
 
+async function insertAttribute(req, res) {
+    const { title } = req.body;
+    try {
+        const attribute = await ProductMetaServices.insertAttribute(req.body);
+
+        return res.json(attribute)
+    } catch (error) {
+        return formatError('createAttribute()', 500, error, error.message, res);
+    }
+}
+
 async function getAttribute(req, res) {
     try {
         const attribute = await ProductMetaServices.getAttributeById(req.params.id);
@@ -305,6 +376,7 @@ async function getAttributes(req, res) {
 
 async function updateAttribute(req, res) {
     try {
+        
         const attribute = await ProductMetaServices.updateAttribute(req.params.id, req.body);
         return res.json(attribute);
     } catch (error) {
@@ -418,6 +490,7 @@ module.exports = {
     batchInsert,
 
     createProductCategory,
+    insertProductCategory,
     getProductCategories,
     removeProductCategory,
     updatedProductCategory,
@@ -426,6 +499,7 @@ module.exports = {
     activateProductCategory,
 
     createProductFamily,
+    insertProductFamily,
     getProductFamily,
     getProductFamilies,
     deleteProductFamily,
@@ -434,7 +508,9 @@ module.exports = {
     updateProductFamily,
 
     createBrand,
+    insertBrand,
     getBrandById,
+    getActiveBrands,
     getBrands,
     updateBrand,
     softDeleteBrand,
@@ -442,6 +518,7 @@ module.exports = {
     activateBrand,
 
     createAttribute,
+    insertAttribute,
     getAttribute,
     getAttributes,
     updateAttribute,

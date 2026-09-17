@@ -254,6 +254,7 @@ class AuthService {
                 
                 try {
                     const vendorResult = await Vendor.getVendorByUserId(userAccount.user_id);
+                    console.log("Vendor Acc.",vendorResult, userAccount.user_id)
                     if (vendorResult) {
                         userAccount.vendor = vendorResult;
                     }
@@ -265,7 +266,7 @@ class AuthService {
             return {
                 success: true,
                 authenticated: true,
-                message: `Welcome to ${userAccount.title}`,
+                message: `Welcome to back`,
                 userAccount
             }
 

@@ -558,6 +558,11 @@ class VendorService {
             return null;
         }
     }
+
+    static async getOrderVendorDashboardData(vendorId, timeFrame){
+        if (timeFrame) return Vendor.getOrderVendorDashboardDataTimeFrames(vendorId, timeFrame);
+        return await Vendor.getOrderVendorDashboardData(vendorId);
+    }
 }
 
 module.exports = VendorService;

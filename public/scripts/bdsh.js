@@ -51,6 +51,8 @@ const tabContents = {
     orders: document.getElementById('tab-orders'),
     analytics: document.getElementById('tab-analytics'),
     category: document.getElementById('tab-categories'),
+    families: document.getElementById('tab-families'),
+    brands: document.getElementById('tab-brands'),
     profile: document.getElementById('tab-profile'),
     settings: document.getElementById('tab-settings'),
     logs: document.getElementById('tab-logs'),
@@ -67,6 +69,8 @@ const tabTitles = {
     orders: 'Orders',
     analytics: 'Analytics',
     category: 'Categories',
+    families: 'Families',
+    brands: 'Brands',
     profile: 'Profile',
     settings: 'Settings',
     logs: 'Logs',
@@ -86,6 +90,8 @@ let profileManager = null;
 let logsManager = null;
 let vendorInventory = null;
 let categoryManager = null;
+let familiesManager = null;
+let ordersManager = null;
 
 sidebarLinks.forEach(link => {
     link.addEventListener('click', function (e) {
@@ -113,7 +119,6 @@ sidebarLinks.forEach(link => {
                 }
                 break;
             case 'logs':
-                // Watch for logs tab activation
                 if (!logsManager) {
                     logsManager = new LogsManager();
                 }
@@ -128,6 +133,19 @@ sidebarLinks.forEach(link => {
                     categoryManager = new CategoriesManager();
                 }
                 break;
+            case 'families':
+                if (!familiesManager) {
+                    familiesManager = new FamiliesManager();
+                }
+                break;
+            case 'orders':
+                if (!ordersManager){
+                    ordersManager = new OrdersManager();
+                }
+                break;
+            case 'brands':
+                
+                break;
         }
 
         if (tabContents[tabId]) {
@@ -140,12 +158,10 @@ sidebarLinks.forEach(link => {
     });
 });
 
-// ============================================================
-// PROFILE POPUP MENU
-// ============================================================
 const profileTrigger = document.getElementById('profileTrigger');
 const profilePopup = document.getElementById('profilePopup');
 const popupChevron = document.getElementById('popupChevron');
+
 let isPopupOpen = false;
 
 function togglePopup(e) {

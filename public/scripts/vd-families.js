@@ -1,4 +1,4 @@
-class CategoriesManager {
+class FamiliesManager {
     constructor(options = {}) {
 
         this.api = {
@@ -23,7 +23,7 @@ class CategoriesManager {
 
         this.loaded = false;
         this.loading = false;
-        this.categories = [];   // current page only
+        this.families = [];   // current page only
         this.requests = [];     // all vendor requests (small list)
         this.submitting = false;
 
@@ -39,7 +39,7 @@ class CategoriesManager {
             this.els.error.classList.add('hidden');
 
             try {
-                const response = await axios.get(`${this.api.base}/categories/s`,
+                const response = await axios.get(`${this.api.base}/families/s`,
                     {
                         params: {
                             key: v
@@ -51,11 +51,13 @@ class CategoriesManager {
                 this.loaded = true;
                 this.loading = false;
 
-                this.categories = payload.categories;
+                this.families = payload.families;
+                console.log(this.families)
+
                 this.pagination = {
                     page: payload.pagination?.page ?? this.page,
                     limit: payload.pagination?.limit ?? this.limit,
-                    total: payload.pagination?.total ?? payload.data.length,
+                    total: payload.pagination?.total ?? payload.families.length,
                     total_pages: payload.pagination?.total_pages ?? 1,
                     has_next_page: !!payload.pagination?.has_next_page,
                     has_previous_page: !!payload.pagination?.has_previous_page
@@ -85,7 +87,7 @@ class CategoriesManager {
             if (e.key !== 'Escape') return;
             if (!this.els.modal.classList.contains('hidden')) {
                 this.closeModal();
-            } else if (!this.els.categoryDetailModal.classList.contains('hidden')) {
+            } else if (!this.els.familyDetailModal.classList.contains('hidden')) {
                 this.closeDetail();
             }
         };
@@ -101,28 +103,28 @@ class CategoriesManager {
         const $$ = (s) => Array.from(this.root.querySelectorAll(s));
 
         return {
-            refreshBtn: $('#categoriesRefreshBtn'),
-            requestBtn: $('#requestCategoryBtn'),
+            refreshBtn: $('#familiesRefreshBtn'),
+            requestBtn: $('#requestFamilyBtn'),
 
-            totalCount: $('#catTotalCount'),
-            pendingCount: $('#catPendingCount'),
-            approvedCount: $('#catApprovedCount'),
+            totalCount: $('#famTotalCount'),
+            pendingCount: $('#famPendingCount'),
+            approvedCount: $('#famApprovedCount'),
 
-            search: $('#categorySearch'),
-            clearSearch: $('#clearCategorySearch'),
-            viewToggles: $$('.view-toggle'),
+            search: $('#familySearch'),
+            clearSearch: $('#clearFamilySearch'),
+            viewToggles: $$('.family-view-toggle'),
 
-            loading: $('#categoriesLoading'),
-            error: $('#categoriesError'),
-            errorMsg: $('#categoriesErrorMsg'),
-            retryBtn: $('#categoriesRetryBtn'),
+            loading: $('#familiesLoading'),
+            error: $('#familiesError'),
+            errorMsg: $('#familiesErrorMsg'),
+            retryBtn: $('#familiesRetryBtn'),
 
-            empty: $('#categoriesEmpty'),
-            emptyMsg: $('#categoriesEmptyMsg'),
-            emptyRequestBtn: $('#categoriesEmptyRequestBtn'),
+            empty: $('#familiesEmpty'),
+            emptyMsg: $('#familiesEmptyMsg'),
+            emptyRequestBtn: $('#familiesEmptyRequestBtn'),
 
-            grid: $('#categoriesGrid'),
-            footerHint: $('#categoriesFooterHint'),
+            grid: $('#familiesGrid'),
+            footerHint: $('#familiesFooterHint'),
 
             modal: $('#requestModal'),
             modalForm: $('#requestForm'),
@@ -136,27 +138,27 @@ class CategoriesManager {
             dismissOverlay: $('[data-dismiss="request"]'),
 
             // pagination
-            paginationWrap: $('#categoriesPagination'),
-            paginationInfo: $('#catPaginationInfo'),
-            pageInfo: $('#catPageInfo'),
-            prevBtn: $('#catPrevBtn'),
-            nextBtn: $('#catNextBtn'),
-            limitSelect: $('#catLimitSelect'),
+            paginationWrap: $('#familiesPagination'),
+            paginationInfo: $('#famPaginationInfo'),
+            pageInfo: $('#famPageInfo'),
+            prevBtn: $('#famPrevBtn'),
+            nextBtn: $('#famNextBtn'),
+            limitSelect: $('#famLimitSelect'),
 
-            categoryDetailModal: $('#detailModal'),
-            catDetailId: $('#detailId'),
-            catDetailUpdated: $('#detailUpdated'),
-            catDetailListings: $('#detailListings'),
-            catDetailListingsRow: $('#detailListingsRow'),
-            catDetailDescription: $('#detailDescription'),
-            catDetailRequestSection: $('#detailRequestSection'),
-            catDetailTitle: $('#detailTitle'),
-            catDetailMeta: $('#detailMeta'),
-            closeCatDetailBtn: $('closeDetailBtn'),
-            closeCatDetailBtn: $('#closeDetailBtn'),
-            catDetailCloseFooterBtn: $('#detailCloseFooterBtn'),
+            familyDetailModal: $('#detailModal'),
+            famDetailId: $('#detailId'),
+            famDetailUpdated: $('#detailUpdated'),
+            famDetailListings: $('#detailListings'),
+            famDetailListingsRow: $('#detailListingsRow'),
+            famDetailDescription: $('#detailDescription'),
+            famDetailRequestSection: $('#detailRequestSection'),
+            famDetailTitle: $('#detailTitle'),
+            famDetailMeta: $('#detailMeta'),
+            closeFamDetailBtn: $('closeDetailBtn'),
+            closeFamDetailBtn: $('#closeDetailBtn'),
+            famDetailCloseFooterBtn: $('#detailCloseFooterBtn'),
 
-            sidebarLink: document.querySelector('.sidebar-link[data-tab="categories"]')
+            sidebarLink: document.querySelector('.sidebar-link[data-tab="families"]')
         };
     }
 
@@ -205,31 +207,28 @@ class CategoriesManager {
 
         // Delegated card click
         e.grid?.addEventListener('click', (ev) => {
-            const card = ev.target.closest('[data-category-id]');
+            const card = ev.target.closest('[data-family-id]');
             if (!card) return;
-            this.openDetail(card.dataset.categoryId);
+            this.openDetail(card.dataset.familyId);
         });
 
         // Keyboard activation
         e.grid?.addEventListener('keydown', (ev) => {
             if (ev.key !== 'Enter' && ev.key !== ' ') return;
-            const card = ev.target.closest('[data-category-id]');
+            const card = ev.target.closest('[data-family-id]');
             if (!card) return;
             ev.preventDefault();
-            this.openDetail(card.dataset.categoryId);
+            this.openDetail(card.dataset.familyId);
         });
 
         // Detail modal closers
-        e.closeCatDetailBtn?.addEventListener('click', () => this.closeDetail());
-        e.catDetailCloseFooterBtn?.addEventListener('click', () => this.closeDetail());
-        e.catDetailDismiss?.addEventListener('click', () => this.closeDetail());
+        e.closeFamDetailBtn?.addEventListener('click', () => this.closeDetail());
+        e.famDetailCloseFooterBtn?.addEventListener('click', () => this.closeDetail());
+        e.famDetailDismiss?.addEventListener('click', () => this.closeDetail());
 
-        e.catDetailRequestBtn?.addEventListener('click', () => {
-            const cat = this.activeCategory;
-            this.closeDetail();
-            this.openModal();
-            if (cat) this.els.modalTitle.value = cat.title;
-        });
+        e.modalTitle.addEventListener('keyup', (ev) => {
+            setTimeout(() => { e.modalReason.value = `I want to list ${ev.target.value}`; }, 100);
+        })
     }
 
     /**
@@ -260,29 +259,29 @@ class CategoriesManager {
             });
             if (this.search) params.set('q', this.search);
 
-            const [catRes, reqRes] = await Promise.allSettled([
+            const [famRes, reqRes] = await Promise.allSettled([
                 axios.get(
-                    `${this.api.base}/categories/p?${params.toString()}`,
+                    `${this.api.base}/families/active`,
                     { withCredentials: true }
                 ),
                 axios.get(
-                    `${this.api.base}/categories/requested`,
+                    `${this.api.base}/families/r/requested`,
                     { withCredentials: true }
                 )
             ]);
 
             // ---------- Categories (required) ----------
-            if (catRes.status === 'rejected') throw catRes.reason;
+            if (famRes.status === 'rejected') throw famRes.reason;
 
-            const payload = catRes.value.data || {};
+            const payload = famRes.value.data || {};
 
-            // Support both {data, pagination} and legacy {categories} shapes
-            if (Array.isArray(payload.data)) {
-                this.categories = payload.data;
+            // Support both {data, pagination} and legacy shapes
+            if (Array.isArray(payload.families)) {
+                this.families = payload.families;
                 this.pagination = {
                     page: payload.pagination?.page ?? this.page,
                     limit: payload.pagination?.limit ?? this.limit,
-                    total: payload.pagination?.total ?? payload.data.length,
+                    total: payload.pagination?.total ?? payload.families.length,
                     total_pages: payload.pagination?.total_pages ?? 1,
                     has_next_page: !!payload.pagination?.has_next_page,
                     has_previous_page: !!payload.pagination?.has_previous_page
@@ -291,9 +290,9 @@ class CategoriesManager {
                 this.page = this.pagination.page;
                 this.limit = this.pagination.limit;
 
-            } else if (Array.isArray(payload.categories)) {
+            } else if (Array.isArray(payload.families)) {
                 // Legacy: server ignored pagination — keep client-side fallback
-                this.categories = payload.categories;
+                this.families = payload.families;
                 this.pagination = {
                     page: 1, limit: this.limit,
                     total: payload.categories.length,
@@ -301,7 +300,7 @@ class CategoriesManager {
                     has_next_page: false, has_previous_page: false
                 };
             } else {
-                this.categories = [];
+                this.families = [];
                 this.pagination = {
                     page: 1, limit: this.limit, total: 0, total_pages: 0,
                     has_next_page: false, has_previous_page: false
@@ -361,65 +360,65 @@ class CategoriesManager {
         }
 
         e.empty.classList.add('hidden');
-        e.grid.innerHTML = list.map(cat => this.renderCard(cat)).join('');
+        e.grid.innerHTML = list.map(fam => this.renderCard(fam)).join('');
         this.renderPagination();
         this._refreshIcons();
 
 
     }
 
-    openDetail(categoryId) {
-        const cat = this.categories.find(c => String(c.id) === String(categoryId));
-        if (!cat) return;
+    openDetail(famId) {
+        const fam = this.families.find(f => String(f.id) === String(famId));
+        if (!fam) return;
 
-        this.activeCategory = cat;
-        this._renderDetail(cat);
+        this.activeFamily = fam;
+        this._renderDetail(fam);
 
-        this.els.categoryDetailModal.classList.remove('hidden');
-        this.els.categoryDetailModal.style.display = 'flex';
+        this.els.familyDetailModal.classList.remove('hidden');
+        this.els.familyDetailModal.style.display = 'flex';
         document.body.style.overflow = 'hidden';
         this._refreshIcons();
 
-        setTimeout(() => this.els.closeCatDetailBtn?.focus(), 50);
+        setTimeout(() => this.els.closeFamDetailBtn?.focus(), 50);
     }
 
     closeDetail() {
-        this.els.categoryDetailModal.classList.add('hidden');
-        this.els.categoryDetailModal.style.display = 'none';
+        this.els.familyDetailModal.classList.add('hidden');
+        this.els.familyDetailModal.style.display = 'none';
         document.body.style.overflow = '';
-        this.activeCategory = null;
+        this.activeFamily = null;
     }
 
-    _renderDetail(cat) {
+    _renderDetail(fam) {
         const e = this.els;
 
 
-        e.catDetailTitle.textContent = cat.title || 'Category';
-        e.catDetailMeta.textContent = cat.last_updates
-            ? `Updated: ${formatDate(cat.last_updates)}`
-            : `Category #${cat.id}`;
+        e.famDetailTitle.textContent = fam.title || 'Family';
+        e.famDetailMeta.textContent = fam.last_updates
+            ? `Updated: ${formatDate(fam.last_updates)}`
+            : `Family #${fam.id}`;
 
 
-        const desc = (cat.description || '').trim();
-        e.catDetailDescription.textContent = desc || 'No description provided.';
-        e.catDetailDescription.classList.toggle('text-gray-400', !desc);
-        e.catDetailDescription.classList.toggle('italic', !desc);
-        e.catDetailDescription.classList.toggle('text-gray-700', !!desc);
+        const desc = (fam.description || '').trim();
+        e.famDetailDescription.textContent = desc || 'No description provided.';
+        e.famDetailDescription.classList.toggle('text-gray-400', !desc);
+        e.famDetailDescription.classList.toggle('italic', !desc);
+        e.famDetailDescription.classList.toggle('text-gray-700', !!desc);
 
         // ---- Details grid ----
-        e.catDetailId.textContent = String(cat.id ?? '—');
-        e.catDetailUpdated.textContent = cat.last_updates
-            ? new Date(cat.last_updates).toLocaleString('en-US', {
+        e.famDetailId.textContent = String(fam.id ?? '—');
+        e.famDetailUpdated.textContent = fam.last_updates
+            ? new Date(fam.last_updates).toLocaleString('en-US', {
                 year: 'numeric', month: 'short', day: 'numeric',
                 hour: '2-digit', minute: '2-digit'
             })
             : '—';
 
-        if (typeof cat.listings_count === 'number') {
-            e.catDetailListingsRow.classList.remove('hidden');
-            e.catDetailListings.textContent = cat.listings_count.toLocaleString();
+        if (typeof fam.listings_count === 'number') {
+            e.famDetailListingsRow.classList.remove('hidden');
+            e.famDetailListings.textContent = fam.listings_count.toLocaleString();
         } else {
-            e.catDetailListingsRow.classList.add('hidden');
+            e.famDetailListingsRow.classList.add('hidden');
         }
 
         this._refreshIcons();
@@ -446,8 +445,8 @@ class CategoriesManager {
         wrap.classList.toggle('hidden', !shouldShow);
     }
 
-    renderCard(cat) {
-        const req = this.getRequestForTitle(cat.title);
+    renderCard(fam) {
+        const req = this.getRequestForTitle(fam.title);
         const pill = req
             ? `<span class="item-pill ${req.status}">
                     <i data-lucide="${req.status === 'approved' ? 'check' : req.status === 'rejected' ? 'x' : 'clock'}" class="w-3 h-3"></i>
@@ -457,18 +456,21 @@ class CategoriesManager {
             : '';
 
         return `
-                <div class="item-card rounded-xl p-4 flex flex-col gap-2 cursor-pointer" data-category-id="${cat.id}">
+                <div class="item-card rounded-xl p-4 flex flex-col gap-2 cursor-pointer" data-family-id="${fam.id}">
                     <div class="flex items-start justify-between gap-2">
                     <div class="flex gap-2.5 min-w-0">
                         <div class="w-9 h-9 rounded-lg bg-brand-light text-brand flex items-center justify-center flex-shrink-0">
                             <i data-lucide="tag" class="w-4 h-4"></i>
                         </div>
                         <div class="min-w-0">
-                            <p class="text-sm font-semibold text-gray-900 truncate" title="${this._escapeHtml(cat.title)}">
-                                ${this._highlight(cat.title)}
+                            <p class="text-sm font-semibold text-gray-900 truncate" title="${this._escapeHtml(fam.title)}">
+                                ${this._highlight(fam.title)}
+                            </p>
+                            <p class="text-[11px] text-gray-500">
+                                ${fam.category_title || '— No category mapped —'}
                             </p>
                             <p class="text-[11px] text-gray-400">
-                                ${cat.last_updates ? ` Updated: ${formatDate(cat.last_updates)}` : ''}
+                                ${fam.last_updates ? `Updated: ${formatDate(fam.last_updates)}` : ''}
                             </p>
                         </div>
                     </div>
@@ -479,14 +481,14 @@ class CategoriesManager {
     }
 
     updateStats() {
-        this.els.totalCount.textContent = this.categories.length;
+        this.els.totalCount.textContent = this.families.length;
         this.els.pendingCount.textContent =
             this.requests.filter(r => r.status === 'requested').length;
         this.els.approvedCount.textContent =
             this.requests.filter(r => r.status === 'active').length;
     }
 
-    
+
     setView(v) {
         this.view = v;
         this.els.viewToggles.forEach(btn => {
@@ -497,9 +499,9 @@ class CategoriesManager {
     }
 
     filteredCategories() {
-        let list = this.categories;
+        let list = this.families;
 
-        if (this.view === 'mine') { 
+        if (this.view === 'mine') {
             list = this.requests;
         }
 
@@ -542,16 +544,16 @@ class CategoriesManager {
         const reason = this.els.modalReason.value.trim();
 
         if (!title) {
-            this._setFieldError('_title', 'Please enter a category name.');
+            this._setFieldError('_title', 'Please enter a name.');
             this.els.modalTitle.focus();
             return;
         }
         if (title.length < 2 || title.length > 255) {
-            this._setFieldError('_title', 'Category name must be 2–255 characters.');
+            this._setFieldError('_title', 'Name must be 2–255 characters.');
             return;
         }
 
-        const dup = this.categories.find(
+        const dup = this.families.find(
             c => String(c.title).toLowerCase().trim() === title.toLowerCase()
         );
         if (dup) {
@@ -561,7 +563,7 @@ class CategoriesManager {
 
         const existingReq = this.getRequestForTitle(title);
         if (existingReq && existingReq.status === 'pending') {
-            this._setFieldError('_title', 'You already have a pending request for this category.');
+            this._setFieldError('_title', 'You already have a pending request for this family.');
             return;
         }
 
@@ -569,7 +571,7 @@ class CategoriesManager {
 
         try {
             const res = await axios.post(
-                `${this.api.base}/meta/categories/insert`,
+                `${this.api.base}/meta/families/insert`,
                 { title: title, reason: reason || null },
                 { withCredentials: true }
             );
@@ -587,13 +589,13 @@ class CategoriesManager {
 
             this.requests.unshift(request);
             this.closeModal();
-            this._notify('success', 'Category request submitted. Our team will review it.');
+            this._notify('success', 'Family request submitted. Our team will review it.');
             this.render();
 
         } catch (err) {
-            console.error('Error submitting category', err);
+            console.error('Error submitting family:', err);
 
-             this.els.modalErrorMsg.textContent = err.response?.data?.message || 'Internal Server Error';
+            this.els.modalErrorMsg.textContent = err.response?.data?.message || 'Internal Server Error';
 
             this.els.modalError.classList.remove('hidden');
             this._refreshIcons();
@@ -629,10 +631,8 @@ class CategoriesManager {
         this.submitting = on;
         const btn = this.els.modalSubmitBtn;
         btn.disabled = on;
-        btn.querySelector('.btn-label').classList.toggle('hidden', on);
-        const loading = btn.querySelector('.btn-loading');
-        loading.classList.toggle('hidden', !on);
-        loading.classList.toggle('inline-flex', on);
+        if (on) btn.textContent = 'Submitting...';
+        else btn.textContent = 'Submit'
     }
 
     _humanizeError(err) {

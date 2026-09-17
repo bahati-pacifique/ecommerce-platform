@@ -60,6 +60,7 @@ async function renderDashboard(req, res) {
     //const port = isProduction ? '' : process.env.PORT;
 
     const user = req.user || {};
+    
 
     res.render('dashboard', { user, protocal, domainName });
 }

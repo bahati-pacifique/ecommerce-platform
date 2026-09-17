@@ -2,6 +2,8 @@ const { acceptsHtml } = require('../../../util/helpers');
 const VendorService = require('../../../src/services/vendor.services');
 const StoreService = require('../../../src/services/store.services');
 
+const { clearAuthentication } = require('../../../util/helpers')
+
 const isProduction = process.env.NODE_ENV === 'production';
 
 const sslUrlPrefix = isProduction ? 'https://' : 'http://';
@@ -67,6 +69,12 @@ function redirectedToDashboard(req, res) {
 
     const vendorId = user?.vendor?.id;
 
+    if (!vendorId) {
+        clearAuthentication(res);
+        req.session.message = 'Please login to continue';
+        return res.redirect(`${protocal}auth.${domainName}?r=${protocal}business.${domainName}/dashboard`)
+    }
+
     if (acceptsHtml(req)) {
         res.redirect(`/${vendorId.replaceAll('-', '')}/dashboard`)
     }
@@ -98,9 +106,8 @@ async function renderDashboard(req, res) {
     //Update lastActive
     try {
         await VendorService.updateLastActive(user.vendor.id);
-        console.log(`Vendor ${user.vendor?.business_name} active status updated`);
     } catch (error) {
-        console.log('updatind vendor last active:', error)
+        console.log('updating vendor last active:', error)
     }
 
     return res.render('business-dashboard',
@@ -165,9 +172,24 @@ async function renderInvontoryForm(req, res) {
 
     const { stores } = await StoreService.getPaginatedStoresByVendorId(user.vendor.id);
 
-    console.log(stores);
-
     return res.render('inventory-form', { user, protocal, domainName, stores });
+}
+
+async function getVendorOrderDashboard(req, res) {
+    try {
+        const vendorId = req.user.vendor.id;
+
+        const { period } = req.query;
+
+        if (!vendorId) return res.status(401).json({ message: 'Not authenticated' });
+
+        const result = await VendorService.getOrderVendorDashboardData(vendorId, period);
+
+        return res.json(result);
+    } catch (error) {
+        console.log('getVendorOrderDashboard():', error);
+        res.status(500).json({ message: !error.code ? error.message : 'Failed — Internal Server Error' });
+    }
 }
 
 
@@ -182,5 +204,6 @@ module.exports = {
     renderTerms,
     redirectedToDashboard,
     renderStoreDashboard,
-    renderInvontoryForm
+    renderInvontoryForm,
+    getVendorOrderDashboard
 }

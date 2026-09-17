@@ -202,3 +202,33 @@ async function checkFile(url) {
         return false;
     }
 }
+
+function _formatDate(d) {
+    if (!d) return '';
+
+    const dt = new Date(d);
+    const now = new Date();
+
+    const isSameDay = dt.getDate() === now.getDate() &&
+        dt.getMonth() === now.getMonth() &&
+        dt.getFullYear() === now.getFullYear();
+
+    if (isSameDay) {
+        const msDiff = now - dt;
+        const hoursDiff = Math.floor(msDiff / 3600000);
+
+        if (hoursDiff >= 1) {
+            return `${hoursDiff}h ago`;
+        }
+        return 'today';
+    }
+
+    const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const startOfTarget = new Date(dt.getFullYear(), dt.getMonth(), dt.getDate());
+    const diff = Math.round((startOfToday - startOfTarget) / 86400000);
+
+    if (diff === 1) return 'yesterday';
+    if (diff > 1 && diff < 30) return `${diff} days ago`;
+
+    return dt.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+}

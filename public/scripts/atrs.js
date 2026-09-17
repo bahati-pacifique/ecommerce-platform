@@ -911,6 +911,7 @@ async function handleAttributeFormSubmit(e) {
 
     if (id) {
         const payload = getChangedAttributes(attributeOriginalEditing, formData);
+        console.log(attributeOriginalEditing, formData, payload);
         success = await updateAttribute(parseInt(id), payload);
     } else {
         success = await createAttribute(formData);

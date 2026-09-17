@@ -2,8 +2,8 @@ const ProductMetaModel = require('../models/productMeta.model');
 
 class ProductMetaService {
 
-    static async batchInsert(tableName, columns, values, conflictOptionals = {}){
-        
+    static async batchInsert(tableName, columns, values, conflictOptionals = {}) {
+
         const result = await ProductMetaModel.batchInsert(tableName, columns, values, conflictOptionals)
 
         return result;
@@ -12,6 +12,12 @@ class ProductMetaService {
     //===========================================================================
     static async createProductCategory(title, slug, description) {
         const result = await ProductMetaModel.createProductCategory(title, slug, description);
+
+        return result;
+    }
+
+    static async insertProductCategory(title, slug, description, reason, by) {
+        const result = await ProductMetaModel.insertProductCategory(title, slug, description, reason, by);
 
         return result;
     }
@@ -40,8 +46,12 @@ class ProductMetaService {
         return await ProductMetaModel.getActiveCategories();
     }
 
-    static async getActiveCategoriesPaginated(page, limit) {
-        return await ProductMetaModel.getActiveCategoriesPaginated(page, limit);
+    static async getCategoriesPaginated(page, limit, status = 'active', reqId) {
+        return await ProductMetaModel.getCategoriesPaginated(page, limit, status, reqId);
+    }
+
+    static async searchCategory(searchKey, page, limit) {
+        return await ProductMetaModel.searchCategory(searchKey, page, limit);
     }
 
     /**
@@ -59,12 +69,25 @@ class ProductMetaService {
         return await ProductMetaModel.createProductFamily(categoryId, title, slug, description);
     }
 
+    static async insertProductFamily(categoryId, title, slug, description, reason, by) {
+        
+        return await ProductMetaModel.insertProductFamily(categoryId, title, slug, description, reason, by);
+    }
+
     static async getProductFamily(id) {
         return await ProductMetaModel.getProductFamily(id);
     }
 
     static async getProductFamilies(filters) {
         return await ProductMetaModel.getProductFamilies(filters)
+    }
+
+    static async searchProductFamilies(searchKey, page, limit) {
+        return await ProductMetaModel.searchFamily(searchKey, page, limit)
+    }
+
+    static async getProductFamiliesWithRequested(page, limit, status = 'active', requesterId) {
+        return await ProductMetaModel.getProductFamiliesPaginatedRequested(page, limit, status, requesterId);
     }
 
     static async updateProductFamily(id, payload) {
@@ -87,9 +110,13 @@ class ProductMetaService {
         return await ProductMetaModel.updateProductFamily(id, payload)
     }
 
-    static async getActiveFamilies() {
-        return await ProductMetaModel.getActiveFamilies();
+    static async getActiveProductFamilies() {
+        return await ProductMetaModel.getActiveProductFamilies();
     }
+
+    // static async getProductFamilies() {
+    //     return await ProductMetaModel.getProductFamilies();
+    // }
 
     /**
      * 
@@ -98,6 +125,10 @@ class ProductMetaService {
      */
     static async createBrand(payload) {
         return await ProductMetaModel.createProductBrand(payload);
+    }
+
+    static async insertBrand(payload) {
+        return await ProductMetaModel.insertProductBrand(payload);
     }
 
     static async getBrandById(id) {
@@ -164,6 +195,10 @@ class ProductMetaService {
     //Attributes
     static async createAttribute(payload) {
         return await ProductMetaModel.createAttribute(payload);
+    }
+
+    static async insertAttribute(payload) {
+        return await ProductMetaModel.insertAttribute(payload);
     }
 
     static async getAttributeById(id) {
@@ -263,7 +298,7 @@ class ProductMetaService {
     }
 
     static async updateAttributeValue(id, updateData) {
-        
+
         if (!id || isNaN(id)) {
             throw new Error("ID must be provided.");
         }

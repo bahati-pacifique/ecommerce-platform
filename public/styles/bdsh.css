@@ -556,3 +556,129 @@ body {
         transform: translateY(0);
     }
 }
+
+/* Range toggle active state (matches .view-toggle pattern) */
+.range-btn.active {
+    background: #fff;
+    color: #0F172A;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08);
+}
+
+/* Status bar rows */
+.status-row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: 10px;
+}
+
+.status-row .track {
+    height: 6px;
+    background: #F1F5F9;
+    border-radius: 999px;
+    overflow: hidden;
+}
+
+.status-row .fill {
+    height: 100%;
+    border-radius: 999px;
+    transition: width .3s ease;
+}
+
+/* Status color tokens */
+.fill-pending {
+    background: #F59E0B;
+}
+
+.fill-processing {
+    background: #3B82F6;
+}
+
+.fill-shipped {
+    background: #8B5CF6;
+}
+
+.fill-delivered {
+    background: #22C55E;
+}
+
+.fill-cancelled {
+    background: #EF4444;
+}
+
+/* Store card */
+.store-summary-card {
+    border: 1px solid #E2E8F0;
+    border-radius: 12px;
+    background: #fff;
+    padding: 16px;
+    transition: border-color .15s ease, box-shadow .15s ease;
+}
+
+.store-summary-card:hover {
+    border-color: #FCA5A5;
+    box-shadow: 0 6px 20px -12px rgba(15, 23, 42, 0.15);
+}
+
+/* itemegory card */
+.item-card {
+    transition: all .15s ease;
+    border: 1px solid #E2E8F0;
+    background: #fff;
+}
+
+.item-card:hover {
+    border-color: #FCA5A5;
+    background: #FFFBFA;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px -12px rgba(15, 23, 42, 0.15);
+}
+
+/* Status pill */
+.item-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 999px;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.item-pill.pending {
+    background: #FEF3C7;
+    color: #B45309;
+}
+
+.item-pill.approved {
+    background: #DCFCE7;
+    color: #15803D;
+}
+
+.item-pill.rejected {
+    background: #FEE2E2;
+    color: #B91C1C;
+}
+
+/* View toggle active */
+.view-toggle.active {
+    background: #fff;
+    color: #0F172A;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08);
+}
+
+/* Search highlight */
+.item-highlight {
+    background: #FEF3C7;
+    border-radius: 3px;
+    padding: 0 2px;
+}
+
+/* Field error */
+.field-error input,
+.field-error textarea {
+    border-color: #DC2626;
+    background: #FEF2F2;
+}

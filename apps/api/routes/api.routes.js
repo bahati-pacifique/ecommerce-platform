@@ -1,11 +1,12 @@
 const express = require('express');
 const router = express.Router();
 
-//const ProductMetaController = require('../../../controllers/ProductMetaController');
+const ProductMetaController = require('../../../controllers/ProductMetaController');
 //const VendorController = require('../../../controllers/vendors.controller')
 const apiController = require('../controller/api.controller');
 const StoreController = require('../../../controllers/store.controller');
 const InventoryController = require('../../../controllers/inventory.controller');
+const BusinessController = require('../../business/controller/business.controller');
 //const BusinessController = require('../../business/controller/business.controller')
 
 const { administration, session, dashboard, business } = require('../../../middlewares/authGuards');
@@ -15,8 +16,20 @@ router.get('/users/user-account', apiController.getRandomUserByAccountCategory);
 
 router.get('/categories/', apiController.getProductActiveCategories);
 router.get('/categories/p', dashboard, apiController.getProductActiveCategoriesPaginated);
-router.get('/families/', apiController.getProductActiveCategories);
+router.get('/categories/s', dashboard, apiController.searchCategories);
+router.get('/categories/:status', dashboard, apiController.getProductCategoriesPaginated);
+
+router.get('/families/', apiController.getProductActiveFamilies);
+router.get('/families/active', business, apiController.getProductFamilies);
+router.get('/families/s', dashboard, apiController.searchFamilies);
+router.get('/families/r/:status', business, apiController.getProductFamiliesPaginatedRequested);
+
 router.get('/brands/', apiController.getActiveBrands);
+
+router.post('/meta/categories/insert', business, ProductMetaController.insertProductCategory);
+router.post('/meta/families/insert', business, ProductMetaController.insertProductFamily);
+router.post('/meta/brands', business, ProductMetaController.insertBrand);
+router.post('/meta/attribute', business, ProductMetaController.insertAttribute);
 
 router.get('/users/check-username', apiController.checkUsername);
 router.post('/users/profile/profile-upload', dashboard, apiController.uploadUserProfileAvatar);
@@ -51,6 +64,7 @@ router.patch('/business/inventories/:id/default', business, InventoryController.
 router.get('/business/inventories/:id/status', business, InventoryController.setInventoryStatus);
 
 router.get('/inventory/data/vendor', business, InventoryController.getInventoryVendorDashboardData);
+router.get('/vendor/data/orders', business, BusinessController.getVendorOrderDashboard)
 
 //router.delete('/business/inventories/:id', business, InventoryController.deleteInventory);
 
