@@ -1000,7 +1000,7 @@ class ProductMetaModel {
         const { rows } = await db.query(`
             INSERT INTO brands(title, slug, logo_url, website, description, meta, status, requested_reason, requested_by) 
             VALUES ($1, $2, $3, $4, $5, $6, 'requested', $7, $8) RETURNING *;
-            `, [title, slug, logo_url || null, website || null, description, meta || null, req_reason, req_by]);
+            `, [title, slug, logo_url || null, website || null, description, meta || {}, req_reason, req_by]);
 
         return rows[0] ?? null;
     }
@@ -1117,6 +1117,237 @@ class ProductMetaModel {
                 totalPages,
                 hasPrevPage: page > 1,
                 hasNextPage: page < totalPages
+            }
+        };
+    }
+
+    /**
+     * Querying paginated families by requester
+     *
+     * @param {*} page query page
+     * @param {*} limit query limit
+     * @param {*} status query status
+     * @param {*} requesterId view owner
+     * @returns paginated result
+     */
+    static async getProductBrandsRequested(
+        page = 1,
+        limit = 20,
+        status = 'active',
+        requesterId = null
+    ) {
+
+        page = Math.max(1, Number(page));
+        limit = Math.max(1, Number(limit));
+
+        const offset = (page - 1) * limit;
+
+        const conditions = [];
+        const params = [];
+
+        // Status
+        params.push(status);
+
+        conditions.push(
+            `br.status = $${params.length}`
+        );
+
+        // Requester
+        if (requesterId) {
+
+            params.push(requesterId);
+
+            conditions.push(
+                `br.requested_by = $${params.length}`
+            );
+        }
+
+        const whereClause = `
+            WHERE ${conditions.join(' AND ')}
+        `;
+
+        // Pagination parameters
+        const limitParam = params.length + 1;
+        const offsetParam = params.length + 2;
+
+        params.push(limit, offset);
+
+        const countQuery = `
+            SELECT
+                COUNT(*)::int AS total
+
+            FROM brands br
+
+            ${whereClause}
+        `;
+
+        const dataQuery = `
+            SELECT
+
+            br.id,
+
+            br.title,
+
+            br.slug,
+
+            br.description,
+            br.meta,
+            br.logo_url,
+            br.website,
+
+            br.status,
+
+            br.requested_by,
+
+            br.requested_at,
+
+            br.verified_by,
+
+            br.verified_at,
+
+            COALESCE(
+                br.updated_at,
+                br.created_at
+            ) AS last_updates
+
+            FROM brands br
+
+            LEFT JOIN users u
+                ON u.id = br.requested_by
+
+            ${whereClause}
+
+            ORDER BY
+                br.title ASC
+
+            LIMIT $${limitParam}
+
+            OFFSET $${offsetParam}
+        `;
+
+        const [countResult, dataResult] = await Promise.all([
+
+            db.query(
+                countQuery,
+                params.slice(0, -2)
+            ),
+
+            db.query(
+                dataQuery,
+                params
+            )
+
+        ]);
+
+        const total = countResult.rows[0].total;
+
+        const totalPages = Math.ceil(
+            total / limit
+        );
+
+        return {
+
+            data: dataResult.rows,
+
+            pagination: {
+
+                page,
+
+                limit,
+
+                total,
+
+                total_pages: totalPages,
+
+                has_next_page:
+                    page < totalPages,
+
+                has_previous_page:
+                    page > 1
+            }
+        };
+    }
+
+    /**
+     * Search categories with pagination
+     *
+     * @param {string} searchKey
+     * @param {number} page
+     * @param {number} limit
+     * @returns {Promise<Object>}
+     */
+    static async searchBrands(searchKey, page = 1, limit = 20) {
+
+        page = Math.max(1, Number(page));
+        limit = Math.max(1, Number(limit));
+
+        const offset = (page - 1) * limit;
+        const search = `%${searchKey.trim()}%`;
+
+        const countQuery = `
+                SELECT COUNT(*)::int AS total
+                FROM brands
+                WHERE status = 'active'
+                AND (
+                    title ILIKE $1
+                    OR description ILIKE $1
+                )
+            `;
+
+        const dataQuery = `
+            SELECT
+            br.id,
+
+            br.title,
+
+            br.slug,
+
+            br.description,
+            br.meta,
+            br.logo_url,
+            br.website,
+
+            br.status,
+
+            br.requested_by,
+
+            br.requested_at,
+
+            br.verified_by,
+
+            br.verified_at,
+
+            COALESCE(
+                br.updated_at,
+                br.created_at
+            ) AS last_updates
+            FROM brands br
+            WHERE status = 'active'
+            AND (
+                title ILIKE $1
+                OR description ILIKE $1
+            )
+            ORDER BY title ASC
+            LIMIT $2 OFFSET $3
+        `;
+
+        const [countResult, dataResult] = await Promise.all([
+            db.query(countQuery, [search]),
+            db.query(dataQuery, [search, limit, offset])
+        ]);
+
+        const total = countResult.rows[0].total;
+        const totalPages = Math.ceil(total / limit);
+
+        return {
+            categories: dataResult.rows,
+            pagination: {
+                page,
+                limit,
+                total,
+                totalPages,
+                hasNextPage: page < totalPages,
+                hasPreviousPage: page > 1
             }
         };
     }

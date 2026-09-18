@@ -25,11 +25,14 @@ router.get('/families/s', dashboard, apiController.searchFamilies);
 router.get('/families/r/:status', business, apiController.getProductFamiliesPaginatedRequested);
 
 router.get('/brands/', apiController.getActiveBrands);
+router.get('/brands/all', ProductMetaController.getBrands);
+router.get('/brands/s', business, apiController.searchBrands);
+router.get('/brands/:status', business, ProductMetaController.getBrandsRequested);
 
 router.post('/meta/categories/insert', business, ProductMetaController.insertProductCategory);
 router.post('/meta/families/insert', business, ProductMetaController.insertProductFamily);
-router.post('/meta/brands', business, ProductMetaController.insertBrand);
-router.post('/meta/attribute', business, ProductMetaController.insertAttribute);
+router.post('/meta/brands/insert', business, ProductMetaController.insertProductBrand);
+router.post('/meta/attribute/insert', business, ProductMetaController.insertAttribute);
 
 router.get('/users/check-username', apiController.checkUsername);
 router.post('/users/profile/profile-upload', dashboard, apiController.uploadUserProfileAvatar);

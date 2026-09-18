@@ -150,6 +150,18 @@ class ProductMetaService {
         return await ProductMetaModel.getProductBrands({ page, limit, status });
     }
 
+    static async getPaginatedBrandsRequested(queryOptions, requesterId) {
+        const page = parseInt(queryOptions?.page, 10) || 1;
+        const limit = parseInt(queryOptions?.limit, 10) || 10;
+        const status = queryOptions?.status || 'active';
+
+        return await ProductMetaModel.getProductBrandsRequested(page, limit, status, requesterId);
+    }
+    
+    static async searchBrands(searchKey, page, limit) {
+        return await ProductMetaModel.searchBrands(searchKey, page, limit);
+    }
+
     static async getActiveBrandsList() {
         return await ProductMetaModel.getActiveBrands();
     }

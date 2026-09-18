@@ -300,13 +300,16 @@ function renderBrandsTable() {
                 </td>
                 <td class="px-4 py-3 text-center">
                     <div class="flex items-center justify-center gap-2">
+                        <button class="p-1.5 font-medium text-medium rounded-lg text-green-800 hover:bg-green-100 transition brand-activate-btn ${(['requested'].includes(brand.status)) ? '' : 'opacity-0'}" title="Validate" data-id="${brand.id}">
+                            <i class="bi bi-check2"></i>
+                        </button>
                         <button class="p-1.5 rounded-lg text-black-100 hover:bg-black/5 transition brand-edit-btn" title="Edit" data-id="${brand.id}">
-                            <i class="fas fa-edit"></i>
+                           <i class="bi bi-pen"></i>
                         </button>
-                        <button class="p-1.5 rounded-lg text-brand hover:bg-brand-light transition brand-delete-btn ${brand.status === "deleted" ? 'hidden' : ''}" title="Remove" data-id="${brand.id}">
-                            <i class="fas fa-trash"></i>
+                        <button class="p-1.5 rounded-lg text-brand hover:bg-brand-light transition brand-delete-btn ${brand.status === "deleted" ? 'opacity-0' : ''}" title="Remove" data-id="${brand.id}">
+                            <i class="bi bi-trash3"></i>
                         </button>
-                        <button class="p-1.5 font-medium text-medium rounded-lg text-green-800 hover:bg-green-100 transition brand-activate-btn ${(['deleted', 'disabled'].includes(brand.status)) ? '' : 'hidden'}" title="Delete" data-id="${brand.id}">
+                        <button class="p-1.5 font-medium text-medium rounded-lg text-green-800 hover:bg-green-100 transition brand-activate-btn ${(['deleted', 'disabled'].includes(brand.status)) ? '' : 'opacity-0'}" title="Activate" data-id="${brand.id}">
                             <i class="bi bi-arrow-counterclockwise"></i>
                         </button>
                     </div>

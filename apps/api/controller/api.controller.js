@@ -109,6 +109,17 @@ async function getActiveBrands(req, res) {
     }
 }
 
+async function searchBrands(req, res) {
+    try {
+        const { key, page, limit } = req.query;
+        const result = await ProductMetaServices.searchBrands(key, page, limit);
+
+        return res.json(result);
+    } catch (error) {
+        return formatError('searchCategories()', 500, error, 'Failed — Internal Server Error', res);
+    }
+}
+
 async function getActiveAttributes(req, res) {
     try {
         const result = await ProductMetaServices.getActiveAttribute();
@@ -164,9 +175,6 @@ async function submitVendorApplication(req, res) {
         vendorData = JSON.parse(vendorData);
 
         const currentUser = req.user;
-
-        // const userData = req.body.user;
-        // const vendorData = req.body.vendor;
 
         /*
          * If the user is already authenticated, we don't need
@@ -547,10 +555,14 @@ module.exports = {
     getProductFamiliesPaginatedRequested,
 
     getActiveBrands,
+    searchBrands,
+    
     getActiveAttributes,
     getActiveAttributeValues,
+
     testSendEmail,
     testMaizleEmail,
+
     submitVendorApplication,
     getRandomUserByAccountCategory,
     checkUsername,

@@ -1138,7 +1138,7 @@
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
               <div>
                 <h2 class="text-lg font-bold text-gray-900">Marketplace Product Families</h2>
-                <p class="text-sm text-gray-500">Browse existing categories or request a new families for your store.</p>
+                <p class="text-sm text-gray-500">Browse existing or request a new families for your store.</p>
               </div>
               <div class="flex items-center gap-2">
                 <button id="familiesRefreshBtn" class="p-2.5 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition" title="Refresh families">
@@ -1176,10 +1176,10 @@
               </div>
 
               <div class="flex items-center gap-1 p-1 bg-gray-100 rounded-xl">
-                <button data-view="all" class="family-view-toggle px-3 py-1.5 rounded-lg text-xs font-medium text-gray-500 transition">
+                <button data-view="all" class="view-toggle px-3 py-1.5 rounded-lg text-xs font-medium text-gray-500 transition">
                   All
                 </button>
-                <button data-view="mine" class="family-view-toggle px-3 py-1.5 rounded-lg text-xs font-medium text-gray-500 transition">
+                <button data-view="mine" class="view-toggle px-3 py-1.5 rounded-lg text-xs font-medium text-gray-500 transition">
                   My Requests
                 </button>
               </div>
@@ -1262,7 +1262,130 @@
 
         <div id="tab-brands" class="tab-content">
 
-          <h1>Brands</h1>
+          <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+              <div>
+                <h2 class="text-lg font-bold text-gray-900">Marketplace Brands</h2>
+                <p class="text-sm text-gray-500">Browse existing brands or request a new brand for your store.</p>
+              </div>
+              <div class="flex items-center gap-2">
+                <button id="brandsRefreshBtn" class="p-2.5 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition" title="Refresh brands">
+                  <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+                </button>
+                <button id="requestBrandBtn" class="px-4 py-2 bg-brand text-white rounded-xl text-sm font-medium hover:bg-brand-dark transition flex items-center gap-2">
+                  <i data-lucide="plus" class="w-4 h-4"></i>
+                  <span class="hidden sm:inline">Request Brand</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 md:grid-cols-3 gap-3 mb-6">
+              <div class="bg-gray-50 rounded-xl p-3 text-center">
+                <p class="text-xl font-bold text-gray-900" id="brandTotalCount">0</p>
+                <p class="text-xs text-gray-500">Available</p>
+              </div>
+              <div class="bg-amber-50 rounded-xl p-3 text-center">
+                <p class="text-xl font-bold text-amber-600" id="brandPendingCount">0</p>
+                <p class="text-xs text-gray-500">Your Pending Requests</p>
+              </div>
+              <div class="bg-green-50 rounded-xl p-3 text-center col-span-2 md:col-span-1">
+                <p class="text-xl font-bold text-green-600" id="brandApprovedCount">0</p>
+                <p class="text-xs text-gray-500">Approved Requests</p>
+              </div>
+            </div>
+
+            <div class="flex flex-wrap items-center gap-3 mb-5">
+              <div class="flex-1 min-w-[200px] relative">
+                <i data-lucide="search" class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                <input id="brandSearch" type="text" placeholder="Search brands..." class="w-full pl-10 pr-10 py-2.5 rounded-xl border border-gray-200 bg-white text-sm focus:outline-none focus:border-brand focus:ring-2 focus:ring-brand/10">
+                <button id="clearBrandSearch" class="hidden absolute right-2.5 top-1/2 -translate-y-1/2 p-1 rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-100">
+                  <i data-lucide="x" class="w-3.5 h-3.5"></i>
+                </button>
+              </div>
+
+              <div class="flex items-center gap-1 p-1 bg-gray-100 rounded-xl">
+                <button data-view="all" class="view-toggle px-3 py-1.5 rounded-lg text-xs font-medium text-gray-500 transition">
+                  All
+                </button>
+                <button data-view="mine" class="view-toggle px-3 py-1.5 rounded-lg text-xs font-medium text-gray-500 transition">
+                  My Requests
+                </button>
+              </div>
+            </div>
+
+            <div id="brandsLoading" class="hidden py-10 text-center">
+              <div class="inline-flex items-center gap-3 text-gray-500">
+                <svg class="w-5 h-5 animate-spin" viewBox="0 0 24 24" fill="none">
+                  <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-opacity="0.25" stroke-width="3" />
+                  <path d="M22 12a10 10 0 0 0-10-10" stroke="currentColor" stroke-width="3" stroke-linecap="round" />
+                </svg>
+                Loading brands...
+              </div>
+            </div>
+
+            <div id="brandsError" class="hidden rounded-xl mt-3 mb-3 border border-red-200 bg-red-50 p-4 flex items-start gap-3">
+              <i data-lucide="alert-triangle" class="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5"></i>
+              <div class="flex-1 min-w-0">
+                <p class="text-sm font-semibold text-red-800">Failed to load brands</p>
+                <p id="brandsErrorMsg" class="text-xs text-red-700 mt-0.5">Please try again.</p>
+              </div>
+              <button id="brandsRetryBtn" class="px-3 py-1.5 rounded-lg bg-white border border-red-200 text-xs font-medium text-red-700 hover:bg-red-50">
+                Retry
+              </button>
+            </div>
+
+            <div id="brandsEmpty" class="hidden py-12 text-center">
+              <div class="mx-auto w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center">
+                <i data-lucide="tags" class="w-5 h-5 text-gray-400"></i>
+              </div>
+              <h3 class="mt-3 text-sm font-semibold text-gray-900">No brands found</h3>
+              <p class="mt-1 text-xs text-gray-500" id="brandsEmptyMsg">Try a different search or request a new brand.</p>
+              <button id="brandsEmptyRequestBtn" class="mt-4 inline-flex items-center gap-2 px-4 py-2 bg-brand text-white rounded-xl text-sm font-medium hover:bg-brand-dark transition">
+                <i data-lucide="plus" class="w-4 h-4"></i>
+                Request a Brand
+              </button>
+            </div>
+
+            <div id="brandsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3"></div>
+
+            <div id="brandsPagination" class="hidden mt-5 pt-4 border-t border-gray-100">
+              <div class="flex flex-col sm:flex-row items-center justify-between gap-3">
+
+                <p class="text-xs text-gray-500" id="brandPaginationInfo">
+                  Showing 0-0 of 0
+                </p>
+
+                <div class="flex items-center gap-2">
+                  <button id="brandPrevBtn" class="px-3 py-1.5 rounded-lg border border-gray-200 text-sm text-gray-600 hover:bg-gray-50 transition disabled:opacity-40 disabled:cursor-not-allowed">
+                    <i data-lucide="chevron-left" class="w-4 h-4"></i>
+                  </button>
+                  <span class="text-xs text-gray-500 min-w-[100px] text-center" id="brandPageInfo">
+                    Page 1 of 1
+                  </span>
+                  <button id="brandNextBtn" class="px-3 py-1.5 rounded-lg border border-gray-200 text-sm text-gray-600 hover:bg-gray-50 transition disabled:opacity-40 disabled:cursor-not-allowed">
+                    <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                  </button>
+                </div>
+
+                <div class="flex items-center gap-2">
+                  <label class="text-xs text-gray-500">Show:</label>
+                  <select id="brandLimitSelect" class="px-2 py-1 rounded-lg border border-gray-200 text-sm text-gray-700 focus:outline-none focus:border-brand">
+                    <option value="10">10</option>
+                    <option value="20" selected>20</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <p class="mt-5 text-xs text-gray-400" id="brandsFooterHint">
+              <span class="text-black">These are system verified brands.</span>
+              <br> Can't find what you need? Request a brand and our team will review it.
+            </p>
+
+          </div>
 
         </div>
 
@@ -1293,6 +1416,11 @@
                 <p id="detailDescription" class="text-sm text-gray-700 leading-relaxed whitespace-pre-line">
                   —
                 </p>
+              </div>
+
+              <div id="brandDetailMetaSection" class="hidden">
+                <p class="text-[11px] uppercase tracking-wider font-semibold text-gray-400 mb-2">Attributes</p>
+                <dl id="brandDetailMetaList" class="rounded-xl border border-gray-200 divide-y divide-gray-100 overflow-hidden"></dl>
               </div>
 
               <div>
@@ -1334,50 +1462,14 @@
           <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" data-dismiss="request"></div>
           <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
             <div class="sticky top-0 bg-white border-b border-gray-100 px-6 py-4 flex items-center justify-between">
-              <h3 class="text-lg font-bold text-gray-900">Request</h3>
+              <h3 class="text-lg font-bold text-gray-900" id="requestModalTitle"></h3>
               <button id="closeRequestBtn" class="text-gray-400 hover:text-gray-600 transition">
                 <i data-lucide="x" class="w-5 h-5"></i>
               </button>
             </div>
 
-            <form id="requestForm" class="p-6 space-y-4" novalidate>
-              <div class="rounded-xl bg-blue-50 border border-blue-100 p-3 flex items-start gap-2.5">
-                <i data-lucide="info" class="w-4 h-4 text-blue-600 flex-shrink-0 mt-0.5"></i>
-                <p class="text-xs text-blue-800 leading-relaxed">
-                  Requests are reviewed by the COCOCE team. You'll be notified once approved.
-                </p>
-              </div>
-
-              <div class="field" data-field="_title">
-                <label for="requestCategoryTitle" class="block text-sm font-medium text-gray-700 mb-1.5">
-                  Category name <span class="text-brand">*</span>
-                </label>
-                <input id="requestTitle" name="_title" type="text" maxlength="255" autocomplete="off" placeholder="e.g. Smartwatches" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-brand focus:ring-2 focus:ring-brand/10">
-                <p class="field-msg hidden mt-1.5 text-xs text-red-600"></p>
-              </div>
-
-              <div class="field" data-field="reason">
-                <label for="requestReason" class="block text-sm font-medium text-gray-700 mb-1.5">
-                  Why do you need it? <span class="text-gray-400 font-normal">(optional)</span>
-                </label>
-                <textarea id="requestReason" name="reason" rows="3" placeholder="Describe the products you'd list under this category..." class="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-brand focus:ring-2 focus:ring-brand/10 resize-y min-h-[80px]"></textarea>
-              </div>
-
-              <!-- Inline submit error -->
-              <div id="requestError" class="hidden rounded-lg border border-red-200 bg-red-50 p-3 flex items-start gap-2">
-                <i data-lucide="alert-circle" class="w-4 h-4 text-red-600 flex-shrink-0 mt-0.5"></i>
-                <p id="requestErrorMsg" class="text-xs text-red-700"></p>
-              </div>
-
-              <div class="pt-2 flex flex-col-reverse sm:flex-row sm:justify-end gap-2">
-                <button type="button" id="cancelRequestBtn" class="w-full sm:w-auto px-4 py-2.5 rounded-xl border border-gray-200 text-sm font-medium text-gray-700 hover:bg-gray-50 transition">
-                  Cancel
-                </button>
-                <button type="submit" id="submitRequestBtn" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-brand text-white text-sm font-semibold hover:bg-brand-dark transition disabled:opacity-60 disabled:cursor-not-allowed">
-                  Submit Request
-                </button>
-              </div>
-            </form>
+            <div id="requestFormContainer"></div>
+            
           </div>
         </div>
 
@@ -1825,10 +1917,11 @@
   <script src="/scripts/helper/utils.js"></script>
   <script src="/scripts/vendor-profile.js"></script>
   <script src="/scripts/vendor-logs.js"></script>
-  <script src="/scripts/vendor-inventory.js"></script>
+  <script src="/scripts/vd-inventory.js"></script>
   <script src="/scripts/vd-categories.js"></script>
   <script src="/scripts/vd-families.js"></script>
-  <script src="/scripts/vd-order-dashboard.js"></script>
+  <script src="/scripts/vd-orders.js"></script>
+  <script src="/scripts/vd-brands.js"></script>
   <script src="/scripts/bdsh.js"></script>
   <script>
     lucide.createIcons();

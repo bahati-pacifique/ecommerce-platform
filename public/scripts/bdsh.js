@@ -40,9 +40,6 @@ document.querySelectorAll('.sidebar-link').forEach(link => {
     });
 });
 
-// ============================================================
-// TAB SWITCHING WITH TITLE UPDATE
-// ============================================================
 const sidebarLinks = document.querySelectorAll('.sidebar-link');
 const tabContents = {
     overview: document.getElementById('tab-overview'),
@@ -92,6 +89,7 @@ let vendorInventory = null;
 let categoryManager = null;
 let familiesManager = null;
 let ordersManager = null;
+let brandsManager = null;
 
 sidebarLinks.forEach(link => {
     link.addEventListener('click', function (e) {
@@ -132,11 +130,13 @@ sidebarLinks.forEach(link => {
                 if (!categoryManager) {
                     categoryManager = new CategoriesManager();
                 }
+                categoryManager._resumed();
                 break;
             case 'families':
                 if (!familiesManager) {
                     familiesManager = new FamiliesManager();
                 }
+                familiesManager._resumed();
                 break;
             case 'orders':
                 if (!ordersManager){
@@ -144,7 +144,10 @@ sidebarLinks.forEach(link => {
                 }
                 break;
             case 'brands':
-                
+                if (!brandsManager){
+                    brandsManager = new BrandsManager();
+                }
+                brandsManager._resumed();
                 break;
         }
 

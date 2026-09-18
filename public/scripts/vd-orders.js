@@ -1,34 +1,11 @@
-// class VendorOrder {
-//     constructor() {
-//         this._fetchVendorStoreData();
-//     }
-
-//     async _fetchVendorStoreData() {
-
-//         try {
-//             const response = await axios.get(`${protocal}api.${domainName}/vendor/data/orders`, { withCredentials: true });
-//             console.log(response.data)
-//         } catch (error) {
-//             console.log(error)
-//             Notification.showNotification({
-//                 type: 'error',
-//                 message: error.response?.data?.message || 'Internal Server Error'
-//             })
-//         } finally {
-//             //Close tab loader
-//         }
-//     }
-// }
-
-
 class OrdersManager {
     constructor(options = {}) {
         this.root = options.root || document;
 
         this.loaded = false;
         this.loading = false;
-        this.range = '30d';          // '7' | '30' | 'all'
-        this.data = null;           // { summary, stores }
+        this.range = '30d';  // '7' | '30' | 'all'
+        this.data = null;  // { summary, stores }
 
         this.els = this._queryDom();
 
@@ -39,9 +16,6 @@ class OrdersManager {
         this.load();
     }
 
-    // ----------------------------------------------------------
-    // DOM
-    // ----------------------------------------------------------
     _queryDom() {
         const $ = (s) => this.root.querySelector(s);
         const $$ = (s) => Array.from(this.root.querySelectorAll(s));
@@ -103,9 +77,6 @@ class OrdersManager {
         );
     }
 
-    // ----------------------------------------------------------
-    // Load
-    // ----------------------------------------------------------
     async load(force = false) {
         if (this.loading) return;
         if (this.loaded && !force) return;
@@ -116,8 +87,6 @@ class OrdersManager {
         this.els.content.classList.add('hidden');
 
         try {
-            // const params = new URLSearchParams();
-            // if (this.range !== 'all') params.set('range', `${this.range}d`);
 
             const res = await axios.get(`${protocal}api.${domainName}/vendor/data/orders`, { params: { period: this.range }, withCredentials: true });
             const payload = res.data || {};
@@ -143,9 +112,6 @@ class OrdersManager {
         }
     }
 
-    // ----------------------------------------------------------
-    // Render
-    // ----------------------------------------------------------
     render() {
         const e = this.els;
         e.loading.classList.add('hidden');
@@ -276,30 +242,30 @@ class OrdersManager {
       `).join('');
 
         return `
-      <div class="store-summary-card">
-        <div class="flex items-start justify-between gap-3 mb-3">
-          <div class="flex items-center gap-2.5 min-w-0">
-            <div class="w-9 h-9 rounded-lg bg-brand-light text-brand flex items-center justify-center flex-shrink-0">
-              <i data-lucide="store" class="w-4 h-4"></i>
-            </div>
-            <div class="min-w-0">
-              <p class="text-sm font-semibold text-gray-900 truncate" title="${this._escapeHtml(st.store_name || '')}">
-                ${this._escapeHtml(st.store_name || 'Unnamed Store')}
-              </p>
-              <p class="text-[11px] text-gray-400">
-                ${this._num(total)} orders
-              </p>
-            </div>
-          </div>
-          <div class="text-right flex-shrink-0">
-            <p class="text-sm font-bold text-gray-900 tabular-nums">${this._money(revenue)}</p>
-            <p class="text-[11px] text-gray-400">revenue</p>
-          </div>
-        </div>
+            <div class="store-summary-card">
+                <div class="flex items-start justify-between gap-3 mb-3">
+                <div class="flex items-center gap-2.5 min-w-0">
+                    <div class="w-9 h-9 rounded-lg bg-brand-light text-brand flex items-center justify-center flex-shrink-0">
+                    <i data-lucide="store" class="w-4 h-4"></i>
+                    </div>
+                    <div class="min-w-0">
+                    <p class="text-sm font-semibold text-gray-900 truncate" title="${this._escapeHtml(st.store_name || '')}">
+                        ${this._escapeHtml(st.store_name || 'Unnamed Store')}
+                    </p>
+                    <p class="text-[11px] text-gray-400">
+                        ${this._num(total)} orders
+                    </p>
+                    </div>
+                </div>
+                <div class="text-right flex-shrink-0">
+                    <p class="text-sm font-bold text-gray-900 tabular-nums">${this._money(revenue)}</p>
+                    <p class="text-[11px] text-gray-400">revenue</p>
+                </div>
+                </div>
 
-        ${pills ? `<div class="flex flex-wrap gap-1.5">${pills}</div>` : ''}
-      </div>
-    `;
+                ${pills ? `<div class="flex flex-wrap gap-1.5">${pills}</div>` : ''}
+            </div>
+        `;
     }
 
     // ----------------------------------------------------------

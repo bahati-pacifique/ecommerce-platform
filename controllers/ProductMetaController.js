@@ -119,7 +119,7 @@ async function updatedProductCategory(req, res) {
         return res.status(updated ? 201 : 404).json(updated || { message: "Failed — Not found" });
 
     } catch (error) {
-        return formatError('updateProductCategory()', 500, error, !error.code ? error.message :'Failed — Internal Server Error', res);
+        return formatError('updateProductCategory()', 500, error, !error.code ? error.message : 'Failed — Internal Server Error', res);
     }
 }
 
@@ -146,7 +146,7 @@ async function createProductFamily(req, res) {
 }
 
 async function insertProductFamily(req, res) {
-    
+
     const userId = req.user.userId || req.user.user_id || req.user.id;
 
     let { category_id = null, title, slug = null, description, reason } = req.body;
@@ -254,17 +254,24 @@ async function createBrand(req, res) {
     }
 }
 
-async function insertBrand(req, res) {
-    const { title } = req.body;
+async function insertProductBrand(req, res) {
+    const userId = req.user.userId || req.user.user_id || req.user.id;
+    let { title, slug = '', website, logo_url, description, req_reason, meta = {} } = req.body;
+    if (!slug && title) slug = title.toLowerCase().replaceAll(" ", "-");
     try {
-        const newBrand = await ProductMetaServices.insertBrand(req.body);
-        return res.status(newBrand ? 201 : 500).json(newBrand);
-    } catch (error) {
-        console.log(error);
-        let message = 'Failed — Internal Server Error';
-        if (error.code == '23505') message = `${title} brand already exists`;
 
-        return formatError('createBrand()', 400, error, message, res);
+        if (!title) return res.status(400).json({
+            message: "Failed — Category title is required"
+        });
+
+        const category = await ProductMetaServices.insertBrand({ title, slug, description, meta, website, logo_url, req_reason, req_by: userId });
+
+        return res.json(category);
+
+    } catch (error) {
+        let message = 'Failed — Internal Server Error';
+        if (error.code == 23505) message = `${title} category already exists`;
+        return formatError('createProductCategory()', 500, error, message, res);
     }
 }
 
@@ -284,6 +291,20 @@ async function getBrands(req, res) {
         return res.status(200).json(paginatedData);
     } catch (error) {
         return formatError('getBrands()', 500, error, error.message, res);
+    }
+}
+
+async function getBrandsRequested(req, res) {
+    try {
+        const userId = req.user?.userId || req.user?.user_id || req.user?.id || null;
+
+        const status = req.params.status;
+        const { page, limit } = req.query;
+
+        const paginatedData = await ProductMetaServices.getPaginatedBrandsRequested({ status, page, limit }, userId);
+        return res.status(200).json(paginatedData);
+    } catch (error) {
+        return formatError('getBrandsRequested()', 500, error, error.message, res);
     }
 }
 
@@ -376,7 +397,7 @@ async function getAttributes(req, res) {
 
 async function updateAttribute(req, res) {
     try {
-        
+
         const attribute = await ProductMetaServices.updateAttribute(req.params.id, req.body);
         return res.json(attribute);
     } catch (error) {
@@ -508,9 +529,10 @@ module.exports = {
     updateProductFamily,
 
     createBrand,
-    insertBrand,
+    insertProductBrand,
     getBrandById,
     getActiveBrands,
+    getBrandsRequested,
     getBrands,
     updateBrand,
     softDeleteBrand,

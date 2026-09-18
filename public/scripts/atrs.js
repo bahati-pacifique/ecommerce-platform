@@ -327,18 +327,25 @@ function addValueMetaFieldRow(key = '', value = '', index = null) {
 function removeValueMetaFieldRow(rowId) {
     const $row = $(`.meta-field-row[data-row-id="${rowId}"]`);
 
-    if ($('.meta-field-row').length === 1) {
-        if (!confirm('Remove this meta field?')) {
-            return;
+    // if ($('.meta-field-row').length === 1) {
+    //     if (!confirm('Remove this meta field?')) {
+    //         return;
+    //     }
+    // }
+
+    showSnackbar({
+        type: 'warning',
+        message: 'Remove field?',
+        actionText: 'Remove',
+        onAction: () => {
+            $row.remove();
+            updateValueMetaData();
+
+            if ($('.meta-field-row').length === 0) {
+                renderValueMetaFields({});
+            }
         }
-    }
-
-    $row.remove();
-    updateValueMetaData();
-
-    if ($('.meta-field-row').length === 0) {
-        renderValueMetaFields({});
-    }
+    });
 }
 
 function updateValueMetaData() {
@@ -663,11 +670,13 @@ async function fetchValueById(id) {
 
 async function createValue(data) {
     try {
-        const response = await axios.post('/attribute-values/', data, {
+        await axios.post('/attribute-values/', data, {
             withCredentials: true
         });
 
-        const newValue = response.data.value || response.data;
+        closeValueFormModal();
+
+        //const newValue = response.data.value || response.data;
 
         await fetchValues(currentValueAttributeId, 1, true);
     } catch (error) {
@@ -815,6 +824,7 @@ function closeAttributeDeleteModal() {
 }
 
 function openValueCreateModal() {
+
     const attributeId = $valueAttributeFilter.val();
     if (!attributeId) {
         Notification.showNotification({
@@ -911,7 +921,6 @@ async function handleAttributeFormSubmit(e) {
 
     if (id) {
         const payload = getChangedAttributes(attributeOriginalEditing, formData);
-        console.log(attributeOriginalEditing, formData, payload);
         success = await updateAttribute(parseInt(id), payload);
     } else {
         success = await createAttribute(formData);
@@ -1383,9 +1392,6 @@ async function fetchAttributesForSearch() {
     }
 }
 
-// ========== UPDATE LOAD VALUES BUTTON ==========
-
-// Replace the old load values event with this
 $('#loadValuesBtn').off('click').on('click', function () {
     if (!selectedAttributeForSearch) {
         Notification.showNotification({
@@ -1400,7 +1406,6 @@ $('#loadValuesBtn').off('click').on('click', function () {
     fetchValues(currentValueAttributeId, 1, true);
 });
 
-// ========== UPDATE NEW VALUE BUTTON ==========
 $('.new-value-btn').off('click').on('click', function () {
     if (!selectedAttributeForSearch) {
         Notification.showNotification({
@@ -1495,7 +1500,7 @@ $(document).ready(function () {
 
     $("#attributeForm").on('submit', handleAttributeFormSubmit);
 
-    $('.new-value-btn').on('click', openValueCreateModal);
+    $('.new-value-btn').off('click').on('click', openValueCreateModal);
 
     $('#loadValuesBtn').off('click').on('click', function () {
         if (!selectedAttributeForSearch) {

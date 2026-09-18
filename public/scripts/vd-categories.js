@@ -27,9 +27,8 @@ class CategoriesManager {
         this.requests = [];     // all vendor requests (small list)
         this.submitting = false;
 
-        this.els = this._queryDom();
+        this.els = null;
 
-        // Bound, debounced search → resets to page 1
         this._onSearchInput = this._debounce(async (e) => {
             const v = e.target.value;
             this.els.clearSearch?.classList.toggle('hidden', !v);
@@ -91,9 +90,7 @@ class CategoriesManager {
         };
 
         this._onSidebarClick = () => this.load();
-
-        this._wire();
-        this.load();
+        
     }
 
     _queryDom() {
@@ -125,6 +122,7 @@ class CategoriesManager {
             footerHint: $('#categoriesFooterHint'),
 
             modal: $('#requestModal'),
+            requestModalTitle: $('#requestModalTitle'),
             modalForm: $('#requestForm'),
             modalTitle: $('#requestTitle'),
             modalReason: $('#requestReason'),
@@ -161,6 +159,51 @@ class CategoriesManager {
     }
 
     _wire() {
+
+        $('#requestFormContainer').empty();
+        //Attach dynamic form
+        $('#requestFormContainer').html(`
+            <form id="requestForm" class="p-6 space-y-4" novalidate>
+              <div class="rounded-xl bg-blue-50 border border-blue-100 p-3 flex items-start gap-2.5">
+                <i data-lucide="info" class="w-4 h-4 text-blue-600 flex-shrink-0 mt-0.5"></i>
+                <p class="text-xs text-blue-800 leading-relaxed">
+                  Requests are reviewed by the COCOCE team. You'll be notified once approved.
+                </p>
+              </div>
+
+              <div class="field" data-field="_title">
+                <label for="requestTitle" class="block text-sm font-medium text-gray-700 mb-1.5">
+                  Name <span class="text-brand">*</span>
+                </label>
+                <input id="requestTitle" name="_title" type="text" maxlength="255" autocomplete="off" placeholder="e.g. Smartwatches" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-brand focus:ring-2 focus:ring-brand/10">
+                <p class="field-msg hidden mt-1.5 text-xs text-red-600"></p>
+              </div>
+
+              <div class="field" data-field="reason">
+                <label for="requestReason" class="block text-sm font-medium text-gray-700 mb-1.5">
+                  Why do you need it? <span class="text-gray-400 font-normal">(optional)</span>
+                </label>
+                <textarea id="requestReason" name="reason" rows="3" placeholder="Describe the products you'd list under this category..." class="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-brand focus:ring-2 focus:ring-brand/10 resize-y min-h-[80px]"></textarea>
+              </div>
+
+              <div id="requestError" class="hidden rounded-lg border border-red-200 bg-red-50 p-3 flex items-start gap-2">
+                <i data-lucide="alert-circle" class="w-4 h-4 text-red-600 flex-shrink-0 mt-0.5"></i>
+                <p id="requestErrorMsg" class="text-xs text-red-700"></p>
+              </div>
+
+              <div class="pt-2 flex flex-col-reverse sm:flex-row sm:justify-end gap-2">
+                <button type="button" id="cancelRequestBtn" class="w-full sm:w-auto px-4 py-2.5 rounded-xl border border-gray-200 text-sm font-medium text-gray-700 hover:bg-gray-50 transition">
+                  Cancel
+                </button>
+                <button type="submit" id="submitRequestBtn" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-brand text-white text-sm font-semibold hover:bg-brand-dark transition disabled:opacity-60 disabled:cursor-not-allowed">
+                  Submit Request
+                </button>
+              </div>
+            </form>
+        `);
+
+        this.els = this._queryDom();
+
         const e = this.els;
 
         e.sidebarLink?.addEventListener('click', this._onSidebarClick);
@@ -174,7 +217,6 @@ class CategoriesManager {
             btn.addEventListener('click', () => this.setView(btn.dataset.view));
         });
 
-
         // Pagination
         e.prevBtn?.addEventListener('click', () => {
             if (!this.pagination.has_previous_page) return;
@@ -186,6 +228,7 @@ class CategoriesManager {
             this.page = this.page + 1;
             this.load(true);
         });
+
         e.limitSelect?.addEventListener('change', (ev) => {
             this.limit = parseInt(ev.target.value, 10) || 20;
             this.page = 1;
@@ -224,12 +267,25 @@ class CategoriesManager {
         e.catDetailCloseFooterBtn?.addEventListener('click', () => this.closeDetail());
         e.catDetailDismiss?.addEventListener('click', () => this.closeDetail());
 
-        e.catDetailRequestBtn?.addEventListener('click', () => {
-            const cat = this.activeCategory;
-            this.closeDetail();
-            this.openModal();
-            if (cat) this.els.modalTitle.value = cat.title;
+        // e.catDetailRequestBtn?.addEventListener('click', () => {
+        //     const cat = this.activeCategory;
+        //     this.closeDetail();
+        //     this.openModal();
+        //     if (cat) this.els.modalTitle.value = cat.title;
+        // });
+
+        e.modalTitle.addEventListener('keyup', (ev) => {
+            setTimeout(() => { e.modalReason.value = `I want to list in ${ev.target.value} category`; }, 100);
         });
+
+        this.setView('all');
+        this.load(true);
+    }
+
+    _resumed(){
+        this._wire();
+        this.els.modalTitle.placeholder = 'Ex. Consoles';
+        this.els.requestModalTitle.textContent = 'Requesting Product Category';
     }
 
     /**
@@ -250,6 +306,7 @@ class CategoriesManager {
         this.loading = true;
         this.els.loading.classList.remove('hidden');
         this.els.error.classList.add('hidden');
+
         this.render();
 
         try {
@@ -393,7 +450,6 @@ class CategoriesManager {
     _renderDetail(cat) {
         const e = this.els;
 
-
         e.catDetailTitle.textContent = cat.title || 'Category';
         e.catDetailMeta.textContent = cat.last_updates
             ? `Updated: ${formatDate(cat.last_updates)}`
@@ -486,7 +542,7 @@ class CategoriesManager {
             this.requests.filter(r => r.status === 'active').length;
     }
 
-    
+
     setView(v) {
         this.view = v;
         this.els.viewToggles.forEach(btn => {
@@ -499,7 +555,7 @@ class CategoriesManager {
     filteredCategories() {
         let list = this.categories;
 
-        if (this.view === 'mine') { 
+        if (this.view === 'mine') {
             list = this.requests;
         }
 
@@ -585,15 +641,14 @@ class CategoriesManager {
                 created_at: new Date().toISOString()
             };
 
-            this.requests.unshift(request);
             this.closeModal();
             this._notify('success', 'Category request submitted. Our team will review it.');
-            this.render();
+            this.load(true);
 
         } catch (err) {
             console.error('Error submitting category', err);
 
-             this.els.modalErrorMsg.textContent = err.response?.data?.message || 'Internal Server Error';
+            this.els.modalErrorMsg.textContent = err.response?.data?.message || 'Internal Server Error';
 
             this.els.modalError.classList.remove('hidden');
             this._refreshIcons();
@@ -629,10 +684,8 @@ class CategoriesManager {
         this.submitting = on;
         const btn = this.els.modalSubmitBtn;
         btn.disabled = on;
-        btn.querySelector('.btn-label').classList.toggle('hidden', on);
-        const loading = btn.querySelector('.btn-loading');
-        loading.classList.toggle('hidden', !on);
-        loading.classList.toggle('inline-flex', on);
+        if (on) btn.textContent = 'Submitting...';
+        else btn.textContent = 'Submit'
     }
 
     _humanizeError(err) {
