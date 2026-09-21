@@ -110,15 +110,16 @@ function renderAttributesTable() {
                 </td>
                 <td class="px-4 py-3 text-center">
                     <div class="flex items-center justify-center gap-2">
+                        <button class="p-1.5 font-normal text-sm rounded-lg text-green-800 hover:bg-green-100 transition attribute-activate-btn ${(['deleted', 'disabled', 'requested'].includes(attr.status)) ? '' : 'opacity-0'}" title="Activate" data-id="${attr.id}">
+                            <i class="bi bi-check2"></i>
+                        </button>
                         <button class="p-1.5 rounded-lg text-black-100 hover:bg-black/5 transition attribute-edit-btn" title="Edit" data-id="${attr.id}">
-                            <i class="fas fa-edit"></i>
+                            <i class="bi bi-pen"></i>
                         </button>
-                        <button class="p-1.5 rounded-lg text-brand hover:bg-brand-light transition attribute-delete-btn ${attr.status === "deleted" ? 'hidden' : ''}" title="Delete" data-id="${attr.id}">
-                            <i class="fas fa-trash"></i>
+                        <button class="p-1.5 rounded-lg text-brand hover:bg-brand-light transition attribute-delete-btn ${attr.status === "deleted" ? 'opacity-0' : ''}" title="Delete" data-id="${attr.id}">
+                            <i class="bi bi-trash3"></i>
                         </button>
-                        <button class="p-1.5 font-normal text-sm rounded-lg text-green-800 hover:bg-green-100 transition attribute-activate-btn ${(['deleted', 'disabled'].includes(attr.status)) ? '' : 'hidden'}" title="Delete" data-id="${attr.id}">
-                            <i class="bi bi-arrow-counterclockwise"></i>
-                        </button>
+                        
                     </div>
                 </td>
             </tr>
@@ -326,12 +327,6 @@ function addValueMetaFieldRow(key = '', value = '', index = null) {
 
 function removeValueMetaFieldRow(rowId) {
     const $row = $(`.meta-field-row[data-row-id="${rowId}"]`);
-
-    // if ($('.meta-field-row').length === 1) {
-    //     if (!confirm('Remove this meta field?')) {
-    //         return;
-    //     }
-    // }
 
     showSnackbar({
         type: 'warning',

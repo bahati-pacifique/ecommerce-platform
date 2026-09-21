@@ -1269,7 +1269,7 @@ class ProductMetaModel {
     }
 
     /**
-     * Search categories with pagination
+     * Search brands with pagination
      *
      * @param {string} searchKey
      * @param {number} page
@@ -1432,11 +1432,11 @@ class ProductMetaModel {
         return rows[0] ?? null;
     }
 
-    static async insertAttribute({ title, description, display_order, req_reason, req_by }) {
+    static async insertAttribute({ title, description, display_order = '1', reason, req_by }) {
         const { rows } = await db.query(`
             INSERT INTO attributes(title, description, display_order, status, requested_reason, requested_by) 
             VALUES ($1, $2, $3, 'requested', $4, $5) RETURNING *;
-            `, [title, description, display_order || null, req_reason, req_by]);
+            `, [title, description, display_order || null, reason, req_by]);
 
         return rows[0] ?? null;
     }
@@ -1446,7 +1446,6 @@ class ProductMetaModel {
 
         return result;
     }
-
 
     static async activateAttribute(id) {
         const result = await this.#setStatus('active', id, 'attributes');
@@ -1539,6 +1538,299 @@ class ProductMetaModel {
         return rows;
     }
 
+    /**
+     * Querying paginated brands by requester
+     *
+     * @param {*} page query page
+     * @param {*} limit query limit
+     * @param {*} status query status
+     * @param {*} requesterId view owner
+     * @returns paginated result
+     */
+    static async getAttributesRequested(
+        page = 1,
+        limit = 20,
+        status = 'active',
+        requesterId = null
+    ) {
+
+        page = Math.max(1, Number(page));
+        limit = Math.max(1, Number(limit));
+
+        const offset = (page - 1) * limit;
+
+        const conditions = [];
+        const params = [];
+
+        // Status
+        params.push(status);
+
+        conditions.push(
+            `attr.status = $${params.length}`
+        );
+
+        // Requester
+        if (requesterId) {
+
+            params.push(requesterId);
+
+            conditions.push(
+                `attr.requested_by = $${params.length}`
+            );
+        }
+
+        const whereClause = `
+            WHERE ${conditions.join(' AND ')}
+        `;
+
+        // Pagination parameters
+        const limitParam = params.length + 1;
+        const offsetParam = params.length + 2;
+
+        params.push(limit, offset);
+
+        const countQuery = `
+            SELECT
+                COUNT(*)::int AS total
+
+            FROM attributes attr
+
+            ${whereClause}
+        `;
+
+        const dataQuery = `
+            SELECT
+
+            attr.id,
+
+            attr.title,
+
+            attr.description,
+            attr.display_order,
+            attr.status,
+
+            attr.requested_by,
+            u.username AS requester,
+
+            attr.requested_at,
+
+            attr.verified_by,
+
+            attr.verified_at,
+
+            COALESCE(
+                attr.updated_at,
+                attr.created_at
+            ) AS last_updates
+
+            FROM attributes attr
+
+            LEFT JOIN users u
+                ON u.id = attr.requested_by
+
+            ${whereClause}
+
+            ORDER BY
+                attr.title ASC
+
+            LIMIT $${limitParam}
+
+            OFFSET $${offsetParam}
+        `;
+
+        const [countResult, dataResult] = await Promise.all([
+
+            db.query(
+                countQuery,
+                params.slice(0, -2)
+            ),
+
+            db.query(
+                dataQuery,
+                params
+            )
+
+        ]);
+
+        const total = countResult.rows[0].total;
+
+        const totalPages = Math.ceil(
+            total / limit
+        );
+
+        return {
+
+            data: dataResult.rows,
+
+            pagination: {
+
+                page,
+
+                limit,
+
+                total,
+
+                total_pages: totalPages,
+
+                has_next_page:
+                    page < totalPages,
+
+                has_previous_page:
+                    page > 1
+            }
+        };
+    }
+
+    // static async getAttributesRequested({
+    //     page = 1,
+    //     limit = 10,
+    //     status = 'active',
+    //     requesterId
+    // } = {}) {
+
+    //     const offset = (page - 1) * limit;
+
+    //     const where = [];
+    //     const values = [];
+    //     let index = 1;
+
+    //     if (!status || status === 'all') status = null;
+
+    //     if (status !== null) {
+    //         where.push(`status = $${index++}`);
+    //         values.push(status);
+    //     }
+
+    //     if (requesterId) {
+    //         where.push(`requested_by = $${index++}`);
+    //         values.push(requesterId)
+    //     }
+
+    //     const whereClause = where.length
+    //         ? `WHERE ${where.join(' AND ')}`
+    //         : '';
+
+    //     // Total records
+    //     const { rows: [{ total }] } = await db.query(`
+    //         SELECT COUNT(*)::INTEGER AS total
+    //         FROM attributes
+    //         ${whereClause}
+    //     `, values);
+
+    //     // Current page
+    //     values.push(limit);
+    //     values.push(offset);
+
+    //     const { rows: attributes } = await db.query(`
+    //         SELECT *
+    //         FROM attributes
+    //         ${whereClause}
+    //         ORDER BY title ASC
+    //         LIMIT $${index++}
+    //         OFFSET $${index}
+    //     `, values);
+
+    //     const totalPages = Math.ceil(total / limit);
+
+    //     return {
+    //         attributes,
+    //         pagination: {
+    //             page,
+    //             limit,
+    //             counts: total,
+    //             totalPages,
+    //             hasPrevPage: page > 1,
+    //             hasNextPage: page < totalPages
+    //         }
+    //     };
+    // }
+
+    /**
+     * Search attributes with pagination
+     *
+     * @param {string} searchKey
+     * @param {number} page
+     * @param {number} limit
+     * @returns {Promise<Object>}
+     */
+    static async searchAttributes(searchKey, page = 1, limit = 20) {
+
+        page = Math.max(1, Number(page));
+        limit = Math.max(1, Number(limit));
+
+        const offset = (page - 1) * limit;
+        const search = `%${searchKey.trim()}%`;
+
+        const countQuery = `
+                SELECT COUNT(*)::int AS total
+                FROM attributes
+                WHERE status = 'active'
+                AND (
+                    title ILIKE $1
+                    OR description ILIKE $1
+                )
+            `;
+
+        const dataQuery = `
+            SELECT
+            attr.id,
+
+            attr.title,
+
+            attr.slug,
+
+            attr.description,
+            attr.meta,
+            attr.logo_url,
+            attr.website,
+
+            attr.status,
+
+            attr.requested_by,
+            u.username AS requester,
+
+            attr.requested_at,
+
+            attr.verified_by,
+
+            attr.verified_at,
+
+            COALESCE(
+                attr.updated_at,
+                attr.created_at
+            ) AS last_updates
+            FROM attributes attr 
+            LEFT JOIN users u ON u.id = attr.requested_by
+            WHERE attr.status = 'active'
+            AND (
+                title ILIKE $1
+                OR description ILIKE $1
+            )
+            ORDER BY title ASC
+            LIMIT $2 OFFSET $3
+        `;
+
+        const [countResult, dataResult] = await Promise.all([
+            db.query(countQuery, [search]),
+            db.query(dataQuery, [search, limit, offset])
+        ]);
+
+        const total = countResult.rows[0].total;
+        const totalPages = Math.ceil(total / limit);
+
+        return {
+            data: dataResult.rows,
+            pagination: {
+                page,
+                limit,
+                total,
+                totalPages,
+                hasNextPage: page < totalPages,
+                hasPreviousPage: page > 1
+            }
+        };
+    }
+
     static async updateAttribute(id, { title, description, display_order }) {
         const updates = [];
         const values = [];
@@ -1579,11 +1871,11 @@ class ProductMetaModel {
 
 
     //Values
-    static async createAttributeValue({ attribute_id, value, display_order, meta }) {
+    static async createAttributeValue(attribute_id, { value, display_order, meta }) {
         const { rows } = await db.query(`
             INSERT INTO attribute_values(attribute_id, value, display_order, meta) 
             VALUES ($1, $2, $3, $4) RETURNING *;
-            `, [attribute_id, value, display_order || null, meta]);
+            `, [attribute_id, value, display_order || 1, meta]);
 
         return rows[0] ?? null;
     }
@@ -1624,10 +1916,9 @@ class ProductMetaModel {
         return rows[0] ?? null;
     }
 
-    static async getAttributeValues({
+    static async getAttributeValues(attribute_id, {
         page = 1,
-        limit = 10,
-        attribute_id
+        limit = 10
     } = {}) {
 
         const offset = (page - 1) * limit;

@@ -355,7 +355,7 @@ async function hardDeleteBrand(req, res) {
 
 //Attributes
 async function createAttribute(req, res) {
-    const { title } = req.body;
+    
     try {
         const attribute = await ProductMetaServices.createAttribute(req.body);
 
@@ -366,9 +366,16 @@ async function createAttribute(req, res) {
 }
 
 async function insertAttribute(req, res) {
-    const { title } = req.body;
+
+    const userId = req.user?.userId || req.user?.user_id || req.user?.id || null;
+    let { title, description, reason } = req.body;
+
+    if (!title) return res.status(400).json({
+        message: "Title is required"
+    });
+    
     try {
-        const attribute = await ProductMetaServices.insertAttribute(req.body);
+        const attribute = await ProductMetaServices.insertAttribute({ title, description, reason, req_by: userId });
 
         return res.json(attribute)
     } catch (error) {
@@ -395,9 +402,27 @@ async function getAttributes(req, res) {
     }
 }
 
+async function getRequestedAttributes(req, res) {
+    try {
+        const userId = req.user?.userId || req.user?.user_id || req.user?.id || null;
+
+        
+        if (!userId) return res.json({ attributes: [] });
+
+        const status = req.params.status;
+        const { page, limit } = req.query;
+
+        const paginatedData = await ProductMetaServices.getAttributesRequested(page, limit, status, userId);
+        return res.status(200).json(paginatedData);
+
+    } catch (error) {
+        return formatError('getRequestedAttributes', 500, error, error.message, res);
+    }
+}
+
+
 async function updateAttribute(req, res) {
     try {
-
         const attribute = await ProductMetaServices.updateAttribute(req.params.id, req.body);
         return res.json(attribute);
     } catch (error) {
@@ -436,11 +461,13 @@ async function hardDeleteAttribute(req, res) {
     }
 }
 
-//Values
+/**
+ * Body data: {attribute_id, value, display_order, meta}
+ */
 async function createAttributeValue(req, res) {
-    const { title } = req.body;
+    const attribute_id = req.params.attribute_id || req.body.attribute_id;
     try {
-        const attributeValue = await ProductMetaServices.createAttributeValue(req.body);
+        const attributeValue = await ProductMetaServices.createAttributeValue(attribute_id, req.body);
 
         return res.json(attributeValue)
     } catch (error) {
@@ -458,9 +485,11 @@ async function getAttributeValue(req, res) {
     }
 }
 
+
 async function getAttributesValues(req, res) {
     try {
-        const result = await ProductMetaServices.getPaginatedAttributesValue(req.query);
+        const attribute_id = req.params.attribute_id || req.query.attribute_id;
+        const result = await ProductMetaServices.getPaginatedAttributesValue(attribute_id, req.query);
         return res.json(result);
     } catch (error) {
         return formatError('getAttributeValues()', 500, error, error.message, res);
@@ -469,6 +498,30 @@ async function getAttributesValues(req, res) {
 
 async function updateAttributeValue(req, res) {
     try {
+        const attributeValue = await ProductMetaServices.updateAttributeValue(req.params.id, req.body);
+        return res.json(attributeValue);
+    } catch (error) {
+        const status = error.message === "Not found" ? 404 : 400;
+        return formatError('updateAttributeValue()', status, error, error.message, res);
+    }
+}
+
+async function vendorAttributeValueUpdate(req, res) {
+    /**
+     * get requested_by, check if req.user userId matching requested_by
+     */
+
+    //But Overall currently vendor are not allowed to update/change attribute value:
+
+    return res.status(401).json({success: false, message: 'You are currently not allowed to update attributes catalog'});
+    
+    //TODO: Implement function on (future) requirement change
+    try {
+        
+        const userId = req.user.userId || req.user.user_id || req.user.id;
+
+        //Get attribute by attribute value id
+
         const attributeValue = await ProductMetaServices.updateAttributeValue(req.params.id, req.body);
         return res.json(attributeValue);
     } catch (error) {
@@ -541,6 +594,7 @@ module.exports = {
 
     createAttribute,
     insertAttribute,
+    getRequestedAttributes,
     getAttribute,
     getAttributes,
     updateAttribute,
@@ -552,6 +606,7 @@ module.exports = {
     getAttributeValue,
     getAttributesValues,
     updateAttributeValue,
+    vendorAttributeValueUpdate,
     activateAttributeValue,
     softDeleteAttributeValue,
     hardDeleteAttributeValue

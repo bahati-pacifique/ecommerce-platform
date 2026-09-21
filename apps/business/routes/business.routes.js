@@ -6,6 +6,7 @@ const businessController = require('../controller/business.controller');
 const { dashboard, session, business, vendorBusinessRegister } = require('../../../middlewares/authGuards');
 
 router.get('/stores/docs/terms', session, businessController.renderTerms);
+router.get('/docs/attributes-registry-terms', session, businessController.renderAttributeRegistryTerms);
 
 router.get('/', session, businessController.businessHomePage);
 router.get('/dashboard', business, businessController.redirectedToDashboard);

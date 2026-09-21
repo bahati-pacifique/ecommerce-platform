@@ -130,6 +130,17 @@ async function getActiveAttributes(req, res) {
     }
 }
 
+async function searchAttributes(req, res) {
+    try {
+        const { key, page, limit } = req.query;
+        const result = await ProductMetaServices.searchAttributes(key, page, limit);
+
+        return res.json(result);
+    } catch (error) {
+        return formatError('searchCategories()', 500, error, 'Failed — Internal Server Error', res);
+    }
+}
+
 async function getActiveAttributeValues(req, res) {
     try {
         const result = await ProductMetaServices.getActiveAttributeValues();
@@ -559,6 +570,7 @@ module.exports = {
     
     getActiveAttributes,
     getActiveAttributeValues,
+    searchAttributes,
 
     testSendEmail,
     testMaizleEmail,

@@ -29,17 +29,29 @@ router.get('/brands/all', ProductMetaController.getBrands);
 router.get('/brands/s', business, apiController.searchBrands);
 router.get('/brands/:status', business, ProductMetaController.getBrandsRequested);
 
+router.get('/attributes/', apiController.getActiveAttributes);
+router.get('/attributes/active', business, ProductMetaController.getAttributes);
+router.get('/attributes/values', business, apiController.getActiveAttributeValues);
+router.get('/attributes/values/:attribute_id', business, ProductMetaController.getAttributesValues);
+router.get('/attributes/all', business, ProductMetaController.getAttributes);
+router.get('/attributes/s', business, apiController.searchAttributes);
+router.get('/attributes/:status', business, ProductMetaController.getRequestedAttributes)
+
 router.post('/meta/categories/insert', business, ProductMetaController.insertProductCategory);
 router.post('/meta/families/insert', business, ProductMetaController.insertProductFamily);
 router.post('/meta/brands/insert', business, ProductMetaController.insertProductBrand);
-router.post('/meta/attribute/insert', business, ProductMetaController.insertAttribute);
+router.post('/meta/attributes/insert', business, ProductMetaController.insertAttribute);
+router.patch('/meta/attributes/:id', business, ProductMetaController.vendorAttributeValueUpdate)
+
+router.post('/meta/attributes-values/insert/:attribute_id', business, ProductMetaController.createAttributeValue);
 
 router.get('/users/check-username', apiController.checkUsername);
 router.post('/users/profile/profile-upload', dashboard, apiController.uploadUserProfileAvatar);
 router.delete('/users/profile/profile-avatar', dashboard, apiController.removeUserProfileImage);
 
-router.get('/attributes/', dashboard, apiController.getActiveAttributes);
+//router.get('/attributes/', dashboard, apiController.getActiveAttributes);
 router.get('/attributes-values/', dashboard, apiController.getActiveAttributeValues);
+
 router.post('/test-send-email/', apiController.testSendEmail);
 router.post('/test-mz-email/', apiController.testMaizleEmail);
 

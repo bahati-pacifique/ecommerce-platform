@@ -682,3 +682,138 @@ body {
     border-color: #DC2626;
     background: #FEF2F2;
 }
+
+/* Value chip */
+.attr-value-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    background: #F1F5F9;
+    color: #334155;
+    font-size: 12px;
+    font-weight: 500;
+    border: 1px solid #E2E8F0;
+}
+
+.attr-value-chip button {
+    color: #94A3B8;
+    cursor: pointer;
+    transition: color .15s ease;
+    display: inline-flex;
+}
+
+.attr-value-chip button:hover {
+    color: #EF4444;
+}
+
+/* Attribute card hover matches item-card */
+.item-card {
+    cursor: pointer;
+}
+
+/* Value chips */
+.attr-value-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: #F1F5F9;
+  color: #334155;
+  font-size: 12px;
+  font-weight: 500;
+  border: 1px solid #E2E8F0;
+  cursor: pointer;
+  transition: border-color .15s ease, background .15s ease;
+}
+.attr-value-chip:hover {
+  border-color: #FCA5A5;
+  background: #FFFBFA;
+}
+.attr-value-chip:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(237, 27, 36, 0.15);
+  border-color: #ED1B24;
+}
+.attr-value-chip button {
+  color: #94A3B8;
+  cursor: pointer;
+  transition: color .15s ease;
+  display: inline-flex;
+}
+.attr-value-chip button:hover { color: #EF4444; }
+
+/* Dynamic meta key/value rows */
+.meta-pair-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.5fr) auto;
+  gap: 8px;
+  align-items: center;
+}
+.meta-pair-row input {
+  width: 100%;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid #E2E8F0;
+  background: #fff;
+  font-size: 13px;
+}
+.meta-pair-row input:focus {
+  outline: none;
+  border-color: #ED1B24;
+  box-shadow: 0 0 0 3px rgba(237, 27, 36, 0.10);
+}
+.meta-pair-row button.remove {
+  padding: 8px;
+  border-radius: 8px;
+  color: #94A3B8;
+  transition: color .15s ease, background .15s ease;
+  background: transparent;
+  cursor: pointer;
+}
+.meta-pair-row button.remove:hover {
+  color: #EF4444;
+  background: #FEF2F2;
+}
+@media (max-width: 640px) {
+  .meta-pair-row { grid-template-columns: 1fr; }
+  .meta-pair-row button.remove { justify-self: end; }
+}
+
+/* Reused pill styles (from existing dashboard) */
+.item-card {
+  cursor: pointer;
+  border: 1px solid #E2E8F0;
+  background: #fff;
+  transition: border-color .15s ease, box-shadow .15s ease;
+}
+.item-card:hover {
+  border-color: #FCA5A5;
+  box-shadow: 0 6px 20px -12px rgba(15,23,42,0.15);
+}
+.item-pill {
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.item-pill.pending   { background:#FEF3C7; color:#B45309; }
+.item-pill.approved  { background:#DCFCE7; color:#15803D; }
+.item-pill.rejected  { background:#FEE2E2; color:#B91C1C; }
+.item-pill.inactive  { background:#F1F5F9; color:#64748B; }
+
+.req-panel-pending   { background:#FFFBEB; border-color:#FDE68A; color:#92400E; }
+.req-panel-approved  { background:#F0FDF4; border-color:#BBF7D0; color:#166534; }
+.req-panel-rejected  { background:#FEF2F2; border-color:#FECACA; color:#991B1B; }
+
+.item-highlight { background:#FEF3C7; border-radius:3px; padding:0 2px; }
+.field-error input,
+.field-error textarea,
+.field-error select { border-color:#DC2626; background:#FEF2F2; }

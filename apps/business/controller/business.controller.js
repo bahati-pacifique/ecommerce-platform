@@ -80,6 +80,12 @@ function redirectedToDashboard(req, res) {
     }
 }
 
+async function renderAttributeRegistryTerms(req, res) {
+    const user = req.user;
+
+    res.render('attribute-registry-terms', {protocal, domainName, user});
+}
+
 async function renderDashboard(req, res) {
     const user = req.user || null;
 
@@ -202,6 +208,7 @@ module.exports = {
     renderApplicationReview,
     renderStoreCreation,
     renderTerms,
+    renderAttributeRegistryTerms,
     redirectedToDashboard,
     renderStoreDashboard,
     renderInvontoryForm,

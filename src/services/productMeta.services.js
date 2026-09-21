@@ -70,7 +70,7 @@ class ProductMetaService {
     }
 
     static async insertProductFamily(categoryId, title, slug, description, reason, by) {
-        
+
         return await ProductMetaModel.insertProductFamily(categoryId, title, slug, description, reason, by);
     }
 
@@ -157,7 +157,7 @@ class ProductMetaService {
 
         return await ProductMetaModel.getProductBrandsRequested(page, limit, status, requesterId);
     }
-    
+
     static async searchBrands(searchKey, page, limit) {
         return await ProductMetaModel.searchBrands(searchKey, page, limit);
     }
@@ -235,6 +235,14 @@ class ProductMetaService {
         return await ProductMetaModel.getActiveAttributes();
     }
 
+    static async getAttributesRequested(page, limit, status = 'active', requesterId) {
+        return await ProductMetaModel.getAttributesRequested( page, limit, status, requesterId );
+    }
+
+    static async searchAttributes(searchKey, page, limit) {
+        return await ProductMetaModel.searchAttributes(searchKey, page, limit)
+    }
+
     static async updateAttribute(id, updateData) {
         if (!id || isNaN(id)) {
             throw new Error("ID must be provided.");
@@ -280,8 +288,8 @@ class ProductMetaService {
     }
 
     //Attribute values
-    static async createAttributeValue(payload) {
-        return await ProductMetaModel.createAttributeValue(payload);
+    static async createAttributeValue(attributeId, payload) {
+        return await ProductMetaModel.createAttributeValue(attributeId, payload);
     }
 
     static async getAttributeValueById(id) {
@@ -295,13 +303,13 @@ class ProductMetaService {
         return attribute;
     }
 
-    static async getPaginatedAttributesValue(queryOptions) {
+    static async getPaginatedAttributesValue(attributeId, queryOptions) {
 
         queryOptions.page = parseInt(queryOptions.page, 10) || 1;
         queryOptions.limit = parseInt(queryOptions.limit, 10) || 10;
         queryOptions.status = queryOptions?.status || 'active';
 
-        return await ProductMetaModel.getAttributeValues(queryOptions);
+        return await ProductMetaModel.getAttributeValues(attributeId, queryOptions);
 
     }
 
@@ -314,10 +322,13 @@ class ProductMetaService {
         if (!id || isNaN(id)) {
             throw new Error("ID must be provided.");
         }
+
         const result = await ProductMetaModel.updateAttributeValues(id, updateData);
+
         if (!result) {
             throw new Error('Not found');
         }
+
         return result;
     }
 

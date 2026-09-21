@@ -253,6 +253,11 @@
             <span class="link-text">Brands</span>
           </a>
 
+          <a href="#" class="sidebar-link" data-tab="attributes" data-title="attributes">
+            <span class="icon"><i data-lucide="columns-2"></i></span>
+            <span class="link-text">Attributes</span>
+          </a>
+
           <a href="#" class="sidebar-link" data-tab="profile" data-title="Profile">
             <span class="icon"><i data-lucide="user-round"></i></span>
             <span class="link-text">Profile</span>
@@ -297,7 +302,7 @@
             </button>
             <div class="popup-divider"></div>
             <form action="<%=locals.protocal%>auth.<%=locals.domain%>/signout" method="POST" class="popup-item danger">
-              <input type="hidden" value="<%=locals.protocal%>business.<%=locals.domain%>" name="host">
+              <input type="hidden" value="<%=locals.protocal%>business.<%=locals.domainName%>" name="host">
               <input type="hidden" name="userAccount" value="<=locals.user.userAccount%>">
               <button type="submit" class="flex items-center gap-2">
                 <span class="icon">
@@ -1389,6 +1394,508 @@
 
         </div>
 
+        <div id="tab-attributes" class="tab-content">
+          <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+              <div>
+                <h2 class="text-lg font-bold text-gray-900">Marketplace Attributes</h2>
+                <p class="text-sm text-gray-500">Browse attributes and manage their values.</p>
+              </div>
+              <div class="flex items-center gap-2">
+                <button id="attributesRefreshBtn" class="p-2.5 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition" title="Refresh attributes">
+                  <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+                </button>
+                <button id="requestAttributeBtn" class="px-4 py-2 bg-brand text-white rounded-xl text-sm font-medium hover:bg-brand-dark transition flex items-center gap-2">
+                  <i data-lucide="plus" class="w-4 h-4"></i>
+                  <span class="hidden sm:inline">Request Attribute</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 md:grid-cols-3 gap-3 mb-6">
+              <div class="bg-gray-50 rounded-xl p-3 text-center">
+                <p class="text-xl font-bold text-gray-900" id="attrTotalCount">0</p>
+                <p class="text-xs text-gray-500">Available</p>
+              </div>
+              <div class="bg-amber-50 rounded-xl p-3 text-center">
+                <p class="text-xl font-bold text-amber-600" id="attrPendingCount">0</p>
+                <p class="text-xs text-gray-500">Your Pending Requests</p>
+              </div>
+              <div class="bg-green-50 rounded-xl p-3 text-center col-span-2 md:col-span-1">
+                <p class="text-xl font-bold text-green-600" id="attrApprovedCount">0</p>
+                <p class="text-xs text-gray-500">Approved Requests</p>
+              </div>
+            </div>
+
+            <div class="flex flex-wrap items-center gap-3 mb-5">
+              <div class="flex-1 min-w-[200px] relative">
+                <i data-lucide="search" class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                <input id="attributeSearch" type="text" placeholder="Search attributes..." class="w-full pl-10 pr-10 py-2.5 rounded-xl border border-gray-200 bg-white text-sm focus:outline-none focus:border-brand focus:ring-2 focus:ring-brand/10">
+                <button id="clearAttributeSearch" class="hidden absolute right-2.5 top-1/2 -translate-y-1/2 p-1 rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-100">
+                  <i data-lucide="x" class="w-3.5 h-3.5"></i>
+                </button>
+              </div>
+              <div class="flex items-center gap-1 p-1 bg-gray-100 rounded-xl">
+                <button data-view="all" class="view-toggle px-3 py-1.5 rounded-lg text-xs font-medium text-gray-500 transition">All</button>
+                <button data-view="mine" class="view-toggle px-3 py-1.5 rounded-lg text-xs font-medium text-gray-500 transition">My Requests</button>
+              </div>
+            </div>
+
+            <div id="attributesLoading" class="hidden py-10 text-center">
+              <div class="inline-flex items-center gap-3 text-gray-500">
+                <svg class="w-5 h-5 animate-spin" viewBox="0 0 24 24" fill="none">
+                  <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-opacity="0.25" stroke-width="3" />
+                  <path d="M22 12a10 10 0 0 0-10-10" stroke="currentColor" stroke-width="3" stroke-linecap="round" />
+                </svg>
+                Loading attributes...
+              </div>
+            </div>
+
+            <div id="attributesError" class="hidden rounded-xl mt-3 mb-3 border border-red-200 bg-red-50 p-4 flex items-start gap-3">
+              <i data-lucide="alert-triangle" class="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5"></i>
+              <div class="flex-1 min-w-0">
+                <p class="text-sm font-semibold text-red-800">Failed to load attributes</p>
+                <p id="attributesErrorMsg" class="text-xs text-red-700 mt-0.5">Please try again.</p>
+              </div>
+              <button id="attributesRetryBtn" class="px-3 py-1.5 rounded-lg bg-white border border-red-200 text-xs font-medium text-red-700 hover:bg-red-50">
+                Retry
+              </button>
+            </div>
+
+            <div id="attributesEmpty" class="hidden py-12 text-center">
+              <div class="mx-auto w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center">
+                <i data-lucide="list-checks" class="w-5 h-5 text-gray-400"></i>
+              </div>
+              <h3 class="mt-3 text-sm font-semibold text-gray-900">No attributes found</h3>
+              <p class="mt-1 text-xs text-gray-500" id="attributesEmptyMsg">Try a different search or request a new attribute.</p>
+              <button id="attributesEmptyRequestBtn" class="mt-4 inline-flex items-center gap-2 px-4 py-2 bg-brand text-white rounded-xl text-sm font-medium hover:bg-brand-dark transition">
+                <i data-lucide="plus" class="w-4 h-4"></i>
+                Request an Attribute
+              </button>
+            </div>
+
+            <div id="attributesGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3"></div>
+
+            <div id="attributesPagination" class="hidden mt-5 pt-4 border-t border-gray-100">
+              <div class="flex flex-col sm:flex-row items-center justify-between gap-3">
+                <p class="text-xs text-gray-500" id="attrPaginationInfo">Showing 0-0 of 0</p>
+                <div class="flex items-center gap-2">
+                  <button id="attrPrevBtn" class="px-3 py-1.5 rounded-lg border border-gray-200 text-sm text-gray-600 hover:bg-gray-50 transition disabled:opacity-40 disabled:cursor-not-allowed">
+                    <i data-lucide="chevron-left" class="w-4 h-4"></i>
+                  </button>
+                  <span class="text-xs text-gray-500 min-w-[100px] text-center" id="attrPageInfo">Page 1 of 1</span>
+                  <button id="attrNextBtn" class="px-3 py-1.5 rounded-lg border border-gray-200 text-sm text-gray-600 hover:bg-gray-50 transition disabled:opacity-40 disabled:cursor-not-allowed">
+                    <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                  </button>
+                </div>
+                <div class="flex items-center gap-2">
+                  <label class="text-xs text-gray-500">Show:</label>
+                  <select id="attrLimitSelect" class="px-2 py-1 rounded-lg border border-gray-200 text-sm text-gray-700 focus:outline-none focus:border-brand">
+                    <option value="10">10</option>
+                    <option value="20" selected>20</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <p class="mt-5 text-xs text-gray-400" id="attributesFooterHint">
+              <span class="text-black">These are system verified product attributes.</span><br>
+              Can't find what you need? Request an attribute and our team will review it.
+            </p>
+
+          </div>
+          <p class="text-sm mt-3 text-gray-500">Please read and understand our <a class="text-brand hover:underline" href="/docs/attributes-registry-terms" target="_blank">business attribute terms</a>. By accessing or using these attributes, you agree to these terms.</p>
+        </div>
+
+        
+        <div id="requestAttributeModal" class="fixed inset-0 z-50 hidden items-center justify-center px-4">
+          <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" data-dismiss="attribute-request"></div>
+          <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
+            <div class="sticky top-0 bg-white border-b border-gray-100 px-6 py-4 flex items-center justify-between">
+              <h3 class="text-lg font-bold text-gray-900">Request an Attribute</h3>
+              <button id="closeRequestAttributeBtn" class="text-gray-400 hover:text-gray-600 transition">
+                <i data-lucide="x" class="w-5 h-5"></i>
+              </button>
+            </div>
+
+            <form id="requestAttributeForm" class="p-6 space-y-4" novalidate>
+              <div class="rounded-xl bg-blue-50 border border-blue-100 p-3 flex items-start gap-2.5">
+                <i data-lucide="info" class="w-4 h-4 text-blue-600 flex-shrink-0 mt-0.5"></i>
+                <p class="text-xs text-blue-800 leading-relaxed">
+                  Requests are reviewed by the COCOCE team. You'll be notified once approved.
+                </p>
+              </div>
+
+              <div class="field" data-field="_title">
+                <label for="requestAttributeTitle" class="block text-sm font-medium text-gray-700 mb-1.5">
+                  Attribute name <span class="text-brand">*</span>
+                </label>
+                <input id="requestAttributeTitle" name="_title" type="text" maxlength="100" autocomplete="off" placeholder="e.g. Screen size" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-brand focus:ring-2 focus:ring-brand/10">
+                <p class="field-msg hidden mt-1.5 text-xs text-red-600"></p>
+              </div>
+
+              <div class="field" data-field="reason">
+                <label for="requestAttributeReason" class="block text-sm font-medium text-gray-700 mb-1.5">
+                  Why do you need it? <span class="text-gray-400 font-normal">(optional)</span>
+                </label>
+                <textarea id="requestAttributeReason" name="reason" rows="3" placeholder="Describe how you'll use this attribute..." class="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-brand focus:ring-2 focus:ring-brand/10 resize-y min-h-[80px]"></textarea>
+              </div>
+
+              <div id="requestAttributeError" class="hidden rounded-lg border border-red-200 bg-red-50 p-3 flex items-start gap-2">
+                <i data-lucide="alert-circle" class="w-4 h-4 text-red-600 flex-shrink-0 mt-0.5"></i>
+                <p id="requestAttributeErrorMsg" class="text-xs text-red-700"></p>
+              </div>
+
+              <div class="pt-2 flex flex-col-reverse sm:flex-row sm:justify-end gap-2">
+                <button type="button" id="cancelRequestAttributeBtn" class="w-full sm:w-auto px-4 py-2.5 rounded-xl border border-gray-200 text-sm font-medium text-gray-700 hover:bg-gray-50 transition">
+                  Cancel
+                </button>
+                <button type="submit" id="submitRequestAttributeBtn" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-brand text-white text-sm font-semibold hover:bg-brand-dark transition disabled:opacity-60 disabled:cursor-not-allowed">
+                  <span class="btn-label">Submit</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <div id="attributeDetailModal" class="fixed inset-0 z-50 hidden items-center justify-center px-4">
+          <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" data-dismiss="attribute-detail"></div>
+          <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[80vh] flex flex-col overflow-hidden">
+
+            <!-- Header -->
+            <div class="flex items-start justify-between gap-3 px-6 py-5 border-b border-gray-100">
+              <div class="flex items-center gap-3 min-w-0">
+                <div class="w-11 h-11 rounded-xl bg-brand-light text-brand flex items-center justify-center flex-shrink-0">
+                  <i data-lucide="list-checks" class="w-5 h-5"></i>
+                </div>
+                <div class="min-w-0">
+                  <h3 id="attrDetailTitle" class="text-base font-bold text-gray-900 truncate">Attribute</h3>
+                  <p id="attrDetailMeta" class="text-xs text-gray-400 mt-0.5">—</p>
+                </div>
+              </div>
+              <button id="closeAttributeDetailBtn" class="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition flex-shrink-0">
+                <i data-lucide="x" class="w-5 h-5"></i>
+              </button>
+            </div>
+
+  
+            <div class="flex-1 overflow-y-auto px-6 py-5 space-y-5">
+
+              <div>
+                <p class="text-[11px] uppercase tracking-wider font-semibold text-gray-400 mb-2">Description</p>
+                <p id="attrDetailDescription" class="text-sm text-gray-700 leading-relaxed whitespace-pre-line">—</p>
+              </div>
+
+              <div>
+                <p class="text-[11px] uppercase tracking-wider font-semibold text-gray-400 mb-2">Details</p>
+                <dl class="rounded-xl border border-gray-200 divide-y divide-gray-100 overflow-hidden">
+                  <div class="flex items-center justify-between px-4 py-2.5">
+                    <dt class="text-xs text-gray-500">Attribute ID</dt>
+                    <dd id="attrDetailId" class="text-xs font-mono text-gray-800">—</dd>
+                  </div>
+                  <div class="flex items-center justify-between px-4 py-2.5">
+                    <dt class="text-xs text-gray-500">Values</dt>
+                    <dd id="attrDetailValueCount" class="text-xs text-gray-800">—</dd>
+                  </div>
+                  <div class="flex items-center justify-between px-4 py-2.5">
+                    <dt class="text-xs text-gray-500">Last updated</dt>
+                    <dd id="attrDetailUpdated" class="text-xs text-gray-800">—</dd>
+                  </div>
+                </dl>
+              </div>
+
+              <div id="attrDetailRequestSection" class="hidden">
+                <p class="text-[11px] uppercase tracking-wider font-semibold text-gray-400 mb-2">Request</p>
+                <div id="attrDetailRequest" class="rounded-xl border p-3.5 space-y-2 text-xs"></div>
+              </div>
+
+              <div>
+                <div class="flex items-center justify-between mb-2">
+                  <p class="text-[11px] uppercase tracking-wider font-semibold text-gray-400">
+                    Values <span id="attrValuesCount" class="text-gray-300 normal-case font-normal tracking-normal">—</span>
+                  </p>
+                  <button id="toggleAddValueBtn" class="text-xs font-semibold text-brand hover:text-brand-dark transition inline-flex items-center gap-1">
+                    <i data-lucide="plus" class="w-3 h-3"></i> Add value
+                  </button>
+                </div>
+
+                <div id="addValueForm" class="hidden mb-4 rounded-xl border border-brand/30 bg-brand-light/30 p-4">
+                  <form id="attributeValueForm" class="space-y-3">
+
+                    <div class="field" data-field="_value">
+                      <label for="newAttributeValue" class="block text-xs font-medium text-gray-700 mb-1">
+                        Value <span class="text-brand">*</span>
+                      </label>
+                      <input id="newAttributeValue" type="text" maxlength="255" autocomplete="off" placeholder="e.g. Red" class="w-full px-3.5 py-2.5 rounded-lg border border-gray-200 bg-white text-sm focus:outline-none focus:border-brand focus:ring-2 focus:ring-brand/10">
+                      <p class="field-msg hidden mt-1 text-xs text-red-600"></p>
+                    </div>
+
+                    <!-- Dynamic meta key/value pairs -->
+                    <div id="metaPairsSection">
+                      <div class="flex items-center justify-between mb-1.5">
+                        <label class="block text-xs font-medium text-gray-700">
+                          Metadata <span class="text-gray-400 font-normal">(optional)</span>
+                        </label>
+                        <button type="button" id="addMetaPairBtn" class="text-xs font-semibold text-brand hover:text-brand-dark transition inline-flex items-center gap-1">
+                          <i data-lucide="plus" class="w-3 h-3"></i> Add field
+                        </button>
+                      </div>
+                      <div id="metaPairsList" class="space-y-2"></div>
+                      <p class="text-[11px] text-gray-400 mt-1.5">
+                        Extra details — e.g. <span class="text-gray-600">code → #FF0000</span>,
+                        <span class="text-gray-600">pros → Longer battery</span>.
+                      </p>
+                    </div>
+
+                    <div class="flex items-center justify-end gap-2 pt-1">
+                      <button type="button" id="cancelAddValueBtn" class="px-3 py-2 rounded-lg border border-gray-200 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 transition">
+                        Cancel
+                      </button>
+                      <button type="submit" id="saveAttributeValueBtn" class="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-brand text-white text-sm font-semibold hover:bg-brand-dark transition disabled:opacity-60 disabled:cursor-not-allowed">
+                        <span class="btn-label">Add</span>
+                      </button>
+                    </div>
+
+                    <p id="addValueError" class="hidden text-xs text-red-600"></p>
+                  </form>
+                </div>
+
+                <div id="attrValuesLoading" class="hidden py-6 text-center">
+                  <div class="inline-flex items-center gap-2 text-gray-400 text-xs">
+                    <svg class="w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none">
+                      <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-opacity="0.25" stroke-width="3" />
+                      <path d="M22 12a10 10 0 0 0-10-10" stroke="currentColor" stroke-width="3" stroke-linecap="round" />
+                    </svg>
+                    Loading values...
+                  </div>
+                </div>
+
+                <div id="attrValuesEmpty" class="hidden rounded-xl border border-dashed border-gray-200 p-6 text-center">
+                  <i data-lucide="list" class="w-5 h-5 text-gray-300 mx-auto"></i>
+                  <p class="mt-2 text-xs text-gray-500">No values yet. Add the first one.</p>
+                </div>
+
+                <ul id="attrValuesList" class="flex flex-wrap gap-1.5"></ul>
+
+                <div id="editValuePanel" class="hidden mt-4 rounded-xl border border-gray-200 bg-gray-50 p-4">
+                  <div class="flex items-center justify-between mb-3">
+                    <p class="text-sm font-semibold text-gray-900">
+                      Edit value
+                      <span id="editValueOriginal" class="text-xs font-normal text-gray-400"></span>
+                    </p>
+                    <button type="button" id="cancelEditValueBtn" class="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition">
+                      <i data-lucide="x" class="w-4 h-4"></i>
+                    </button>
+                  </div>
+
+                  <form id="editValueForm" class="space-y-3">
+                    <div class="field" data-field="_editValue">
+                      <label for="editValueInput" class="block text-xs font-medium text-gray-700 mb-1">
+                        Value <span class="text-brand">*</span>
+                      </label>
+                      <input id="editValueInput" type="text" maxlength="255" autocomplete="off" class="w-full px-3.5 py-2.5 rounded-lg border border-gray-200 bg-white text-sm focus:outline-none focus:border-brand focus:ring-2 focus:ring-brand/10">
+                      <p class="field-msg hidden mt-1 text-xs text-red-600"></p>
+                    </div>
+
+                    <div id="editMetaPairsSection">
+                      <div class="flex items-center justify-between mb-1.5">
+                        <label class="block text-xs font-medium text-gray-700">
+                          Metadata <span class="text-gray-400 font-normal">(optional)</span>
+                        </label>
+                        <button type="button" id="addEditMetaPairBtn" class="text-xs font-semibold text-brand hover:text-brand-dark transition inline-flex items-center gap-1">
+                          <i data-lucide="plus" class="w-3 h-3"></i> Add field
+                        </button>
+                      </div>
+                      <div id="editMetaPairsList" class="space-y-2"></div>
+                    </div>
+
+                    <div class="flex items-center justify-end gap-2 pt-1">
+                      <button type="button" id="cancelEditValueBtnFooter" class="px-3 py-2 rounded-lg border border-gray-200 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 transition">
+                        Cancel
+                      </button>
+                      <button type="submit" id="saveEditValueBtn" class="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-brand text-white text-sm font-semibold hover:bg-brand-dark transition disabled:opacity-60 disabled:cursor-not-allowed">
+                        <span class="btn-label">Save</span>
+                      </button>
+                    </div>
+
+                    <p id="editValueError" class="hidden text-xs text-red-600"></p>
+                  </form>
+                </div>
+
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <div id="requestAttributeModal" class="fixed inset-0 z-50 hidden items-center justify-center px-4">
+          <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" data-dismiss="attribute-request"></div>
+          <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
+            <div class="sticky top-0 bg-white border-b border-gray-100 px-6 py-4 flex items-center justify-between">
+              <h3 class="text-lg font-bold text-gray-900">Request an Attribute</h3>
+              <button id="closeRequestAttributeBtn" class="text-gray-400 hover:text-gray-600 transition">
+                <i data-lucide="x" class="w-5 h-5"></i>
+              </button>
+            </div>
+
+            <form id="requestAttributeForm" class="p-6 space-y-4" novalidate>
+              <div class="rounded-xl bg-blue-50 border border-blue-100 p-3 flex items-start gap-2.5">
+                <i data-lucide="info" class="w-4 h-4 text-blue-600 flex-shrink-0 mt-0.5"></i>
+                <p class="text-xs text-blue-800 leading-relaxed">
+                  Requests are reviewed by the COCOCE team. You'll be notified once approved.
+                </p>
+              </div>
+
+              <div class="field" data-field="_title">
+                <label for="requestAttributeTitle" class="block text-sm font-medium text-gray-700 mb-1.5">
+                  Attribute name <span class="text-brand">*</span>
+                </label>
+                <input id="requestAttributeTitle" name="_title" type="text" maxlength="100" autocomplete="off" placeholder="e.g. Screen size" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-brand focus:ring-2 focus:ring-brand/10">
+                <p class="field-msg hidden mt-1.5 text-xs text-red-600"></p>
+              </div>
+
+              <div class="field" data-field="reason">
+                <label for="requestAttributeReason" class="block text-sm font-medium text-gray-700 mb-1.5">
+                  Why do you need it? <span class="text-gray-400 font-normal">(optional)</span>
+                </label>
+                <textarea id="requestAttributeReason" name="reason" rows="3" placeholder="Describe how you'll use this attribute..." class="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-brand focus:ring-2 focus:ring-brand/10 resize-y min-h-[80px]"></textarea>
+              </div>
+
+              <div id="requestAttributeError" class="hidden rounded-lg border border-red-200 bg-red-50 p-3 flex items-start gap-2">
+                <i data-lucide="alert-circle" class="w-4 h-4 text-red-600 flex-shrink-0 mt-0.5"></i>
+                <p id="requestAttributeErrorMsg" class="text-xs text-red-700"></p>
+              </div>
+
+              <div class="pt-2 flex flex-col-reverse sm:flex-row sm:justify-end gap-2">
+                <button type="button" id="cancelRequestAttributeBtn" class="w-full sm:w-auto px-4 py-2.5 rounded-xl border border-gray-200 text-sm font-medium text-gray-700 hover:bg-gray-50 transition">
+                  Cancel
+                </button>
+                <button type="submit" id="submitRequestAttributeBtn" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-brand text-white text-sm font-semibold hover:bg-brand-dark transition disabled:opacity-60 disabled:cursor-not-allowed">
+                  Submit
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+
+        <div id="attributeDetailModal" class="fixed inset-0 z-50 hidden items-center justify-center px-4">
+          <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" data-dismiss="attribute-detail"></div>
+          <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[88vh] flex flex-col overflow-hidden">
+
+            <div class="flex items-start justify-between gap-3 px-6 py-5 border-b border-gray-100">
+              <div class="flex items-center gap-3 min-w-0">
+                <div class="w-11 h-11 rounded-xl bg-brand-light text-brand flex items-center justify-center flex-shrink-0">
+                  <i data-lucide="list-checks" class="w-5 h-5"></i>
+                </div>
+                <div class="min-w-0">
+                  <h3 id="attrDetailTitle" class="text-base font-bold text-gray-900 truncate">Attribute</h3>
+                  <p id="attrDetailMeta" class="text-xs text-gray-400 mt-0.5">—</p>
+                </div>
+              </div>
+              <button id="closeAttributeDetailBtn" class="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition flex-shrink-0">
+                <i data-lucide="x" class="w-5 h-5"></i>
+              </button>
+            </div>
+
+            <div class="flex-1 overflow-y-auto px-6 py-5 space-y-5">
+
+              <div>
+                <p class="text-[11px] uppercase tracking-wider font-semibold text-gray-400 mb-2">Description</p>
+                <p id="attrDetailDescription" class="text-sm text-gray-700 leading-relaxed whitespace-pre-line">—</p>
+              </div>
+
+              <div>
+                <p class="text-[11px] uppercase tracking-wider font-semibold text-gray-400 mb-2">Details</p>
+                <dl class="rounded-xl border border-gray-200 divide-y divide-gray-100 overflow-hidden">
+                  <div class="flex items-center justify-between px-4 py-2.5">
+                    <dt class="text-xs text-gray-500">Attribute ID</dt>
+                    <dd id="attrDetailId" class="text-xs font-mono text-gray-800">—</dd>
+                  </div>
+                  <div class="flex items-center justify-between px-4 py-2.5">
+                    <dt class="text-xs text-gray-500">Values</dt>
+                    <dd id="attrDetailValueCount" class="text-xs text-gray-800">—</dd>
+                  </div>
+                  <div class="flex items-center justify-between px-4 py-2.5">
+                    <dt class="text-xs text-gray-500">Last updated</dt>
+                    <dd id="attrDetailUpdated" class="text-xs text-gray-800">—</dd>
+                  </div>
+                </dl>
+              </div>
+
+              <div id="attrDetailRequestSection" class="hidden">
+                <p class="text-[11px] uppercase tracking-wider font-semibold text-gray-400 mb-2">Request</p>
+                <div id="attrDetailRequest" class="rounded-xl border p-3.5 space-y-2 text-xs"></div>
+              </div>
+
+              <div>
+                <div class="flex items-center justify-between mb-2">
+                  <p class="text-[11px] uppercase tracking-wider font-semibold text-gray-400">
+                    Values <span id="attrValuesCount" class="text-gray-300 normal-case font-normal tracking-normal">—</span>
+                  </p>
+                  <button id="toggleAddValueBtn" class="text-xs font-semibold text-brand hover:text-brand-dark transition inline-flex items-center gap-1">
+                    <i data-lucide="plus" class="w-3 h-3"></i> Add value
+                  </button>
+                </div>
+
+                <div id="addValueForm" class="hidden mb-3 rounded-xl border border-brand/30 bg-brand-light/30 p-3.5">
+                  <form id="attributeValueForm" class="space-y-3">
+
+                    <div class="field" data-field="_value">
+                      <label for="newAttributeValue" class="block text-xs font-medium text-gray-700 mb-1">
+                        Value <span class="text-brand">*</span>
+                      </label>
+                      <input id="newAttributeValue" type="text" maxlength="255" autocomplete="off" placeholder="e.g. Red" class="w-full px-3.5 py-2.5 rounded-lg border border-gray-200 bg-white text-sm focus:outline-none focus:border-brand focus:ring-2 focus:ring-brand/10">
+                      <p class="field-msg hidden mt-1 text-xs text-red-600"></p>
+                    </div>
+
+                    <div id="metaFieldsContainer" class="space-y-3"></div>
+
+                    <div class="flex items-center justify-end gap-2 pt-1">
+                      <button type="button" id="cancelAddValueBtn" class="px-3 py-2 rounded-lg border border-gray-200 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 transition">
+                        Cancel
+                      </button>
+                      <button type="submit" id="saveAttributeValueBtn" class="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-brand text-white text-sm font-semibold hover:bg-brand-dark transition disabled:opacity-60 disabled:cursor-not-allowed">
+                        <span class="btn-label">Add</span>
+                      </button>
+                    </div>
+
+                    <p id="addValueError" class="hidden text-xs text-red-600"></p>
+                  </form>
+                </div>
+
+                <div id="attrValuesLoading" class="hidden py-6 text-center">
+                  <div class="inline-flex items-center gap-2 text-gray-400 text-xs">
+                    <svg class="w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none">
+                      <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-opacity="0.25" stroke-width="3" />
+                      <path d="M22 12a10 10 0 0 0-10-10" stroke="currentColor" stroke-width="3" stroke-linecap="round" />
+                    </svg>
+                    Loading values...
+                  </div>
+                </div>
+
+                <div id="attrValuesEmpty" class="hidden rounded-xl border border-dashed border-gray-200 p-6 text-center">
+                  <i data-lucide="list" class="w-5 h-5 text-gray-300 mx-auto"></i>
+                  <p class="mt-2 text-xs text-gray-500">No values yet. Add the first one.</p>
+                </div>
+
+                <ul id="attrValuesList" class="flex flex-wrap gap-1.5"></ul>
+              </div>
+
+            </div>
+
+            <div class="px-6 py-4 border-t border-gray-100 bg-gray-50 flex flex-col-reverse sm:flex-row sm:justify-end gap-2">
+              <button id="attrDetailCloseFooterBtn" class="w-full sm:w-auto px-4 py-2.5 rounded-xl border border-gray-200 bg-white text-sm font-medium text-gray-700 hover:bg-gray-100 transition">
+                Close
+              </button>
+            </div>
+
+          </div>
+        </div>
+
         <div id="detailModal" role="dialog" aria-modal="true" aria-labelledby="detailTitle" class="fixed inset-0 z-50 hidden items-center justify-center px-4">
           <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" data-dismiss="category-detail"></div>
           <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[85vh] flex flex-col overflow-hidden">
@@ -1469,7 +1976,7 @@
             </div>
 
             <div id="requestFormContainer"></div>
-            
+
           </div>
         </div>
 
@@ -1504,7 +2011,7 @@
                   </div>
 
 
-                  <p class="text-xs text-brand">Drag or click to select profile image. Accepted: JPG — ".jpg" images only</p>
+                  <p class="text-xs text-gray-300">Drag or click to select profile image. Accepted: JPG — ".jpg" images only</p>
 
                   <button type="button" id="uploadProfileImgBtn" class="flex items-center gap-2 px-6 py-2.5 bg-brand text-white rounded-xl font-medium hover:bg-brand-dark transition disabled:opacity-50 disabled:cursor-not-allowed hidden">
                     <i data-lucide="upload"></i> Save
@@ -1516,7 +2023,7 @@
                     <p class="text-xs text-gray-500 mt-1 text-center" id="avatarUploadStatus">Uploading...</p>
                   </div>
 
-                  <button type="button" id="removeAvatarBtn" class="absolute top-0 right-4 flex items-center gap-2 px-6 py-2.5 bg-brand text-white rounded-xl font-medium hover:bg-brand-dark transition disabled:opacity-50 disabled:cursor-not-allowed hidden">
+                  <button type="button" id="removeAvatarBtn" class="absolute top-0 right-4 flex items-center gap-2 px-6 py-2.5 bg-brand/70 text-white rounded-xl font-medium hover:bg-brand-dark/70 transition disabled:opacity-50 disabled:cursor-not-allowed hidden">
                     <i data-lucide="trash"></i> Remove
                   </button>
 
@@ -1922,7 +2429,9 @@
   <script src="/scripts/vd-families.js"></script>
   <script src="/scripts/vd-orders.js"></script>
   <script src="/scripts/vd-brands.js"></script>
+  <script src="/scripts/vd-attributes.js"></script>
   <script src="/scripts/bdsh.js"></script>
+
   <script>
     lucide.createIcons();
   </script>

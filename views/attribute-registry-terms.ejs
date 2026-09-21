@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Attribute Registry — COCOCE Docs</title>
+  <meta name="description" content="What marketplace attributes are, how they work on COCOCE, and the rules that keep the catalog clean and trustworthy.">
+  <link rel="icon" href="/favicon.ico" type="image/x-icon">
+
+  <link rel="stylesheet" href="/styles/main.css">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    html {
+      -webkit-text-size-adjust: 100%;
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background:
+        radial-gradient(1200px 400px at 50% -100px, #FFF5F5 0%, transparent 60%),
+        #F8FAFC;
+      color: #0F172A;
+      min-height: 100vh;
+    }
+
+    /* Anchor offset for sticky header */
+    [id] {
+      scroll-margin-top: 88px;
+    }
+
+    /* Prose */
+    .prose-doc {
+      color: #334155;
+      line-height: 1.7;
+    }
+
+    .prose-doc p {
+      margin-bottom: 1rem;
+    }
+
+    .prose-doc strong {
+      color: #0F172A;
+      font-weight: 600;
+    }
+
+    .prose-doc a {
+      color: #ED1B24;
+      text-decoration: none;
+      border-bottom: 1px solid rgba(237, 27, 36, 0.25);
+      transition: border-color .15s ease;
+    }
+
+    .prose-doc a:hover {
+      border-color: #ED1B24;
+    }
+
+    .prose-doc ul,
+    .prose-doc ol {
+      margin: 0 0 1rem 1.25rem;
+      padding: 0;
+    }
+
+    .prose-doc li {
+      margin-bottom: .35rem;
+    }
+
+    .prose-doc code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 0.85em;
+      background: #F1F5F9;
+      border: 1px solid #E2E8F0;
+      border-radius: 4px;
+      padding: 1px 5px;
+      color: #0F172A;
+    }
+
+    /* Callouts */
+    .callout {
+      border-radius: 12px;
+      padding: 14px 16px;
+      display: flex;
+      gap: 12px;
+      margin: 1rem 0;
+    }
+
+    .callout-icon {
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .callout-info {
+      background: #EFF6FF;
+      border: 1px solid #BFDBFE;
+      color: #1E3A8A;
+    }
+
+    .callout-warn {
+      background: #FFFBEB;
+      border: 1px solid #FDE68A;
+      color: #92400E;
+    }
+
+    .callout-danger {
+      background: #FEF2F2;
+      border: 1px solid #FECACA;
+      color: #991B1B;
+    }
+
+    .callout-success {
+      background: #F0FDF4;
+      border: 1px solid #BBF7D0;
+      color: #166534;
+    }
+
+    .callout p:last-child {
+      margin-bottom: 0;
+    }
+
+    /* TOC active state */
+    .toc-link.active {
+      color: #ED1B24;
+      border-left-color: #ED1B24;
+      font-weight: 600;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ===================== HEADER ===================== -->
+  <header class="sticky top-0 z-40 border-b border-ink-200/70 bg-white/80 backdrop-blur">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between gap-3">
+
+      <a href="<%= locals.protocal %>business.<%= locals.domainName %>" class="flex items-center gap-2 min-w-0">
+        <img src="/images/logos/business.png" alt="COCOCE" class="h-7">
+      </a>
+
+      <nav class="flex items-center gap-2">
+        <a href="<%= locals.protocal %>business.<%= locals.domainName %>/dashboard" class="hidden sm:inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium text-ink-700 hover:bg-ink-100 transition">
+          <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
+          Go to Dashboard
+        </a>
+
+        <a href="<%= locals.protocal %>business.<%= locals.domainName %>" class="hidden sm:inline-flex items-center gap-1.5 px-3 py-2 rounded-xl border border-ink-200 text-xs font-medium text-ink-700 hover:bg-ink-50 transition">
+          <i data-lucide="home" class="w-4 h-4"></i>
+          Home
+        </a>
+
+        <a href="<%= locals.protocal %>admin.<%= locals.domainName %>/dashboard" class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-brand text-white text-xs font-semibold hover:bg-brand-dark transition">
+          I'm Admin
+        </a>
+
+        <% if (locals.user) {%>
+        <form action="<%=locals.protocal%>auth.<%=locals.domainName%>/signout" method="POST">
+          <input type="hidden" value="<%=locals.protocal%>business.<%=locals.domainName%>/docs/attributes-registry-terms" name="host">
+          <input type="hidden" name="userAccount" value="<=locals.user.userAccount%>">
+          <button type="submit" href="<%= locals.protocal %>business.<%= locals.domainName %>" class="flex items-center gap-1.5 px-3 py-1 rounded-xl border border-ink-200 text-xs font-medium text-ink-700 hover:bg-ink-50 transition">
+            Signout
+            <i data-lucide="move-right"></i>
+          </button>
+        </form>
+        <%} else {%>
+        <a href="<%= locals.protocal %>auth.<%= locals.domainName %>?r=<%=locals.protocal%>business.<%=locals.domainName%>/docs/attributes-registry-terms" class="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-ink-200 text-xs font-medium text-ink-700 hover:bg-ink-50 transition">
+          Signin
+        </a>
+        <%}%>
+      </nav>
+
+    </div>
+  </header>
+
+  <section class="max-w-5xl mx-auto px-4 sm:px-6 pt-8 sm:pt-12">
+    <div class="max-w-3xl">
+      <p class="text-xs font-extrabold uppercase tracking-wider text-brand">Doc</p>
+      <h1 class="mt-1 text-3xl sm:text-4xl font-bold tracking-tight text-ink-900">
+        Attribute Registry
+      </h1>
+      <p class="mt-3 text-base text-ink-500 leading-relaxed">
+        What marketplace attributes are, why they exist on COCOCE, and the rules that keep the
+        catalog consistent, trustworthy, and safe to build on.
+      </p>
+
+      <div class="mt-5 flex flex-wrap items-center gap-3 text-xs text-ink-400">
+        <span class="inline-flex items-center gap-1.5">
+          <i data-lucide="clock" class="w-3.5 h-3.5"></i>
+          Last updated: September 2026
+        </span>
+        <span aria-hidden="true">·</span>
+        <span class="inline-flex items-center gap-1.5">
+          <i data-lucide="file-text" class="w-3.5 h-3.5"></i>
+          Applies to: all vendors and admin staff
+        </span>
+      </div>
+    </div>
+  </section>
+
+  <div class="max-w-5xl mx-auto px-4 sm:px-6 py-10 sm:py-12 grid lg:grid-cols-[220px_1fr] gap-8">
+
+    <aside class="hidden lg:block">
+      <nav class="sticky top-20 text-sm" aria-label="On this page">
+        <p class="text-[11px] uppercase tracking-wider font-semibold text-ink-400 mb-3">On this page</p>
+        <ul class="space-y-0.5">
+          <li><a href="#overview" class="toc-link block border-l-2 border-transparent pl-3 py-1.5 text-ink-500 hover:text-ink-900 transition">Overview</a></li>
+          <li><a href="#why" class="toc-link block border-l-2 border-transparent pl-3 py-1.5 text-ink-500 hover:text-ink-900 transition">Why attributes matter</a></li>
+          <li><a href="#anatomy" class="toc-link block border-l-2 border-transparent pl-3 py-1.5 text-ink-500 hover:text-ink-900 transition">Anatomy of an attribute</a></li>
+          <li><a href="#values" class="toc-link block border-l-2 border-transparent pl-3 py-1.5 text-ink-500 hover:text-ink-900 transition">Attribute values</a></li>
+          <li><a href="#integrity" class="toc-link block border-l-2 border-transparent pl-3 py-1.5 text-ink-500 hover:text-ink-900 transition">Data integrity</a></li>
+          <li><a href="#lifecycle" class="toc-link block border-l-2 border-transparent pl-3 py-1.5 text-ink-500 hover:text-ink-900 transition">Lifecycle &amp; permissions</a></li>
+          <li><a href="#metadata" class="toc-link block border-l-2 border-transparent pl-3 py-1.5 text-ink-500 hover:text-ink-900 transition">Value metadata</a></li>
+          <li><a href="#dos" class="toc-link block border-l-2 border-transparent pl-3 py-1.5 text-ink-500 hover:text-ink-900 transition">Do &amp; don't</a></li>
+          <li><a href="#faq" class="toc-link block border-l-2 border-transparent pl-3 py-1.5 text-ink-500 hover:text-ink-900 transition">FAQ</a></li>
+        </ul>
+      </nav>
+    </aside>
+
+    <article class="prose-doc min-w-0">
+
+      <section id="overview">
+        <h2 class="text-xl font-bold text-ink-900 mb-3">Overview</h2>
+        <p>
+          An <strong>attribute</strong> is a marketplace-level, system-verified property that
+          describes a class of products. Examples on COCOCE include
+          <code>Color</code>, <code>RAM Type</code>, <code>Storage</code>, <code>Screen Size</code>,
+          and <code>Material</code>.
+        </p>
+        <p>
+          Attributes are not products. They are the vocabulary vendors use when listing products.
+          A single attribute — say <code>Color</code> — can apply to thousands of listings across
+          every store on the marketplace. Its <strong>values</strong> (<em>Red</em>, <em>Black</em>,
+          <em>Blue</em>) are what actually attach to a product when it's listed.
+        </p>
+
+        <div class="callout callout-info">
+          <i data-lucide="info" class="w-5 h-5 callout-icon"></i>
+          <div>
+            <p class="text-sm leading-relaxed">
+              <strong>Mental model.</strong> Think of attributes as the columns of a spreadsheet
+              that every vendor shares, and values as the cells that get filled in per listing.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section id="why" class="mt-10">
+        <h2 class="text-xl font-bold text-ink-900 mb-3">Why attributes matter</h2>
+        <p>
+          A marketplace without shared attributes is a pile of unstructured text. Buyers can't
+          filter, the platform can't compare, and search returns noise. Attributes solve that
+          by enforcing a shared, verified vocabulary at three levels:
+        </p>
+        <ul>
+          <li><strong>For buyers</strong> — Enables reliable filters, side-by-side comparison,
+            and accurate search facets (e.g. &ldquo;Android phones with 8GB RAM or more&rdquo;).</li>
+          <li><strong>For vendors</strong> — Reduces listing-time errors, gives visibility in
+            filtered navigation, and lets products surface where buyers are looking.</li>
+          <li><strong>For the platform</strong> — Powers recommendations, category insights,
+            fraud detection, and any downstream tooling that needs structured product data.</li>
+        </ul>
+        <p>
+          Every attribute you add to the registry makes the entire marketplace — not just your
+          store — more structured and more useful. That's why the registry is shared, and why
+          changes to it are governed.
+        </p>
+      </section>
+
+      <section id="anatomy" class="mt-10">
+        <h2 class="text-xl font-bold text-ink-900 mb-3">Anatomy of an attribute</h2>
+        <p>Every attribute in the registry has a fixed set of fields:</p>
+
+        <dl class="rounded-xl border border-ink-200 divide-y divide-ink-100 overflow-hidden not-prose">
+          <div class="flex items-start justify-between gap-4 px-4 py-3">
+            <dt class="text-xs font-semibold text-ink-700 flex-shrink-0 w-32">Title</dt>
+            <dd class="text-sm text-ink-700 text-right">
+              Human-readable name — <em>Color</em>, <em>RAM Type</em>. Unique across the registry.
+            </dd>
+          </div>
+          <div class="flex items-start justify-between gap-4 px-4 py-3">
+            <dt class="text-xs font-semibold text-ink-700 flex-shrink-0 w-32">Description</dt>
+            <dd class="text-sm text-ink-700 text-right">
+              Explains what the attribute means and when to use it. Optional but strongly encouraged.
+            </dd>
+          </div>
+          <div class="flex items-start justify-between gap-4 px-4 py-3">
+            <dt class="text-xs font-semibold text-ink-700 flex-shrink-0 w-32">Status</dt>
+            <dd class="text-sm text-ink-700 text-right">
+              <code>active</code>, <code>inactive</code>, or <code>requested</code>.
+            </dd>
+          </div>
+          <div class="flex items-start justify-between gap-4 px-4 py-3">
+            <dt class="text-xs font-semibold text-ink-700 flex-shrink-0 w-32">Values</dt>
+            <dd class="text-sm text-ink-700 text-right">
+              The set of allowed options for this attribute. See the next section.
+            </dd>
+          </div>
+          <div class="flex items-start justify-between gap-4 px-4 py-3">
+            <dt class="text-xs font-semibold text-ink-700 flex-shrink-0 w-32">Audit trail</dt>
+            <dd class="text-sm text-ink-700 text-right">
+              Who requested it, when, and who verified or denied it.
+            </dd>
+          </div>
+        </dl>
+      </section>
+
+      <section id="values" class="mt-10">
+        <h2 class="text-xl font-bold text-ink-900 mb-3">Attribute values</h2>
+        <p>
+          Values are the actual options inside an attribute. <em>Red</em> and <em>Black</em> are
+          values of the <code>Color</code> attribute. <em>DDR4</em> and <em>DDR5</em> are values
+          of the <code>RAM Type</code> attribute.
+        </p>
+        <p>
+          Values are scoped to their attribute — you cannot have a <em>Red</em> on the
+          <code>RAM Type</code> attribute, and you cannot have a <em>DDR4</em> on the
+          <code>Color</code> attribute. Each value is unique within its attribute (case-insensitive).
+        </p>
+
+        <div class="callout callout-info">
+          <i data-lucide="lightbulb" class="w-5 h-5 callout-icon"></i>
+          <div>
+            <p class="text-sm leading-relaxed">
+              <strong>Vendors can add values.</strong> If you need <em>Deep Purple</em> for a
+              product, you don't need to request it from admin — you can add it directly to the
+              <code>Color</code> attribute. It becomes immediately usable and available to every
+              other vendor on the marketplace.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section id="integrity" class="mt-10">
+        <h2 class="text-xl font-bold text-ink-900 mb-3">Data integrity</h2>
+        <p>
+          Every attribute and every value you add to the registry is <strong>shared by the entire
+            marketplace</strong>. Other vendors will list products under them. Buyers will filter and
+          search using them. That's why the registry is governed, and why sloppy additions have
+          consequences beyond your store.
+        </p>
+
+        <h3 class="mt-6 mb-2 text-base font-semibold text-ink-900">What makes a good attribute</h3>
+        <ul>
+          <li><strong>Universal</strong> — Applies to many products, not just one SKU.
+            <em>Color</em> is good. <em>Red iPhone 15 Pro Max</em> is not — that's a product.
+          </li>
+          <li><strong>Objective</strong> — Has a clear, unambiguous meaning. <em>Screen Size</em> is
+            objective; <em>Looks Nice</em> is not.</li>
+          <li><strong>Non-redundant</strong> — Doesn't duplicate an existing attribute. Search the
+            registry first before requesting a new one.</li>
+          <li><strong>Well-named</strong> — Title case, singular, no abbreviations:
+            <em>RAM Type</em>, not <em>ram_type</em> or <em>RAMs</em>.
+          </li>
+        </ul>
+
+        <h3 class="mt-6 mb-2 text-base font-semibold text-ink-900">What makes a good value</h3>
+        <ul>
+          <li><strong>Standard format</strong> — Match existing conventions in the same attribute.
+            If siblings use <em>128GB</em>, don't introduce <em>128 GB</em> or <em>128gb</em>.</li>
+          <li><strong>Canonical spelling</strong> — <em>Grey</em> and <em>Gray</em> are duplicates.
+            Use the spelling already present in the attribute.</li>
+          <li><strong>Self-contained</strong> — A value should make sense on its own:
+            <em>DDR4</em>, not <em>Type 4</em>.
+          </li>
+          <li><strong>No ranges or combos</strong> — <em>8–16GB</em> is two values, not one.
+            Split them.</li>
+        </ul>
+
+        <div class="callout callout-warn">
+          <i data-lucide="alert-triangle" class="w-5 h-5 callout-icon"></i>
+          <div>
+            <p class="text-sm leading-relaxed">
+              <strong>Duplicates degrade the catalog.</strong> Adding <em>Blue</em> when
+              <em>Blue</em> already exists (even with different capitalization or spacing) creates
+              two filter entries that show identical results, and splits product data across
+              both. The platform rejects exact matches, but near-duplicates are the vendor's
+              responsibility.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section id="lifecycle" class="mt-10">
+        <h2 class="text-xl font-bold text-ink-900 mb-3">Lifecycle &amp; permissions</h2>
+        <p>
+          The registry distinguishes between <strong>additive</strong> operations, which vendors
+          can perform, and <strong>structural</strong> operations, which are admin-only.
+        </p>
+
+        <h3 class="mt-6 mb-2 text-base font-semibold text-ink-900">What vendors can do</h3>
+        <ul>
+          <li><strong>Request a new attribute</strong> — Submit a request for a
+            registry-level attribute that doesn't exist yet. The request enters a review queue
+            and is visible to the platform admin team.</li>
+          <li><strong>Add a value</strong> to any existing active attribute — Immediately
+            usable, immediately available to every vendor.</li>
+          <li><strong>Edit a value you created</strong> — Correct typos, fix metadata, or
+            adjust the value's details.</li>
+        </ul>
+
+        <h3 class="mt-6 mb-2 text-base font-semibold text-ink-900">What only admins can do</h3>
+
+        <div class="callout callout-danger">
+          <i data-lucide="shield-alert" class="w-5 h-5 callout-icon"></i>
+          <div>
+            <p class="text-sm leading-relaxed">
+              <strong>Once an attribute or value is in the registry, only privileged admin
+                users can remove, disable, or update it.</strong> This applies to system-defined
+              attributes and values, and to vendor-added values once they've been adopted
+              across listings.
+            </p>
+          </div>
+        </div>
+
+        <p>Specifically, admin-only operations include:</p>
+        <ul>
+          <li><strong>Deleting an attribute</strong> — Removes it from the registry entirely.</li>
+          <li><strong>Deleting a value</strong> — Removes a specific option from an attribute.</li>
+          <li><strong>Disabling an attribute or value</strong> — Sets it to
+            <code>inactive</code> so it no longer appears for new listings, while preserving
+            existing products that reference it.
+          </li>
+          <li><strong>Renaming an attribute or value</strong> — Changing the canonical title
+            or value text.</li>
+          <li><strong>Editing attribute metadata</strong> — Description, display order, or
+            verification state.</li>
+          <li><strong>Approving or denying requests</strong> — Reviewing vendor-submitted
+            attribute requests.</li>
+        </ul>
+
+        <p>
+          The reason for this split is stability. If any vendor could rename or delete a
+          registry attribute, every other vendor's listings would break silently. The audit
+          trail on every attribute and value ensures changes are traceable to a specific
+          privileged user.
+        </p>
+
+        <div class="callout callout-info">
+          <i data-lucide="history" class="w-5 h-5 callout-icon"></i>
+          <div>
+            <p class="text-sm leading-relaxed">
+              <strong>Nothing is hard-deleted by default.</strong> When admin staff disable an
+              attribute or value, existing listings continue to render correctly — the option
+              simply stops appearing in the picker for new listings. Hard deletes are reserved
+              for duplicates and errors caught early.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section id="metadata" class="mt-10">
+        <h2 class="text-xl font-bold text-ink-900 mb-3">Value metadata</h2>
+        <p>
+          Each value can carry optional <strong>metadata</strong> — a small set of key-value
+          pairs that add structure without requiring a new attribute. Metadata is per-value,
+          flexible, and only as strict as you make it.
+        </p>
+        <p>Common uses:</p>
+
+        <div class="rounded-xl border border-ink-200 divide-y divide-ink-100 overflow-hidden not-prose">
+          <div class="px-4 py-3">
+            <p class="text-xs font-semibold text-ink-700">Color codes</p>
+            <p class="text-sm text-ink-500 mt-0.5">
+              Value <em>Red</em> → <code>{ "code": "#FF0000" }</code> — enables color swatches
+              in filters and product pages.
+            </p>
+          </div>
+          <div class="px-4 py-3">
+            <p class="text-xs font-semibold text-ink-700">Pros and cons</p>
+            <p class="text-sm text-ink-500 mt-0.5">
+              Value <em>DDR4</em> → <code>{ "pros": "Cheaper, widely supported", "cons": "Slower than DDR5" }</code>
+            </p>
+          </div>
+          <div class="px-4 py-3">
+            <p class="text-xs font-semibold text-ink-700">Numeric equivalents</p>
+            <p class="text-sm text-ink-500 mt-0.5">
+              Value <em>15.6"</em> → <code>{ "inches": "15.6" }</code> — helps with range filters.
+            </p>
+          </div>
+          <div class="px-4 py-3">
+            <p class="text-xs font-semibold text-ink-700">External references</p>
+            <p class="text-sm text-ink-500 mt-0.5">
+              Value <em>iPhone 15</em> → <code>{ "ref": "apple.com/iphone-15" }</code>
+            </p>
+          </div>
+        </div>
+
+        <h3 class="mt-6 mb-2 text-base font-semibold text-ink-900">Metadata rules</h3>
+        <ul>
+          <li><strong>Optional</strong> — A value with no metadata is perfectly valid.</li>
+          <li><strong>Key-value pairs</strong> — Keys and values are both strings.</li>
+          <li><strong>Keys must be unique</strong> within a single value's metadata.</li>
+          <li><strong>Keep keys short and predictable</strong> — <code>code</code>,
+            <code>capacity</code>, <code>hex</code> — not sentences.
+          </li>
+          <li><strong>No nested structures</strong> — Flat objects only. If you need hierarchy,
+            that's a signal you need a new attribute, not deeper metadata.</li>
+        </ul>
+      </section>
+
+      <section id="dos" class="mt-10">
+        <h2 class="text-xl font-bold text-ink-900 mb-3">Do &amp; don't</h2>
+
+        <div class="grid sm:grid-cols-2 gap-4 not-prose">
+          <div class="rounded-xl border border-emerald-200 bg-emerald-50/40 p-4">
+            <div class="flex items-center gap-2 mb-3">
+              <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-600"></i>
+              <p class="text-xs font-semibold text-emerald-700 uppercase tracking-wider">Do</p>
+            </div>
+            <ul class="space-y-2 text-sm text-emerald-900">
+              <li>Search the registry before requesting an attribute.</li>
+              <li>Match the naming conventions of sibling values.</li>
+              <li>Write descriptions that explain when to use the attribute.</li>
+              <li>Add metadata when it improves filtering or display.</li>
+              <li>Fix your own values if you spot a typo.</li>
+            </ul>
+          </div>
+
+          <div class="rounded-xl border border-red-200 bg-red-50/40 p-4">
+            <div class="flex items-center gap-2 mb-3">
+              <i data-lucide="x-circle" class="w-4 h-4 text-red-600"></i>
+              <p class="text-xs font-semibold text-red-700 uppercase tracking-wider">Don't</p>
+            </div>
+            <ul class="space-y-2 text-sm text-red-900">
+              <li>Request attributes that are really product names.</li>
+              <li>Add duplicate values with different casing or spacing.</li>
+              <li>Use attributes for marketing copy or subjective claims.</li>
+              <li>Rename or delete a value once listings depend on it.</li>
+              <li>Pack multiple meanings into a single value or key.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section id="faq" class="mt-10">
+        <h2 class="text-xl font-bold text-ink-900 mb-3">FAQ</h2>
+
+        <div class="space-y-5">
+          <div>
+            <p class="text-sm font-semibold text-ink-900">What's the difference between an attribute and a category?</p>
+            <p class="text-sm text-ink-500 mt-1">
+              Categories group products (<em>Phones</em>, <em>Laptops</em>). Attributes describe
+              them (<em>Color</em>, <em>RAM Type</em>). A product lives in one category but has
+              many attributes.
+            </p>
+          </div>
+
+          <div>
+            <p class="text-sm font-semibold text-ink-900">Can I delete a value I just added?</p>
+            <p class="text-sm text-ink-500 mt-1">
+              If you created it and no listings depend on it yet, yes. Once a value is used in
+              live listings, deletion is admin-only to protect those listings from breaking.
+            </p>
+          </div>
+
+          <div>
+            <p class="text-sm font-semibold text-ink-900">What happens to my listings if an attribute is disabled?</p>
+            <p class="text-sm text-ink-500 mt-1">
+              Nothing. Your listings keep rendering with the value they already have. The
+              attribute simply stops appearing in the picker when new listings are created.
+            </p>
+          </div>
+
+          <div>
+            <p class="text-sm font-semibold text-ink-900">How long does a request take to be reviewed?</p>
+            <p class="text-sm text-ink-500 mt-1">
+              The admin team aims to review requests within a few business days. You'll be
+              notified when your request is approved or denied, with a reason if denied.
+            </p>
+          </div>
+
+          <div>
+            <p class="text-sm font-semibold text-ink-900">Can two attributes have the same value?</p>
+            <p class="text-sm text-ink-500 mt-1">
+              Yes. <em>Silver</em> can exist as a value under <code>Color</code> and also under
+              <code>Material</code>. Uniqueness is enforced per-attribute, not globally.
+            </p>
+          </div>
+
+          <div>
+            <p class="text-sm font-semibold text-ink-900">Why is my new attribute marked "requested" instead of "active"?</p>
+            <p class="text-sm text-ink-500 mt-1">
+              All new attributes enter the registry as requests. Only admin staff can promote a
+              request to <code>active</code>, which is when it becomes available to vendors
+              for listing products.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section class="mt-12 pt-6 border-t border-ink-200">
+        <p class="text-xs text-ink-400">
+          This document is maintained by the COCOCE platform team. If something here contradicts
+          what you see in the product, the product is authoritative — please
+          <a href="mailto:sales@cococe.rw">let us know</a> so we can correct this page.
+        </p>
+      </section>
+
+    </article>
+  </div>
+
+  <footer class="border-t border-ink-200 bg-white/60">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 py-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-ink-400">
+      <span>© 2026 COCOCE — Attribute Registry Documentation</span>
+      <div class="flex gap-6">
+        <a href="/privacy" class="hover:text-brand transition">Privacy</a>
+        <a href="/terms" class="hover:text-brand transition">Terms</a>
+        <a href="mailto:sales@cococe.rw" class="hover:text-brand transition">Support</a>
+        <a href="<%= locals.protocal %>business.<%= locals.domainName %>/dashboard" class="hover:text-brand transition">Vendor Dashboard</a>
+    </div>
+    </div>
+    </footer>
+
+    <script>
+      lucide.createIcons();
+    </script>
+
+    <script src="/scripts/a_r_t.js"></script>
+
+</body>
+
+</html>

@@ -50,6 +50,7 @@ const tabContents = {
     category: document.getElementById('tab-categories'),
     families: document.getElementById('tab-families'),
     brands: document.getElementById('tab-brands'),
+    attributes: document.getElementById('tab-attributes'),
     profile: document.getElementById('tab-profile'),
     settings: document.getElementById('tab-settings'),
     logs: document.getElementById('tab-logs'),
@@ -68,6 +69,7 @@ const tabTitles = {
     category: 'Categories',
     families: 'Families',
     brands: 'Brands',
+    attributes: 'Attributes',
     profile: 'Profile',
     settings: 'Settings',
     logs: 'Logs',
@@ -90,6 +92,7 @@ let categoryManager = null;
 let familiesManager = null;
 let ordersManager = null;
 let brandsManager = null;
+let attributesManager = null;
 
 sidebarLinks.forEach(link => {
     link.addEventListener('click', function (e) {
@@ -139,15 +142,21 @@ sidebarLinks.forEach(link => {
                 familiesManager._resumed();
                 break;
             case 'orders':
-                if (!ordersManager){
+                if (!ordersManager) {
                     ordersManager = new OrdersManager();
                 }
                 break;
             case 'brands':
-                if (!brandsManager){
+                if (!brandsManager) {
                     brandsManager = new BrandsManager();
                 }
                 brandsManager._resumed();
+                break;
+            case 'attributes':
+                if (!attributesManager) {
+                    attributesManager = new AttributesManager();
+                }
+                //attributesManager._resumed();
                 break;
         }
 

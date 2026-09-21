@@ -153,7 +153,7 @@ class BrandsManager {
             brandDetailRequestSection: $('#detailRequestSection'),
             brandDetailRequest: $('#detailRequest'),
             brandDetailRequestBtn: $('#detailRequestBtn'),
-            closeBrandDetailBtn: $('#closedetailBtn'),
+            closeBrandDetailBtn: $('#closeDetailBtn'),
             brandDetailCloseFooterBtn: $('#detailCloseFooterBtn'),
             brandDetailDismiss: $('[data-dismiss="brand-detail"]'),
 
@@ -258,7 +258,6 @@ class BrandsManager {
         this.els.modalForm?.removeEventListener('submit', this.submitRequest);
         this.els.modalForm?.addEventListener('submit', (ev) => this.submitRequest(ev));
 
-        // Delegated card click → detail modal
         this.els.grid?.addEventListener('click', (ev) => {
             const card = ev.target.closest('[data-brand-id]');
             if (!card) return;
@@ -407,6 +406,7 @@ class BrandsManager {
         }
 
         const list = this.filteredBrands();
+        
         this.updateStats();
 
         if (list.length === 0) {
@@ -551,7 +551,7 @@ class BrandsManager {
         document.body.style.overflow = 'hidden';
         this._refreshIcons();
 
-        setTimeout(() => this.els.closeBrandDetailBtn?.focus(), 50);
+        //setTimeout(() => this.els.closeBrandDetailBtn?.focus(), 50);
     }
 
     closeDetail() {
@@ -849,7 +849,7 @@ class BrandsManager {
 
     _requestLabel(status) {
         switch (status) {
-            case 'active': return 'Approved';
+            case 'active': return 'Active';
             case 'requested': return 'Pending';
             case 'rejected': return 'Rejected';
             case 'inactive': return 'Inactive';
