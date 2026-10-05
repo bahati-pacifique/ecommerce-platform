@@ -9,7 +9,7 @@ const InventoryController = require('../../../controllers/inventory.controller')
 const BusinessController = require('../../business/controller/business.controller');
 //const BusinessController = require('../../business/controller/business.controller')
 
-const { administration, session, dashboard, business } = require('../../../middlewares/authGuards');
+const { administration, dashboard, business } = require('../../../middlewares/authGuards');
 //const VendorService = require('../../../src/services/vendor.services');
 
 router.get('/users/user-account', apiController.getRandomUserByAccountCategory);
@@ -35,7 +35,8 @@ router.get('/attributes/values', business, apiController.getActiveAttributeValue
 router.get('/attributes/values/:attribute_id', business, ProductMetaController.getAttributesValues);
 router.get('/attributes/all', business, ProductMetaController.getAttributes);
 router.get('/attributes/s', business, apiController.searchAttributes);
-router.get('/attributes/:status', business, ProductMetaController.getRequestedAttributes)
+router.get('/attributes/:attribute_id/values/s', business, apiController.searchAttributeValues);
+router.get('/attributes/:status', business, ProductMetaController.getRequestedAttributes);
 
 router.post('/meta/categories/insert', business, ProductMetaController.insertProductCategory);
 router.post('/meta/families/insert', business, ProductMetaController.insertProductFamily);
@@ -57,7 +58,7 @@ router.post('/test-mz-email/', apiController.testMaizleEmail);
 
 router.post('/business/vendor-application', apiController.submitVendorApplication);
 router.put('/business/vendor-application/deny/:id', dashboard, apiController.rejectBusinessApplication);
-router.get('/business/check-businessname', apiController.checkBusinessUsername);
+router.get('/business/check-businessname/', apiController.checkBusinessUsername);
 router.get('/business/applications/', apiController.getBusinessApplications);
 router.get('/business/applications/:identifier', apiController.checkVendorApplication);
 router.post('/business/applications/:id/approve', administration, apiController.approveBusinessApplication);
@@ -78,8 +79,12 @@ router.patch('/business/:storeId/inventories/', business, InventoryController.up
 router.patch('/business/inventories/:id/default', business, InventoryController.setDefaultInventory);
 router.get('/business/inventories/:id/status', business, InventoryController.setInventoryStatus);
 
-router.get('/inventory/data/vendor', business, InventoryController.getInventoryVendorDashboardData);
-router.get('/vendor/data/orders', business, BusinessController.getVendorOrderDashboard)
+router.get('/inventory/data/vendor/', business, InventoryController.getInventoryVendorDashboardData);
+router.get('/vendor/data/orders/', business, BusinessController.getVendorOrderDashboard);
+router.get('/vendor/data/analytics/', business, BusinessController.getAnalyticVendorDashboardData);
+router.get('/vendor/data/overview/', business, BusinessController.getVendorOverviewData);
+
+//router.post('/cataloging/product', business, apiController.insertProductCatalog);
 
 //router.delete('/business/inventories/:id', business, InventoryController.deleteInventory);
 

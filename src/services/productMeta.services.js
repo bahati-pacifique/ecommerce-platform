@@ -243,6 +243,10 @@ class ProductMetaService {
         return await ProductMetaModel.searchAttributes(searchKey, page, limit)
     }
 
+    static async searchAttributeValues(attributeId, searchKey, page, limit) {
+        return await ProductMetaModel.searchAttributesValues(attributeId, searchKey, page, limit)
+    }
+
     static async updateAttribute(id, updateData) {
         if (!id || isNaN(id)) {
             throw new Error("ID must be provided.");

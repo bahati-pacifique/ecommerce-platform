@@ -52,17 +52,14 @@ async function renderAccountSelection(req, res) {
 
 async function renderDashboard(req, res) {
 
-    //const isProduction = process.env.NODE_ENV === 'production';
-
-    //const domain = process.env.DOMAIN;
-
-    //const protocal = isProduction ? "https://" : "http://"
-    //const port = isProduction ? '' : process.env.PORT;
-
     const user = req.user || {};
-    
 
     res.render('dashboard', { user, protocal, domainName });
+}
+
+async function renderProductCatalog(req, res) {
+    const user = req.user;
+    res.render('product-catalog', { user, protocal, domainName, type: 'admin' });
 }
 
 async function renderBusinessApplications(req, res) {
@@ -144,5 +141,6 @@ module.exports = {
     renderBusinessApplications,
     renderLoginPage,
     renderAccountSelection,
+    renderProductCatalog,
     signout
 }

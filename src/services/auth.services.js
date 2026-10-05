@@ -28,7 +28,9 @@ class AuthService {
             user = await authModel.getUserByUsernameOrEmail(identifier);
 
             if (!user) {
-                throw new Error(`Account not found — This might be a temporary error, you may try again`);
+                //throw new Error(`Account not found — This might be a temporary error, you may try again`);
+
+                throw new Error(`Session terminated — Please try to log in again`);
             }
 
             const match = await bcrypt.compare(password, user.password_hash);

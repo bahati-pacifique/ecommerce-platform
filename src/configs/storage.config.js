@@ -1,6 +1,5 @@
-const path = require('path');
-
 module.exports = {
+
     root: '/var/www/cococe-storage',
 
     images: '/var/www/cococe-storage/images',
@@ -17,12 +16,22 @@ module.exports = {
 
     vids: '/var/www/cococe-storage/vids',
 
-    //Generic file
+    // Generic files
     files: '/var/www/cococe-storage/files',
 
-    //Public profile & portfolios images
+
+    // Public profile & portfolio images
     profiles: '/var/www/cococe-storage/images/users/profiles',
+
     profileIds: '/var/www/cococe-storage/images/users/ids',
-    
+
+
+    // Product media
+    products: '/var/www/cococe-storage/products',
+
+    productImages: '/var/www/cococe-storage/products/images',
+
+
+    // Business files
     business: '/var/www/cococe-storage/business'
 };

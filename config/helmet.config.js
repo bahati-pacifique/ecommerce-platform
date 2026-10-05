@@ -96,6 +96,7 @@ module.exports = {
                 "'unsafe-inline'",
                 "https://cdn.tailwindcss.com",
                 "https://cdn.jsdelivr.net",
+                "https://jsdelivr.net/",
                 "https://cdnjs.cloudflare.com",
                 "https://unpkg.com",
                 "https://code.jquery.com",

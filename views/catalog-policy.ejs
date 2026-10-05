@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Catalog Policy — COCOCE</title>
+  <meta name="description" content="How the COCOCE marketplace product catalog works — what can be added, by whom, how it is reviewed, and how it can be changed.">
+  <link rel="icon" href="/favicon.ico" type="image/x-icon">
+
+  <link rel="stylesheet" href="/styles/main.css">
+
+  <meta property="og:image" content="https://cdn.cococe.rw/branding/brand/logos/cococe.png">
+  <meta property="og:url" content="https://www.cococe.rw">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Laptops, Printers, Accessories, Game consoles, Electronics, and much more, cococe, your wish our priority">
+  <meta property="og:description" content="COCOCE Kigali Rwanda, Laptops, Desktops, Computer accessories, Smart tv, projectors, discover what you want about digital assets near you at Kigali">
+  <meta property="og:logo" content="https://cdn.cococe.rw/branding/brand/logos/cococe.png" />
+  <meta name="twitter:card" content="https://cdn.cococe.rw/branding/brand/logos/cococe.png">
+
+  <meta property="twitter:domain" content="https://cococe.rw">
+  <meta property="twitter:url" content="https://cococe.rw">
+  <meta name="twitter:title" content="Laptops, Printers, Accessories, Game consoles, Electronics, and much more, cococe, your wish our priority">
+  <meta name="twitter:description" content="COCOCE Kigali Rwanda, Laptops, Desktops, Computer accessories, Smart tv, projectors, discover what you want about digital assets near you at Kigali">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    html {
+      -webkit-text-size-adjust: 100%;
+      scroll-behavior: smooth;
+      scrollbar-gutter: stable;
+      overflow-x: clip;
+    }
+
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: #F8FAFC;
+      color: #0F172A;
+      min-height: 100vh;
+      margin: 0;
+      overflow-x: clip;
+    }
+
+    html,
+    body {
+      min-width: 0;
+      max-width: 100%;
+    }
+
+    [id] {
+      scroll-margin-top: 88px;
+    }
+
+    .prose-doc {
+      color: #334155;
+      line-height: 1.75;
+      font-size: 15px;
+    }
+
+    .prose-doc p {
+      margin: 0 0 1rem;
+    }
+
+    .prose-doc strong {
+      color: #0F172A;
+      font-weight: 600;
+    }
+
+    .prose-doc a {
+      color: #ED1B24;
+      text-decoration: none;
+      border-bottom: 1px solid rgba(237, 27, 36, 0.25);
+      transition: border-color .15s ease;
+    }
+
+    .prose-doc a:hover {
+      border-color: #ED1B24;
+    }
+
+    .prose-doc ul,
+    .prose-doc ol {
+      margin: 0 0 1rem 1.25rem;
+      padding: 0;
+    }
+
+    .prose-doc li {
+      margin-bottom: .4rem;
+    }
+
+    .prose-doc code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 0.85em;
+      background: #F1F5F9;
+      border: 1px solid #E2E8F0;
+      border-radius: 4px;
+      padding: 1px 5px;
+      color: #0F172A;
+    }
+
+    .toc-link.active {
+      color: #ED1B24;
+      border-left-color: #ED1B24;
+      font-weight: 600;
+    }
+
+    /* Callouts */
+    .callout {
+      border-radius: 12px;
+      padding: 14px 16px;
+      display: flex;
+      gap: 12px;
+      margin: 1rem 0;
+    }
+
+    .callout-icon {
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .callout-info {
+      background: #EFF6FF;
+      border: 1px solid #BFDBFE;
+      color: #1E3A8A;
+    }
+
+    .callout-warn {
+      background: #FFFBEB;
+      border: 1px solid #FDE68A;
+      color: #92400E;
+    }
+
+    .callout-danger {
+      background: #FEF2F2;
+      border: 1px solid #FECACA;
+      color: #991B1B;
+    }
+
+    .callout p:last-child {
+      margin-bottom: 0;
+    }
+
+    /* Data table */
+    .policy-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+      border: 1px solid #E2E8F0;
+      border-radius: 12px;
+      overflow: hidden;
+      margin: 1rem 0;
+    }
+
+    .policy-table th {
+      background: #F8FAFC;
+      text-align: left;
+      font-size: 11px;
+      font-weight: 600;
+      color: #64748B;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+      padding: 10px 14px;
+      border-bottom: 1px solid #E2E8F0;
+    }
+
+    .policy-table td {
+      padding: 12px 14px;
+      border-bottom: 1px solid #F1F5F9;
+      color: #334155;
+      vertical-align: top;
+    }
+
+    .policy-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .policy-table tr:hover td {
+      background: #F8FAFC;
+    }
+
+    @media print {
+
+      header,
+      footer,
+      aside,
+      .no-print {
+        display: none !important;
+      }
+
+      body {
+        background: white;
+      }
+
+      .prose-doc {
+        font-size: 12pt;
+      }
+
+      a {
+        border: none;
+        color: #0F172A;
+      }
+
+      .callout {
+        break-inside: avoid;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <header class="sticky top-0 z-40 border-b border-ink-200/70 bg-white/85 backdrop-blur no-print">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between gap-3">
+      <a href="<%= locals.protocal %><%= locals.domainName %>" class="flex items-center gap-2 flex-shrink-0">
+        <img src="https://cdn.cococe.rw/branding/brand/logos/cococe.png?v=<%-new Date().getTime()%>" alt="COCOCE" class="h-8">
+      </a>
+      <nav class="flex items-center gap-2">
+        <a href="<%= locals.protocal %>business.<%= locals.domainName %>/dashboard" class="hidden sm:inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium text-ink-700 hover:bg-ink-100 transition">
+          <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
+          Dashboard
+        </a>
+        
+        <a href="<%= locals.protocal %>admin.<%= locals.domainName %>/dashboard" class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-brand text-white text-xs font-semibold hover:bg-brand-dark transition">
+          <i data-lucide="shield-cog-corner" class="w-4 h-4"></i>
+          Admin Dashboard
+        </a>
+        
+      </nav>
+    </div>
+  </header>
+
+  <section class="max-w-5xl mx-auto px-4 sm:px-6 pt-8 sm:pt-12">
+    <div class="max-w-3xl">
+      <p class="text-xs font-semibold uppercase tracking-wider text-brand">Policy</p>
+      <h1 class="mt-1 text-3xl sm:text-4xl font-bold tracking-tight text-ink-900">
+        Catalog Policy
+      </h1>
+      <p class="mt-3 text-base text-ink-500 leading-relaxed">
+        How COCOCE's shared product catalog is built, governed, and kept trustworthy —
+        and what vendors and admin staff can and cannot change.
+      </p>
+
+      <div class="mt-5 flex flex-wrap items-center gap-3 text-xs text-ink-400">
+        <span class="inline-flex items-center gap-1.5">
+          <i data-lucide="calendar" class="w-3.5 h-3.5"></i>
+          Last updated: <%= locals.updatedAt || 'Latest' %>
+        </span>
+        <span aria-hidden="true">·</span>
+        <span class="inline-flex items-center gap-1.5">
+          <i data-lucide="users" class="w-3.5 h-3.5"></i>
+          Applies to: all vendors and admin staff
+        </span>
+      </div>
+    </div>
+  </section>
+
+  <div class="max-w-5xl mx-auto px-4 sm:px-6 py-10 sm:py-12 grid lg:grid-cols-[220px_1fr] gap-8">
+
+    <aside class="hidden lg:block no-print">
+      <nav class="sticky top-20 text-sm" aria-label="On this page">
+        <p class="text-[11px] uppercase tracking-wider font-semibold text-ink-400 mb-3">On this page</p>
+        <ul class="space-y-0.5">
+          <li><a href="#purpose" class="toc-link block border-l-2 border-transparent pl-3 py-1.5 text-ink-500 hover:text-ink-900 transition">1. Purpose</a></li>
+          <li><a href="#structure" class="toc-link block border-l-2 border-transparent pl-3 py-1.5 text-ink-500 hover:text-ink-900 transition">2. Catalog structure</a></li>
+          <li><a href="#roles" class="toc-link block border-l-2 border-transparent pl-3 py-1.5 text-ink-500 hover:text-ink-900 transition">3. Roles &amp; permissions</a></li>
+          <li><a href="#additions" class="toc-link block border-l-2 border-transparent pl-3 py-1.5 text-ink-500 hover:text-ink-900 transition">4. Catalog additions</a></li>
+          <li><a href="#naming" class="toc-link block border-l-2 border-transparent pl-3 py-1.5 text-ink-500 hover:text-ink-900 transition">5. Naming conventions</a></li>
+          <li><a href="#review" class="toc-link block border-l-2 border-transparent pl-3 py-1.5 text-ink-500 hover:text-ink-900 transition">6. Review process</a></li>
+          <li><a href="#edits" class="toc-link block border-l-2 border-transparent pl-3 py-1.5 text-ink-500 hover:text-ink-900 transition">7. Edits, disabling, removal</a></li>
+          <li><a href="#duplicates" class="toc-link block border-l-2 border-transparent pl-3 py-1.5 text-ink-500 hover:text-ink-900 transition">8. Duplicates &amp; cleanup</a></li>
+          <li><a href="#media" class="toc-link block border-l-2 border-transparent pl-3 py-1.5 text-ink-500 hover:text-ink-900 transition">9. Product media</a></li>
+          <li><a href="#enforcement" class="toc-link block border-l-2 border-transparent pl-3 py-1.5 text-ink-500 hover:text-ink-900 transition">10. Enforcement</a></li>
+          <li><a href="#appeals" class="toc-link block border-l-2 border-transparent pl-3 py-1.5 text-ink-500 hover:text-ink-900 transition">11. Appeals</a></li>
+          <li><a href="#contact" class="toc-link block border-l-2 border-transparent pl-3 py-1.5 text-ink-500 hover:text-ink-900 transition">12. Contact</a></li>
+        </ul>
+      </nav>
+    </aside>
+
+    <article class="prose-doc min-w-0">
+
+      <section id="purpose">
+        <h2 class="text-xl font-bold text-ink-900 mb-3">1. Purpose</h2>
+        <p>
+          The COCOCE product catalog is a <strong>shared, verified registry</strong> of products,
+          families, brands, and attributes used across every store on the marketplace. Its purpose
+          is to give buyers consistent, filterable, and comparable product data — and to give
+          vendors a clean, non-duplicated vocabulary for listing what they sell.
+        </p>
+        <p>
+          This policy describes how the catalog is structured, who may change it, how changes are
+          reviewed, and what happens when the rules are broken. It supplements — and does not
+          replace — the <a href="/terms">Marketplace Terms &amp; Conditions</a>.
+        </p>
+      </section>
+
+      <section id="structure" class="mt-10">
+        <h2 class="text-xl font-bold text-ink-900 mb-3">2. Catalog structure</h2>
+        <p>
+          The catalog is organized as a hierarchy. Each level has a distinct meaning and a
+          distinct lifecycle.
+        </p>
+
+        <pre class="rounded-xl border border-ink-200 bg-ink-50 p-4 text-xs overflow-x-auto"><code>Category
+  └── Family
+        └── Brand
+              └── Product
+                    ├── Product Variant
+                    │     └── Variant Attributes
+                    └── Media</code></pre>
+
+        <table class="policy-table">
+          <thead>
+            <tr>
+              <th>Level</th>
+              <th>Represents</th>
+              <th>Example</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Category</strong></td>
+              <td>Broad grouping of products</td>
+              <td>Computers, Electronics, Audio</td>
+            </tr>
+            <tr>
+              <td><strong>Family</strong></td>
+              <td>Type of product within a category</td>
+              <td>Laptops, Smartphones, Headphones</td>
+            </tr>
+            <tr>
+              <td><strong>Brand</strong></td>
+              <td>Manufacturer or marque</td>
+              <td>Dell, Apple, Sony</td>
+            </tr>
+            <tr>
+              <td><strong>Product</strong></td>
+              <td>Canonical marketplace product</td>
+              <td>Dell XPS 13</td>
+            </tr>
+            <tr>
+              <td><strong>Variant</strong></td>
+              <td>Specific configuration of a product</td>
+              <td>XPS 13 / 16GB / 512GB / Silver</td>
+            </tr>
+            <tr>
+              <td><strong>Attribute</strong></td>
+              <td>Shared property used in variants</td>
+              <td>Color, RAM Type, Storage</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="callout callout-info">
+          <i data-lucide="info" class="w-5 h-5 callout-icon"></i>
+          <div>
+            <p class="text-sm leading-relaxed">
+              <strong>Attributes are shared across families.</strong> The <code>Color</code>
+              attribute is used by laptops, phones, headphones, and many others. Adding a value
+              to an attribute affects every family that uses it.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section id="roles" class="mt-10">
+        <h2 class="text-xl font-bold text-ink-900 mb-3">3. Roles &amp; permissions</h2>
+        <p>
+          The catalog distinguishes between <strong>additive</strong> operations that vendors
+          can perform freely and <strong>structural</strong> operations reserved for admin staff.
+        </p>
+
+        <table class="policy-table">
+          <thead>
+            <tr>
+              <th style="width:55%">Operation</th>
+              <th style="width:22.5%">Vendor</th>
+              <th style="width:22.5%">Admin</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Register a new product</td>
+              <td>Request</td>
+              <td>Direct</td>
+            </tr>
+            <tr>
+              <td>Add a new attribute value</td>
+              <td>Direct</td>
+              <td>Direct</td>
+            </tr>
+            <tr>
+              <td>Request a new family</td>
+              <td>Request</td>
+              <td>Direct</td>
+            </tr>
+            <tr>
+              <td>Request a new brand</td>
+              <td>Request</td>
+              <td>Direct</td>
+            </tr>
+            <tr>
+              <td>Request a new attribute</td>
+              <td>Request</td>
+              <td>Direct</td>
+            </tr>
+            <tr>
+              <td>Edit a value you created</td>
+              <td>Direct</td>
+              <td>Direct</td>
+            </tr>
+            <tr>
+              <td>Edit a value created by another vendor</td>
+              <td>No</td>
+              <td>Direct</td>
+            </tr>
+            <tr>
+              <td>Disable an attribute or value</td>
+              <td>No</td>
+              <td>Direct</td>
+            </tr>
+            <tr>
+              <td>Rename an attribute</td>
+              <td>No</td>
+              <td>Direct</td>
+            </tr>
+            <tr>
+              <td>Delete an attribute or value</td>
+              <td>No</td>
+              <td>Direct</td>
+            </tr>
+            <tr>
+              <td>Approve or reject requests</td>
+              <td>No</td>
+              <td>Direct</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="callout callout-warn">
+          <i data-lucide="alert-triangle" class="w-5 h-5 callout-icon"></i>
+          <div>
+            <p class="text-sm leading-relaxed">
+              <strong>Why the split?</strong> The catalog is shared. If any vendor could rename
+              or delete a catalog entry, every other vendor's listings would break silently.
+              The audit trail on every catalog row makes every change traceable to a specific
+              privileged user.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section id="additions" class="mt-10">
+        <h2 class="text-xl font-bold text-ink-900 mb-3">4. Catalog additions</h2>
+
+        <h3 class="mt-5 mb-2 text-base font-semibold text-ink-900">Products</h3>
+        <p>
+          Products are the primary thing vendors add. A product is a canonical entry in the
+          shared catalog — it is not a store listing, and it does not carry price, stock, or
+          seller-specific conditions.
+        </p>
+        <ul>
+          <li>Every product belongs to exactly one family and one brand;</li>
+          <li>Product titles follow the conventions in §5;</li>
+          <li>Every product must have at least one image and at least one variant;</li>
+          <li>Variant attribute combinations must be unique within a product;</li>
+          <li>New products enter the review queue (see §6).</li>
+        </ul>
+
+        <h3 class="mt-5 mb-2 text-base font-semibold text-ink-900">Attribute values</h3>
+        <p>
+          Vendors may add new values to existing attributes without review. This is the most
+          common catalog addition and should be done freely — but carefully.
+        </p>
+        <ul>
+          <li>Values must match the format and conventions of sibling values;</li>
+          <li>Values must be unique within their attribute (case-insensitive);</li>
+          <li>Values may carry optional metadata (see §9);</li>
+          <li>Values added by a vendor belong to the marketplace, not the vendor.</li>
+        </ul>
+
+        <h3 class="mt-5 mb-2 text-base font-semibold text-ink-900">Families, brands, attributes</h3>
+        <p>
+          New families, brands, and attributes require admin approval. Vendors submit a request
+          with a short justification, and the admin team reviews it. Approved requests become
+          part of the shared catalog and are visible to all vendors.
+        </p>
+      </section>
+
+      <section id="naming" class="mt-10">
+        <h2 class="text-xl font-bold text-ink-900 mb-3">5. Naming conventions</h2>
+        <p>
+          Consistent naming is what makes the catalog usable. All catalog entries must follow
+          the conventions below.
+        </p>
+
+        <table class="policy-table">
+          <thead>
+            <tr>
+              <th style="width:30%">Level</th>
+              <th style="width:35%">Rule</th>
+              <th style="width:35%">Examples</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Family</td>
+              <td>Plural, Title Case</td>
+              <td>Laptops · Smartphones · Tablets</td>
+            </tr>
+            <tr>
+              <td>Brand</td>
+              <td>Official brand name, as the manufacturer writes it</td>
+              <td>Dell · HP · Samsung</td>
+            </tr>
+            <tr>
+              <td>Attribute</td>
+              <td>Singular, Title Case, no abbreviations</td>
+              <td>Color · RAM Type · Screen Size</td>
+            </tr>
+            <tr>
+              <td>Attribute value</td>
+              <td>Consistent with siblings — same units, casing, spacing</td>
+              <td>16GB · 512GB · 1TB</td>
+            </tr>
+            <tr>
+              <td>Product</td>
+              <td>Brand + model. No color, size, or configuration.</td>
+              <td>Dell XPS 13 · iPhone 15 Pro · Sony WH-1000XM5</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="callout callout-warn">
+          <i data-lucide="alert-circle" class="w-5 h-5 callout-icon"></i>
+          <div>
+            <p class="text-sm leading-relaxed">
+              <strong>Do not mix formats within an attribute.</strong> If existing values
+              are <em>8GB</em>, <em>16GB</em>, <em>32GB</em>, do not add <em>8 GB</em> or
+              <em>16 gb</em>. Look at the existing values before adding a new one.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section id="review" class="mt-10">
+        <h2 class="text-xl font-bold text-ink-900 mb-3">6. Review process</h2>
+        <p>
+          Submissions that require review enter a queue. The admin team evaluates each submission
+          against this policy and either approves it, rejects it with a reason, or requests
+          clarification.
+        </p>
+
+        <h3 class="mt-5 mb-2 text-base font-semibold text-ink-900">Timeline</h3>
+        <ul>
+          <li>Most reviews are completed within a few business days;</li>
+          <li>Complex submissions may take longer;</li>
+          <li>Vendors are notified when their submission is approved or denied;</li>
+          <li>Denied submissions include a reason and can be revised and resubmitted.</li>
+        </ul>
+
+        <h3 class="mt-5 mb-2 text-base font-semibold text-ink-900">What reviewers consider</h3>
+        <ul>
+          <li><strong>Accuracy</strong> — Does the submission describe the product correctly?</li>
+          <li><strong>Uniqueness</strong> — Does an equivalent entry already exist?</li>
+          <li><strong>Completeness</strong> — Are required fields, images, and variants present?</li>
+          <li><strong>Compliance</strong> — Does it comply with this policy and applicable law?</li>
+          <li><strong>Fit</strong> — Is it appropriate for the COCOCE catalog and audience?</li>
+        </ul>
+
+        <h3 class="mt-5 mb-2 text-base font-semibold text-ink-900">Why submissions are rejected</h3>
+        <ul>
+          <li>Duplicate of an existing product, brand, or family;</li>
+          <li>Product title includes a configuration, color, or size;</li>
+          <li>Description contains marketing claims or promotional language;</li>
+          <li>Missing images, variants, or other required information;</li>
+          <li>Product is a prohibited item under the Marketplace Terms;</li>
+          <li>Information cannot be verified or is clearly inaccurate.</li>
+        </ul>
+      </section>
+
+      <section id="edits" class="mt-10">
+        <h2 class="text-xl font-bold text-ink-900 mb-3">7. Edits, disabling, and removal</h2>
+        <p>
+          Once a catalog entry is in active use, changes to it have consequences for every
+          listing that references it. The catalog therefore treats edits conservatively.
+        </p>
+
+        <div class="callout callout-danger">
+          <i data-lucide="shield-alert" class="w-5 h-5 callout-icon"></i>
+          <div>
+            <p class="text-sm leading-relaxed">
+              <strong>Only admin staff may edit, disable, or remove a catalog entry once it
+                has been published.</strong> This applies to products, families, brands, attributes,
+              and attribute values.
+            </p>
+          </div>
+        </div>
+
+        <h3 class="mt-5 mb-2 text-base font-semibold text-ink-900">Disabling vs. deleting</h3>
+        <p>
+          Disabling is preferred over deleting. When an entry is disabled:
+        </p>
+        <ul>
+          <li>It is hidden from new listings and product registration;</li>
+          <li>Existing listings that reference it continue to render correctly;</li>
+          <li>The entry can be re-enabled if the change was a mistake.</li>
+        </ul>
+        <p>
+          Deletion is reserved for duplicates, errors caught early, and entries that violate
+          this policy.
+        </p>
+
+        <h3 class="mt-5 mb-2 text-base font-semibold text-ink-900">What vendors can still edit</h3>
+        <ul>
+          <li>Values you created, before other listings depend on them;</li>
+          <li>Values you created, to correct typos or fix metadata;</li>
+          <li>Products you registered that are still in <code>draft</code> or <code>requested</code> state.</li>
+        </ul>
+      </section>
+
+      <section id="duplicates" class="mt-10">
+        <h2 class="text-xl font-bold text-ink-900 mb-3">8. Duplicates and cleanup</h2>
+        <p>
+          Duplicates degrade the catalog: they split data across entries, break filters, and
+          confuse buyers. The platform rejects exact duplicates automatically, but near-duplicates
+          are the vendor's responsibility.
+        </p>
+
+        <h3 class="mt-5 mb-2 text-base font-semibold text-ink-900">What counts as a duplicate</h3>
+        <ul>
+          <li><strong>Exact</strong> — same title, case-insensitive (rejected by the platform);</li>
+          <li><strong>Near</strong> — different casing, spacing, or punctuation (<em>Grey</em> vs <em>Gray</em>);</li>
+          <li><strong>Semantic</strong> — different words, same meaning (<em>1TB</em> vs <em>1000GB</em>);</li>
+          <li><strong>Structural</strong> — two families, brands, or attributes that mean the same thing.</li>
+        </ul>
+
+        <h3 class="mt-5 mb-2 text-base font-semibold text-ink-900">Cleanup</h3>
+        <p>
+          Admin staff periodically review the catalog for duplicates and inconsistencies.
+          Where duplicates are found:
+        </p>
+        <ul>
+          <li>Listings are migrated to the canonical entry where possible;</li>
+          <li>The duplicate is disabled, then removed;</li>
+          <li>Vendors whose listings are affected are notified.</li>
+        </ul>
+      </section>
+
+      <section id="media" class="mt-10">
+        <h2 class="text-xl font-bold text-ink-900 mb-3">9. Product media</h2>
+        <p>
+          Product images are part of the shared catalog. Once a product is approved, its
+          images are visible to all vendors who list that product.
+        </p>
+
+        <h3 class="mt-5 mb-2 text-base font-semibold text-ink-900">Requirements</h3>
+        <ul>
+          <li>Minimum 1 image; maximum 10 images per product;</li>
+          <li>Formats: JPEG, PNG, WebP — max 5MB each;</li>
+          <li>The first image is the primary image and is used as the thumbnail;</li>
+          <li>Images must be your own, or licensed for commercial use;</li>
+          <li>Images must depict the actual product — no renders, stock photos of unrelated items, or misleading visuals.</li>
+        </ul>
+
+        <h3 class="mt-5 mb-2 text-base font-semibold text-ink-900">Prohibited image content</h3>
+        <ul>
+          <li>Watermarks, promotional text, prices, or contact details;</li>
+          <li>Logos of stores other than the manufacturer's brand;</li>
+          <li>Nudity, violence, or otherwise offensive content;</li>
+          <li>Images that infringe third-party copyright or trademark.</li>
+        </ul>
+
+        <h3 class="mt-5 mb-2 text-base font-semibold text-ink-900">Metadata on attribute values</h3>
+        <p>
+          Attribute values may carry optional metadata — such as color codes for the
+          <code>Color</code> attribute or pros/cons for the <code>RAM Type</code> attribute.
+          Metadata is stored as key-value pairs and follows the same review and edit rules
+          as the value itself.
+        </p>
+      </section>
+
+      <section id="enforcement" class="mt-10">
+        <h2 class="text-xl font-bold text-ink-900 mb-3">10. Enforcement</h2>
+        <p>
+          Violations of this policy are handled proportionally to their severity and frequency.
+        </p>
+
+        <table class="policy-table">
+          <thead>
+            <tr>
+              <th style="width:45%">Violation</th>
+              <th style="width:55%">Consequence</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Formatting inconsistency in a value</td>
+              <td>Value corrected by admin; vendor notified</td>
+            </tr>
+            <tr>
+              <td>Duplicate value or attribute</td>
+              <td>Entry disabled or merged; vendor notified</td>
+            </tr>
+            <tr>
+              <td>Product submitted with insufficient information</td>
+              <td>Submission rejected with reason; vendor may resubmit</td>
+            </tr>
+            <tr>
+              <td>Repeated low-quality submissions</td>
+              <td>Submission privileges restricted; direct registration disabled</td>
+            </tr>
+            <tr>
+              <td>Deliberate falsification of catalog data</td>
+              <td>Listings removed; account suspended pending review</td>
+            </tr>
+            <tr>
+              <td>Uploading prohibited media or content</td>
+              <td>Content removed; possible account termination</td>
+            </tr>
+            <tr>
+              <td>Fraudulent or abusive use of the catalog</td>
+              <td>Account termination; possible referral to authorities</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section id="appeals" class="mt-10">
+        <h2 class="text-xl font-bold text-ink-900 mb-3">11. Appeals</h2>
+        <p>
+          If your submission is rejected, or if a catalog change affects your listings and you
+          believe the decision was incorrect, you can appeal.
+        </p>
+        <ul>
+          <li>Appeals are submitted by email to <a href="mailto:sales@cococe.rw">catalog@cococe.rw</a>;</li>
+          <li>Include the relevant product, attribute, or submission reference;</li>
+          <li>Explain the grounds for your appeal and any supporting evidence;</li>
+          <li>Appeals are reviewed by a different member of the catalog team where possible;</li>
+          <li>You will receive a written decision within ten business days.</li>
+        </ul>
+      </section>
+
+      <section id="contact" class="mt-10">
+        <h2 class="text-xl font-bold text-ink-900 mb-3">12. Contact</h2>
+        <p>For questions about this policy:</p>
+        <ul>
+          <li>Catalog team — <a href="mailto:sales@cococe.rw">catalog@cococe.rw</a></li>
+          <li>General support — <a href="mailto:sales@cococe.rw">support@cococe.rw</a></li>
+          <li>Legal — <a href="mailto:sales@cococe.rw">legal@cococe.rw</a></li>
+        </ul>
+        <p>
+          For a condensed, vendor-facing summary of how attributes work, see the
+          <a href="/docs/attributes-registry-terms">Attribute Registry</a> documentation.
+        </p>
+      </section>
+
+      <section class="mt-12 pt-6 border-t border-ink-200">
+        <p class="text-xs text-ink-400">
+          This policy is maintained by the COCOCE catalog team and reviewed periodically.
+          It supplements the <a href="/docs/marketplace-terms">Marketplace Terms &amp; Conditions</a>. Where
+          this policy and the Terms conflict on a legal matter, the Terms prevail.
+        </p>
+      </section>
+
+    </article>
+  </div>
+
+  <footer class="border-t border-ink-200 bg-white/60 no-print">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 py-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-ink-400">
+      <span>© 2026 <span class="text-brand font-extrabold">COCOCE</span> — Catalog Policy</span>
+      <div class="flex flex-wrap gap-x-6 gap-y-2 justify-center">
+        <a href="/docs/marketplace-terms" class="hover:text-brand transition">Terms</a>
+        <a href="/privacy" class="hover:text-brand transition">Privacy</a>
+        <a href="/docs/docs/catalog-terms" class="hover:text-brand transition">Catalog Terms</a>
+        <a href="/docs/attributes-registry-terms" class="hover:text-brand transition">Attribute Registry</a>
+        <a href="mailto:sales@cococe.rw" class="hover:text-brand transition">Support</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    lucide.createIcons();
+
+    (function() {
+      const links = Array.from(document.querySelectorAll('.toc-link'));
+      const targets = links
+        .map(a => document.getElementById(a.getAttribute('href').slice(1)))
+        .filter(Boolean);
+      if (!targets.length) return;
+
+      const io = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (!entry.isIntersecting) return;
+          const id = entry.target.id;
+          links.forEach(a => {
+            a.classList.toggle('active', a.getAttribute('href') === `#${id}`);
+          });
+        });
+      }, {
+        rootMargin: '-88px 0px -60% 0px',
+        threshold: 0
+      });
+      targets.forEach(t => io.observe(t));
+    })();
+  </script>
+
+</body>
+
+</html>

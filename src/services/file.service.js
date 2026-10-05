@@ -1,20 +1,21 @@
 const storage = require('../configs/storage.config');
 
 const path = require('path');
-//import { rm } from 'node:fs/promises';
-const { unlink } = require('node:fs/promises');
+const { unlink, mkdir, writeFile } = require('node:fs/promises');
+
 
 class FileServices {
+
     /**
-     * Moves a file to the user profiles directory
-     * @param {object} file - The file object from express-fileupload (req.files.image)
-     * @returns {string} The generated unique filename
+     * Moves a file to the user profiles directory.
+     *
+     * @param {object} file
+     * @returns {string} saved file path
      */
     static async uploadProfileImage(file) {
 
         const fileName = file.name;
 
-        // Construct destination path
         const destination = path.join(
             storage.profiles,
             fileName
@@ -22,17 +23,18 @@ class FileServices {
 
         await file.mv(destination);
 
-        //TODO implement Log activity
+        // TODO: implement activity log
 
         return destination;
     }
 
+
     /**
-    * Removes a file from the storage directory.
-    * 
-    * @param {string} relativePath file's relative path
-    * @returns {Promise<boolean>} returns true if file was removed, otherwise throw an error
-    */
+     * Removes a file from the storage directory.
+     *
+     * @param {string} relativePath
+     * @returns {Promise<boolean>}
+     */
     static async removeFile(relativePath) {
 
         const destination = path.join(
@@ -41,18 +43,29 @@ class FileServices {
         );
 
         try {
+
             await unlink(destination);
+
             return true;
+
         } catch (error) {
-            console.error(`Error deleting file: ${error.message}`);
-            throw new Error(`Error deleting file: ${error.message}`)
+
+            console.error(
+                `Error deleting file: ${error.message}`
+            );
+
+            throw new Error(
+                `Error deleting file: ${error.message}`
+            );
         }
     }
 
+
     /**
-     * Uploads and renames a business user photo ID based on their User ID
-     * @param {object} file - The uploaded file object
-     * @returns {string} The final saved file name
+     * Uploads a business user photo ID.
+     *
+     * @param {object} file
+     * @returns {string} saved file path
      */
     static async uploadUserPhotoId(file) {
 
@@ -63,15 +76,22 @@ class FileServices {
             fileName
         );
 
-        // Save the file
         await file.mv(destination);
 
-        console.log('User id copy image uploaded')
+        console.log(
+            'User id copy image uploaded'
+        );
 
-        // Return the final file name so the controller can save it to the DB
         return destination;
     }
 
+
+    /**
+     * Uploads a store avatar.
+     *
+     * @param {object} file
+     * @returns {string} saved file path
+     */
     static async uploadStoreAvatar(file) {
 
         const fileName = file.name;
@@ -83,13 +103,103 @@ class FileServices {
             fileName
         );
 
-        // Save the file
         await file.mv(destination);
 
-        // Return the final file name so the controller can save it to the DB
         return destination;
     }
 
+
+    /**
+     * Saves a processed product image.
+     *
+     * Product images are already processed by Sharp,
+     * so this method receives a Buffer instead of
+     * the original express-fileupload file.
+     *
+     * Storage structure:
+     *
+     * products/
+     *   {productId}/
+     *     images/
+     *       {mediaId}.webp
+     *
+     * @param {Buffer} buffer
+     * @param {string} productId
+     * @param {string} mediaId
+     * @returns {Promise<Object>}
+     */
+    static async saveProductImage(
+        buffer,
+        productId,
+        mediaId
+    ) {
+
+        if (!Buffer.isBuffer(buffer)) {
+            throw new TypeError(
+                'Product image buffer is required'
+            );
+        }
+
+        if (!productId) {
+            throw new Error(
+                'Product ID is required'
+            );
+        }
+
+        if (!mediaId) {
+            throw new Error(
+                'Media ID is required'
+            );
+        }
+
+
+        const directory = path.join(
+            storage.products,
+            'images',
+            productId
+            
+        );
+
+
+        await mkdir(directory, {
+            recursive: true
+        });
+
+
+        const fileName =
+            `${mediaId}.webp`;
+
+
+        const destination =
+            path.join(
+                directory,
+                fileName
+            );
+
+
+        await writeFile(
+            destination,
+            buffer
+        );
+
+
+        const storageKey =
+            path.posix.join(
+                'products',
+                productId,
+                'images',
+                fileName
+            );
+
+
+        return {
+            storageKey,
+            path: destination,
+            fileName,
+            size: buffer.length
+        };
+    }
 }
+
 
 module.exports = FileServices;

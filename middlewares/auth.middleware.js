@@ -270,7 +270,6 @@ function authPass({ acceptedTypes }) {
                         redirectTo: `${sslUrlPrefix}auth.${process.env.DOMAIN}`
                     })
                 }
-                //return deny401(req, res, { message: 'We detect suspicious activity. Please loginto continue' })
             }
 
             const user = {
@@ -361,7 +360,6 @@ function authPass({ acceptedTypes }) {
                 return res.redirect(`${sslUrlPrefix}auth.${process.env.DOMAIN}${portSuffix}?r=${to}`)
                 //return res.redirect(`${sslUrlPrefix}auth.${process.env.DOMAIN}${portSuffix}`)
             } else {
-
                 return res.status(401).json({
                     authenticated: false,
                     success: false,
@@ -370,7 +368,7 @@ function authPass({ acceptedTypes }) {
                     message: 'Authentication failed — Please login to continue'
                 })
             }
-            //return deny401(req, res, { message: 'Please login to continue', originalUrl: req.originalUrl });
+            
         }
 
         const userId = refreshToken.userId;

@@ -23,7 +23,16 @@ const {
     deny401,
     deny403
 } = require('../../../util/helpers');
+
 const authServices = require('../../../src/services/auth.services');
+
+const isProduction = process.env.NODE_ENV === 'production';
+const sslUrlPrefix = isProduction ? 'https://' : 'http://';
+
+const portSuffix = isProduction ? '' : `:${process.env.PORT}`;
+
+const protocal = sslUrlPrefix;
+const domainName = `${process.env.DOMAIN}${portSuffix}`;
 
 // function isAllowedHost(hostname) {
 //     return (
@@ -79,6 +88,8 @@ const authServices = require('../../../src/services/auth.services');
 //         redirectTo: '/'
 //     })
 // }
+
+
 
 function renderLoginPage(req, res) {
 
@@ -144,10 +155,12 @@ function renderLoginPage(req, res) {
     }
 
     return res.render("auth", {
+        protocal,
+        domainName,
         message: sessionMsg || '',
         referer: redirectTo,
         logo: homeImageUrl,
-        heroMessage
+        heroMessage,
     });
 }
 
@@ -501,9 +514,19 @@ async function signout(req, res) {
     }
 }
 
+function renderAuthPrivacy(req, res) {
+    return res.render('auth-privacy', {protocal, domainName});
+}
+
+function renderAuthTerms(req, res) {
+    return res.render('auth-terms', {protocal, domainName});
+}
+
 module.exports = {
     renderLoginPage,
     renderAccountSelection,
+    renderAuthPrivacy,
+    renderAuthTerms,
     login,
     accountLogin,
     signout

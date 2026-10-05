@@ -93,21 +93,24 @@ let familiesManager = null;
 let ordersManager = null;
 let brandsManager = null;
 let attributesManager = null;
+let analyticsManager = null;
+let overViewManager = null;
+
+if (activeTab === 'overview') {
+    overViewManager = new OverviewManager();
+}
 
 sidebarLinks.forEach(link => {
     link.addEventListener('click', function (e) {
         e.preventDefault();
 
-        // Remove active from all links
         sidebarLinks.forEach(l => l.classList.remove('active'));
         this.classList.add('active');
 
-        // Hide all tab contents
         Object.values(tabContents).forEach(content => {
             if (content) content.classList.remove('active');
         });
 
-        // Show selected tab
         const tabId = this.dataset.tab;
 
         switch (tabId) {
@@ -156,7 +159,16 @@ sidebarLinks.forEach(link => {
                 if (!attributesManager) {
                     attributesManager = new AttributesManager();
                 }
-                //attributesManager._resumed();
+                break;
+            case 'analytics':
+                if (!analyticsManager) {
+                    analyticsManager = new AnalyticsManager();
+                }
+                break;
+            case 'overview':
+                if (!overViewManager) {
+                    overViewManager = new OverviewManager();
+                }
                 break;
         }
 
@@ -191,24 +203,20 @@ function closePopup() {
 
 profileTrigger.addEventListener('click', togglePopup);
 
-// Close popup when clicking outside
 document.addEventListener('click', function (e) {
     if (!profileTrigger.contains(e.target) && !profilePopup.contains(e.target)) {
         closePopup();
     }
 });
 
-// Close popup on Escape key
 document.addEventListener('keydown', function (e) {
     if (e.key === 'Escape' && isPopupOpen) {
         closePopup();
     }
 });
 
-// Popup item actions
 document.getElementById('viewProfileBtn').addEventListener('click', function () {
     closePopup();
-    // Find and click the profile tab
     const profileTab = document.querySelector('.sidebar-link[data-tab="profile"]');
     if (profileTab) profileTab.click();
 });
@@ -219,88 +227,6 @@ document.getElementById('accountSettingsBtn').addEventListener('click', function
     if (settingsTab) settingsTab.click();
 });
 
-// ============================================================
-// CHARTS
-// ============================================================
-// Sales Chart
-const salesCtx = document.getElementById('salesChart')?.getContext('2d');
-if (salesCtx) {
-    new Chart(salesCtx, {
-        type: 'line',
-        data: {
-            labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-            datasets: [{
-                label: 'Sales ($)',
-                data: [1200, 1900, 1500, 2200, 2800, 2100, 2600],
-                borderColor: '#ED1B24',
-                backgroundColor: 'rgba(237, 27, 36, 0.05)',
-                fill: true,
-                tension: 0.4,
-                borderWidth: 2,
-                pointBackgroundColor: '#ED1B24',
-                pointBorderColor: 'white',
-                pointBorderWidth: 2,
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    display: false
-                }
-            },
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    grid: {
-                        color: 'rgba(0,0,0,0.04)'
-                    }
-                },
-                x: {
-                    grid: {
-                        display: false
-                    }
-                }
-            }
-        }
-    });
-}
-
-// Order Status Chart
-const orderCtx = document.getElementById('orderChart')?.getContext('2d');
-if (orderCtx) {
-    new Chart(orderCtx, {
-        type: 'doughnut',
-        data: {
-            labels: ['Completed', 'Processing', 'Pending', 'Cancelled'],
-            datasets: [{
-                data: [1112, 124, 48, 23],
-                backgroundColor: ['#22c55e', '#3b82f6', '#f59e0b', '#ef4444'],
-                borderWidth: 0,
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    position: 'bottom',
-                    labels: {
-                        padding: 12,
-                        usePointStyle: true,
-                        pointStyle: 'circle'
-                    }
-                }
-            },
-            cutout: '70%',
-        }
-    });
-}
-
-// ============================================================
-// QUICK ACTIONS MODAL
-// ============================================================
 const quickActionsBtn = document.getElementById('quickActionsBtn');
 const quickActionsModal = document.getElementById('quickActionsModal');
 
@@ -318,23 +244,12 @@ function closeQuickActions() {
 
 quickActionsBtn.addEventListener('click', openQuickActions);
 
-// Close on Escape
 document.addEventListener('keydown', function (e) {
     if (e.key === 'Escape') {
         if (!quickActionsModal.classList.contains('hidden')) {
             closeQuickActions();
         }
     }
-});
-
-// Quick action links
-document.querySelectorAll('#quickActionsModal a').forEach(link => {
-    link.addEventListener('click', function (e) {
-        e.preventDefault();
-        closeQuickActions();
-        const text = this.querySelector('p')?.textContent || 'Action';
-
-    });
 });
 
 $(document).ready(() => {
@@ -391,8 +306,6 @@ async function fetchAndFillStore() {
 
 (function () {
 
-
-    // ---------- Generic helpers ----------
     function bindClearButton(inputId, clearId) {
         const input = document.getElementById(inputId);
         const clearBtn = document.getElementById(clearId);
@@ -413,7 +326,6 @@ async function fetchAndFillStore() {
         });
     }
 
-    // ---------- ORDERS search ----------
     const ordersInput = document.getElementById('ordersSearchInput');
     const ordersPaymentFilter = document.getElementById('ordersPaymentFilter');
     const ordersDateFilter = document.getElementById('ordersDateFilter');
@@ -482,7 +394,6 @@ async function fetchAndFillStore() {
         }
     }
 
-    // Bind orders events
     bindClearButton('ordersSearchInput', 'ordersSearchClear');
     ordersInput?.addEventListener('input', runOrdersFilter);
     ordersPaymentFilter?.addEventListener('change', runOrdersFilter);

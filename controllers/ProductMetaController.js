@@ -355,7 +355,7 @@ async function hardDeleteBrand(req, res) {
 
 //Attributes
 async function createAttribute(req, res) {
-    
+
     try {
         const attribute = await ProductMetaServices.createAttribute(req.body);
 
@@ -373,7 +373,7 @@ async function insertAttribute(req, res) {
     if (!title) return res.status(400).json({
         message: "Title is required"
     });
-    
+
     try {
         const attribute = await ProductMetaServices.insertAttribute({ title, description, reason, req_by: userId });
 
@@ -406,7 +406,7 @@ async function getRequestedAttributes(req, res) {
     try {
         const userId = req.user?.userId || req.user?.user_id || req.user?.id || null;
 
-        
+
         if (!userId) return res.json({ attributes: [] });
 
         const status = req.params.status;
@@ -513,11 +513,11 @@ async function vendorAttributeValueUpdate(req, res) {
 
     //But Overall currently vendor are not allowed to update/change attribute value:
 
-    return res.status(401).json({success: false, message: 'You are currently not allowed to update attributes catalog'});
-    
+    return res.status(401).json({ success: false, message: 'You are currently not allowed to update attributes catalog' });
+
     //TODO: Implement function on (future) requirement change
     try {
-        
+
         const userId = req.user.userId || req.user.user_id || req.user.id;
 
         //Get attribute by attribute value id
@@ -557,6 +557,24 @@ async function hardDeleteAttributeValue(req, res) {
     } catch (error) {
         const status = error.message === "Not found" ? 404 : 400;
         return formatError('hardDeleteAttributeValue()', status, error, error.message, res);
+    }
+}
+
+async function getAnalyticVendorDashboardData(req, res) {
+    try {
+
+        const vendorId = req.user.vendor?.id;
+
+        if (!vendorId) return res.status(403).json({ message: 'Vendor account not found' });
+
+        const { period } = req.query;
+
+        const result = await ProductMetaServices.getAnalyticVendorDashboardData(vendorId, period);
+
+        return result;
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({ message: 'Unable to get data — Internal Error' })
     }
 }
 
@@ -609,5 +627,7 @@ module.exports = {
     vendorAttributeValueUpdate,
     activateAttributeValue,
     softDeleteAttributeValue,
-    hardDeleteAttributeValue
+    hardDeleteAttributeValue,
+
+    getAnalyticVendorDashboardData
 };

@@ -59,7 +59,7 @@ class VendorService {
             throw new Error(
                 'This user already has a vendor application under review'
             );
-        }else{
+        } else {
             console.log("User has no pend application")
         }
 
@@ -549,20 +549,32 @@ class VendorService {
         return Vendor.getVendorStats();
     }
 
-    static async checkBusinessUsername(username){
+    static async checkBusinessUsername(username) {
         try {
             const isAvailable = await Vendor.checkBusinessUsernameAvailable(username);
             return isAvailable;
         } catch (error) {
-            console.log("checkBusinessUsername(): ",error)
+            console.log("checkBusinessUsername(): ", error)
             return null;
         }
     }
 
-    static async getOrderVendorDashboardData(vendorId, timeFrame){
+    static async getOrderVendorDashboardData(vendorId, timeFrame) {
         if (timeFrame) return Vendor.getOrderVendorDashboardDataTimeFrames(vendorId, timeFrame);
         return await Vendor.getOrderVendorDashboardData(vendorId);
     }
+
+    static async getAnalyticVendorDashboardData(vendorId, period) {
+        return await Vendor.getAnalyticsVendorDashboardData(vendorId, period);
+    }
+
+    static async getVendorOverviewData(vendorId,
+        period = '7d',
+        lowStockThreshold = 5) {
+        return await Vendor.getVendorOverviewData(vendorId, period, lowStockThreshold)
+    }
+
+
 }
 
 module.exports = VendorService;

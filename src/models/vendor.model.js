@@ -72,17 +72,7 @@ const APPLICATION_STATUSES = [
     'rejected'
 ];
 
-
-// ============================================================
-// VENDOR MODEL
-// ============================================================
-
 class Vendor {
-
-
-    // ========================================================
-    // VENDOR APPLICATIONS
-    // ========================================================
 
     /**
      * Submit a new vendor application.
@@ -2265,6 +2255,1326 @@ class Vendor {
             },
 
             stores: []
+        };
+    }
+
+    static async getAnalyticsVendorDashboardData(
+        vendorId,
+        period = '30d'
+    ) {
+
+        const allowedPeriods = [
+            '7d',
+            '30d',
+            '90d',
+            '12m',
+            'all'
+        ];
+
+        if (!allowedPeriods.includes(period)) {
+            throw new Error(
+                "Invalid period. Use '7d', '30d', '90d', '12m', or 'all'."
+            );
+        }
+
+        let currentCondition = '';
+        let previousCondition = '';
+
+        if (period === '7d') {
+
+            currentCondition = `
+            AND so.created_at >= NOW() - INTERVAL '7 days'
+        `;
+
+            previousCondition = `
+            AND so.created_at >= NOW() - INTERVAL '14 days'
+            AND so.created_at < NOW() - INTERVAL '7 days'
+        `;
+
+        } else if (period === '30d') {
+
+            currentCondition = `
+            AND so.created_at >= NOW() - INTERVAL '30 days'
+        `;
+
+            previousCondition = `
+            AND so.created_at >= NOW() - INTERVAL '60 days'
+            AND so.created_at < NOW() - INTERVAL '30 days'
+        `;
+
+        } else if (period === '90d') {
+
+            currentCondition = `
+            AND so.created_at >= NOW() - INTERVAL '90 days'
+        `;
+
+            previousCondition = `
+            AND so.created_at >= NOW() - INTERVAL '180 days'
+            AND so.created_at < NOW() - INTERVAL '90 days'
+        `;
+
+        } else if (period === '12m') {
+
+            currentCondition = `
+            AND so.created_at >= NOW() - INTERVAL '12 months'
+        `;
+
+            previousCondition = `
+            AND so.created_at >= NOW() - INTERVAL '24 months'
+            AND so.created_at < NOW() - INTERVAL '12 months'
+        `;
+        }
+
+        const query = `
+        WITH vendor_stores AS (
+
+            SELECT
+                id,
+                name
+
+            FROM stores
+
+            WHERE vendor_id = $1
+        ),
+
+        /*
+         * Current period orders
+         */
+        current_orders AS (
+
+            SELECT
+                so.id,
+                so.store_id,
+                so.customer_order_id,
+                so.subtotal,
+                so.discount,
+                so.tax,
+                so.shipping_fee,
+                so.total,
+                so.status,
+                so.created_at
+
+            FROM store_orders so
+
+            INNER JOIN vendor_stores vs
+                ON vs.id = so.store_id
+
+            WHERE TRUE
+
+                ${currentCondition}
+        ),
+
+        /*
+         * Previous period orders
+         */
+        previous_orders AS (
+
+            SELECT
+                so.id,
+                so.store_id,
+                so.customer_order_id,
+                so.total,
+                so.status,
+                so.created_at
+
+            FROM store_orders so
+
+            INNER JOIN vendor_stores vs
+                ON vs.id = so.store_id
+
+            WHERE TRUE
+
+                ${previousCondition}
+        ),
+
+        /*
+         * Current overall analytics
+         */
+        current_stats AS (
+
+            SELECT
+
+                COUNT(*)::int AS total_orders,
+
+                COUNT(*) FILTER (
+                    WHERE status <> 'cancelled'
+                )::int AS valid_orders,
+
+                COUNT(*) FILTER (
+                    WHERE status = 'pending'
+                )::int AS pending_orders,
+
+                COUNT(*) FILTER (
+                    WHERE status = 'processing'
+                )::int AS processing_orders,
+
+                COUNT(*) FILTER (
+                    WHERE status = 'shipped'
+                )::int AS shipped_orders,
+
+                COUNT(*) FILTER (
+                    WHERE status = 'delivered'
+                )::int AS delivered_orders,
+
+                COUNT(*) FILTER (
+                    WHERE status = 'cancelled'
+                )::int AS cancelled_orders,
+
+                COALESCE(
+                    SUM(total) FILTER (
+                        WHERE status <> 'cancelled'
+                    ),
+                    0
+                ) AS sales,
+
+                COALESCE(
+                    SUM(subtotal) FILTER (
+                        WHERE status <> 'cancelled'
+                    ),
+                    0
+                ) AS subtotal,
+
+                COALESCE(
+                    SUM(discount) FILTER (
+                        WHERE status <> 'cancelled'
+                    ),
+                    0
+                ) AS discount,
+
+                COALESCE(
+                    SUM(tax) FILTER (
+                        WHERE status <> 'cancelled'
+                    ),
+                    0
+                ) AS tax,
+
+                COALESCE(
+                    SUM(shipping_fee) FILTER (
+                        WHERE status <> 'cancelled'
+                    ),
+                    0
+                ) AS shipping_fee,
+
+                COALESCE(
+                    AVG(total) FILTER (
+                        WHERE status <> 'cancelled'
+                    ),
+                    0
+                ) AS average_order_value
+
+            FROM current_orders
+        ),
+
+        /*
+         * Previous overall analytics
+         */
+        previous_stats AS (
+
+            SELECT
+
+                COUNT(*) FILTER (
+                    WHERE status <> 'cancelled'
+                )::int AS valid_orders,
+
+                COALESCE(
+                    SUM(total) FILTER (
+                        WHERE status <> 'cancelled'
+                    ),
+                    0
+                ) AS sales,
+
+                COALESCE(
+                    AVG(total) FILTER (
+                        WHERE status <> 'cancelled'
+                    ),
+                    0
+                ) AS average_order_value
+
+            FROM previous_orders
+        ),
+
+        /*
+         * Items sold during current period
+         */
+        current_item_stats AS (
+
+            SELECT
+
+                COALESCE(
+                    SUM(oi.quantity),
+                    0
+                )::int AS items_sold
+
+            FROM order_items oi
+
+            INNER JOIN current_orders co
+                ON co.id = oi.store_order_id
+
+            WHERE co.status <> 'cancelled'
+        ),
+
+        /*
+         * Customers during current period
+         */
+        current_customer_stats AS (
+
+            SELECT
+
+                COUNT(
+                    DISTINCT co.customer_order_id
+                )::int AS customer_orders
+
+            FROM current_orders co
+
+            WHERE co.status <> 'cancelled'
+        ),
+
+        /*
+         * Sales by store
+         */
+        store_stats AS (
+
+            SELECT
+
+                vs.id AS store_id,
+
+                vs.name AS store_name,
+
+                COUNT(co.id) FILTER (
+                    WHERE co.status <> 'cancelled'
+                )::int AS orders,
+
+                COALESCE(
+                    SUM(co.total) FILTER (
+                        WHERE co.status <> 'cancelled'
+                    ),
+                    0
+                ) AS sales,
+
+                COALESCE(
+                    AVG(co.total) FILTER (
+                        WHERE co.status <> 'cancelled'
+                    ),
+                    0
+                ) AS average_order_value,
+
+                COALESCE(
+                    SUM(oi_stats.items_sold),
+                    0
+                )::int AS items_sold
+
+            FROM vendor_stores vs
+
+            LEFT JOIN current_orders co
+                ON co.store_id = vs.id
+
+            LEFT JOIN LATERAL (
+
+                SELECT
+                    SUM(oi.quantity)::int AS items_sold
+
+                FROM order_items oi
+
+                WHERE oi.store_order_id = co.id
+
+                  AND co.status <> 'cancelled'
+
+            ) oi_stats
+                ON TRUE
+
+            GROUP BY
+                vs.id,
+                vs.name
+        ),
+
+        /*
+         * Top-selling products.
+         *
+         * Uses the product snapshot stored in order_items.
+         */
+        top_products AS (
+
+            SELECT
+
+                oi.product_title,
+
+                COALESCE(
+                    SUM(oi.quantity),
+                    0
+                )::int AS units_sold,
+
+                COUNT(
+                    DISTINCT oi.store_order_id
+                )::int AS orders,
+
+                COALESCE(
+                    SUM(oi.total),
+                    0
+                ) AS sales
+
+            FROM order_items oi
+
+            INNER JOIN current_orders co
+                ON co.id = oi.store_order_id
+
+            WHERE co.status <> 'cancelled'
+
+            GROUP BY
+                oi.product_title
+
+            ORDER BY
+                sales DESC
+
+            LIMIT 10
+        ),
+
+        /*
+         * Current inventory statistics.
+         */
+        inventory_stats AS (
+
+            SELECT
+
+                COUNT(DISTINCT i.id)::int
+                    AS inventories,
+
+                COUNT(DISTINCT ii.id)::int
+                    AS inventory_items,
+
+                COALESCE(
+                    SUM(ii.quantity),
+                    0
+                )::int AS total_quantity,
+
+                COALESCE(
+                    SUM(ii.reserved),
+                    0
+                )::int AS reserved_quantity,
+
+                COALESCE(
+                    SUM(
+                        GREATEST(
+                            ii.quantity - ii.reserved,
+                            0
+                        )
+                    ),
+                    0
+                )::int AS available_quantity,
+
+                COUNT(ii.id) FILTER (
+                    WHERE
+                        (ii.quantity - ii.reserved) <= 0
+                )::int AS out_of_stock_items,
+
+                COUNT(ii.id) FILTER (
+                    WHERE
+                        (ii.quantity - ii.reserved) > 0
+                        AND
+                        (ii.quantity - ii.reserved) <= 5
+                )::int AS low_stock_items
+
+            FROM inventories i
+
+            INNER JOIN vendor_stores vs
+                ON vs.id = i.store_id
+
+            LEFT JOIN inventory_items ii
+                ON ii.inventory_id = i.id
+
+            WHERE i.status = 'active'
+        ),
+
+        /*
+         * Percentage changes.
+         */
+        changes AS (
+
+            SELECT
+
+                CASE
+                    WHEN ps.sales = 0 THEN NULL
+                    ELSE (
+                        (
+                            cs.sales - ps.sales
+                        ) / ps.sales
+                    ) * 100
+                END AS sales_change_percent,
+
+                CASE
+                    WHEN ps.valid_orders = 0 THEN NULL
+                    ELSE (
+                        (
+                            cs.valid_orders
+                            - ps.valid_orders
+                        )::numeric
+                        / ps.valid_orders
+                    ) * 100
+                END AS orders_change_percent,
+
+                CASE
+                    WHEN ps.average_order_value = 0 THEN NULL
+                    ELSE (
+                        (
+                            cs.average_order_value
+                            - ps.average_order_value
+                        ) / ps.average_order_value
+                    ) * 100
+                END AS average_order_value_change_percent
+
+            FROM current_stats cs
+
+            CROSS JOIN previous_stats ps
+        )
+
+        SELECT
+
+            json_build_object(
+
+                /*
+                 * Period
+                 */
+                'period',
+                $2::text,
+
+                /*
+                 * Main summary
+                 */
+                'summary',
+                json_build_object(
+
+                    'sales',
+                    cs.sales,
+
+                    'orders',
+                    cs.valid_orders,
+
+                    'average_order_value',
+                    cs.average_order_value,
+
+                    'items_sold',
+                    cis.items_sold,
+
+                    'customer_orders',
+                    ccs.customer_orders,
+
+                    'subtotal',
+                    cs.subtotal,
+
+                    'discount',
+                    cs.discount,
+
+                    'tax',
+                    cs.tax,
+
+                    'shipping_fee',
+                    cs.shipping_fee
+
+                ),
+
+                /*
+                 * Percentage changes
+                 */
+                'changes',
+                json_build_object(
+
+                    'sales',
+                    ch.sales_change_percent,
+
+                    'orders',
+                    ch.orders_change_percent,
+
+                    'average_order_value',
+                    ch.average_order_value_change_percent
+
+                ),
+
+                /*
+                 * Order statuses
+                 */
+                'orders_by_status',
+                json_build_object(
+
+                    'pending',
+                    cs.pending_orders,
+
+                    'processing',
+                    cs.processing_orders,
+
+                    'shipped',
+                    cs.shipped_orders,
+
+                    'delivered',
+                    cs.delivered_orders,
+
+                    'cancelled',
+                    cs.cancelled_orders
+
+                ),
+
+                /*
+                 * Store performance
+                 */
+                'stores',
+
+                COALESCE(
+
+                    (
+                        SELECT
+                            json_agg(
+
+                                json_build_object(
+
+                                    'store_id',
+                                    ss.store_id,
+
+                                    'store_name',
+                                    ss.store_name,
+
+                                    'orders',
+                                    ss.orders,
+
+                                    'sales',
+                                    ss.sales,
+
+                                    'average_order_value',
+                                    ss.average_order_value,
+
+                                    'items_sold',
+                                    ss.items_sold
+
+                                )
+
+                                ORDER BY
+                                    ss.sales DESC
+
+                            )
+
+                        FROM store_stats ss
+                    ),
+
+                    '[]'::json
+
+                ),
+
+                /*
+                 * Top products
+                 */
+                'top_products',
+
+                COALESCE(
+
+                    (
+                        SELECT
+                            json_agg(
+
+                                json_build_object(
+
+                                    'product_title',
+                                    tp.product_title,
+
+                                    'units_sold',
+                                    tp.units_sold,
+
+                                    'orders',
+                                    tp.orders,
+
+                                    'sales',
+                                    tp.sales
+
+                                )
+
+                                ORDER BY
+                                    tp.sales DESC
+
+                            )
+
+                        FROM top_products tp
+                    ),
+
+                    '[]'::json
+
+                ),
+
+                /*
+                 * Inventory
+                 */
+                'inventory',
+
+                (
+                    SELECT
+                        json_build_object(
+
+                            'inventories',
+                            inventories,
+
+                            'inventory_items',
+                            inventory_items,
+
+                            'total_quantity',
+                            total_quantity,
+
+                            'reserved_quantity',
+                            reserved_quantity,
+
+                            'available_quantity',
+                            available_quantity,
+
+                            'out_of_stock_items',
+                            out_of_stock_items,
+
+                            'low_stock_items',
+                            low_stock_items
+
+                        )
+
+                    FROM inventory_stats
+                )
+
+            ) AS analytics
+
+        FROM current_stats cs
+
+        CROSS JOIN current_item_stats cis
+
+        CROSS JOIN current_customer_stats ccs
+
+        CROSS JOIN changes ch;
+    `;
+
+        const { rows } = await db.query(
+            query,
+            [
+                vendorId,
+                period
+            ]
+        );
+
+        return rows[0]?.analytics || {
+
+            period,
+
+            summary: {
+                sales: 0,
+                orders: 0,
+                average_order_value: 0,
+                items_sold: 0,
+                customer_orders: 0,
+                subtotal: 0,
+                discount: 0,
+                tax: 0,
+                shipping_fee: 0
+            },
+
+            changes: {
+                sales: null,
+                orders: null,
+                average_order_value: null
+            },
+
+            orders_by_status: {
+                pending: 0,
+                processing: 0,
+                shipped: 0,
+                delivered: 0,
+                cancelled: 0
+            },
+
+            stores: [],
+
+            top_products: [],
+
+            inventory: {
+                inventories: 0,
+                inventory_items: 0,
+                total_quantity: 0,
+                reserved_quantity: 0,
+                available_quantity: 0,
+                out_of_stock_items: 0,
+                low_stock_items: 0
+            }
+        };
+    }
+
+    static async getVendorOverviewData(
+        vendorId,
+        period = '7d',
+        lowStockThreshold = 5
+    ) {
+        const allowedPeriods = ['7d', '30d', 'all'];
+
+        if (!allowedPeriods.includes(period)) {
+            throw new Error(
+                "Invalid period. Use '7d', '30d', or 'all'."
+            );
+        }
+
+        const threshold = Math.max(
+            0,
+            Number(lowStockThreshold) || 5
+        );
+
+        let dateCondition = '';
+
+        if (period === '7d') {
+            dateCondition = `
+            AND so.created_at >= NOW() - INTERVAL '7 days'
+        `;
+        } else if (period === '30d') {
+            dateCondition = `
+            AND so.created_at >= NOW() - INTERVAL '30 days'
+        `;
+        }
+
+        const query = `
+        WITH vendor_stores AS (
+            SELECT
+                id,
+                name,
+                status
+            FROM stores
+            WHERE vendor_id = $1
+        ),
+
+        /*
+         * ---------------------------------------------------------
+         * ORDER SUMMARY
+         * ---------------------------------------------------------
+         */
+        order_summary AS (
+            SELECT
+                COUNT(so.id)::int AS total_orders,
+
+                COUNT(so.id)
+                    FILTER (
+                        WHERE so.status = 'pending'
+                    )::int AS pending_orders,
+
+                COUNT(so.id)
+                    FILTER (
+                        WHERE so.status = 'processing'
+                    )::int AS processing_orders,
+
+                COUNT(so.id)
+                    FILTER (
+                        WHERE so.status = 'shipped'
+                    )::int AS shipped_orders,
+
+                COUNT(so.id)
+                    FILTER (
+                        WHERE so.status = 'delivered'
+                    )::int AS delivered_orders,
+
+                COUNT(so.id)
+                    FILTER (
+                        WHERE so.status = 'cancelled'
+                    )::int AS cancelled_orders,
+
+                /*
+                 * Sales exclude cancelled orders.
+                 *
+                 * This is currently gross order value.
+                 * Refunds / COCOCE fees / payouts are handled
+                 * separately in the financial system.
+                 */
+                COALESCE(
+                    SUM(so.total)
+                    FILTER (
+                        WHERE so.status <> 'cancelled'
+                    ),
+                    0
+                ) AS sales
+
+            FROM store_orders so
+
+            INNER JOIN vendor_stores vs
+                ON vs.id = so.store_id
+
+            WHERE TRUE
+                ${dateCondition}
+        ),
+
+        /*
+         * ---------------------------------------------------------
+         * INVENTORY SUMMARY
+         * ---------------------------------------------------------
+         */
+        inventory_summary AS (
+            SELECT
+                COUNT(ii.id)::int AS inventory_items,
+
+                COUNT(ii.id)
+                    FILTER (
+                        WHERE (ii.quantity - ii.reserved)
+                              <= $3
+                    )::int AS low_stock_items
+
+            FROM inventory_items ii
+
+            INNER JOIN inventories i
+                ON i.id = ii.inventory_id
+
+            INNER JOIN vendor_stores vs
+                ON vs.id = i.store_id
+
+            WHERE i.status = 'active'
+              AND ii.status <> 'out_of_stock'
+        ),
+
+        /*
+         * ---------------------------------------------------------
+         * STORE SUMMARY
+         * ---------------------------------------------------------
+         */
+        store_summary AS (
+            SELECT
+                COUNT(*)::int AS total_stores,
+
+                COUNT(*)
+                    FILTER (
+                        WHERE status = 'active'
+                    )::int AS active_stores,
+
+                COUNT(*)
+                    FILTER (
+                        WHERE status = 'inactive' OR status = 'disabled'
+                    )::int AS pending_stores
+
+            FROM vendor_stores
+        ),
+
+        /*
+         * ---------------------------------------------------------
+         * DAILY SALES
+         * ---------------------------------------------------------
+         */
+        daily_sales AS (
+            SELECT
+                DATE(so.created_at) AS sale_date,
+
+                COALESCE(
+                    SUM(so.total)
+                    FILTER (
+                        WHERE so.status <> 'cancelled'
+                    ),
+                    0
+                ) AS sales
+
+            FROM store_orders so
+
+            INNER JOIN vendor_stores vs
+                ON vs.id = so.store_id
+
+            WHERE TRUE
+                ${dateCondition}
+
+            GROUP BY DATE(so.created_at)
+            ORDER BY sale_date ASC
+        ),
+
+        /*
+         * ---------------------------------------------------------
+         * ORDER STATUS
+         * ---------------------------------------------------------
+         */
+        order_status AS (
+            SELECT
+                COUNT(so.id)
+                    FILTER (
+                        WHERE so.status = 'pending'
+                    )::int AS pending,
+
+                COUNT(so.id)
+                    FILTER (
+                        WHERE so.status = 'processing'
+                    )::int AS processing,
+
+                COUNT(so.id)
+                    FILTER (
+                        WHERE so.status = 'shipped'
+                    )::int AS shipped,
+
+                COUNT(so.id)
+                    FILTER (
+                        WHERE so.status = 'delivered'
+                    )::int AS delivered,
+
+                COUNT(so.id)
+                    FILTER (
+                        WHERE so.status = 'cancelled'
+                    )::int AS cancelled
+
+            FROM store_orders so
+
+            INNER JOIN vendor_stores vs
+                ON vs.id = so.store_id
+
+            WHERE TRUE
+                ${dateCondition}
+        ),
+
+        /*
+         * ---------------------------------------------------------
+         * ALERT COUNTS
+         * ---------------------------------------------------------
+         */
+        alert_summary AS (
+            SELECT
+                (
+                    SELECT COUNT(*)::int
+                    FROM inventory_items ii
+                    INNER JOIN inventories i
+                        ON i.id = ii.inventory_id
+                    INNER JOIN vendor_stores vs
+                        ON vs.id = i.store_id
+                    WHERE i.status = 'active'
+                      AND ii.status <> 'out_of_stock'
+                      AND (ii.quantity - ii.reserved)
+                          <= $3
+                ) AS low_stock_count,
+
+                (
+                    SELECT COUNT(*)::int
+                    FROM store_orders so
+                    INNER JOIN vendor_stores vs
+                        ON vs.id = so.store_id
+                    WHERE so.status = 'pending'
+                ) AS pending_order_count,
+
+                (
+                    SELECT COUNT(*)::int
+                    FROM vendor_stores
+                    WHERE status = 'inactive' OR status = 'disabled'
+                ) AS pending_store_count
+        ),
+
+        /*
+         * ---------------------------------------------------------
+         * RECENT ORDERS
+         * ---------------------------------------------------------
+         */
+        recent_orders AS (
+            SELECT
+                so.id,
+                so.order_number,
+                vs.name AS store_name,
+                so.status,
+                so.total,
+                so.created_at
+
+            FROM store_orders so
+
+            INNER JOIN vendor_stores vs
+                ON vs.id = so.store_id
+
+            ORDER BY so.created_at DESC
+
+            LIMIT 5
+        )
+
+        /*
+         * ---------------------------------------------------------
+         * FINAL DASHBOARD OBJECT
+         * ---------------------------------------------------------
+         */
+        SELECT
+            json_build_object(
+
+                'period',
+                $2::text,
+
+                /*
+                 * -------------------------------------------------
+                 * SUMMARY
+                 * -------------------------------------------------
+                 */
+                'summary',
+                json_build_object(
+
+                    'sales',
+                    COALESCE(
+                        order_summary.sales,
+                        0
+                    ),
+
+                    'orders',
+                    COALESCE(
+                        order_summary.total_orders,
+                        0
+                    ),
+
+                    'pending_orders',
+                    COALESCE(
+                        order_summary.pending_orders,
+                        0
+                    ),
+
+                    'inventory_items',
+                    COALESCE(
+                        inventory_summary.inventory_items,
+                        0
+                    ),
+
+                    'low_stock_items',
+                    COALESCE(
+                        inventory_summary.low_stock_items,
+                        0
+                    ),
+
+                    'total_stores',
+                    COALESCE(
+                        store_summary.total_stores,
+                        0
+                    ),
+
+                    'active_stores',
+                    COALESCE(
+                        store_summary.active_stores,
+                        0
+                    ),
+
+                    'pending_stores',
+                    COALESCE(
+                        store_summary.pending_stores,
+                        0
+                    )
+                ),
+
+                /*
+                 * -------------------------------------------------
+                 * SALES CHART
+                 * -------------------------------------------------
+                 */
+                'sales_chart',
+                COALESCE(
+                    (
+                        SELECT json_agg(
+                            json_build_object(
+                                'date',
+                                ds.sale_date,
+
+                                'label',
+                                TO_CHAR(
+                                    ds.sale_date,
+                                    'Dy'
+                                ),
+
+                                'sales',
+                                ds.sales
+                            )
+                            ORDER BY ds.sale_date ASC
+                        )
+                        FROM daily_sales ds
+                    ),
+                    '[]'::json
+                ),
+
+                /*
+                 * -------------------------------------------------
+                 * ORDER STATUS
+                 * -------------------------------------------------
+                 */
+                'order_status',
+                json_build_object(
+
+                    'pending',
+                    COALESCE(
+                        order_status.pending,
+                        0
+                    ),
+
+                    'processing',
+                    COALESCE(
+                        order_status.processing,
+                        0
+                    ),
+
+                    'shipped',
+                    COALESCE(
+                        order_status.shipped,
+                        0
+                    ),
+
+                    'delivered',
+                    COALESCE(
+                        order_status.delivered,
+                        0
+                    ),
+
+                    'cancelled',
+                    COALESCE(
+                        order_status.cancelled,
+                        0
+                    )
+                ),
+
+                /*
+                 * -------------------------------------------------
+                 * ALERTS
+                 * -------------------------------------------------
+                 */
+                'alerts',
+                (
+                    SELECT COALESCE(
+                        json_agg(alert_data),
+                        '[]'::json
+                    )
+                    FROM (
+                        SELECT
+                            json_build_object(
+                                'type',
+                                'low_stock',
+
+                                'severity',
+                                CASE
+                                    WHEN low_stock_count >= 10
+                                        THEN 'urgent'
+                                    ELSE 'attention'
+                                END,
+
+                                'icon',
+                                '⚠️',
+
+                                'title',
+                                'Low Stock Alert',
+
+                                'message',
+                                low_stock_count
+                                    || ' inventory item(s) are low on stock.'
+                            ) AS alert_data
+
+                        FROM alert_summary
+                        WHERE low_stock_count > 0
+
+                        UNION ALL
+
+                        SELECT
+                            json_build_object(
+                                'type',
+                                'pending_orders',
+
+                                'severity',
+                                'attention',
+
+                                'icon',
+                                '📦',
+
+                                'title',
+                                'Pending Orders',
+
+                                'message',
+                                pending_order_count
+                                    || ' order(s) are waiting for processing.'
+                            )
+
+                        FROM alert_summary
+                        WHERE pending_order_count > 0
+
+                        UNION ALL
+
+                        SELECT
+                            json_build_object(
+                                'type',
+                                'pending_stores',
+
+                                'severity',
+                                'attention',
+
+                                'icon',
+                                '🏪',
+
+                                'title',
+                                'Pending Stores',
+
+                                'message',
+                                pending_store_count
+                                    || ' store(s) are waiting for approval.'
+                            )
+
+                        FROM alert_summary
+                        WHERE pending_store_count > 0
+                    ) alerts
+                ),
+
+                /*
+                 * -------------------------------------------------
+                 * RECENT ORDERS
+                 * -------------------------------------------------
+                 */
+                'recent_orders',
+                COALESCE(
+                    (
+                        SELECT json_agg(
+                            json_build_object(
+
+                                'id',
+                                ro.id,
+
+                                'order_number',
+                                ro.order_number,
+
+                                'store_name',
+                                ro.store_name,
+
+                                'status',
+                                ro.status,
+
+                                'total',
+                                ro.total,
+
+                                'created_at',
+                                ro.created_at
+                            )
+                            ORDER BY ro.created_at DESC
+                        )
+                        FROM recent_orders ro
+                    ),
+                    '[]'::json
+                )
+
+            ) AS overview
+
+            FROM order_summary
+            CROSS JOIN inventory_summary
+            CROSS JOIN store_summary
+            CROSS JOIN order_status;
+        `;
+
+        const { rows } = await db.query(
+            query,
+            [
+                vendorId,
+                period,
+                threshold
+            ]
+        );
+
+        return rows[0]?.overview || {
+            period,
+
+            summary: {
+                sales: 0,
+                orders: 0,
+                pending_orders: 0,
+                inventory_items: 0,
+                low_stock_items: 0,
+                total_stores: 0,
+                active_stores: 0,
+                pending_stores: 0
+            },
+
+            sales_chart: [],
+
+            order_status: {
+                pending: 0,
+                processing: 0,
+                shipped: 0,
+                delivered: 0,
+                cancelled: 0
+            },
+
+            alerts: [],
+
+            recent_orders: []
         };
     }
 }

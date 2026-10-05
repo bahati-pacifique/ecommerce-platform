@@ -5,6 +5,10 @@ const VendorServices = require('../../../src/services/vendor.services');
 const UserServices = require('../../../src/services/user.services');
 const FileServices = require('../../../src/services/file.service');
 
+const { convertToWebp } = require('../../../src/services/media.service');
+
+const qs = require('qs');
+
 async function getProductActiveCategories(req, res) {
     try {
         const result = await ProductMetaServices.getActiveCategories();
@@ -134,6 +138,18 @@ async function searchAttributes(req, res) {
     try {
         const { key, page, limit } = req.query;
         const result = await ProductMetaServices.searchAttributes(key, page, limit);
+
+        return res.json(result);
+    } catch (error) {
+        return formatError('searchCategories()', 500, error, 'Failed — Internal Server Error', res);
+    }
+}
+
+async function searchAttributeValues(req, res) {
+    try {
+        const { attribute_id } = req.params;
+        const { key, page, limit } = req.query;
+        const result = await ProductMetaServices.searchAttributeValues(attribute_id, key, page, limit);
 
         return res.json(result);
     } catch (error) {
@@ -552,6 +568,607 @@ async function removeUserProfileImage(req, res) {
     }
 }
 
+// async function insertProductCatalog(req, res) {
+//   try {
+//     // ============================================================
+//     // 1. Expand bracket notation
+//     // ============================================================
+//     const body = qs.parse(Object.assign({}, req.body));
+
+//     const product   = body.product   || {};
+//     const variants  = Array.isArray(body.variants) ? body.variants : [];
+//     const mediaMeta = Array.isArray(body.media)    ? body.media    : [];
+
+//     // ============================================================
+//     // 2. Map files (object) to their media indices via the field name
+//     // ============================================================
+//     const filesByIndex = {};
+//     for (const [fieldName, file] of Object.entries(req.files || {})) {
+//       const m = fieldName.match(/^media\[(\d+)\]\[file\]$/);
+//       if (!m) continue;
+//       filesByIndex[Number(m[1])] = file;
+//     }
+
+//     const media = mediaMeta.map((meta, i) => ({
+//       file: filesByIndex[i] || null,
+//       position: Number(meta?.position ?? i),
+//       is_primary: meta?.is_primary === 'true' || meta?.is_primary === true
+//     }));
+
+//     // ============================================================
+//     // 3. Debug
+//     // ============================================================
+//     console.log('--- PRODUCT ---');
+//     console.log(product);
+
+//     console.log('--- VARIANTS ---');
+//     console.log(JSON.stringify(variants, null, 2));
+
+//     console.log('--- MEDIA ---');
+//     console.log(media.map(m => ({
+//       name: m.file?.name,
+//       mimetype: m.file?.mimetype,
+//       size: m.file?.size,
+//       position: m.position,
+//       is_primary: m.is_primary
+//     })));
+
+//     // ============================================================
+//     // 4. Validate
+//     // ============================================================
+//     const errors = [];
+
+//     if (!product.title?.trim())  errors.push('product.title is required');
+//     if (!product.slug?.trim())   errors.push('product.slug is required');
+//     if (!product.family_id)      errors.push('product.family_id is required');
+//     if (!variants.length)        errors.push('At least one variant is required');
+//     if (!media.length)           errors.push('At least one image is required');
+
+//     for (let i = 0; i < variants.length; i++) {
+//       const v = variants[i];
+//       if (!v.sku?.trim()) errors.push(`variants[${i}].sku is required`);
+//       const attrs = Array.isArray(v.attributes) ? v.attributes : [];
+//       if (!attrs.length) errors.push(`variants[${i}].attributes must have at least one entry`);
+//     }
+
+//     for (let i = 0; i < media.length; i++) {
+//       const m = media[i];
+//       if (!m.file) {
+//         errors.push(`media[${i}].file is missing`);
+//       } else if (!/^image\/(jpeg|png|webp)$/.test(m.file.mimetype)) {
+//         errors.push(`media[${i}] has unsupported type ${m.file.mimetype}`);
+//       }
+//     }
+
+//     if (errors.length) {
+//       return res.status(422).json({ message: 'Validation failed', errors });
+//     }
+
+//     for (const m of media) {
+//         console.log(m.file)
+//       }
+
+//     // ============================================================
+//     // 5. Persist — replace this block with your real DB logic
+//     // ============================================================
+//     // Everything below is a stub. Wire it to your ORM/query builder.
+//     // The data model is already normalized: `product`, `variants[]`,
+//     // and `media[]` — all cleanly separated.
+
+//     // const result = await db.transaction(async (tx) => {
+//     //   const [createdProduct] = await tx('products').insert({
+//     //     family_id: Number(product.family_id),
+//     //     brand_id: product.brand_id ? Number(product.brand_id) : null,
+//     //     title: product.title.trim(),
+//     //     slug: product.slug.trim(),
+//     //     description: product.description || null,
+//     //     target_gender: product.target_gender || 'not_applied',
+//     //     age_restriction: product.age_restriction || 'not_applied',
+//     //     requested_reason: product.requested_reason || null,
+//     //     status: 'requested',
+//     //     requested_by: req.user?.id || null,
+//     //     requested_at: new Date()
+//     //   }).returning('*');
+//     //
+//     //   for (const v of variants) {
+//     //     const [createdVariant] = await tx('product_variants').insert({
+//     //       product_id: createdProduct.id,
+//     //       sku: v.sku.trim(),
+//     //       barcode: v.barcode || null,
+//     //       weight_grams: v.weight_grams ? Number(v.weight_grams) : null,
+//     //       status: v.status || 'available'
+//     //     }).returning('*');
+//     //
+//     //     for (const a of (v.attributes || [])) {
+//     //       await tx('variant_attribute_values').insert({
+//     //         variant_id: createdVariant.id,
+//     //         attribute_value_id: Number(a.attribute_value_id)
+//     //       });
+//     //     }
+//     //   }
+//     //
+//     //   for (const m of media) {
+//     //     const cdnUrl = await uploadToCdn(m.file);   // your helper
+//     //     await tx('product_media').insert({
+//     //       product_id: createdProduct.id,
+//     //       url: cdnUrl,
+//     //       position: m.position,
+//     //       is_primary: m.is_primary
+//     //     });
+//     //   }
+//     //
+//     //   return createdProduct;
+//     // });
+
+//     // Placeholder response so the frontend can proceed while persistence
+//     // is being wired up
+//     return res.status(500).json({
+//       message: 'Received — persistence not yet implemented',
+//       product,
+//       variants,
+//       media: media.map(m => ({
+//         name: m.file.name,
+//         size: m.file.size,
+//         position: m.position,
+//         is_primary: m.is_primary
+//       }))
+//     });
+
+//   } catch (error) {
+//     console.error('[insertProductCatalog]', error);
+//     return res.status(500).json({ message: error.message || 'Internal server error' });
+//   }
+// }
+
+// async function insertProductCatalog(req, res) {
+//   try {
+
+//     const body = qs.parse(Object.assign({}, req.body));
+
+//     const product   = body.product   || {};
+//     const variants  = Array.isArray(body.variants) ? body.variants : [];
+//     const mediaMeta = Array.isArray(body.media)    ? body.media    : [];
+
+//     const filesByIndex = {};
+//     for (const [fieldName, file] of Object.entries(req.files || {})) {
+//       const m = fieldName.match(/^media\[(\d+)\]\[file\]$/);
+//       if (!m) continue;
+//       filesByIndex[Number(m[1])] = file;
+//     }
+
+//     const media = mediaMeta.map((meta, i) => ({
+//       file: filesByIndex[i] || null,
+//       position: Number(meta?.position ?? i),
+//       is_primary: meta?.is_primary === 'true' || meta?.is_primary === true
+//     }));
+
+//     console.log('--- PRODUCT ---');
+//     console.log(product);
+
+//     console.log('--- VARIANTS ---');
+//     console.log(JSON.stringify(variants, null, 2));
+
+//     console.log('--- MEDIA ---');
+//     console.log(media.map(m => ({
+//       name: m.file?.name,
+//       mimetype: m.file?.mimetype,
+//       size: m.file?.size,
+//       position: m.position,
+//       is_primary: m.is_primary
+//     })));
+
+//     const errors = [];
+
+//     if (!product.title?.trim())  errors.push('product.title is required');
+//     if (!product.slug?.trim())   errors.push('product.slug is required');
+//     if (!product.family_id)      errors.push('product.family_id is required');
+//     if (!variants.length)        errors.push('At least one variant is required');
+//     if (!media.length)           errors.push('At least one image is required');
+
+//     for (let i = 0; i < variants.length; i++) {
+//       const v = variants[i];
+//       if (!v.sku?.trim()) errors.push(`variants[${i}].sku is required`);
+//       const attrs = Array.isArray(v.attributes) ? v.attributes : [];
+//       if (!attrs.length) errors.push(`variants[${i}].attributes must have at least one entry`);
+//     }
+
+//     for (let i = 0; i < media.length; i++) {
+//       const m = media[i];
+//       if (!m.file) {
+//         errors.push(`media[${i}].file is missing`);
+//       } else if (!/^image\/(jpeg|png|webp)$/.test(m.file.mimetype)) {
+//         errors.push(`media[${i}] has unsupported type ${m.file.mimetype}`);
+//       }
+//     }
+
+//     if (errors.length) {
+//       return res.status(422).json({ message: 'Validation failed', errors });
+//     }
+
+//     for (const m of media) {
+//         console.log(m.file)
+//       }
+
+
+//     return res.status(500).json({
+//       message: 'Received — persistence not yet implemented',
+//       product,
+//       variants,
+//       media: media.map(m => ({
+//         name: m.file.name,
+//         size: m.file.size,
+//         position: m.position,
+//         is_primary: m.is_primary
+//       }))
+//     });
+
+//   } catch (error) {
+//     console.error('[insertProductCatalog]', error);
+//     return res.status(500).json({ message: error.message || 'Internal server error' });
+//   }
+// }
+
+// async function insertProductCatalog(req, res) {
+
+//     try {
+
+//         const body = qs.parse(
+//             Object.assign({}, req.body)
+//         );
+
+//         const product = body.product || {};
+
+//         const variants = Array.isArray(body.variants)
+//             ? body.variants
+//             : [];
+
+//         const mediaMeta = Array.isArray(body.media)
+//             ? body.media
+//             : [];
+
+//         /*
+//          * --------------------------------------------------
+//          * MAP UPLOADED FILES BY MEDIA INDEX
+//          * --------------------------------------------------
+//          */
+
+//         const filesByIndex = {};
+
+//         for (const [fieldName, file] of Object.entries(req.files || {})) {
+
+//             const match = fieldName.match(
+//                 /^media\[(\d+)\]\[file\]$/
+//             );
+
+//             if (!match) continue;
+
+//             filesByIndex[Number(match[1])] = file;
+//         }
+
+//         /*
+//          * --------------------------------------------------
+//          * BUILD MEDIA
+//          * --------------------------------------------------
+//          */
+
+//         const media = mediaMeta.map((meta, i) => ({
+
+//             file: filesByIndex[i] || null,
+
+//             position: Number(
+//                 meta?.position ?? i
+//             ),
+
+//             is_primary:
+//                 meta?.is_primary === 'true' ||
+//                 meta?.is_primary === true
+
+//         }));
+
+//         /*
+//          * --------------------------------------------------
+//          * DEBUG
+//          * --------------------------------------------------
+//          */
+
+//         console.log('--- PRODUCT ---');
+//         console.log(product);
+
+//         console.log('--- VARIANTS ---');
+//         console.log(
+//             JSON.stringify(
+//                 variants,
+//                 null,
+//                 2
+//             )
+//         );
+
+//         console.log('--- MEDIA ---');
+
+//         console.log(
+//             media.map(m => ({
+//                 name: m.file?.name,
+//                 mimetype: m.file?.mimetype,
+//                 size: m.file?.size,
+//                 position: m.position,
+//                 is_primary: m.is_primary
+//             }))
+//         );
+
+//         /*
+//          * --------------------------------------------------
+//          * VALIDATION
+//          * --------------------------------------------------
+//          */
+
+//         const errors = [];
+
+//         /*
+//          * Product
+//          */
+
+//         if (!product.title?.trim()) {
+//             errors.push(
+//                 'product.title is required'
+//             );
+//         }
+
+//         if (!product.slug?.trim()) {
+//             errors.push(
+//                 'product.slug is required'
+//             );
+//         }
+
+//         if (!product.family_id) {
+//             errors.push(
+//                 'product.family_id is required'
+//             );
+//         }
+
+//         /*
+//          * Variants
+//          */
+
+//         if (!variants.length) {
+//             errors.push(
+//                 'At least one variant is required'
+//             );
+//         }
+
+//         for (let i = 0; i < variants.length; i++) {
+
+//             const variant = variants[i];
+
+//             if (!variant.sku?.trim()) {
+//                 errors.push(
+//                     `variants[${i}].sku is required`
+//                 );
+//             }
+
+//             const attributes = Array.isArray(
+//                 variant.attributes
+//             )
+//                 ? variant.attributes
+//                 : [];
+
+//             if (!attributes.length) {
+//                 errors.push(
+//                     `variants[${i}].attributes must have at least one entry`
+//                 );
+//             }
+//         }
+
+//         /*
+//          * Media
+//          */
+
+//         if (!media.length) {
+//             errors.push(
+//                 'At least one image is required'
+//             );
+//         }
+
+//         if (media.length > 10) {
+//             errors.push(
+//                 'A maximum of 10 images is allowed'
+//             );
+//         }
+
+//         for (let i = 0; i < media.length; i++) {
+
+//             const item = media[i];
+
+//             if (!item.file) {
+
+//                 errors.push(
+//                     `media[${i}].file is missing`
+//                 );
+
+//                 continue;
+//             }
+
+//             if (
+//                 !/^image\/(jpeg|png|webp)$/.test(
+//                     item.file.mimetype
+//                 )
+//             ) {
+
+//                 errors.push(
+//                     `media[${i}] has unsupported type ${item.file.mimetype}`
+//                 );
+//             }
+//         }
+
+//         /*
+//          * Only one primary image
+//          */
+
+//         const primaryCount = media.filter(
+//             item => item.is_primary
+//         ).length;
+
+//         if (primaryCount > 1) {
+//             errors.push(
+//                 'Only one product image can be primary'
+//             );
+//         }
+
+//         /*
+//          * Validation response
+//          */
+
+//         if (errors.length) {
+
+//             return res.status(422).json({
+//                 message: 'Validation failed',
+//                 errors
+//             });
+//         }
+
+//         /*
+//          * --------------------------------------------------
+//          * PROCESS IMAGES
+//          * --------------------------------------------------
+//          */
+
+//         const processedMedia = [];
+
+//         for (const item of media) {
+
+//             const result = await convertToWebp(
+//                 item.file.data
+//             );
+
+//             processedMedia.push({
+
+//                 ...result,
+
+//                 original_name:
+//                     item.file.name,
+
+//                 original_mimetype:
+//                     item.file.mimetype,
+
+//                 original_size:
+//                     item.file.size,
+
+//                 position:
+//                     item.position,
+
+//                 is_primary:
+//                     item.is_primary
+
+//             });
+//         }
+
+//         /*
+//          * --------------------------------------------------
+//          * DEBUG PROCESSED MEDIA
+//          * --------------------------------------------------
+//          */
+
+//         console.log('--- PROCESSED MEDIA ---');
+
+//         console.log(
+//             processedMedia.map(item => ({
+//                 buffer: item.buffer,
+//                 original_name:
+//                     item.original_name,
+
+//                 original_size:
+//                     item.original_size,
+
+//                 output_size:
+//                     item.size,
+
+//                 width:
+//                     item.width,
+
+//                 height:
+//                     item.height,
+
+//                 mime_type:
+//                     item.mime_type,
+
+//                 position:
+//                     item.position,
+
+//                 is_primary:
+//                     item.is_primary
+//             }))
+//         );
+
+//         /*
+//          * --------------------------------------------------
+//          * PERSISTENCE
+//          * --------------------------------------------------
+//          *
+//          * TODO:
+//          *
+//          * 1. Create product
+//          * 2. Create variants
+//          * 3. Create variant attributes
+//          * 4. Upload processed images
+//          * 5. Create product_media records
+//          *
+//          * This should eventually be handled through
+//          * product/media/storage services and a DB transaction.
+//          */
+
+//         return res.status(200).json({
+
+//             message:
+//                 'Product catalog data validated and images processed',
+
+//             product,
+
+//             variants,
+
+//             media: processedMedia.map(item => ({
+
+//                 original_name:
+//                     item.original_name,
+
+//                 original_size:
+//                     item.original_size,
+
+//                 size:
+//                     item.size,
+
+//                 width:
+//                     item.width,
+
+//                 height:
+//                     item.height,
+
+//                 mime_type:
+//                     item.mime_type,
+
+//                 position:
+//                     item.position,
+
+//                 is_primary:
+//                     item.is_primary
+
+//             }))
+
+//         });
+
+//     } catch (error) {
+
+//         console.error(
+//             '[insertProductCatalog]',
+//             error
+//         );
+
+//         return res.status(500).json({
+//             message:
+//                 error.message ||
+//                 'Internal server error'
+//         });
+//     }
+// }
+
 module.exports = {
 
     getProductActiveCategories,
@@ -567,10 +1184,11 @@ module.exports = {
 
     getActiveBrands,
     searchBrands,
-    
+
     getActiveAttributes,
     getActiveAttributeValues,
     searchAttributes,
+    searchAttributeValues,
 
     testSendEmail,
     testMaizleEmail,

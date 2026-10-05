@@ -301,7 +301,7 @@
               <span>Account Settings</span>
             </button>
             <div class="popup-divider"></div>
-            <form action="<%=locals.protocal%>auth.<%=locals.domain%>/signout" method="POST" class="popup-item danger">
+            <form action="<%=locals.protocal%>auth.<%=locals.domainName%>/signout" method="POST" class="popup-item danger">
               <input type="hidden" value="<%=locals.protocal%>business.<%=locals.domainName%>" name="host">
               <input type="hidden" name="userAccount" value="<=locals.user.userAccount%>">
               <button type="submit" class="flex items-center gap-2">
@@ -348,137 +348,238 @@
 
         <div id="tab-overview" class="tab-content active px-3 py-4" style="overflow-y: auto;">
 
+          <!-- Header -->
+          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
+            <div>
+              <h2 class="text-xl font-semibold text-gray-800">
+                Overview
+              </h2>
+              <p class="text-sm text-gray-500 mt-1">
+                Monitor your business performance across all stores.
+              </p>
+            </div>
+
+            <!-- Period -->
+            <div>
+              <select id="overview-period" class="border border-gray-200 rounded-lg px-3 py-2 text-sm
+                       bg-white text-gray-700 focus:outline-none
+                       focus:ring-2 focus:ring-red-100 focus:border-red-400">
+                <option value="7d" selected>Last 7 days</option>
+                <option value="30d">Last 30 days</option>
+                <option value="all">All time</option>
+              </select>
+            </div>
+          </div>
+
+
+          <!-- Summary Cards -->
           <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-            <div class="stat-card bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
-              <div class="flex items-start justify-between">
-                <div>
-                  <p class="text-sm text-gray-500 font-medium">Total Revenue</p>
-                  <p class="text-2xl font-bold text-gray-900 mt-1">$124,892</p>
-                  <p class="text-xs text-green-600 mt-1">↑ 12.5% from last month</p>
-                </div>
-                <div class="w-10 h-10 bg-brand-light rounded-xl flex items-center justify-center text-brand text-xl">💰</div>
+
+            <!-- Sales -->
+            <div class="bg-white rounded-xl border border-gray-100 p-5 shadow-sm">
+              <div class="flex items-center justify-between">
+                <p class="text-sm text-gray-500">
+                  Total Sales
+                </p>
+
+                <span class="w-9 h-9 rounded-lg bg-green-50
+                             flex items-center justify-center text-green-600">
+                  <i class="fas fa-chart-line"></i>
+                </span>
               </div>
+
+              <p id="overview-sales" class="text-2xl font-bold text-gray-800 mt-3">
+                $0.00
+              </p>
+
+              <p id="overview-sales-change" class="text-xs text-gray-500 mt-1">
+                —
+              </p>
             </div>
 
-            <div class="stat-card bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
-              <div class="flex items-start justify-between">
-                <div>
-                  <p class="text-sm text-gray-500 font-medium">Total Orders</p>
-                  <p class="text-2xl font-bold text-gray-900 mt-1">1,284</p>
-                  <p class="text-xs text-gray-500 mt-1">48 pending</p>
-                </div>
-                <div class="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center text-blue-500 text-xl">📦</div>
+
+            <!-- Orders -->
+            <div class="bg-white rounded-xl border border-gray-100 p-5 shadow-sm">
+              <div class="flex items-center justify-between">
+                <p class="text-sm text-gray-500">
+                  Total Orders
+                </p>
+
+                <span class="w-9 h-9 rounded-lg bg-blue-50
+                             flex items-center justify-center text-blue-600">
+                  <i class="fas fa-shopping-bag"></i>
+                </span>
               </div>
+
+              <p id="overview-orders" class="text-2xl font-bold text-gray-800 mt-3">
+                0
+              </p>
+
+              <p id="overview-pending-orders" class="text-xs text-gray-500 mt-1">
+                0 pending
+              </p>
             </div>
 
-            <div class="stat-card bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
-              <div class="flex items-start justify-between">
-                <div>
-                  <p class="text-sm text-gray-500 font-medium">Inventory Items</p>
-                  <p class="text-2xl font-bold text-gray-900 mt-1">3,847</p>
-                  <p class="text-xs text-amber-600 mt-1">⚠️ 23 low stock</p>
-                </div>
-                <div class="w-10 h-10 bg-amber-50 rounded-xl flex items-center justify-center text-amber-500 text-xl">📊</div>
+            <div class="bg-white rounded-xl border border-gray-100 p-5 shadow-sm">
+              <div class="flex items-center justify-between">
+                <p class="text-sm text-gray-500">
+                  Inventory Items
+                </p>
+
+                <span class="w-9 h-9 rounded-lg bg-purple-50
+                             flex items-center justify-center text-purple-600">
+                  <i class="fas fa-boxes"></i>
+                </span>
               </div>
+
+              <p id="overview-inventory-items" class="text-2xl font-bold text-gray-800 mt-3">
+                0
+              </p>
+
+              <p id="overview-low-stock" class="text-xs text-gray-500 mt-1">
+                ⚠️ 0 low stock
+              </p>
             </div>
 
-            <div class="stat-card bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
-              <div class="flex items-start justify-between">
-                <div>
-                  <p class="text-sm text-gray-500 font-medium">Total Stores</p>
-                  <p class="text-2xl font-bold text-gray-900 mt-1">12</p>
-                  <p class="text-xs text-gray-500 mt-1">8 active · 4 pending</p>
-                </div>
-                <div class="w-10 h-10 bg-purple-50 rounded-xl flex items-center justify-center text-purple-500 text-xl">🏪</div>
+
+            <!-- Stores -->
+            <div class="bg-white rounded-xl border border-gray-100 p-5 shadow-sm">
+              <div class="flex items-center justify-between">
+                <p class="text-sm text-gray-500">
+                  Total Stores
+                </p>
+
+                <span class="w-9 h-9 rounded-lg bg-orange-50
+                             flex items-center justify-center text-orange-600">
+                  <i class="fas fa-store"></i>
+                </span>
               </div>
+
+              <p id="overview-total-stores" class="text-2xl font-bold text-gray-800 mt-3">
+                0
+              </p>
+
+              <p id="overview-store-status" class="text-xs text-gray-500 mt-1">
+                0 active · 0 pending
+              </p>
             </div>
+
           </div>
 
           <div class="grid md:grid-cols-2 gap-6 mb-6">
-            <!-- Sales Chart -->
-            <div class="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
-              <div class="flex items-center justify-between mb-4">
-                <h3 class="text-sm font-semibold text-gray-700">Sales Overview</h3>
-                <span class="text-xs text-gray-400">Last 7 days</span>
+
+            <div class="bg-white rounded-xl border border-gray-100
+                    shadow-sm p-5">
+
+              <div class="flex items-center justify-between mb-5">
+                <div>
+                  <h3 class="text-base font-semibold text-gray-800">
+                    Sales Overview
+                  </h3>
+
+                  <p class="text-xs text-gray-400 mt-1">
+                    Sales across all your stores
+                  </p>
+                </div>
               </div>
-              <div class="chart-container">
+
+              <div class="h-72">
                 <canvas id="salesChart"></canvas>
               </div>
+
             </div>
 
-            <div class="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
-              <div class="flex items-center justify-between mb-4">
-                <h3 class="text-sm font-semibold text-gray-700">Order Status</h3>
-                <span class="text-xs text-gray-400">Current</span>
+            <div class="bg-white rounded-xl border border-gray-100
+                    shadow-sm p-5">
+
+              <div class="flex items-center justify-between mb-5">
+                <div>
+                  <h3 class="text-base font-semibold text-gray-800">
+                    Order Status
+                  </h3>
+
+                  <p class="text-xs text-gray-400 mt-1">
+                    Current order distribution
+                  </p>
+                </div>
               </div>
-              <div class="chart-container">
+
+              <div class="h-72 flex items-center justify-center">
                 <canvas id="orderChart"></canvas>
               </div>
+
             </div>
+
           </div>
 
-          <!-- Alerts & Inventory Preview -->
           <div class="grid md:grid-cols-2 gap-6">
-            <!-- Alerts -->
-            <div class="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
-              <h3 class="text-sm font-semibold text-gray-700 mb-4">⚠️ Alerts</h3>
-              <div class="space-y-3">
-                <div class="flex items-center gap-3 p-3 bg-red-50 rounded-xl border border-red-200">
-                  <span class="text-xl">🔴</span>
-                  <div class="flex-1">
-                    <p class="text-sm font-medium text-red-700">Low Stock Alert</p>
-                    <p class="text-xs text-red-600">5 items below minimum threshold</p>
-                  </div>
-                  <span class="text-xs font-semibold text-red-700">URGENT</span>
+
+            <div class="bg-white rounded-xl border border-gray-100
+                    shadow-sm p-5">
+
+              <div class="flex items-center justify-between mb-4">
+                <div>
+                  <h3 class="text-base font-semibold text-gray-800">
+                    Alerts
+                  </h3>
+
+                  <p class="text-xs text-gray-400 mt-1">
+                    Important things that may need your attention
+                  </p>
                 </div>
-                <div class="flex items-center gap-3 p-3 bg-amber-50 rounded-xl border border-amber-200">
-                  <span class="text-xl">🟡</span>
-                  <div class="flex-1">
-                    <p class="text-sm font-medium text-amber-700">Old Stock Warning</p>
-                    <p class="text-xs text-amber-600">12 items aging > 180 days</p>
-                  </div>
-                  <span class="text-xs font-semibold text-amber-700">ATTENTION</span>
-                </div>
-                <div class="flex items-center gap-3 p-3 bg-green-50 rounded-xl border border-green-200">
-                  <span class="text-xl">🟢</span>
-                  <div class="flex-1">
-                    <p class="text-sm font-medium text-green-700">Stock Restocked</p>
-                    <p class="text-xs text-green-600">34 items restocked this week</p>
-                  </div>
-                  <span class="text-xs font-semibold text-green-700">DONE</span>
-                </div>
+
+                <span class="w-9 h-9 rounded-lg bg-amber-50
+                             flex items-center justify-center text-amber-600">
+                  <i class="fas fa-bell"></i>
+                </span>
               </div>
+
+              <div id="overview-alerts" class="space-y-3">
+
+                <div class="p-4 rounded-xl border border-gray-100 bg-gray-50">
+                  <p class="text-sm text-gray-400">
+                    Loading alerts...
+                  </p>
+                </div>
+
+              </div>
+
             </div>
 
-            <!-- Recent Orders -->
-            <div class="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
-              <h3 class="text-sm font-semibold text-gray-700 mb-4">🛒 Recent Orders</h3>
-              <div class="space-y-3">
-                <div class="flex items-center justify-between p-3 bg-gray-50 rounded-xl">
-                  <div>
-                    <p class="text-sm font-medium text-gray-800">#ORD-2341</p>
-                    <p class="text-xs text-gray-400">Tech Supplies Rwanda</p>
-                  </div>
-                  <span class="status-badge pending">Pending</span>
+            <div class="bg-white rounded-xl border border-gray-100
+                    shadow-sm p-5">
+
+              <div class="flex items-center justify-between mb-4">
+                <div>
+                  <h3 class="text-base font-semibold text-gray-800">
+                    Recent Orders
+                  </h3>
+
+                  <p class="text-xs text-gray-400 mt-1">
+                    Latest orders across your stores
+                  </p>
                 </div>
-                <div class="flex items-center justify-between p-3 bg-gray-50 rounded-xl">
-                  <div>
-                    <p class="text-sm font-medium text-gray-800">#ORD-2340</p>
-                    <p class="text-xs text-gray-400">Global Electronics Ltd</p>
-                  </div>
-                  <span class="status-badge active">Completed</span>
-                </div>
-                <div class="flex items-center justify-between p-3 bg-gray-50 rounded-xl">
-                  <div>
-                    <p class="text-sm font-medium text-gray-800">#ORD-2339</p>
-                    <p class="text-xs text-gray-400">Green Energy Solutions</p>
-                  </div>
-                  <span class="status-badge inactive">Cancelled</span>
-                </div>
+
+                <span class="w-9 h-9 rounded-lg bg-blue-50
+                             flex items-center justify-center text-blue-600">
+                  <i class="fas fa-receipt"></i>
+                </span>
               </div>
-              <a href="#" class="block text-center text-sm text-brand hover:text-brand-dark transition mt-3 font-medium">View All Orders →</a>
+
+              <div id="overview-recent-orders" class="space-y-3">
+
+                <div class="p-4 rounded-xl border border-gray-100 bg-gray-50">
+                  <p class="text-sm text-gray-400">
+                    Loading recent orders...
+                  </p>
+                </div>
+
+              </div>
+
             </div>
+
           </div>
+
         </div>
 
         <div id="tab-stores" class="tab-content relative">
@@ -685,138 +786,10 @@
 
         </div>
 
-        <!-- <div id="tab-orders" class="tab-content">
-          <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-            <div class="flex items-center justify-between mb-6">
-              <div>
-                <h2 class="text-lg font-bold text-gray-900">Orders</h2>
-                <p class="text-sm text-gray-500">Track and manage all your orders</p>
-              </div>
-              <div class="flex gap-2">
-                <select class="search-select" id="ordersStatusFilter">
-                  <option value="">All Status</option>
-                  <option value="pending">Pending</optfion>
-                  <option value="processing">Processing</option>
-                  <option value="completed">Completed</option>
-                  <option value="cancelled">Cancelled</option>
-                </select>
-                <button class="px-4 py-2 bg-brand text-white rounded-xl text-sm font-medium hover:bg-brand-dark transition">
-                  <i class="fas fa-filter"></i>
-                </button>
-              </div>
-            </div>
 
-            <div class="search-toolbar">
-              <div class="search-wrapper">
-                <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <circle cx="11" cy="11" r="8" />
-                  <line x1="21" y1="21" x2="16.65" y2="16.65" />
-                </svg>
-                <input type="text" id="ordersSearchInput" class="search-input" placeholder="Search order ID, customer name or email...">
-                <span class="search-clear" id="ordersSearchClear" title="Clear">
-                  <i class="fas fa-times"></i>
-                </span>
-              </div>
-              <select class="search-select" id="ordersPaymentFilter">
-                <option value="">All Payments</option>
-                <option value="paid">Paid</option>
-                <option value="unpaid">Unpaid</option>
-                <option value="refunded">Refunded</option>
-              </select>
-              <select class="search-select" id="ordersDateFilter">
-                <option value="">All Dates</option>
-                <option value="today">Today</option>
-                <option value="7days">Last 7 days</option>
-                <option value="30days">Last 30 days</option>
-              </select>
-              <button class="search-btn" id="ordersSearchBtn">
-                <i class="fas fa-search"></i>
-                <span>Search</span>
-              </button>
-              <span class="search-results-info" id="ordersResultsInfo"></span>
-            </div>
-
-            <div class="overflow-x-auto">
-              <table class="w-full">
-                <thead>
-                  <tr class="bg-gray-50 border-b border-gray-100">
-                    <th class="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Order ID</th>
-                    <th class="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Customer</th>
-                    <th class="text-center px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider hidden md:table-cell">Total</th>
-                    <th class="text-center px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
-                    <th class="text-center px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider hidden lg:table-cell">Date</th>
-                    <th class="text-center px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
-                  </tr>
-                </thead>
-                <tbody id="ordersTableBody">
-                  <tr class="border-b border-gray-50 hover:bg-gray-50 transition order-row" data-order="ord-2341" data-customer="John Doe" data-email="john@example.com" data-status="pending" data-payment="unpaid" data-date="2024-12-15">
-                    <td class="px-4 py-3 text-sm font-mono text-gray-500">#ORD-2341</td>
-                    <td class="px-4 py-3">
-                      <p class="text-sm font-medium text-gray-900">John Doe</p>
-                      <p class="text-xs text-gray-400">john@example.com</p>
-                    </td>
-                    <td class="px-4 py-3 text-center hidden md:table-cell text-sm font-semibold text-gray-900">$234.00</td>
-                    <td class="px-4 py-3 text-center"><span class="status-badge pending">Pending</span></td>
-                    <td class="px-4 py-3 text-center hidden lg:table-cell text-sm text-gray-500">2024-12-15</td>
-                    <td class="px-4 py-3 text-center">
-                      <button class="p-1.5 rounded-lg text-blue-600 hover:bg-blue-50 transition"><i class="fas fa-eye"></i></button>
-                      <button class="p-1.5 rounded-lg text-blue-600 hover:bg-blue-50 transition"><i class="fas fa-edit"></i></button>
-                    </td>
-                  </tr>
-                  <tr class="border-b border-gray-50 hover:bg-gray-50 transition order-row" data-order="ord-2340" data-customer="Jane Smith" data-email="jane@example.com" data-status="completed" data-payment="paid" data-date="2024-12-14">
-                    <td class="px-4 py-3 text-sm font-mono text-gray-500">#ORD-2340</td>
-                    <td class="px-4 py-3">
-                      <p class="text-sm font-medium text-gray-900">Jane Smith</p>
-                      <p class="text-xs text-gray-400">jane@example.com</p>
-                    </td>
-                    <td class="px-4 py-3 text-center hidden md:table-cell text-sm font-semibold text-gray-900">$1,234.00</td>
-                    <td class="px-4 py-3 text-center"><span class="status-badge active">Completed</span></td>
-                    <td class="px-4 py-3 text-center hidden lg:table-cell text-sm text-gray-500">2024-12-14</td>
-                    <td class="px-4 py-3 text-center">
-                      <button class="p-1.5 rounded-lg text-blue-600 hover:bg-blue-50 transition"><i class="fas fa-eye"></i></button>
-                      <button class="p-1.5 rounded-lg text-blue-600 hover:bg-blue-50 transition"><i class="fas fa-edit"></i></button>
-                    </td>
-                  </tr>
-                  <tr class="border-b border-gray-50 hover:bg-gray-50 transition order-row" data-order="ord-2339" data-customer="Tech Supplies Rwanda" data-email="info@techsupplies.rw" data-status="cancelled" data-payment="refunded" data-date="2024-12-13">
-                    <td class="px-4 py-3 text-sm font-mono text-gray-500">#ORD-2339</td>
-                    <td class="px-4 py-3">
-                      <p class="text-sm font-medium text-gray-900">Tech Supplies Rwanda</p>
-                      <p class="text-xs text-gray-400">info@techsupplies.rw</p>
-                    </td>
-                    <td class="px-4 py-3 text-center hidden md:table-cell text-sm font-semibold text-gray-900">$560.00</td>
-                    <td class="px-4 py-3 text-center"><span class="status-badge inactive">Cancelled</span></td>
-                    <td class="px-4 py-3 text-center hidden lg:table-cell text-sm text-gray-500">2024-12-13</td>
-                    <td class="px-4 py-3 text-center">
-                      <button class="p-1.5 rounded-lg text-blue-600 hover:bg-blue-50 transition"><i class="fas fa-eye"></i></button>
-                      <button class="p-1.5 rounded-lg text-blue-600 hover:bg-blue-50 transition"><i class="fas fa-edit"></i></button>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-
-            <div class="flex flex-wrap items-center justify-between gap-3 mt-4 pt-3 border-t border-gray-100">
-              <p class="text-xs text-gray-500" id="ordersShowingText">Showing 1-3 of 1,284 items</p>
-              <div class="flex items-center gap-2">
-                <button class="px-3 py-1 rounded-lg border border-gray-200 text-sm text-gray-600 hover:bg-gray-50 transition disabled:opacity-40 disabled:cursor-not-allowed">
-                  <i class="fas fa-chevron-left"></i>
-                </button>
-                <span class="text-xs text-gray-500">Page 1 of 428</span>
-                <button class="px-3 py-1 rounded-lg border border-gray-200 text-sm text-gray-600 hover:bg-gray-50 transition disabled:opacity-40 disabled:cursor-not-allowed">
-                  <i class="fas fa-chevron-right"></i>
-                </button>
-              </div>
-            </div>
-          </div>
-        </div> -->
-
-        <!-- ============================================================ -->
-        <!-- TAB: ORDERS  (Vendor Order Dashboard) -->
-        <!-- ============================================================ -->
         <div id="tab-orders" class="tab-content">
           <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
 
-            <!-- Header -->
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
               <div>
                 <h2 class="text-lg font-bold text-gray-900">Orders</h2>
@@ -914,27 +887,21 @@
                 </div>
               </div>
 
-              <!-- ==================== STATUS + MONEY ==================== -->
               <div class="grid md:grid-cols-2 gap-6">
 
-                <!-- Status breakdown -->
                 <div class="rounded-xl border border-gray-100 p-5">
                   <p class="text-[11px] uppercase tracking-wider font-semibold text-gray-400 mb-3">By Status</p>
                   <div class="space-y-2.5" id="statusBreakdown">
-                    <!-- populated -->
                   </div>
                 </div>
 
-                <!-- Money breakdown -->
                 <div class="rounded-xl border border-gray-100 p-5">
                   <p class="text-[11px] uppercase tracking-wider font-semibold text-gray-400 mb-3">Revenue Breakdown</p>
                   <dl class="space-y-2.5" id="moneyBreakdown">
-                    <!-- populated -->
                   </dl>
                 </div>
               </div>
 
-              <!-- ==================== VELOCITY ==================== -->
               <div>
                 <p class="text-[11px] uppercase tracking-wider font-semibold text-gray-400 mb-3">Velocity</p>
                 <div class="grid grid-cols-3 gap-3">
@@ -953,7 +920,6 @@
                 </div>
               </div>
 
-              <!-- ==================== PER-STORE ==================== -->
               <div>
                 <div class="flex items-center justify-between mb-3">
                   <p class="text-[11px] uppercase tracking-wider font-semibold text-gray-400">By Store</p>
@@ -961,7 +927,6 @@
                 </div>
 
                 <div id="storesGrid" class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  <!-- populated -->
                 </div>
 
                 <div id="storesEmpty" class="hidden rounded-xl border border-dashed border-gray-200 p-8 text-center">
@@ -977,34 +942,374 @@
           </div>
         </div>
 
-        <div id="tab-analytics" class="tab-content">
-          <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-            <h2 class="text-lg font-bold text-gray-900 mb-2">Analytics</h2>
-            <p class="text-sm text-gray-500 mb-6">Deep insights into your business performance</p>
+        <div id="tab-analytics" class="tab-content relative">
 
-            <div class="grid md:grid-cols-2 gap-6">
-              <div class="bg-gray-50 rounded-xl p-4">
-                <p class="text-xs text-gray-400 uppercase tracking-wider">Revenue</p>
-                <p class="text-3xl font-bold text-gray-900 mt-1">$124,892</p>
-                <p class="text-sm text-green-600 mt-1">↑ 12.5% from last month</p>
+          <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
+
+              <div>
+                <h2 class="text-lg font-bold text-gray-900">
+                  Analytics
+                </h2>
+
+                <p class="text-sm text-gray-500 mt-1">
+                  Deep insights into your business performance
+                </p>
               </div>
-              <div class="bg-gray-50 rounded-xl p-4">
-                <p class="text-xs text-gray-400 uppercase tracking-wider">Orders</p>
-                <p class="text-3xl font-bold text-gray-900 mt-1">1,284</p>
-                <p class="text-sm text-green-600 mt-1">↑ 8.3% from last month</p>
+
+              <div class="flex items-center gap-2 md:gap-3">
+                <select id="analytics-period" class="cursor-pointer border border-gray-200 rounded-lg px-3 py-2
+                text-sm text-gray-700 bg-white
+                focus:outline-none focus:ring-2 focus:ring-gray-200">
+                  <option value="7d">Last 7 days</option>
+                  <option value="30d" selected>Last 30 days</option>
+                  <option value="90d">Last 90 days</option>
+                  <option value="12m">Last 12 months</option>
+                  <option value="all">All time</option>
+                </select>
+
+                <button id="analyticsRefreshBtn" class="inline-flex items-center gap-2 justify-center px-6 py-3 text-sm font-medium text-white transition-all duration-200 bg-gradient-to-r from-brand to-brand-dark rounded-xl shadow-lg shadow-brand-500/25 hover:shadow-brand-500/40 hover:-translate-y-0.5">
+                  <i data-lucide="refresh-cw"></i>
+                </button>
               </div>
-              <div class="bg-gray-50 rounded-xl p-4">
-                <p class="text-xs text-gray-400 uppercase tracking-wider">Conversion Rate</p>
-                <p class="text-3xl font-bold text-gray-900 mt-1">3.8%</p>
-                <p class="text-sm text-amber-600 mt-1">↓ 0.2% from last month</p>
-              </div>
-              <div class="bg-gray-50 rounded-xl p-4">
-                <p class="text-xs text-gray-400 uppercase tracking-wider">Average Order Value</p>
-                <p class="text-3xl font-bold text-gray-900 mt-1">$97.20</p>
-                <p class="text-sm text-green-600 mt-1">↑ 4.1% from last month</p>
-              </div>
+
             </div>
+
+            <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+
+              <div class="bg-gray-50 rounded-xl p-5">
+
+                <p class="text-xs text-gray-400 uppercase tracking-wider">
+                  Sales
+                </p>
+
+                <p id="analytics-sales" class="text-3xl font-bold text-gray-900 mt-1">
+                  0.00
+                </p>
+
+                <p id="analytics-sales-change" class="text-sm mt-1">
+                  —
+                </p>
+
+              </div>
+
+              <div class="bg-gray-50 rounded-xl p-5">
+
+                <p class="text-xs text-gray-400 uppercase tracking-wider">
+                  Orders
+                </p>
+
+                <p id="analytics-orders" class="text-3xl font-bold text-gray-900 mt-1">
+                  0
+                </p>
+
+                <p id="analytics-orders-change" class="text-sm mt-1">
+                  —
+                </p>
+
+              </div>
+
+              <div class="bg-gray-50 rounded-xl p-5">
+
+                <p class="text-xs text-gray-400 uppercase tracking-wider">
+                  Average Order Value
+                </p>
+
+                <p id="analytics-aov" class="text-3xl font-bold text-gray-900 mt-1">
+                  0.0
+                </p>
+
+                <p id="analytics-aov-change" class="text-sm mt-1">
+                  —
+                </p>
+
+              </div>
+
+
+              <div class="bg-gray-50 rounded-xl p-5">
+
+                <p class="text-xs text-gray-400 uppercase tracking-wider">
+                  Items Sold
+                </p>
+
+                <p id="analytics-items-sold" class="text-3xl font-bold text-gray-900 mt-1">
+                  0
+                </p>
+
+              </div>
+
+              <div class="bg-gray-50 rounded-xl p-5">
+
+                <p class="text-xs text-gray-400 uppercase tracking-wider">
+                  Customers
+                </p>
+
+                <p id="analytics-customers" class="text-3xl font-bold text-gray-900 mt-1">
+                  0
+                </p>
+
+              </div>
+
+              <div class="bg-gray-50 rounded-xl p-5">
+
+                <p class="text-xs text-gray-400 uppercase tracking-wider">
+                  Available Stock
+                </p>
+
+                <p id="analytics-available-stock" class="text-3xl font-bold text-gray-900 mt-1">
+                  0
+                </p>
+
+                <p id="analytics-low-stock" class="text-sm text-amber-600 mt-1">
+                  0 low stock
+                </p>
+
+              </div>
+
+            </div>
+
+            <div class="mt-8">
+
+              <h3 class="text-sm font-semibold text-gray-900 mb-4">
+                Order Performance
+              </h3>
+
+              <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+
+                <div class="border border-gray-100 rounded-xl p-4">
+                  <p class="text-xs text-gray-400 uppercase">
+                    Pending
+                  </p>
+
+                  <p id="analytics-pending" class="text-2xl font-bold text-gray-900 mt-1">
+                    0
+                  </p>
+                </div>
+
+
+                <div class="border border-gray-100 rounded-xl p-4">
+                  <p class="text-xs text-gray-400 uppercase">
+                    Processing
+                  </p>
+
+                  <p id="analytics-processing" class="text-2xl font-bold text-gray-900 mt-1">
+                    0
+                  </p>
+                </div>
+
+
+                <div class="border border-gray-100 rounded-xl p-4">
+                  <p class="text-xs text-gray-400 uppercase">
+                    Shipped
+                  </p>
+
+                  <p id="analytics-shipped" class="text-2xl font-bold text-gray-900 mt-1">
+                    0
+                  </p>
+                </div>
+
+
+                <div class="border border-gray-100 rounded-xl p-4">
+                  <p class="text-xs text-gray-400 uppercase">
+                    Delivered
+                  </p>
+
+                  <p id="analytics-delivered" class="text-2xl font-bold text-gray-900 mt-1">
+                    0
+                  </p>
+                </div>
+
+
+                <div class="border border-gray-100 rounded-xl p-4">
+                  <p class="text-xs text-gray-400 uppercase">
+                    Cancelled
+                  </p>
+
+                  <p id="analytics-cancelled" class="text-2xl font-bold text-gray-900 mt-1">
+                    0
+                  </p>
+                </div>
+
+              </div>
+
+            </div>
+
+            <div class="mt-8">
+
+              <div class="flex items-center justify-between mb-4">
+
+                <h3 class="text-sm font-semibold text-gray-900">
+                  Store Performance
+                </h3>
+
+              </div>
+
+              <div class="overflow-x-auto">
+
+                <table class="w-full text-sm">
+
+                  <thead>
+                    <tr class="border-b border-gray-100 text-left">
+
+                      <th class="py-3 pr-4 font-medium text-gray-500">
+                        Store
+                      </th>
+
+                      <th class="py-3 px-4 font-medium text-gray-500">
+                        Orders
+                      </th>
+
+                      <th class="py-3 px-4 font-medium text-gray-500">
+                        Items Sold
+                      </th>
+
+                      <th class="py-3 px-4 font-medium text-gray-500">
+                        Sales
+                      </th>
+
+                      <th class="py-3 pl-4 font-medium text-gray-500">
+                        AOV
+                      </th>
+
+                    </tr>
+                  </thead>
+
+                  <tbody id="analytics-stores">
+
+                    <tr>
+                      <td colspan="5" class="py-8 text-center text-gray-400">
+                        No store data available
+                      </td>
+                    </tr>
+
+                  </tbody>
+
+                </table>
+
+              </div>
+
+            </div>
+
+            <div class="mt-8">
+
+              <h3 class="text-sm font-semibold text-gray-900 mb-4">
+                Top Selling Products
+              </h3>
+
+              <div class="overflow-x-auto">
+
+                <table class="w-full text-sm">
+
+                  <thead>
+                    <tr class="border-b border-gray-100 text-left">
+
+                      <th class="py-3 pr-4 font-medium text-gray-500">
+                        Product
+                      </th>
+
+                      <th class="py-3 px-4 font-medium text-gray-500">
+                        Units Sold
+                      </th>
+
+                      <th class="py-3 px-4 font-medium text-gray-500">
+                        Orders
+                      </th>
+
+                      <th class="py-3 pl-4 font-medium text-gray-500">
+                        Sales
+                      </th>
+
+                    </tr>
+                  </thead>
+
+                  <tbody id="analytics-products">
+
+                    <tr>
+                      <td colspan="4" class="py-8 text-center text-gray-400">
+                        No product data available
+                      </td>
+                    </tr>
+
+                  </tbody>
+
+                </table>
+
+              </div>
+
+            </div>
+
+            <div class="mt-8">
+
+              <h3 class="text-sm font-semibold text-gray-900 mb-4">
+                Inventory Overview
+              </h3>
+
+              <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+
+                <div class="border border-gray-100 rounded-xl p-4">
+
+                  <p class="text-xs text-gray-400 uppercase">
+                    Total Quantity
+                  </p>
+
+                  <p id="analytics-inventory-total" class="text-2xl font-bold text-gray-900 mt-1">
+                    0
+                  </p>
+
+                </div>
+
+
+                <div class="border border-gray-100 rounded-xl p-4">
+
+                  <p class="text-xs text-gray-400 uppercase">
+                    Reserved
+                  </p>
+
+                  <p id="analytics-inventory-reserved" class="text-2xl font-bold text-gray-900 mt-1">
+                    0
+                  </p>
+
+                </div>
+
+
+                <div class="border border-gray-100 rounded-xl p-4">
+
+                  <p class="text-xs text-gray-400 uppercase">
+                    Low Stock
+                  </p>
+
+                  <p id="analytics-inventory-low" class="text-2xl font-bold text-gray-900 mt-1">
+                    0
+                  </p>
+
+                </div>
+
+
+                <div class="border border-gray-100 rounded-xl p-4">
+
+                  <p class="text-xs text-gray-400 uppercase">
+                    Out of Stock
+                  </p>
+
+                  <p id="analytics-inventory-out" class="text-2xl font-bold text-gray-900 mt-1">
+                    0
+                  </p>
+
+                </div>
+
+              </div>
+
+            </div>
+
           </div>
+
+          <div class="abs-centered hidden" id="analyticsLoader">
+            <svg version="1.1" x="0" y="0" width="150px" height="150px" viewBox="-10 -10 120 120" enable-background="new 0 0 200 200" xml:space="preserve">
+              <path class="c-loader" d="M0,50 A50,50,0 1 1 100,50 A50,50,0 1 1 0,50" />
+            </svg>
+          </div>
+
         </div>
 
         <div id="tab-categories" class="tab-content">
@@ -1081,7 +1386,6 @@
               </button>
             </div>
 
-            <!-- Empty -->
             <div id="categoriesEmpty" class="hidden py-12 text-center">
               <div class="mx-auto w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center">
                 <i data-lucide="tags" class="w-5 h-5 text-gray-400"></i>
@@ -1099,7 +1403,6 @@
             <div id="categoriesPagination" class="hidden mt-5 pt-4 border-t border-gray-100">
               <div class="flex flex-col sm:flex-row items-center justify-between gap-3">
 
-                <!-- Info -->
                 <p class="text-xs text-gray-500" id="catPaginationInfo">
                   Showing 0-0 of 0
                 </p>
@@ -1131,7 +1434,7 @@
             <p class="mt-5 text-xs text-gray-400" id="categoriesFooterHint">
               <span class="text-black">These are system verified product categories.</span>
               <br>
-              Can't find what you need? Request a category and our team will review it.
+              Can't find what you need? Request a your category for listing.
             </p>
           </div>
         </div>
@@ -1258,7 +1561,7 @@
 
             <p class="mt-5 text-xs text-gray-400" id="familiesFooterHint">
               <span class="text-black">These are system verified product categories.</span>
-              <br> Can't find what you need? Request a family and our team will review it.
+              <br> Can't find what you need? Request a family for listing.
             </p>
 
           </div>
@@ -1387,7 +1690,7 @@
 
             <p class="mt-5 text-xs text-gray-400" id="brandsFooterHint">
               <span class="text-black">These are system verified brands.</span>
-              <br> Can't find what you need? Request a brand and our team will review it.
+              <br> Can't find what you need? Request a brand for listing.
             </p>
 
           </div>
@@ -1503,14 +1806,14 @@
 
             <p class="mt-5 text-xs text-gray-400" id="attributesFooterHint">
               <span class="text-black">These are system verified product attributes.</span><br>
-              Can't find what you need? Request an attribute and our team will review it.
+              Can't find what you need? Request your listing attribute.
             </p>
 
           </div>
           <p class="text-sm mt-3 text-gray-500">Please read and understand our <a class="text-brand hover:underline" href="/docs/attributes-registry-terms" target="_blank">business attribute terms</a>. By accessing or using these attributes, you agree to these terms.</p>
         </div>
 
-        
+
         <div id="requestAttributeModal" class="fixed inset-0 z-50 hidden items-center justify-center px-4">
           <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" data-dismiss="attribute-request"></div>
           <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
@@ -1581,7 +1884,7 @@
               </button>
             </div>
 
-  
+
             <div class="flex-1 overflow-y-auto px-6 py-5 space-y-5">
 
               <div>
@@ -2352,9 +2655,9 @@
         <div class="flex flex-col md:flex-row justify-between items-center gap-2 text-xs text-gray-400">
           <span>© 2026 COCOCE Business — Vendor Dashboard</span>
           <div class="flex gap-6">
-            <a href="/privacy" class="hover:text-brand transition">Privacy</a>
-            <a href="/terms" class="hover:text-brand transition">Terms</a>
-            <a href="mailto:support@cococe.rw" class="hover:text-brand transition">Support</a>
+            <a href="/docs/catalog-terms" target="_blank" class="hover:text-brand transition">Catalog terms</a>
+            <a href="/docs/marketplace-terms" class="hover:text-brand transition">Terms</a>
+            <a href="mailto:sales@cococe.rw" class="hover:text-brand transition">Support</a>
             <a href="/docs" class="hover:text-brand transition">Docs</a>
           </div>
         </div>
@@ -2372,46 +2675,46 @@
         </button>
       </div>
       <div class="p-6 grid grid-cols-2 md:grid-cols-3 gap-3">
-        <a href="#" class="flex items-center gap-3 p-3 rounded-xl border border-gray-100 hover:border-brand/20 hover:bg-brand-light transition">
-          <span class="text-xl">🏪</span>
+        <a href="/products/catalog" class="flex items-center gap-3 p-3 rounded-xl border border-gray-100 hover:border-brand/20 hover:bg-brand-light transition" target="_blank">
+          <span class="text-xl"><i data-lucide="menu"></i></span>
           <div>
-            <p class="text-sm font-semibold text-gray-800">Add Store</p>
-            <p class="text-xs text-gray-400">New location</p>
+            <p class="text-sm font-semibold text-gray-800">Catalog</p>
+            <p class="text-xs text-gray-400">Marketplace Catalogue</p>
           </div>
         </a>
-        <a href="#" class="flex items-center gap-3 p-3 rounded-xl border border-gray-100 hover:border-brand/20 hover:bg-brand-light transition">
-          <span class="text-xl">📦</span>
+        <a href="/cataloging/product" target="_blank" class="flex items-center gap-3 p-3 rounded-xl border border-gray-100 hover:border-brand/20 hover:bg-brand-light transition">
+          <span class="text-xl"><i data-lucide="plus"></i></span>
           <div>
-            <p class="text-sm font-semibold text-gray-800">Add Product</p>
-            <p class="text-xs text-gray-400">New inventory</p>
+            <p class="text-sm font-semibold text-gray-800">Add Catalog</p>
+            <p class="text-xs text-gray-400">Add your catalog to marketplace</p>
           </div>
         </a>
-        <a href="#" class="flex items-center gap-3 p-3 rounded-xl border border-gray-100 hover:border-brand/20 hover:bg-brand-light transition">
-          <span class="text-xl">👤</span>
+        <a href="/pricing" target="_blank" class="flex items-center gap-3 p-3 rounded-xl border border-gray-100 hover:border-brand/20 hover:bg-brand-light transition">
+          <span class="text-xl"><i data-lucide="diamond-percent"></i></span>
           <div>
-            <p class="text-sm font-semibold text-gray-800">Edit Profile</p>
-            <p class="text-xs text-gray-400">Update info</p>
+            <p class="text-sm font-semibold text-gray-800">Vending & Pricing</p>
+            <p class="text-xs text-gray-400">Review Marketplace Info</p>
           </div>
         </a>
-        <a href="#" class="flex items-center gap-3 p-3 rounded-xl border border-gray-100 hover:border-brand/20 hover:bg-brand-light transition">
-          <span class="text-xl">📊</span>
+        <a href="/docs/marketplace-terms" target="_blank" class="flex items-center gap-3 p-3 rounded-xl border border-gray-100 hover:border-brand/20 hover:bg-brand-light transition">
+          <span class="text-xl"><i data-lucide="handshake"></i></span>
           <div>
-            <p class="text-sm font-semibold text-gray-800">View Reports</p>
-            <p class="text-xs text-gray-400">Analytics</p>
+            <p class="text-sm font-semibold text-gray-800">Terms</p>
+            <p class="text-xs text-gray-400">Marketplace terms</p>
           </div>
         </a>
-        <a href="#" class="flex items-center gap-3 p-3 rounded-xl border border-gray-100 hover:border-brand/20 hover:bg-brand-light transition">
-          <span class="text-xl">📋</span>
+        <a href="mailto:sales@cococe.rw" class="flex items-center gap-3 p-3 rounded-xl border border-gray-100 hover:border-brand/20 hover:bg-brand-light transition">
+          <span class="text-xl"><i data-lucide="circle-question-mark"></i></span>
           <div>
-            <p class="text-sm font-semibold text-gray-800">Bulk Import</p>
-            <p class="text-xs text-gray-400">Products</p>
+            <p class="text-sm font-semibold text-gray-800">Have question?</p>
+            <p class="text-xs text-gray-400">Get support?</p>
           </div>
         </a>
-        <a href="#" class="flex items-center gap-3 p-3 rounded-xl border border-gray-100 hover:border-brand/20 hover:bg-brand-light transition">
-          <span class="text-xl">⚙️</span>
+        <a href="/marketplace/faqs" target="_blank" class="flex items-center gap-3 p-3 rounded-xl border border-gray-100 hover:border-brand/20 hover:bg-brand-light transition">
+          <span class="text-xl"><i data-lucide="file-question-mark"></i></span>
           <div>
-            <p class="text-sm font-semibold text-gray-800">Settings</p>
-            <p class="text-xs text-gray-400">Preferences</p>
+            <p class="text-sm font-semibold text-gray-800">Visit ou FAQs</p>
+            <p class="text-xs text-gray-400">Have a question?</p>
           </div>
         </a>
       </div>
@@ -2430,6 +2733,8 @@
   <script src="/scripts/vd-orders.js"></script>
   <script src="/scripts/vd-brands.js"></script>
   <script src="/scripts/vd-attributes.js"></script>
+  <script src="/scripts/vd-analytics.js"></script>
+  <script src="/scripts/vd-overview.js"></script>
   <script src="/scripts/bdsh.js"></script>
 
   <script>

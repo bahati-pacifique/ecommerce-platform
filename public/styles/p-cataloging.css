@@ -1,0 +1,419 @@
+html {
+    -webkit-text-size-adjust: 100%;
+    scroll-behavior: smooth;
+}
+
+html,
+body {
+    height: 100%;
+    width: 100%;
+}
+
+body {
+    font-family: 'Inter', system-ui, sans-serif;
+    background: #F8FAFC;
+    color: #0F172A;
+    margin: 0;
+}
+
+.step-indicator {
+    display: flex;
+    align-items: center;
+    gap: 0;
+}
+
+.step-node {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+    cursor: pointer;
+}
+
+.step-node[data-clickable="false"] {
+    cursor: not-allowed;
+}
+
+.step-dot {
+    width: 32px;
+    height: 32px;
+    border-radius: 999px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+    border: 2px solid #E2E8F0;
+    background: #fff;
+    color: #94A3B8;
+    transition: all .2s ease;
+}
+
+.step-node[data-status="active"] .step-dot {
+    border-color: #ED1B24;
+    background: #ED1B24;
+    color: #fff;
+    box-shadow: 0 0 0 4px rgba(237, 27, 36, 0.12);
+}
+
+.step-node[data-status="complete"] .step-dot {
+    border-color: #16A34A;
+    background: #16A34A;
+    color: #fff;
+}
+
+.step-node[data-status="error"] .step-dot {
+    border-color: #DC2626;
+    background: #DC2626;
+    color: #fff;
+}
+
+.step-label {
+    font-size: 11px;
+    font-weight: 500;
+    color: #64748B;
+    white-space: nowrap;
+}
+
+.step-node[data-status="active"] .step-label {
+    color: #0F172A;
+    font-weight: 600;
+}
+
+.step-node[data-status="complete"] .step-label {
+    color: #166534;
+}
+
+.step-connector {
+    flex: 1;
+    height: 2px;
+    background: #E2E8F0;
+    margin: 0 6px;
+    margin-bottom: 22px;
+    transition: background .2s ease;
+}
+
+.step-connector[data-status="complete"] {
+    background: #16A34A;
+}
+
+@media (max-width: 640px) {
+    .step-label {
+        display: none;
+    }
+
+    .step-connector {
+        margin-bottom: 0;
+    }
+}
+
+.field-error input,
+.field-error textarea,
+.field-error select {
+    border-color: #DC2626;
+    background: #FEF2F2;
+}
+
+.field-error input:focus,
+.field-error textarea:focus,
+.field-error select:focus {
+    box-shadow: 0 0 0 4px rgba(220, 38, 38, 0.12);
+}
+
+.ql-toolbar.ql-snow {
+    border: 1px solid #E2E8F0;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    background: #F8FAFC;
+}
+
+.ql-container.ql-snow {
+    border: 1px solid #E2E8F0;
+    border-top: none;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+    font-family: inherit;
+    font-size: 14px;
+    min-height: 200px;
+}
+
+.ql-editor {
+    min-height: 200px;
+    padding: 16px;
+    line-height: 1.65;
+}
+
+.ql-editor.ql-blank::before {
+    color: #94A3B8;
+    font-style: normal;
+}
+
+.dropzone {
+    border: 2px dashed #E2E8F0;
+    border-radius: 12px;
+    padding: 32px 20px;
+    text-align: center;
+    transition: all .15s ease;
+    cursor: pointer;
+    background: #fff;
+}
+
+.dropzone:hover,
+.dropzone.is-dragover {
+    border-color: #ED1B24;
+    background: #FFF5F5;
+}
+
+.dropzone.is-dragover {
+    transform: scale(1.005);
+}
+
+.media-tile {
+    position: relative;
+    aspect-ratio: 1;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid #E2E8F0;
+    background: #F1F5F9;
+    cursor: grab;
+}
+
+.media-tile.is-dragging {
+    opacity: 0.4;
+}
+
+.media-tile.is-primary {
+    border-color: #ED1B24;
+    box-shadow: 0 0 0 3px rgba(237, 27, 36, 0.15);
+}
+
+.media-tile img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.media-tile .media-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, transparent 40%, rgba(0, 0, 0, 0.6) 100%);
+    opacity: 0;
+    transition: opacity .15s ease;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 10px;
+}
+
+.media-tile:hover .media-overlay {
+    opacity: 1;
+}
+
+.media-tile .primary-badge {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    background: #ED1B24;
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    border-radius: 999px;
+    letter-spacing: 0.3px;
+}
+
+.variant-table {
+    table-layout: fixed;
+    width: 100%;
+}
+
+.variant-table th {
+    font-size: 11px;
+    font-weight: 600;
+    color: #64748B;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    padding: 10px 12px;
+    text-align: left;
+    background: #F8FAFC;
+    border-bottom: 1px solid #E2E8F0;
+}
+
+.variant-table td {
+    padding: 12px;
+    font-size: 13px;
+    color: #1F2937;
+    border-bottom: 1px solid #F1F5F9;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+}
+
+.variant-table tr:hover td {
+    background: #F8FAFC;
+}
+
+.variant-table th:nth-child(1) {
+    width: 22%;
+}
+
+.variant-table th:nth-child(2) {
+    width: 40%;
+}
+
+.variant-table th:nth-child(3) {
+    width: 12%;
+}
+
+.variant-table th:nth-child(4) {
+    width: 16%;
+}
+
+.variant-table th:nth-child(5) {
+    width: 10%;
+}
+
+.attr-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    background: #F1F5F9;
+    color: #334155;
+    font-size: 12px;
+    font-weight: 500;
+    border: 1px solid #E2E8F0;
+    max-width: 100%;
+    min-width: 0;
+}
+
+.attr-chip .swatch {
+    width: 12px;
+    height: 12px;
+    border-radius: 999px;
+    border: 1px solid #CBD5E1;
+    flex-shrink: 0;
+}
+
+/* .hidden {
+    display: none !important;
+} Contradicting with tailwind's default class*/ 
+
+.fade-in {
+    animation: fadeIn .25s ease both;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(4px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+#quillEditor .ql-editor:focus,
+#quillEditor .ql-editor:focus-visible,
+#quillEditor .ql-toolbar .ql-picker:focus,
+#quillEditor .ql-toolbar .ql-picker:focus-visible {
+    outline: none !important;
+    box-shadow: none;
+}
+
+#quillEditor .ql-toolbar button:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 2px #ED1B24;
+    border-radius: 4px;
+    color: #ED1B24;
+}
+
+.quill-wrapper {
+    border: 1px solid #E2E8F0;
+    border-radius: 10px;
+    overflow: hidden;
+    background: #fff;
+    transition: border-color .15s ease, box-shadow .15s ease;
+}
+
+.quill-wrapper:focus-within {
+    border-color: #ED1B24;
+    box-shadow: 0 0 0 2px rgba(237, 27, 36, 0.10);
+}
+
+.quill-wrapper:hover:not(:focus-within) {
+    border-color: #CBD5E1;
+}
+
+.field-error .quill-wrapper {
+    border-color: #DC2626;
+    background: #FEF2F2;
+}
+
+.field-error .quill-wrapper:focus-within {
+    box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.12);
+}
+
+.quill-wrapper .ql-toolbar.ql-snow {
+    border: none !important;
+    border-bottom: 1px solid #E2E8F0 !important;
+    background: #F8FAFC;
+    max-width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+}
+
+/* .quill-wrapper .ql-container.ql-snow {
+    border: none !important;
+    font-family: inherit;
+    font-size: 14px;
+    min-height: 200px;
+    max-width: 100%;
+} */
+
+.quill-wrapper .ql-toolbar.ql-snow {
+    border: none !important;
+    border-bottom: 1px solid #E2E8F0 !important;
+    background: #F8FAFC;
+    max-width: 100%;
+    overflow: visible;      /* was: overflow-x: auto; overflow-y: hidden; */
+    position: relative;     /* ensure it's a positioned ancestor */
+    z-index: 5;
+}
+
+.quill-wrapper .ql-editor {
+    min-height: 200px;
+    padding: 16px;
+    line-height: 1.65;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+    outline: none !important;
+}
+
+.quill-wrapper .ql-editor.ql-blank::before {
+    color: #94A3B8;
+    font-style: normal;
+}
+
+.quill-wrapper .ql-toolbar button:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 2px #ED1B24;
+    border-radius: 4px;
+    color: #ED1B24;
+}
+
+.quill-wrapper .ql-container.ql-snow {
+    min-height: 350px;
+}
+
+.quill-wrapper .ql-editor {
+    min-height: 350px;
+    padding: 16px;
+    line-height: 1.65;
+    overflow-y: visible; /* Make — Let it grow instead of scrolling */
+}

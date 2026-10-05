@@ -47,8 +47,6 @@ class VendorInventory {
                 { withCredentials: true }
             );
 
-            console.log(response.data);
-
             $('#total-invt').text(response.data.inventories?.total || '0');
             $('#active-invt').text(response.data.inventories?.active || '0');
             $('#inactive-invt').text(response.data.inventories?.inactive || '0');

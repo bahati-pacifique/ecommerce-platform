@@ -4,6 +4,7 @@ const router = express.Router();
 const adminController = require('../controller/admin.controller');
 
 const ProductMetaController = require('../../../controllers/ProductMetaController');
+const { activateProduct } = require('../../business/controller/business.controller')
 const VendorController = require('../../../controllers/vendors.controller');
 
 const { administration, session } = require('../../../middlewares/authGuards');
@@ -18,7 +19,7 @@ router.post('/product-metas/batch/', ProductMetaController.batchInsert);
 
 /* ================================ Admin Product Meta routes ================================*/
 
-                    //================= Categories =============
+//================= Categories =============
 router.get('/product-categories/', administration, ProductMetaController.getProductCategories);
 router.post('/product-categories/', administration, ProductMetaController.createProductCategory);
 router.get('/product-categories/:id', administration, ProductMetaController.getProductCategory);
@@ -27,7 +28,7 @@ router.patch('/product-categories/:id', administration, ProductMetaController.ac
 router.patch('/product-categories/remove/:id', administration, ProductMetaController.removeProductCategory);
 router.delete('/product-categories/:id', administration, ProductMetaController.deleteProductCategory);
 
-                    //================= Families =============
+//================= Families =============
 router.post('/product-families/', administration, ProductMetaController.createProductFamily);
 router.get('/product-families/', administration, ProductMetaController.getProductFamilies);
 router.get('/product-families/:id', administration, ProductMetaController.getProductFamily);
@@ -36,7 +37,7 @@ router.patch('/product-families/:id', administration, ProductMetaController.acti
 router.patch('/product-families/remove/:id', administration, ProductMetaController.removeProductFamily);
 router.delete('/product-families/:id', administration, ProductMetaController.deleteProductFamily);
 
-                    //================= Brands =============
+//================= Brands =============
 router.post('/product-brands/', administration, ProductMetaController.createBrand);
 router.get('/product-brands/', administration, ProductMetaController.getBrands);
 router.get('/product-brands/:id', administration, ProductMetaController.getBrandById);
@@ -45,7 +46,7 @@ router.patch('/product-brands/:id', administration, ProductMetaController.activa
 router.patch('/product-brands/remove/:id', administration, ProductMetaController.softDeleteBrand);
 router.delete('/product-brands/:id', administration, ProductMetaController.hardDeleteBrand);
 
-            //Attributes
+//Attributes
 router.post('/attributes/', administration, ProductMetaController.createAttribute);
 router.get('/attributes/', administration, ProductMetaController.getAttributes);
 router.get('/attributes/:id', administration, ProductMetaController.getAttribute);
@@ -54,7 +55,7 @@ router.patch('/attributes/:id', administration, ProductMetaController.activateAt
 router.patch('/attributes/remove/:id', administration, ProductMetaController.softDeleteAttribute);
 router.delete('/attributes/:id', administration, ProductMetaController.hardDeleteAttribute);
 
-            //Attributes values
+//Attributes values
 router.post('/attribute-values/', administration, ProductMetaController.createAttributeValue);
 router.get('/attribute-values/', administration, ProductMetaController.getAttributesValues);
 router.get('/attribute-values/:id', administration, ProductMetaController.getAttributeValue);
@@ -63,7 +64,11 @@ router.patch('/attribute-values/:id', administration, ProductMetaController.acti
 router.patch('/attribute-values/remove/:id', administration, ProductMetaController.softDeleteAttributeValue);
 router.delete('/attribute-values/:id', administration, ProductMetaController.hardDeleteAttributeValue);
 
-        //Vendors functionalities
+//Products routes
+router.get('/product/catalog', administration, adminController.renderProductCatalog)
+router.patch('/products/:productId/activate', administration, activateProduct);
+
+//Vendors functionalities
 router.patch('/vendors/v/:id', VendorController.updateVendorVerificationStatus);
 router.patch('/vendors/s/:id', VendorController.updateVendorStatus);
 router.get('/vendors/', VendorController.getVendors);

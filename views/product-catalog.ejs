@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>COCOCE — Product Catalog</title>
+  <link rel="icon" href="/favicon.ico" type="image/x-icon">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <link href="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.snow.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.js"></script>
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <link rel="stylesheet" href="/styles/components/notification.css">
+  <link rel="stylesheet" href="/styles/components/main-snackbar.css">
+  <link rel="stylesheet" href="/styles/components/loaders.css">
+  <link rel="stylesheet" href="/styles/main.css">
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.11.0/axios.min.js" integrity="sha512-h9644v03pHqrIHThkvXhB2PJ8zf5E9IyVnrSfZg8Yj8k4RsO4zldcQc4Bi9iVLUCCsqNY0b4WXVV4UB+wbWENA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+  <script>
+    window.__APP__ = {
+      protocal: "<%= locals.protocal || 'https://' %>",
+      domainName: "<%= locals.domainName || 'cococe.rw' %>",
+      
+    };
+  </script>
+  <script>
+    const CFG = window.__APP__ || {};
+    const API_BASE = `${CFG.protocal || location.protocol + '//'}api.${CFG.domainName || location.hostname}`;
+  </script>
+
+  <link rel="stylesheet" href="/styles/p-catalog.css">
+</head>
+
+<body>
+
+  <header class="bg-white border-b border-ink-200 sticky top-0 z-30 h-14 py-2">
+    <div class="h-full max-w-[1600px] mx-auto px-4 sm:px-6 flex items-center justify-between gap-3">
+      <a href="/dashboard" class="flex items-center gap-2 flex-shrink-0">
+        <img src="/images/logos/business.png" alt="COCOCE" class="h-12">
+      </a>
+
+      <div class="flex items-center gap-3 min-w-0">
+
+        <a href="/docs/catalog-terms" target="_blank" class="text-lg px-4 py-2 bg-white text-sm font-medium text-gray-700 hover:text-brand">
+          <i data-lucide="info" class="w-5 h-5"></i>
+        </a>
+        
+        <a href="<%=locals.protocal%>business.<%=locals.domainName%>/cataloging/product" target="_blank" class="inline-flex items-center gap-1.5 rounded-md bg-brand shadow-sm px-4 py-2 text-sm font-medium text-white hover:bg-brand-dark">
+          <i data-lucide="plus" class="w-4 h-4"></i>
+          <span class="hidden md:block">Create Catalog</span>
+        </a>
+
+        <a href="/dashboard" class="flex items-center gap-1.5 text-xs rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">
+          <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
+          <span class="hidden md:block">Dashboard</span>
+        </a>
+
+        <div class="relative inline-block text-left">
+
+          <button id="dropdownButton" class="inline-flex justify-center w-full rounded-md border border-gray-300 shadow-sm px-4 py-1 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-1 focus:ring-offset-1 focus:ring-brand">
+            <span class="flex items-center gap-1">
+              <i data-lucide="user-round"></i>
+              <span class="capitalize hidden md:block"><%-locals.type%></span>
+            </span>
+            <svg class="-mr-1 ml-2 h-5 w-5" xmlns="http://w3.org" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+            </svg>
+          </button>
+
+
+          <div id="dropdownMenu" class="hidden absolute right-0 mt-2 min-w-16 rounded-md shadow-lg bg-white focus:outline-none border border-slate-300 z-10 px-3 py-2">
+            <form action="<%=locals.protocal%>auth.<%=locals.domainName%>/signout" method="POST" class="popup-item danger">
+              <input type="hidden" value="<%=locals.protocal%>business.<%=locals.domainName%>" name="host">
+              <input type="hidden" name="userAccount" value="<=locals.user.userAccount%>">
+              <button type="submit" class="w-full flex items-center gap-3">
+                <span>
+                  Signout
+                </span>
+                <i data-lucide="LogOut" class="ml-auto"></i>
+              </button>
+            </form>
+          </div>
+        </div>
+
+        
+
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-[1600px] mx-auto px-4 sm:px-6 py-5 sm:py-6">
+    <div class="catalog-shell">
+
+      <section class="panel-left bg-white rounded-2xl border border-ink-200 shadow-soft">
+
+        <div class="p-4 border-b border-ink-100 space-y-3 flex-shrink-0">
+
+          <div id="textSearchWrap" class="relative">
+            <i data-lucide="search" class="w-4 h-4 text-ink-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"></i>
+            <input id="searchInput" type="text" placeholder="Search products…" autocomplete="off" class="w-full pl-9 pr-24 py-2.5 rounded-xl border border-ink-200 bg-white text-sm focus:outline-none focus:border-brand focus:ring-2 focus:ring-brand/10">
+            <div class="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
+              <button id="clearSearchBtn" class="hidden p-1.5 rounded-md text-ink-400 hover:text-ink-700 hover:bg-ink-100 transition" title="Clear">
+                <i data-lucide="x" class="w-3.5 h-3.5"></i>
+              </button>
+              <button id="imageSearchBtn" class="p-1.5 rounded-md text-ink-400 hover:text-brand hover:bg-brand-light transition" title="Search by image">
+                <i data-lucide="camera" class="w-4 h-4"></i>
+              </button>
+              <kbd class="hidden sm:inline-block text-[10px] font-mono text-ink-400 border border-ink-200 rounded px-1.5 py-0.5 leading-none">/</kbd>
+            </div>
+          </div>
+
+          <div id="imageSearchWrap" class="hidden">
+            <div class="flex items-center gap-2 px-2.5 py-2 rounded-xl border border-brand bg-brand-light/40">
+              <div class="w-9 h-9 rounded-lg overflow-hidden border border-brand/30 bg-white flex-shrink-0">
+                <img id="imageSearchThumb" src="" alt="" class="w-full h-full object-cover">
+              </div>
+              <div class="min-w-0 flex-1">
+                <p class="text-[10px] font-semibold uppercase tracking-wider text-brand leading-none">
+                  Image search
+                </p>
+                <p id="imageSearchName" class="text-xs text-ink-700 truncate mt-0.5">—</p>
+              </div>
+              <button id="clearImageSearchBtn" class="p-1.5 rounded-md text-ink-400 hover:text-ink-900 hover:bg-white/60 transition" title="Clear image">
+                <i data-lucide="x" class="w-3.5 h-3.5"></i>
+              </button>
+            </div>
+            <p id="imageSearchStatus" class="text-[11px] text-ink-400 mt-1.5">Searching…</p>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <select id="statusFilter" class="flex-1 px-3 py-2 rounded-xl border border-ink-200 bg-white text-xs focus:outline-none focus:border-brand focus:ring-2 focus:ring-brand/10">
+              <option value="">All statuses</option>
+              <option value="requested">Requested</option>
+              <option value="verified">Verified</option>
+              <option value="active">Active</option>
+              <option value="inactive">Inactive</option>
+              <option value="disabled">Disabled</option>
+              <option value="deleted">Deleted</option>
+              <option value="denied">Denied</option>
+              <option value="unverified">Unverified</option>
+            </select>
+
+            <button id="refreshBtn" class="p-2 rounded-xl border border-ink-200 bg-white text-ink-500 hover:bg-ink-50 transition" title="Refresh">
+              <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+            </button>
+          </div>
+
+          <input id="imageSearchInput" type="file" accept="image/jpeg,image/png,image/webp" class="hidden">
+        </div>
+
+        <div id="listScroll" class="panel-left-scroll">
+
+          <div id="listLoading" class="hidden p-3 space-y-2">
+            <div class="skel h-[68px]"></div>
+            <div class="skel h-[68px]"></div>
+            <div class="skel h-[68px]"></div>
+            <div class="skel h-[68px]"></div>
+            <div class="skel h-[68px]"></div>
+          </div>
+
+          <div id="listError" class="hidden m-3 rounded-xl border border-red-200 bg-red-50 p-4 flex items-start gap-3">
+            <i data-lucide="alert-triangle" class="w-4 h-4 text-red-600 flex-shrink-0 mt-0.5"></i>
+            <div class="min-w-0 flex-1">
+              <p class="text-xs font-semibold text-red-800">Couldn't load products</p>
+              <p id="listErrorMessage" class="text-[11px] text-red-700 mt-0.5 break-words">Please try again.</p>
+            </div>
+            <button id="listRetryBtn" class="text-[11px] font-semibold text-red-700 hover:text-red-900">Retry</button>
+          </div>
+
+          <div id="listEmpty" class="hidden p-8 text-center">
+            <div class="w-12 h-12 rounded-full bg-ink-100 flex items-center justify-center mx-auto">
+              <i data-lucide="package-search" class="w-5 h-5 text-ink-400"></i>
+            </div>
+            <p class="text-sm font-semibold text-ink-900 mt-3">No products found</p>
+            <p id="listEmptyMessage" class="text-xs text-ink-500 mt-1">Try a different search or register a new product.</p>
+            <a href="/products/new" class="mt-4 inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-brand text-white text-xs font-semibold hover:bg-brand-dark transition">
+              <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+              Register product
+            </a>
+          </div>
+
+          <div id="listRows" class="p-2 space-y-1"></div>
+        </div>
+
+        <div class="border-t border-ink-100 px-3 py-3 flex items-center justify-between gap-3 flex-shrink-0">
+          <p id="pageInfo" class="text-[11px] text-ink-500 whitespace-nowrap">—</p>
+          <div class="flex items-center gap-1">
+            <button id="prevBtn" class="p-1.5 rounded-lg border border-ink-200 bg-white text-ink-500 hover:bg-ink-50 transition disabled:opacity-40 disabled:cursor-not-allowed" title="Previous">
+              <i data-lucide="chevron-left" class="w-4 h-4"></i>
+            </button>
+            <button id="nextBtn" class="p-1.5 rounded-lg border border-ink-200 bg-white text-ink-500 hover:bg-ink-50 transition disabled:opacity-40 disabled:cursor-not-allowed" title="Next">
+              <i data-lucide="chevron-right" class="w-4 h-4"></i>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <section id="detailPanel" class="panel-right bg-white rounded-2xl border border-ink-200 shadow-soft">
+
+        <div class="panel-right-header-mobile">
+          <button id="closeDetailBtn" class="p-1.5 rounded-lg text-ink-500 hover:text-ink-900 hover:bg-ink-100 transition">
+            <i data-lucide="arrow-left" class="w-4 h-4"></i>
+          </button>
+          <p class="text-sm font-semibold text-ink-900">Product details</p>
+        </div>
+
+        <div class="panel-right-scroll">
+
+          <div id="detailEmpty" class="detail-empty">
+
+            <h1 class="text-[32px] flex flex-col gap-2">
+              <span class="w-full text-[48px] flex items-center gap-2 justify-center border-b border-b-3 pb-3 border-b-black/50">
+                <span class="font-extrabold">Hi</span>
+                <span class="text-black/70"><%= locals.user.username %></span> 🖐️
+              </span>
+
+              <span class="mt-5">
+                <span class="text-black/70 font-bold">Welcome Back To </span>
+                <span class="text-brand font-extrabold">Product Catalogue</span>
+              </span>
+            </h1>
+
+            <h3 class="mt-2 px-3 py-2 flex flex-col items-center gap-3 text-lg text-gray-500">
+              Click on product catalog to view the details
+              <span class="flex items-center gap-2 text-sm"><span class="text-brand font-bold">COCOCE</span> All right reserved.</span>
+            </h3>
+          </div>
+
+          <div id="detailLoading" class="hidden p-6 space-y-4">
+            <div class="skel h-56 rounded-2xl"></div>
+            <div class="skel h-6 w-2/3"></div>
+            <div class="skel h-4 w-1/2"></div>
+            <div class="grid grid-cols-2 lg:grid-cols-3 gap-3 mt-4">
+              <div class="skel h-20 rounded-xl"></div>
+              <div class="skel h-20 rounded-xl"></div>
+              <div class="skel h-20 rounded-xl"></div>
+              <div class="skel h-20 rounded-xl"></div>
+              <div class="skel h-20 rounded-xl"></div>
+              <div class="skel h-20 rounded-xl"></div>
+            </div>
+          </div>
+
+          <div id="detailContent" class="hidden p-5 sm:p-6 space-y-6">
+
+            <div>
+              <div class="detail-hero">
+                <img id="detailHeroImage" src="" alt="">
+              </div>
+              <div id="detailThumbs" class="detail-thumbs"></div>
+            </div>
+
+            <div class="flex items-start justify-between gap-3 flex-wrap">
+              <div class="min-w-0 flex-1">
+                <h2 id="detailTitle" class="text-xl sm:text-2xl font-bold text-ink-900 break-words">—</h2>
+                <p id="detailSubtitle" class="text-sm text-ink-500 mt-1 break-all">—</p>
+              </div>
+              <span id="detailStatus" class="status-pill">—</span>
+            </div>
+
+            <div>
+              <p class="text-[11px] uppercase tracking-wider font-semibold text-ink-400 mb-2">Overview</p>
+              <div id="metaGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3"></div>
+            </div>
+
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <p class="text-[11px] uppercase tracking-wider font-semibold text-ink-400">Variants</p>
+                <span id="variantCountBadge" class="text-xs text-ink-400">0</span>
+              </div>
+              <div id="variantList" class="space-y-2"></div>
+            </div>
+
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <p class="text-[11px] uppercase tracking-wider font-semibold text-ink-400">Description</p>
+                <button id="toggleDescriptionBtn" class="text-[11px] font-semibold text-brand hover:text-brand-dark hidden">Expand</button>
+              </div>
+              <div id="detailDescription" class="text-sm text-ink-700 leading-relaxed max-h-40 overflow-hidden relative">
+                —
+              </div>
+            </div>
+
+            <%if (locals.type.includes('admin')) {%>
+            <div id="verificationSection" class="w-full flex flex-col hidden">
+              <p class="text-[11px] uppercase tracking-wider font-semibold text-ink-400 mb-2">Verification</p>
+              <div id="verificationTrail" class="w-full rounded-xl border border-ink-200 divide-y divide-ink-100 overflow-hidden"></div>
+              <button class="ml-auto mt-3 rounded-xl border border-green-500 hover:border-green-800 text-green-500 hover:text-green-800 transition px-3 py-2 disabled:bg-gray-400 disabled:text-gray-200 disabled:cursor-not-allowed disabled:opacity-50" id="verifyBtn">Verify product</button>
+            </div>
+            <%}%>
+
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <div id="detailBackdrop" class="hidden fixed inset-0 bg-black/40 z-30 lg:hidden"></div>
+
+  <div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 items-end"></div>
+
+  <% if (locals.type.includes('admin')) {%>
+            <div id="confirmModal" class="fixed inset-0 z-50 hidden items-center justify-center px-4">
+              <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" data-dismiss="confirm"></div>
+              <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
+
+                <div class="sticky top-0 bg-white border-b border-gray-100 px-6 py-4 flex items-center justify-between">
+                  <h3 class="text-lg font-bold text-amber-900 flex items-center gap-3" id="confirmModalTitle">
+                    <i data-lucide="triangle-alert"></i>Product Verification
+                  </h3>
+                  <button class="text-gray-400 hover:text-gray-600 transition confirm-close">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                  </button>
+                </div>
+
+                <div class="px-2 py-3 mt-3 mb-3">
+                  <p id="confirmModalMsg" class="text-xl">
+                    You are about to activate this product listing. Please make sure all details provided are correct.
+                  </p>
+                </div>
+
+                <div class="bg-white border-t border-gray-300 px-6 py-4 flex items-center gap-6 justify-end">
+                  <button class="flex items-center gap-2 px-3 py-1 border border-amber-500 text-amber-800 hover:border-amber-800 rounded-xl confirm-close">
+                    <i data-lucide="x"></i> Cancel
+                  </button>
+                  <button id="activateBtn" class="flex items-center gap-2 px-3 py-1 border border-green-500 text-green-800 hover:border-green-800 rounded-xl">
+                    <i data-lucide="check"></i> Verify
+                  </button>
+                </div>
+              </div>
+            </div>
+            <%}%>
+
+  <script>
+    lucide.createIcons();
+  </script>
+
+  <script src="/scripts/components/notification.js"></script>
+  <script src="/scripts/components/main-snackbar.js"></script>
+  <script src="/scripts/p-catalog.js"></script>
+
+</body>
+
+</html>

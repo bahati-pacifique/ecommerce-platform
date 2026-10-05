@@ -1340,7 +1340,7 @@ class ProductMetaModel {
         const totalPages = Math.ceil(total / limit);
 
         return {
-            categories: dataResult.rows,
+            brands: dataResult.rows,
             pagination: {
                 page,
                 limit,
@@ -1777,12 +1777,7 @@ class ProductMetaModel {
 
             attr.title,
 
-            attr.slug,
-
             attr.description,
-            attr.meta,
-            attr.logo_url,
-            attr.website,
 
             attr.status,
 
@@ -2002,6 +1997,69 @@ class ProductMetaModel {
         return rows;
     }
 
+    /**
+     * Search attributes with pagination
+     *
+     * @param {string} attributeId 
+     * @param {string} searchKey
+     * @param {number} page
+     * @param {number} limit
+     * @returns {Promise<Object>}
+     */
+    static async searchAttributesValues(attributeId, searchKey, page = 1, limit = 20) {
+
+        page = Math.max(1, Number(page));
+        limit = Math.max(1, Number(limit));
+
+        const offset = (page - 1) * limit;
+        const search = `%${searchKey.trim()}%`;
+
+        const countQuery = `
+                SELECT COUNT(*)::int AS total
+                FROM attribute_values
+                WHERE attribute_id = $1
+                AND (
+                    value ILIKE $2
+                )
+            `;
+
+        const dataQuery = `
+            SELECT
+            v.id,
+            v.value,
+            v.display_order,
+            v.meta,
+            v.created_at 
+            FROM attribute_values v 
+            WHERE v.attribute_id = $1
+            AND (
+                v.value ILIKE $2
+            )
+            ORDER BY v.value ASC
+            LIMIT $3 OFFSET $4
+        `;
+
+        const [countResult, dataResult] = await Promise.all([
+            db.query(countQuery, [attributeId, search]),
+            db.query(dataQuery, [attributeId, search, limit, offset])
+        ]);
+
+        const total = countResult.rows[0].total;
+        const totalPages = Math.ceil(total / limit);
+
+        return {
+            data: dataResult.rows,
+            pagination: {
+                page,
+                limit,
+                total,
+                totalPages,
+                hasNextPage: page < totalPages,
+                hasPreviousPage: page > 1
+            }
+        };
+    }
+
     static async updateAttributeValues(id, { attribute_id, value, display_order, meta }) {
         const updates = [];
         const values = [];
@@ -2044,6 +2102,8 @@ class ProductMetaModel {
         const { rows } = await db.query(query, values);
         return rows[0] || null;
     }
+
+    
 }
 
 module.exports = ProductMetaModel

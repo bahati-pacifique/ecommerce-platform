@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Product Catalog Terms — COCOCE Docs</title>
+  <meta name="description" content="What the COCOCE product catalog is, who can register products, and how verification and activation work.">
+  <link rel="icon" href="/favicon.ico" type="image/x-icon">
+
+  <meta name="description" content="The terms and conditions governing the use of the COCOCE marketplace by vendors, buyers, and visitors.">
+
+  <meta property="og:image" content="https://cdn.cococe.rw/branding/brand/logos/cococe.png">
+  <meta property="og:url" content="https://www.cococe.rw">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Laptops, Printers, Accessories, Game consoles, Electronics, and much more, cococe, your wish our priority">
+  <meta property="og:description" content="COCOCE Kigali Rwanda, Laptops, Desktops, Computer accessories, Smart tv, projectors, discover what you want about digital assets near you at Kigali">
+  <meta property="og:logo" content="https://cdn.cococe.rw/branding/brand/logos/cococe.png" />
+  <meta name="twitter:card" content="https://cdn.cococe.rw/branding/brand/logos/cococe.png">
+
+  <meta property="twitter:domain" content="https://cococe.rw">
+  <meta property="twitter:url" content="https://cococe.rw">
+  <meta name="twitter:title" content="Laptops, Printers, Accessories, Game consoles, Electronics, and much more, cococe, your wish our priority">
+  <meta name="twitter:description" content="COCOCE Kigali Rwanda, Laptops, Desktops, Computer accessories, Smart tv, projectors, discover what you want about digital assets near you at Kigali">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="stylesheet" href="/styles/main.css">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <link rel="stylesheet" href="/styles/catalog-terms.css">
+</head>
+
+<body>
+
+  <header class="sticky top-0 z-40 border-b border-ink-200/70 bg-white/85 backdrop-blur no-print">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between gap-3">
+      <a href="<%= locals.homeUrl %>" class="flex items-center gap-2 flex-shrink-0">
+        <img src="/images/logos/business.png" alt="COCOCE" class="h-7">
+      </a>
+      <nav class="flex items-center gap-2">
+        <a href="/dashboard" class="hidden sm:inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium text-ink-700 hover:bg-ink-100 transition">
+          <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
+          Dashboard
+        </a>
+        <a href="<%= locals.protocal %>admin.<%= locals.domainName%>/dashboard" class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-brand text-white text-xs font-semibold hover:bg-brand-dark transition">
+          <i data-lucide="shield" class="w-4 h-4"></i>
+          Admin Dashboard
+        </a>
+      </nav>
+    </div>
+  </header>
+
+  <section class="max-w-5xl mx-auto px-4 sm:px-6 pt-8 sm:pt-12">
+    <div class="max-w-3xl">
+      <p class="text-xs font-semibold uppercase tracking-wider text-brand">Documentation</p>
+      <h1 class="mt-1 text-3xl sm:text-4xl font-bold tracking-tight text-ink-900">
+        Product Catalog
+      </h1>
+      <p class="mt-3 text-base text-ink-500 leading-relaxed">
+        What the COCOCE product catalog is, who can register products, and how the
+        registration, verification, and activation lifecycle works.
+      </p>
+
+      <div class="mt-5 flex flex-wrap items-center gap-3 text-xs text-ink-400">
+        <span class="inline-flex items-center gap-1.5">
+          <i data-lucide="calendar" class="w-3.5 h-3.5"></i>
+          Last updated: <%= locals.updatedAt %>
+        </span>
+        <span aria-hidden="true">·</span>
+        <span class="inline-flex items-center gap-1.5">
+          <i data-lucide="users" class="w-3.5 h-3.5"></i>
+          Applies to: vendors, listers, and admin staff
+        </span>
+      </div>
+    </div>
+  </section>
+
+  <div class="max-w-5xl mx-auto px-4 sm:px-6 py-10 sm:py-12 grid lg:grid-cols-[220px_1fr] gap-8">
+
+    <!-- TOC -->
+    <aside class="hidden lg:block no-print">
+      <nav class="sticky top-20 text-sm" aria-label="On this page">
+        <p class="text-[11px] uppercase tracking-wider font-semibold text-ink-400 mb-3">On this page</p>
+        <ul class="space-y-0.5">
+          <li><a href="#what" class="toc-link block border-l-2 border-transparent pl-3 py-1.5 text-ink-500 hover:text-ink-900 transition">1. What is the product catalog?</a></li>
+          <li><a href="#who" class="toc-link block border-l-2 border-transparent pl-3 py-1.5 text-ink-500 hover:text-ink-900 transition">2. Who can register products</a></li>
+          <li><a href="#lifecycle" class="toc-link block border-l-2 border-transparent pl-3 py-1.5 text-ink-500 hover:text-ink-900 transition">3. The lifecycle</a></li>
+          <li><a href="#verification" class="toc-link block border-l-2 border-transparent pl-3 py-1.5 text-ink-500 hover:text-ink-900 transition">4. Verification &amp; activation</a></li>
+          <li><a href="#listing" class="toc-link block border-l-2 border-transparent pl-3 py-1.5 text-ink-500 hover:text-ink-900 transition">5. From catalog to listing</a></li>
+          <li><a href="#removal" class="toc-link block border-l-2 border-transparent pl-3 py-1.5 text-ink-500 hover:text-ink-900 transition">6. Denial &amp; removal</a></li>
+          <li><a href="#roles" class="toc-link block border-l-2 border-transparent pl-3 py-1.5 text-ink-500 hover:text-ink-900 transition">7. Role summary</a></li>
+          <li><a href="#faq" class="toc-link block border-l-2 border-transparent pl-3 py-1.5 text-ink-500 hover:text-ink-900 transition">8. FAQ</a></li>
+          <li><a href="#links" class="toc-link block border-l-2 border-transparent pl-3 py-1.5 text-ink-500 hover:text-ink-900 transition">9. Related documents</a></li>
+        </ul>
+      </nav>
+    </aside>
+
+    <article class="prose-doc min-w-0">
+
+      <section id="what">
+        <h2 class="text-xl font-bold text-ink-900 mb-3">1. What is the product catalog?</h2>
+        <p>
+          The <strong>product catalog</strong> is the registry of all products that have been
+          registered on COCOCE and are available for vendors to list for sale. It is the shared
+          reference layer that sits between product families (the abstract product type) and
+          listings (a vendor's actual offer with price and stock).
+        </p>
+
+        <div class="callout callout-info">
+          <i data-lucide="lightbulb" class="w-5 h-5 callout-icon"></i>
+          <div>
+            <p class="text-sm leading-relaxed">
+              <strong>In plain terms:</strong> a product catalog entry is a registered product.
+              It defines <em>what</em> can be sold. A listing defines <em>who is selling it</em>,
+              at what price, and with what stock.
+            </p>
+          </div>
+        </div>
+
+        <p>The catalog is what makes the marketplace work at scale:</p>
+        <ul>
+          <li>Vendors search the catalog to find the product they want to sell;</li>
+          <li>Buyers see the same product page regardless of which vendor they buy from;</li>
+          <li>The platform can compare, recommend, and categorise products consistently;</li>
+          <li>Duplicate entries are avoided — <em>Dell XPS 13</em> is one catalog entry, not one per vendor.</li>
+        </ul>
+
+        <p>
+          A product catalog entry describes the product itself: title, description, brand, family,
+          variants, and media. It does <strong>not</strong> contain price, stock, or vendor-specific
+          information — those belong to listings.
+        </p>
+      </section>
+
+      <section id="who" class="mt-10">
+        <h2 class="text-xl font-bold text-ink-900 mb-3">2. Who can register products</h2>
+        <p>
+          Every vendor on COCOCE is allowed to request and register their own products in
+          the catalog. This is intentional — the platform grows its catalog through vendor
+          contribution, not through a central curation team.
+        </p>
+
+        <table class="policy-table">
+          <thead>
+            <tr>
+              <th style="width:35%">Actor</th>
+              <th style="width:65%">What they can do</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Vendor</strong></td>
+              <td>Request and register new products. Register variants, descriptions, and media.
+                Submit for verification. Cannot self-approve.</td>
+            </tr>
+            <tr>
+              <td><strong>Lister</strong></td>
+              <td>Browse the catalog. Create listings against any active product. Cannot
+                register, edit, or remove catalog entries.</td>
+            </tr>
+            <tr>
+              <td><strong>System administrator</strong></td>
+              <td>Verify, activate, disable, deny, or remove catalog entries. The only role
+                with authority over the catalog's verified state.</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="callout callout-info">
+          <i data-lucide="info" class="w-5 h-5 callout-icon"></i>
+          <div>
+            <p class="text-sm leading-relaxed">
+              <strong>Vendors register, admins verify.</strong> Registration and verification
+              are separate steps by design. A vendor's submission is a <em>request</em> —
+              it is not live until an admin has reviewed and activated it.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section id="lifecycle" class="mt-10">
+        <h2 class="text-xl font-bold text-ink-900 mb-3">3. The lifecycle</h2>
+        <p>
+          Every product in the catalog moves through the same set of states. The lifecycle
+          is intentionally linear — a vendor can withdraw a request, but cannot skip
+          verification.
+        </p>
+
+        <div class="not-prose rounded-xl border border-ink-200 overflow-hidden bg-white px-2.5">
+
+          <div class="flow-step px-5">
+            <div class="flow-num">1</div>
+            <div>
+              <p class="text-sm font-semibold text-ink-900">Vendor registers the product</p>
+              <p class="text-sm text-ink-500 mt-0.5">
+                The vendor submits product information, variants, and images. The entry is
+                created in the catalog with the status <code>requested</code>.
+              </p>
+            </div>
+          </div>
+
+          <div class="flow-step is-passive px-5">
+            <div class="flow-num">2</div>
+            <div>
+              <p class="text-sm font-semibold text-ink-900">The product awaits review</p>
+              <p class="text-sm text-ink-500 mt-0.5">
+                The product is visible to the requesting vendor but not yet available for
+                listings by other vendors or listers. It sits in the admin review queue.
+              </p>
+            </div>
+          </div>
+
+          <div class="flow-step is-admin px-5">
+            <div class="flow-num">3</div>
+            <div>
+              <p class="text-sm font-semibold text-ink-900">Admin verifies the product</p>
+              <p class="text-sm text-ink-500 mt-0.5">
+                A system administrator reviews the entry against the
+                <a href="/catalog-policy">Catalog Policy</a> — accuracy of information,
+                completeness, naming conventions, and appropriateness.
+              </p>
+            </div>
+          </div>
+
+          <div class="flow-step is-success px-5">
+            <div class="flow-num">4</div>
+            <div>
+              <p class="text-sm font-semibold text-ink-900">Product is activated</p>
+              <p class="text-sm text-ink-500 mt-0.5">
+                Once verified, the product is <strong>activated</strong>. It becomes visible
+                to all vendors and listers on the platform, and can be listed for sale.
+              </p>
+            </div>
+          </div>
+
+          <div class="flow-step px-5">
+            <div class="flow-num">5</div>
+            <div>
+              <p class="text-sm font-semibold text-ink-900">Vendors create listings</p>
+              <p class="text-sm text-ink-500 mt-0.5">
+                Any vendor can now create a store listing against the product — setting
+                their own price, stock, and fulfilment terms. Listings reference the catalog
+                entry but are otherwise independent.
+              </p>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <section id="verification" class="mt-10">
+        <h2 class="text-xl font-bold text-ink-900 mb-3">4. Verification &amp; activation</h2>
+        <p>
+          Verification is the gate between a vendor's request and the shared catalog. Only
+          system administrators have the authority to verify and activate products.
+        </p>
+
+        <p>During verification, an admin checks:</p>
+        <ul>
+          <li><strong>Accurate information</strong> — the title, description, brand, family, and
+            variants correctly describe a real product;</li>
+          <li><strong>Completeness</strong> — at least one image, at least one variant, and all
+            required fields filled;</li>
+          <li><strong>Naming conventions</strong> — the entry follows the standards in the
+            <a href="/catalog-policy">Catalog Policy</a>;
+          </li>
+          <li><strong>Non-duplication</strong> — no equivalent product already exists in the
+            catalog;</li>
+          <li><strong>Appropriateness</strong> — the product is permitted on the platform
+            and suitable for the COCOCE audience.</li>
+        </ul>
+
+        <div class="callout callout-warn">
+          <i data-lucide="alert-triangle" class="w-5 h-5 callout-icon"></i>
+          <div>
+            <p class="text-sm leading-relaxed">
+              <strong>Vendors cannot self-approve.</strong> Even a vendor who has previously
+              registered dozens of products goes through the same review. The catalog is
+              shared, and verification ensures every entry meets the same bar.
+            </p>
+          </div>
+        </div>
+
+        <p>
+          A verified product is marked <code>active</code> and becomes immediately available
+          for listing by any vendor on the platform.
+        </p>
+      </section>
+
+      <section id="listing" class="mt-10">
+        <h2 class="text-xl font-bold text-ink-900 mb-3">5. From catalog to listing</h2>
+        <p>
+          The catalog and listings are distinct layers. Understanding the split matters
+          because they have different owners and different rules.
+        </p>
+
+        <table class="policy-table">
+          <thead>
+            <tr>
+              <th style="width:25%"></th>
+              <th style="width:37.5%">Product catalog</th>
+              <th style="width:37.5%">Store listing</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Answers</strong></td>
+              <td>What is this product?</td>
+              <td>Who is selling it, and at what price?</td>
+            </tr>
+            <tr>
+              <td><strong>Shared by</strong></td>
+              <td>All vendors</td>
+              <td>One vendor per listing</td>
+            </tr>
+            <tr>
+              <td><strong>Contains</strong></td>
+              <td>Title, description, brand, family, variants, media</td>
+              <td>Price, stock, condition, shipping terms, vendor</td>
+            </tr>
+            <tr>
+              <td><strong>Created by</strong></td>
+              <td>Any vendor — verified by admin</td>
+              <td>Any vendor — no admin approval</td>
+            </tr>
+            <tr>
+              <td><strong>Editable by</strong></td>
+              <td>Admin only, once activated</td>
+              <td>The owning vendor, at any time</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="callout callout-info">
+          <i data-lucide="package" class="w-5 h-5 callout-icon"></i>
+          <div>
+            <p class="text-sm leading-relaxed">
+              <strong>One product, many listings.</strong> A single <em>Dell XPS 13</em>
+              catalog entry can be listed by a dozen different vendors, each at their own
+              price and with their own stock. Buyers see the same product page and can
+              compare offers.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section id="removal" class="mt-10">
+        <h2 class="text-xl font-bold text-ink-900 mb-3">6. Denial &amp; removal</h2>
+        <p>
+          Administrators are responsible for keeping the catalog accurate and trustworthy.
+          When a product fails verification, or when an activated product is later found to
+          be incorrect, admins take action.
+        </p>
+
+        <div class="callout callout-danger">
+          <i data-lucide="shield-alert" class="w-5 h-5 callout-icon"></i>
+          <div>
+            <p class="text-sm leading-relaxed">
+              <strong>Only system administrators can deny, disable, or remove a catalog
+                product.</strong> Vendors cannot delete their own submissions once other
+              vendors have begun listing against them.
+            </p>
+          </div>
+        </div>
+
+        <p>Admins take action when a product has:</p>
+        <ul>
+          <li>Incorrect or misleading information;</li>
+          <li>Duplicate entries (an equivalent product already exists);</li>
+          <li>Naming that violates the Catalog Policy;</li>
+          <li>Product images that infringe copyright or misrepresent the item;</li>
+          <li>Content that is not permitted on the platform.</li>
+        </ul>
+
+        <p>Depending on the severity, admins can:</p>
+
+        <table class="policy-table">
+          <thead>
+            <tr>
+              <th style="width:25%">Action</th>
+              <th style="width:75%">Effect</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Deny</strong></td>
+              <td>Reject a new submission. The requesting vendor is notified with a reason
+                and may correct and resubmit.</td>
+            </tr>
+            <tr>
+              <td><strong>Disable</strong></td>
+              <td>Hide an active product from new listings while keeping existing listings
+                functional. Reversible.</td>
+            </tr>
+            <tr>
+              <td><strong>Remove</strong></td>
+              <td>Delete the product from the catalog. Reserved for clear errors and
+                duplicates. Any listings referencing it are affected.</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <p>
+          Disable is preferred over remove. A disabled product can be re-enabled if the
+          concern turns out to be unfounded; a removed product cannot be brought back.
+        </p>
+      </section>
+
+      <section id="roles" class="mt-10">
+        <h2 class="text-xl font-bold text-ink-900 mb-3">7. Role summary</h2>
+
+        <table class="policy-table">
+          <thead>
+            <tr>
+              <th style="width:55%">Action</th>
+              <th style="width:15%">Vendor</th>
+              <th style="width:15%">Lister</th>
+              <th style="width:15%">Admin</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Register a new product in the catalog</td>
+              <td>✓</td>
+              <td>—</td>
+              <td>✓</td>
+            </tr>
+            <tr>
+              <td>Add variants and media</td>
+              <td>✓</td>
+              <td>—</td>
+              <td>✓</td>
+            </tr>
+            <tr>
+              <td>Submit for verification</td>
+              <td>✓</td>
+              <td>—</td>
+              <td>✓</td>
+            </tr>
+            <tr>
+              <td>Browse the catalog</td>
+              <td>✓</td>
+              <td>✓</td>
+              <td>✓</td>
+            </tr>
+            <tr>
+              <td>Verify a submitted product</td>
+              <td>—</td>
+              <td>—</td>
+              <td>✓</td>
+            </tr>
+            <tr>
+              <td>Activate a product for listing</td>
+              <td>—</td>
+              <td>—</td>
+              <td>✓</td>
+            </tr>
+            <tr>
+              <td>Create a store listing</td>
+              <td>✓</td>
+              <td>✓</td>
+              <td>✓</td>
+            </tr>
+            <tr>
+              <td>Edit product details post-activation</td>
+              <td>—</td>
+              <td>—</td>
+              <td>✓</td>
+            </tr>
+            <tr>
+              <td>Disable a product</td>
+              <td>—</td>
+              <td>—</td>
+              <td>✓</td>
+            </tr>
+            <tr>
+              <td>Remove a product from the catalog</td>
+              <td>—</td>
+              <td>—</td>
+              <td>✓</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section id="faq" class="mt-10">
+        <h2 class="text-xl font-bold text-ink-900 mb-3">8. FAQ</h2>
+
+        <div class="space-y-5">
+          <div>
+            <p class="text-sm font-semibold text-ink-900">Can I sell a product that isn't in the catalog yet?</p>
+            <p class="text-sm text-ink-500 mt-1">
+              No. You must first register it in the catalog and wait for it to be verified
+              and activated. Once active, you can create a listing against it.
+            </p>
+          </div>
+
+          <div>
+            <p class="text-sm font-semibold text-ink-900">What's the difference between registering a product and creating a listing?</p>
+            <p class="text-sm text-ink-500 mt-1">
+              Registering a product adds it to the shared catalog — the description of the
+              product itself. Creating a listing is your store's specific offer: price,
+              stock, and shipping. You register once; you list as many times as you want.
+            </p>
+          </div>
+
+          <div>
+            <p class="text-sm font-semibold text-ink-900">How long does verification take?</p>
+            <p class="text-sm text-ink-500 mt-1">
+              Most submissions are reviewed within a few business days. Complex ones may
+              take longer. You'll be notified when your product is activated or denied.
+            </p>
+          </div>
+
+          <div>
+            <p class="text-sm font-semibold text-ink-900">Can I edit a product after it's been activated?</p>
+            <p class="text-sm text-ink-500 mt-1">
+              No. Once activated, product details are admin-only. If you spot a mistake,
+              contact support — an admin can make the correction.
+            </p>
+          </div>
+
+          <div>
+            <p class="text-sm font-semibold text-ink-900">What happens to my listings if a product is disabled?</p>
+            <p class="text-sm text-ink-500 mt-1">
+              Existing listings continue to work. The product simply stops appearing as an
+              option for new listings. If the product is later re-enabled, it becomes
+              available again.
+            </p>
+          </div>
+
+          <div>
+            <p class="text-sm font-semibold text-ink-900">I found a duplicate. What should I do?</p>
+            <p class="text-sm text-ink-500 mt-1">
+              Report it to <a href="mailto:sales@cococe.rw">sales@cococe.rw</a> with
+              both product references. Admins will merge or remove the duplicate.
+            </p>
+          </div>
+
+          <div>
+            <p class="text-sm font-semibold text-ink-900">Can another vendor list against the product I registered?</p>
+            <p class="text-sm text-ink-500 mt-1">
+              Yes. The catalog is shared. Once a product is active, any vendor can list it.
+              This is by design — the catalog is a common reference, not a vendor-private
+              asset.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section id="links" class="mt-10">
+        <h2 class="text-xl font-bold text-ink-900 mb-3">9. Related documents</h2>
+        <ul>
+          <li><a href="/docs/catalog-policy">Catalog Policy</a> — the rules governing catalog entries, naming, and lifecycle.</li>
+          <li><a href="/docs/marketplace-terms">Marketplace Terms &amp; Conditions</a> — the legal agreement covering all platform use.</li>
+          <li><a href="/docs/attributes-registry-terms">Attribute Registry</a> — how attributes and their values work across the catalog.</li>
+        </ul>
+      </section>
+
+      <section class="mt-12 pt-6 border-t border-ink-200">
+        <p class="text-xs text-ink-400">
+          This document is maintained by the COCOCE platform team. For corrections or
+          questions, contact <a href="mailto:sales@cococe.rw">sales@cococe.rw</a>.
+        </p>
+      </section>
+
+    </article>
+  </div>
+
+  <footer class="border-t border-ink-200 bg-white/60 no-print">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 py-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-ink-400">
+      <span>© 2026 COCOCE — Product Catalog Documentation</span>
+      <div class="flex flex-wrap gap-x-6 gap-y-2 justify-center">
+        <a href="/terms" class="hover:text-brand transition">Terms</a>
+        <a href="/privacy" class="hover:text-brand transition">Privacy</a>
+        <a href="/catalog-policy" class="hover:text-brand transition">Catalog Policy</a>
+        <a href="/docs/attribute-registry" class="hover:text-brand transition">Attribute Registry</a>
+        <a href="mailto:support@cococe.rw" class="hover:text-brand transition">Support</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    lucide.createIcons();
+  </script>
+
+  <script src="/scripts/catalog-terms.js"></script>
+
+</body>
+
+</html>
