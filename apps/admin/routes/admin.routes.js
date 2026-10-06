@@ -75,4 +75,7 @@ router.get('/vendors/', VendorController.getVendors);
 router.get('/vendor/applications', administration, adminController.renderBusinessApplications);
 router.get('/vendor/applications/:reference_number', administration, adminController.renderBusinessApplications);
 
+router.get('/docs/admin-privacy', session, adminController.renderAdminPrivacy);
+router.get('/docs/admin-terms', session, adminController.renderAdminTerms);
+
 module.exports = router;

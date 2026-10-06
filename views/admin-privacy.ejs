@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>COCOCE — System Administration Privacy</title>
+  <meta name="description" content="COCOCE System Administration Privacy — What system administrators can access, how admin actions are logged and audited, and the strict boundaries around administrative privileges.">
+  <link rel="icon" href="/favicon.ico" type="image/x-icon">
+
+  <meta property="og:image" content="https://cdn.cococe.rw/branding/brand/logos/cococe.png">
+  <meta property="og:url" content="https://www.cococe.rw">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Laptops, Printers, Accessories, Game consoles, Electronics, and much more, cococe, your wish our priority">
+  <meta property="og:description" content="COCOCE Kigali Rwanda, Laptops, Desktops, Computer accessories, Smart tv, projectors, discover what you want about digital assets near you at Kigali">
+  <meta property="og:logo" content="https://cdn.cococe.rw/branding/brand/logos/cococe.png" />
+  <meta name="twitter:card" content="https://cdn.cococe.rw/branding/brand/logos/cococe.png">
+  <meta property="twitter:domain" content="https://cococe.rw">
+  <meta property="twitter:url" content="https://cococe.rw">
+  <meta name="twitter:title" content="Laptops, Printers, Accessories, Game consoles, Electronics, and much more, cococe, your wish our priority">
+  <meta name="twitter:description" content="COCOCE Kigali Rwanda, Laptops, Desktops, Computer accessories, Smart tv, projectors, discover what you want about digital assets near you at Kigali">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="stylesheet" href="/styles/main.css">
+
+  <link rel="stylesheet" href="/styles/admin-privacy.css">
+</head>
+
+<body>
+
+  <header class="sticky top-0 z-40 border-b border-ink-200/70 bg-white/85 backdrop-blur no-print">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between gap-3">
+      <a href="<%= locals.protocal %><%= locals.domainName %>" class="flex items-center gap-2 flex-shrink-0">
+        <img src="/images/logos/administration.png" alt="COCOCE" class="h-12">
+      </a>
+      <nav class="flex items-center gap-2">
+        <a href="/dashboard" class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-brand text-white text-xs font-semibold hover:bg-brand-dark transition">
+          <i data-lucide="shield-cog-corner" class="w-4 h-4"></i>
+          Admin Dashboard
+        </a>
+      </nav>
+    </div>
+  </header>
+
+  <section class="max-w-5xl mx-auto px-4 sm:px-6 pt-8 sm:pt-12">
+    <div class="max-w-3xl">
+      <p class="text-xs font-semibold uppercase tracking-wider text-brand">System Administration Privacy</p>
+      <h1 class="mt-1 text-3xl sm:text-4xl font-bold tracking-tight text-ink-900">
+        Admin access. Strict boundaries.
+      </h1>
+      <p class="mt-3 text-base text-ink-500 leading-relaxed">
+        System administrators keep COCOCE running securely, but their access is never unlimited.
+        This page explains exactly what admins can see, what they cannot, how every action is
+        logged, and the safeguards that protect your data from misuse.
+      </p>
+
+      <div class="mt-5 flex flex-wrap items-center gap-3 text-xs text-ink-400">
+        <span class="inline-flex items-center gap-1.5">
+          <i data-lucide="calendar" class="w-3.5 h-3.5"></i>
+          Last updated: <%= locals.updatedAt || 'Latest' %>
+        </span>
+        <span aria-hidden="true">·</span>
+        <span class="inline-flex items-center gap-1.5">
+          <i data-lucide="globe" class="w-3.5 h-3.5"></i>
+          Applies to: cococe.rw and all subdomains
+        </span>
+      </div>
+    </div>
+  </section>
+
+  <div class="max-w-5xl mx-auto px-4 sm:px-6 py-10 sm:py-12 grid lg:grid-cols-[220px_1fr] gap-8">
+
+    <aside class="hidden lg:block no-print">
+      <nav class="sticky top-20 text-sm" aria-label="On this page">
+        <p class="text-[11px] uppercase tracking-wider font-semibold text-ink-400 mb-3">On this page</p>
+        <ul class="space-y-0.5">
+          <li><a href="#what-admins-see" class="toc-link block border-l-2 border-transparent pl-3 py-1.5 text-ink-500 hover:text-ink-900 transition">1. What admins can see</a></li>
+          <li><a href="#what-admins-cannot" class="toc-link block border-l-2 border-transparent pl-3 py-1.5 text-ink-500 hover:text-ink-900 transition">2. What admins cannot see</a></li>
+          <li><a href="#admin-authentication" class="toc-link block border-l-2 border-transparent pl-3 py-1.5 text-ink-500 hover:text-ink-900 transition">3. Admin authentication</a></li>
+          <li><a href="#audit-logging" class="toc-link block border-l-2 border-transparent pl-3 py-1.5 text-ink-500 hover:text-ink-900 transition">4. Audit logging</a></li>
+          <li><a href="#least-privilege" class="toc-link block border-l-2 border-transparent pl-3 py-1.5 text-ink-500 hover:text-ink-900 transition">5. Least privilege</a></li>
+          <li><a href="#data-handling" class="toc-link block border-l-2 border-transparent pl-3 py-1.5 text-ink-500 hover:text-ink-900 transition">6. Data handling rules</a></li>
+          <li><a href="#breach-response" class="toc-link block border-l-2 border-transparent pl-3 py-1.5 text-ink-500 hover:text-ink-900 transition">7. Breach &amp; incident response</a></li>
+          <li><a href="#your-rights" class="toc-link block border-l-2 border-transparent pl-3 py-1.5 text-ink-500 hover:text-ink-900 transition">8. Your rights</a></li>
+          <li><a href="#contact-admin" class="toc-link block border-l-2 border-transparent pl-3 py-1.5 text-ink-500 hover:text-ink-900 transition">9. Contact</a></li>
+        </ul>
+      </nav>
+    </aside>
+
+    <article class="prose-doc min-w-0">
+
+      <section id="what-admins-see">
+        <h2 class="text-xl font-bold text-ink-900 mb-3">1. What system administrators can see</h2>
+        <p>
+          System administrators have elevated access to COCOCE's infrastructure for the purpose
+          of maintaining, securing, and operating the platform. Their access is limited to
+          operational data — never your private credentials.
+        </p>
+        <p>Administrators can view:</p>
+        <ul>
+          <li><strong>Account metadata:</strong> Email address, registration date, last sign-in timestamp, account status (active, suspended, deleted).</li>
+          <li><strong>Store and listing information:</strong> Vendor store details, product listings, catalog entries, and inventory status.</li>
+          <li><strong>Order and transaction records:</strong> Order history, payment status, shipping details, and dispute records.</li>
+          <li><strong>System logs:</strong> Authentication attempts, API errors, performance metrics, and security events.</li>
+          <li><strong>Aggregated analytics:</strong> Platform usage statistics, search trends, and marketplace activity — always in aggregate, never tied to individuals.</li>
+        </ul>
+      </section>
+
+      <section id="what-admins-cannot" class="mt-10">
+        <h2 class="text-xl font-bold text-ink-900 mb-3">2. What system administrators cannot see</h2>
+        <div class="bg-brand-light rounded-3xl p-5 md:p-6 border-l-4 border-brand flex items-center gap-4 shadow-sm my-4">
+          <i data-lucide="eye-off" class="w-8 h-8 md:w-10 md:h-10 text-brand flex-shrink-0"></i>
+          <div class="text-slate-800">
+            <strong>Administrators can never view your password, session tokens, or payment card details.</strong>
+            These are protected by zero-knowledge architecture and are inaccessible to anyone —
+            including COCOCE staff.
+          </div>
+        </div>
+        <p>Specifically, administrators <strong>cannot</strong> see:</p>
+        <ul>
+          <li><strong>Plain-text passwords:</strong> Passwords are hashed with Argon2id and salted. Even admins see only the hash, which cannot be reversed.</li>
+          <li><strong>Session tokens:</strong> Active session identifiers are encrypted and inaccessible to administrative tooling.</li>
+          <li><strong>Payment credentials:</strong> Card numbers, CVV codes, and full payment details are processed by PCI-compliant partners and never stored on COCOCE servers.</li>
+          <li><strong>Private messages:</strong> Any direct communication between buyers and vendors is end-to-end protected and not visible to admins.</li>
+          <li><strong>Browsing history outside COCOCE:</strong> We do not track or store your activity on other websites.</li>
+        </ul>
+      </section>
+
+      <section id="admin-authentication" class="mt-10">
+        <h2 class="text-xl font-bold text-ink-900 mb-3">3. Admin authentication</h2>
+        <p>
+          Administrative accounts are protected by stricter authentication requirements than
+          regular user accounts:
+        </p>
+        <ul>
+          <li><strong>Multi-factor authentication (MFA):</strong> Required for all admin accounts, no exceptions.</li>
+          <li><strong>Hardware security keys:</strong> Senior administrators use FIDO2 hardware keys for the highest-privilege operations.</li>
+          <li><strong>Short session lifetimes:</strong> Admin sessions expire after 15 minutes of inactivity — half the regular user window.</li>
+          <li><strong>IP allowlisting:</strong> Admin access is restricted to approved network ranges where feasible.</li>
+          <li><strong>Separate credentials:</strong> Admin accounts are completely separate from any personal COCOCE accounts.</li>
+        </ul>
+      </section>
+
+      <section id="audit-logging" class="mt-10">
+        <h2 class="text-xl font-bold text-ink-900 mb-3">4. Audit logging — every action is recorded</h2>
+        <p>
+          Every administrative action is logged immutably. There is no such thing as an
+          untracked admin action on COCOCE.
+        </p>
+        <p>Each log entry captures:</p>
+        <ul>
+          <li><strong>Who:</strong> The specific admin account that performed the action.</li>
+          <li><strong>What:</strong> The exact operation (view, edit, delete, export, etc.).</li>
+          <li><strong>When:</strong> A precise timestamp with timezone.</li>
+          <li><strong>Where:</strong> The IP address and device fingerprint of the admin.</li>
+          <li><strong>Why:</strong> A required justification field for any sensitive operation.</li>
+        </ul>
+        <p>
+          Audit logs are stored in write-once storage, encrypted, and retained for a minimum of
+          24 months. They are reviewed regularly by our security team and are available to
+          regulators upon lawful request.
+        </p>
+      </section>
+
+      <section id="least-privilege" class="mt-10">
+        <h2 class="text-xl font-bold text-ink-900 mb-3">5. Least privilege access</h2>
+        <p>
+          Not all administrators have the same level of access. We follow the principle of
+          <strong>least privilege</strong> — each admin is granted only the minimum access
+          necessary to perform their specific role.
+        </p>
+        <ul>
+          <li><strong>Tier 1 — Support:</strong> Can view account metadata and assist with basic account issues. Cannot modify listings, orders, or system settings.</li>
+          <li><strong>Tier 2 — Operations:</strong> Can manage catalog entries, review disputes, and adjust order status. Cannot access security logs or system configuration.</li>
+          <li><strong>Tier 3 — Security:</strong> Can view audit logs, investigate incidents, and suspend accounts. Cannot modify financial records or system code.</li>
+          <li><strong>Tier 4 — Infrastructure:</strong> Can deploy code, manage servers, and configure systems. Cannot view user credentials or payment data.</li>
+        </ul>
+        <p>
+          Access is reviewed quarterly, and any admin who changes roles has their access
+          immediately adjusted.
+        </p>
+      </section>
+
+      <section id="data-handling" class="mt-10">
+        <h2 class="text-xl font-bold text-ink-900 mb-3">6. Data handling rules</h2>
+        <p>
+          Administrators must follow strict data handling rules at all times:
+        </p>
+        <ul>
+          <li><strong>No personal use:</strong> Admin access may never be used for personal curiosity, competitive research, or any purpose unrelated to COCOCE operations.</li>
+          <li><strong>No export without approval:</strong> Exporting user data requires a documented business justification and a second admin's approval.</li>
+          <li><strong>No sharing:</strong> Admin access is non-transferable. Credentials may never be shared, even with other admins.</li>
+          <li><strong>Immediate reporting:</strong> Any suspected data misuse must be reported to the security team within one hour.</li>
+          <li><strong>Confidentiality:</strong> All admins sign a binding confidentiality agreement and undergo annual privacy training.</li>
+        </ul>
+      </section>
+
+      <section id="breach-response" class="mt-10">
+        <h2 class="text-xl font-bold text-ink-900 mb-3">7. Breach &amp; incident response</h2>
+        <p>
+          If we detect that an admin account has been compromised or misused, we act immediately:
+        </p>
+        <ul>
+          <li><strong>Automatic suspension:</strong> The compromised admin account is locked within seconds of detection.</li>
+          <li><strong>Forensic audit:</strong> All actions performed by that account are reviewed in full.</li>
+          <li><strong>Affected user notification:</strong> Any user whose data was accessed is notified within 72 hours, in accordance with Rwandan data protection law.</li>
+          <li><strong>Regulatory reporting:</strong> The incident is reported to the relevant authorities as required.</li>
+          <li><strong>Remediation:</strong> Additional controls are implemented to prevent recurrence.</li>
+        </ul>
+      </section>
+
+      <section id="your-rights" class="mt-10">
+        <h2 class="text-xl font-bold text-ink-900 mb-3">8. Your rights</h2>
+        <p>
+          As a COCOCE user, you have the right to:
+        </p>
+        <ul>
+          <li><strong>Request an access log:</strong> Ask us who accessed your account data and when.</li>
+          <li><strong>Request correction:</strong> Ask us to correct any inaccurate account metadata.</li>
+          <li><strong>Request deletion:</strong> Ask us to delete your account and associated data (subject to legal retention requirements).</li>
+          <li><strong>Lodge a complaint:</strong> Contact our privacy team or the relevant data protection authority if you believe your data has been mishandled.</li>
+        </ul>
+        <p>
+          To exercise any of these rights, contact us using the details in section 9.
+        </p>
+      </section>
+
+      <section id="contact-admin" class="mt-10">
+        <h2 class="text-xl font-bold text-ink-900 mb-3">9. Contact</h2>
+        <p>Questions about system administration privacy may be sent to:</p>
+        <ul>
+          <li>General support — <a href="mailto:sales@cococe.rw">sales@cococe.rw</a></li>
+          <li>Privacy matters — <a href="mailto:sales@cococe.rw">sales@cococe.rw</a></li>
+          <li>Security concerns — <a href="mailto:sales@cococe.rw">sales@cococe.rw</a></li>
+        </ul>
+      </section>
+
+      <section class="mt-12 pt-6 border-t border-ink-200">
+        <p class="text-xs text-ink-400">
+          This document is provided for informational purposes and does not constitute legal
+          advice. COCOCE recommends that users seek independent legal advice where appropriate.
+          If anything here conflicts with mandatory law, the law prevails.
+        </p>
+      </section>
+
+    </article>
+  </div>
+
+  <footer class="border-t border-ink-200 bg-white/60 no-print">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 py-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-ink-400">
+      <span>© 2026 <span class="text-brand font-extrabold">COCOCE</span> — System Administration Privacy</span>
+      <div class="flex flex-wrap gap-x-6 gap-y-2 justify-center">
+        <a href="/dashboard" class="hover:text-brand transition">Dashboard</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    lucide.createIcons();
+  </script>
+  <script src="/scripts/admin-privacy.js"></script>
+
+</body>
+
+</html>

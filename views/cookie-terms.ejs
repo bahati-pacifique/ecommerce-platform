@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>COCOCE — Cookie Terms</title>
+  <meta name="description" content="COCOCE Cookie Terms — What cookies we collect, how we correct and use them, and our commitment to never sharing with third parties. Session, preferences, and system-required cookies.">
+  <link rel="icon" href="/favicon.ico" type="image/x-icon">
+
+  <meta property="og:image" content="https://cdn.cococe.rw/branding/brand/logos/cococe.png">
+  <meta property="og:url" content="https://www.cococe.rw">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Laptops, Printers, Accessories, Game consoles, Electronics, and much more, cococe, your wish our priority">
+  <meta property="og:description" content="COCOCE Kigali Rwanda, Laptops, Desktops, Computer accessories, Smart tv, projectors, discover what you want about digital assets near you at Kigali">
+  <meta property="og:logo" content="https://cdn.cococe.rw/branding/brand/logos/cococe.png" />
+  <meta name="twitter:card" content="https://cdn.cococe.rw/branding/brand/logos/cococe.png">
+  <meta property="twitter:domain" content="https://cococe.rw">
+  <meta property="twitter:url" content="https://cococe.rw">
+  <meta name="twitter:title" content="Laptops, Printers, Accessories, Game consoles, Electronics, and much more, cococe, your wish our priority">
+  <meta name="twitter:description" content="COCOCE Kigali Rwanda, Laptops, Desktops, Computer accessories, Smart tv, projectors, discover what you want about digital assets near you at Kigali">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="stylesheet" href="/styles/main.css">
+
+  <link rel="stylesheet" href="/styles/cookie-terms.css">
+</head>
+
+<body>
+
+  <header class="sticky top-0 z-40 border-b border-ink-200/70 bg-white/85 backdrop-blur no-print">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between gap-3">
+      <a href="<%= locals.protocal %><%= locals.domainName %>" class="flex items-center gap-2 flex-shrink-0">
+        <img src="/images/logos/business.png" alt="COCOCE" class="h-12">
+      </a>
+      <nav class="flex items-center gap-2">
+        <a href="<%= locals.protocal %>business.<%= locals.domainName %>/dashboard" class="hidden sm:inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium text-ink-700 hover:bg-ink-100 transition" target="_blank">
+          <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
+          Dashboard
+        </a>
+        <a href="<%= locals.protocal %>admin.<%= locals.domainName %>/dashboard" class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-brand text-white text-xs font-semibold hover:bg-brand-dark transition">
+          <i data-lucide="shield-cog-corner" class="w-4 h-4"></i>
+          Admin Dashboard
+        </a>
+      </nav>
+    </div>
+  </header>
+
+  <section class="max-w-5xl mx-auto px-4 sm:px-6 pt-8 sm:pt-12">
+    <div class="max-w-3xl">
+      <p class="text-xs font-semibold uppercase tracking-wider text-brand">Cookie Terms</p>
+      <h1 class="mt-1 text-3xl sm:text-4xl font-bold tracking-tight text-ink-900">
+        Cookies we collect. How we correct them. How we use them.
+      </h1>
+      <p class="mt-3 text-base text-ink-500 leading-relaxed">
+        This page explains what cookies COCOCE uses, how we keep them accurate and up to date,
+        and exactly how they power the system's required and automated functionalities.
+        We do not share your cookies with any third party.
+      </p>
+
+      <div class="mt-5 flex flex-wrap items-center gap-3 text-xs text-ink-400">
+        <span class="inline-flex items-center gap-1.5">
+          <i data-lucide="calendar" class="w-3.5 h-3.5"></i>
+          Last updated: <%= locals.updatedAt || 'Latest' %>
+        </span>
+        <span aria-hidden="true">·</span>
+        <span class="inline-flex items-center gap-1.5">
+          <i data-lucide="globe" class="w-3.5 h-3.5"></i>
+          Applies to all COCOCE platform services and sub-services 
+        </span>
+      </div>
+    </div>
+  </section>
+
+  <div class="max-w-5xl mx-auto px-4 sm:px-6 py-10 sm:py-12 grid lg:grid-cols-[220px_1fr] gap-8">
+
+    <aside class="hidden lg:block no-print">
+      <nav class="sticky top-20 text-sm" aria-label="On this page">
+        <p class="text-[11px] uppercase tracking-wider font-semibold text-ink-400 mb-3">On this page</p>
+        <ul class="space-y-0.5">
+          <li><a href="#what-are-cookies" class="toc-link block border-l-2 border-transparent pl-3 py-1.5 text-ink-500 hover:text-ink-900 transition">1. What are cookies</a></li>
+          <li><a href="#cookies-we-collect" class="toc-link block border-l-2 border-transparent pl-3 py-1.5 text-ink-500 hover:text-ink-900 transition">2. Cookies we collect</a></li>
+          <li><a href="#how-we-correct" class="toc-link block border-l-2 border-transparent pl-3 py-1.5 text-ink-500 hover:text-ink-900 transition">3. How we correct them</a></li>
+          <li><a href="#how-we-use" class="toc-link block border-l-2 border-transparent pl-3 py-1.5 text-ink-500 hover:text-ink-900 transition">4. How we use them</a></li>
+          <li><a href="#no-third-party" class="toc-link block border-l-2 border-transparent pl-3 py-1.5 text-ink-500 hover:text-ink-900 transition">5. No third-party sharing</a></li>
+          <li><a href="#system-automated" class="toc-link block border-l-2 border-transparent pl-3 py-1.5 text-ink-500 hover:text-ink-900 transition">6. System &amp; automated use</a></li>
+          <li><a href="#your-control" class="toc-link block border-l-2 border-transparent pl-3 py-1.5 text-ink-500 hover:text-ink-900 transition">7. Your control</a></li>
+          <li><a href="#contact-cookies" class="toc-link block border-l-2 border-transparent pl-3 py-1.5 text-ink-500 hover:text-ink-900 transition">8. Contact</a></li>
+        </ul>
+      </nav>
+    </aside>
+
+    <article class="prose-doc min-w-0">
+
+      <section id="what-are-cookies">
+        <h2 class="text-xl font-bold text-ink-900 mb-3">1. What are cookies</h2>
+        <p>
+          Cookies are small text files stored on your device when you visit a website. They help
+          the site remember your actions and preferences over time — such as keeping you signed
+          in, remembering your display settings, and protecting against security threats.
+        </p>
+        <p>
+          At COCOCE, we use cookies strictly for the operation of the marketplace and
+          authentication system. We do not use them for advertising or tracking across other
+          websites.
+        </p>
+      </section>
+
+      <section id="cookies-we-collect" class="mt-10">
+        <h2 class="text-xl font-bold text-ink-900 mb-3">2. Cookies we collect</h2>
+        <p>We collect a minimal set of cookies, each with a clear and specific purpose:</p>
+
+        <div class="space-y-4 mt-4">
+          <div class="bg-white/80 rounded-3xl p-5 border border-[#e2edf7] shadow-sm">
+            <div class="flex items-center gap-3 text-lg font-semibold text-brand mb-3">
+              <i data-lucide="key" class="w-5 h-5 text-brand"></i>
+              Session Cookie (httpOnly, secure)
+            </div>
+            <p class="text-slate-700 text-sm mb-2">
+              <strong>What it stores:</strong> A temporary session identifier that tells our
+              servers you are logged in.
+            </p>
+            <p class="text-slate-700 text-sm">
+              <strong>Why we need it:</strong> Without this cookie, you would have to sign in
+              again on every page you visit.
+            </p>
+          </div>
+
+          <div class="bg-white/80 rounded-3xl p-5 border border-[#e2edf7] shadow-sm">
+            <div class="flex items-center gap-3 text-lg font-semibold text-brand mb-3">
+              <i data-lucide="user" class="w-5 h-5 text-brand"></i>
+              Username Cookie
+            </div>
+            <p class="text-slate-700 text-sm mb-2">
+              <strong>What it stores:</strong> Your display name or username, so the interface
+              can greet you and personalize your experience.
+            </p>
+            <p class="text-slate-700 text-sm">
+              <strong>Why we need it:</strong> To remember who you are and display the correct
+              account information without asking you repeatedly.
+            </p>
+          </div>
+
+          <div class="bg-white/80 rounded-3xl p-5 border border-[#e2edf7] shadow-sm">
+            <div class="flex items-center gap-3 text-lg font-semibold text-brand mb-3">
+              <i data-lucide="search" class="w-5 h-5 text-brand"></i>
+              Search Index Cookie
+            </div>
+            <p class="text-slate-700 text-sm mb-2">
+              <strong>What it stores:</strong> A lightweight index of your recent search queries
+              and filters, used to speed up repeated searches.
+            </p>
+            <p class="text-slate-700 text-sm">
+              <strong>Why we need it:</strong> To provide faster, more relevant results and to
+              remember your search context as you browse.
+            </p>
+          </div>
+
+          <div class="bg-white/80 rounded-3xl p-5 border border-[#e2edf7] shadow-sm">
+            <div class="flex items-center gap-3 text-lg font-semibold text-brand mb-3">
+              <i data-lucide="shield-check" class="w-5 h-5 text-brand"></i>
+              CSRF Protection Token
+            </div>
+            <p class="text-slate-700 text-sm mb-2">
+              <strong>What it stores:</strong> A unique, unpredictable token tied to your session.
+            </p>
+            <p class="text-slate-700 text-sm">
+              <strong>Why we need it:</strong> To protect you from cross-site request forgery
+              attacks — a common web security threat.
+            </p>
+          </div>
+
+          <div class="bg-white/80 rounded-3xl p-5 border border-[#e2edf7] shadow-sm">
+            <div class="flex items-center gap-3 text-lg font-semibold text-brand mb-3">
+              <i data-lucide="sliders-horizontal" class="w-5 h-5 text-brand"></i>
+              Preferences Cookie
+            </div>
+            <p class="text-slate-700 text-sm mb-2">
+              <strong>What it stores:</strong> Your UI preferences, such as dark mode, language,
+              and layout choices.
+            </p>
+            <p class="text-slate-700 text-sm">
+              <strong>Why we need it:</strong> To remember your settings so you don't have to
+              reconfigure them on every visit.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section id="how-we-correct" class="mt-10">
+        <h2 class="text-xl font-bold text-ink-900 mb-3">3. How we correct them</h2>
+        <p>
+          Cookie accuracy and integrity are important to us. Here is how we ensure the data
+          stored in your cookies remains correct:
+        </p>
+        <ul>
+          <li><strong>Automatic refresh:</strong> Session and CSRF tokens are regenerated on each sign-in and periodically during long sessions.</li>
+          <li><strong>Validation checks:</strong> Every cookie is validated server-side before being trusted. Tampered or expired cookies are rejected immediately.</li>
+          <li><strong>User-driven updates:</strong> When you change your username, preferences, or search filters, the associated cookies are updated in real time.</li>
+          <li><strong>Cleanup on logout:</strong> All non-essential cookies are cleared when you sign out, ensuring no stale data remains.</li>
+          <li><strong>Version tracking:</strong> Cookie formats carry a version marker. If we change the structure, old cookies are invalidated and refreshed automatically.</li>
+        </ul>
+      </section>
+
+      <section id="how-we-use" class="mt-10">
+        <h2 class="text-xl font-bold text-ink-900 mb-3">4. How we use them</h2>
+        <p>
+          Every cookie we set serves one of the following purposes:
+        </p>
+        <ul>
+          <li><strong>Authentication:</strong> To verify that you are who you claim to be and to keep you signed in.</li>
+          <li><strong>Security:</strong> To protect against CSRF, session hijacking, and other common web threats.</li>
+          <li><strong>Personalization:</strong> To remember your display name, preferences, and search context.</li>
+          <li><strong>Performance:</strong> To speed up search and navigation by caching lightweight indexes.</li>
+          <li><strong>System requirements:</strong> To enable the platform's core, automated functionalities (see section 6).</li>
+        </ul>
+        <p>
+          We do not use cookies for advertising, behavioral profiling, or cross-site tracking.
+        </p>
+      </section>
+
+      <section id="no-third-party" class="mt-10">
+        <h2 class="text-xl font-bold text-ink-900 mb-3">5. No third-party sharing</h2>
+        <div class="bg-brand-light rounded-3xl p-5 md:p-6 border-l-4 border-brand flex items-center gap-4 shadow-sm my-4">
+          <i data-lucide="shield-off" class="w-8 h-8 md:w-10 md:h-10 text-brand flex-shrink-0"></i>
+          <div class="text-slate-800">
+            <strong>We do not share your cookies with any third party.</strong> Not with
+            advertisers, not with analytics providers, not with data brokers. Your cookie data
+            stays within COCOCE's systems and is used solely for the purposes described on this
+            page.
+          </div>
+        </div>
+        <p>
+          This means:
+        </p>
+        <ul>
+          <li>No third-party tracking cookies are ever placed on your device by COCOCE.</li>
+          <li>No cookie data is sold, rented, or traded to any external organization.</li>
+          <li>No cookie data is shared with partners, affiliates, or service providers for their own use.</li>
+          <li>All cookie processing happens on COCOCE-controlled infrastructure.</li>
+        </ul>
+      </section>
+
+      <section id="system-automated" class="mt-10">
+        <h2 class="text-xl font-bold text-ink-900 mb-3">6. System &amp; automated use</h2>
+        <p>
+          Some cookies are essential for the system's required and automated functionalities.
+          These include:
+        </p>
+        <ul>
+          <li><strong>Session continuity:</strong> Automatically maintaining your signed-in state as you navigate between pages.</li>
+          <li><strong>Token refresh:</strong> Automatically renewing security tokens before they expire, so you are not interrupted.</li>
+          <li><strong>Search indexing:</strong> Automatically caching your recent searches to deliver faster results on repeat queries.</li>
+          <li><strong>Fraud detection:</strong> Automatically flagging suspicious cookie patterns that may indicate unauthorized access.</li>
+          <li><strong>Load balancing:</strong> Automatically routing your requests to the appropriate server based on session affinity.</li>
+          <li><strong>Preference persistence:</strong> Automatically applying your saved settings (theme, language, layout) on every visit.</li>
+        </ul>
+        <p>
+          These automated functions are what make COCOCE fast, secure, and reliable. They run
+          in the background without requiring any action from you.
+        </p>
+      </section>
+
+      <section id="your-control" class="mt-10">
+        <h2 class="text-xl font-bold text-ink-900 mb-3">7. Your control</h2>
+        <p>
+          You have control over cookies at all times:
+        </p>
+        <ul>
+          <li><strong>Browser settings:</strong> You can configure your browser to block or delete cookies. However, blocking essential cookies may prevent you from signing in or using core features.</li>
+          <li><strong>Sign out:</strong> Signing out clears all non-essential cookies from your device.</li>
+          <li><strong>Clear browsing data:</strong> You can manually clear cookies through your browser's settings at any time.</li>
+          <li><strong>Contact us:</strong> If you have questions about a specific cookie, reach out and we will explain exactly what it does.</li>
+        </ul>
+      </section>
+
+      <section id="contact-cookies" class="mt-10">
+        <h2 class="text-xl font-bold text-ink-900 mb-3">8. Contact</h2>
+        <p>Questions about cookies may be sent to:</p>
+        <ul>
+          <li>General support — <a href="mailto:sales@cococe.rw">sales@cococe.rw</a></li>
+          <li>Privacy matters — <a href="mailto:sales@cococe.rw">sales@cococe.rw</a></li>
+          <li>Security concerns — <a href="mailto:sales@cococe.rw">sales@cococe.rw</a></li>
+        </ul>
+      </section>
+
+      <section class="mt-12 pt-6 border-t border-ink-200">
+        <p class="text-xs text-ink-400">
+          This document is provided for informational purposes and does not constitute legal
+          advice. COCOCE recommends that users seek independent legal advice where appropriate.
+          If anything here conflicts with mandatory law, the law prevails.
+        </p>
+      </section>
+
+    </article>
+  </div>
+
+  <footer class="border-t border-ink-200 bg-white/60 no-print">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 py-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-ink-400">
+      <span>© 2026 <span class="text-brand font-extrabold">COCOCE</span> — All right reserved.</span>
+      <div class="flex flex-wrap gap-x-6 gap-y-2 justify-center">
+        <a href="<%=locals.protocal%>auth.<%=locals.domainName%>/terms" target="_blank" class="hover:text-brand transition">Terms</a>
+        <a href="<%=locals.protocal%>auth.<%=locals.domainName%>/privacy" target="_blank" class="hover:text-brand transition">Privacy</a>
+        <a href="mailto:sales@cococe.rw" class="hover:text-brand transition">Support</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    lucide.createIcons();
+  </script>
+  <script src="/scripts/ck-terms.js"></script>
+
+</body>
+
+</html>

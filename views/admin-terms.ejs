@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>COCOCE · System Administration Terms</title>
+  <meta name="description" content="COCOCE System Administration Terms — Strict security requirements for admins: session protection, logout obligations, confidentiality of system data, and the serious consequences of non-compliance.">
+  <link rel="icon" href="/favicon.ico" type="image/x-icon">
+
+  <meta property="og:image" content="https://cdn.cococe.rw/branding/brand/logos/cococe.png">
+  <meta property="og:url" content="https://www.cococe.rw">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Laptops, Printers, Accessories, Game consoles, Electronics, and much more, cococe, your wish our priority">
+  <meta property="og:description" content="COCOCE Kigali Rwanda, Laptops, Desktops, Computer accessories, Smart tv, projectors, discover what you want about digital assets near you at Kigali">
+  <meta property="og:logo" content="https://cdn.cococe.rw/branding/brand/logos/cococe.png" />
+  <meta name="twitter:card" content="https://cdn.cococe.rw/branding/brand/logos/cococe.png">
+  <meta property="twitter:domain" content="https://cococe.rw">
+  <meta property="twitter:url" content="https://cococe.rw">
+  <meta name="twitter:title" content="Laptops, Printers, Accessories, Game consoles, Electronics, and much more, cococe, your wish our priority">
+  <meta name="twitter:description" content="COCOCE Kigali Rwanda, Laptops, Desktops, Computer accessories, Smart tv, projectors, discover what you want about digital assets near you at Kigali">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="stylesheet" href="/styles/main.css">
+
+  <link rel="stylesheet" href="/styles/admin-privacy.css">
+</head>
+
+<body>
+
+  <header class="sticky top-0 z-40 border-b border-ink-200/70 bg-white/85 backdrop-blur no-print">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between gap-3">
+      <a href="<%= locals.protocal %>admin.<%= locals.domainName %>" class="flex items-center gap-2 flex-shrink-0">
+        <img src="/images/logos/administration.png" alt="COCOCE" class="h-12">
+      </a>
+      <nav class="flex items-center gap-2">
+        <a href="<%= locals.protocal %>admin.<%= locals.domainName %>/dashboard" class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-brand text-white text-xs font-semibold hover:bg-brand-dark transition">
+          <i data-lucide="shield-cog-corner" class="w-4 h-4"></i>
+          Admin Dashboard
+        </a>
+      </nav>
+    </div>
+  </header>
+
+  <section class="max-w-5xl mx-auto px-4 sm:px-6 pt-8 sm:pt-12">
+    <div class="max-w-3xl">
+      <p class="text-xs font-semibold uppercase tracking-wider text-brand">System Administration Terms</p>
+      <h1 class="mt-1 text-3xl sm:text-4xl font-bold tracking-tight text-ink-900">
+        Admin terms. Full accountability.
+      </h1>
+      <p class="mt-3 text-base text-ink-500 leading-relaxed">
+        System administrators hold a position of extreme trust. These terms define the strict
+        security requirements you must follow, the confidentiality obligations you must uphold,
+        and the serious consequences of any failure to comply.
+      </p>
+
+      <div class="mt-5 flex flex-wrap items-center gap-3 text-xs text-ink-400">
+        <span class="inline-flex items-center gap-1.5">
+          <i data-lucide="calendar" class="w-3.5 h-3.5"></i>
+          Last updated: <%= locals.updatedAt || 'Latest' %>
+        </span>
+        <span aria-hidden="true">·</span>
+        <span class="inline-flex items-center gap-1.5">
+          <i data-lucide="globe" class="w-3.5 h-3.5"></i>
+          Applies to: cococe.rw and all subdomains
+        </span>
+      </div>
+    </div>
+  </section>
+
+  <div class="max-w-5xl mx-auto px-4 sm:px-6 py-10 sm:py-12 grid lg:grid-cols-[220px_1fr] gap-8">
+
+    <aside class="hidden lg:block no-print">
+      <nav class="sticky top-20 text-sm" aria-label="On this page">
+        <p class="text-[11px] uppercase tracking-wider font-semibold text-ink-400 mb-3">On this page</p>
+        <ul class="space-y-0.5">
+          <li><a href="#acceptance-admin" class="toc-link block border-l-2 border-transparent pl-3 py-1.5 text-ink-500 hover:text-ink-900 transition">1. Acceptance</a></li>
+          <li><a href="#session-security" class="toc-link block border-l-2 border-transparent pl-3 py-1.5 text-ink-500 hover:text-ink-900 transition">2. Session security</a></li>
+          <li><a href="#logout-obligation" class="toc-link block border-l-2 border-transparent pl-3 py-1.5 text-ink-500 hover:text-ink-900 transition">3. Logout obligation</a></li>
+          <li><a href="#confidentiality" class="toc-link block border-l-2 border-transparent pl-3 py-1.5 text-ink-500 hover:text-ink-900 transition">4. Confidentiality</a></li>
+          <li><a href="#protected-assets" class="toc-link block border-l-2 border-transparent pl-3 py-1.5 text-ink-500 hover:text-ink-900 transition">5. Protected assets</a></li>
+          <li><a href="#additional-conditions" class="toc-link block border-l-2 border-transparent pl-3 py-1.5 text-ink-500 hover:text-ink-900 transition">6. Additional conditions</a></li>
+          <li><a href="#non-compliance" class="toc-link block border-l-2 border-transparent pl-3 py-1.5 text-ink-500 hover:text-ink-900 transition">7. Non-compliance measures</a></li>
+          <li><a href="#contact-admin-terms" class="toc-link block border-l-2 border-transparent pl-3 py-1.5 text-ink-500 hover:text-ink-900 transition">8. Contact</a></li>
+        </ul>
+      </nav>
+    </aside>
+
+    <article class="prose-doc min-w-0">
+
+      <section id="acceptance-admin">
+        <h2 class="text-xl font-bold text-ink-900 mb-3">1. Acceptance of terms</h2>
+        <p>
+          By accepting a system administration role at COCOCE, you agree to be bound by these
+          System Administration Terms. These terms are supplementary to the general
+          <a href="/terms">Terms &amp; Conditions</a> and the
+          <a href="/admin-privacy">System Administration Privacy</a> policy.
+        </p>
+        <div class="bg-brand-light rounded-3xl p-5 md:p-6 border-l-4 border-brand flex items-center gap-4 shadow-sm my-4">
+          <i data-lucide="shield-alert" class="w-8 h-8 md:w-10 md:h-10 text-brand flex-shrink-0"></i>
+          <div class="text-slate-800">
+            <strong>System administration is a privilege, not a right.</strong> It comes with
+            extraordinary access and therefore extraordinary responsibility. Any violation of
+            these terms will be treated with the utmost seriousness.
+          </div>
+        </div>
+      </section>
+
+      <section id="session-security" class="mt-10">
+        <h2 class="text-xl font-bold text-ink-900 mb-3">2. Session security — highest standard required</h2>
+        <p>
+          Administrative sessions grant access to sensitive systems and data. You are required
+          to maintain the highest level of session security at all times:
+        </p>
+        <ul>
+          <li><strong>Avoid public networks:</strong> Never sign in to an administrative session from public Wi-Fi, hotel networks, airports, cafes, or any uncontrolled network.</li>
+          <li><strong>Avoid public machines:</strong> Never sign in from shared computers, library terminals, or any device you do not personally control.</li>
+          <li><strong>Avoid sharing your signed-in machine:</strong> Never leave your signed-in device unattended. Never allow anyone else — including colleagues, family, or friends — to use your signed-in machine.</li>
+          <li><strong>Use trusted networks only:</strong> Connect only through secure, private networks — ideally a company-managed VPN.</li>
+          <li><strong>Lock your screen:</strong> Enable automatic screen lock after a short idle period (maximum 5 minutes) and manually lock your screen whenever you step away.</li>
+          <li><strong>Use approved devices only:</strong> Access administrative systems only from devices that are managed, patched, and approved by COCOCE security.</li>
+        </ul>
+      </section>
+
+      <section id="logout-obligation" class="mt-10">
+        <h2 class="text-xl font-bold text-ink-900 mb-3">3. Logout obligation</h2>
+        <p>
+          You are <strong>required to log out</strong> of your administrative session each and
+          every time you leave it or finish the task at hand. This is not optional.
+        </p>
+        <ul>
+          <li><strong>Log out when finished:</strong> After completing any administrative task, log out immediately.</li>
+          <li><strong>Log out when leaving:</strong> If you step away from your device — even briefly — log out first.</li>
+          <li><strong>Log out at end of day:</strong> Never leave an administrative session open overnight.</li>
+          <li><strong>Log out before switching tasks:</strong> If you move to non-administrative work, close your admin session first.</li>
+          <li><strong>Verify logout:</strong> Confirm that the session has fully terminated and that no cached credentials remain.</li>
+        </ul>
+        <div class="bg-[#fff8ee] rounded-3xl p-5 md:p-7 border border-[#ffd8b5] shadow-md shadow-amber-200/20 my-4">
+          <div class="flex items-center gap-3 text-lg font-semibold text-[#9b4a0e] mb-3">
+            <i data-lucide="log-out" class="w-5 h-5 text-[#b55a1a]"></i>
+            Zero exceptions
+          </div>
+          <p class="text-slate-800 text-sm">
+            There is no scenario in which leaving an administrative session open is acceptable.
+            If you are unsure whether you will return, log out. You can always sign back in.
+          </p>
+        </div>
+      </section>
+
+      <section id="confidentiality" class="mt-10">
+        <h2 class="text-xl font-bold text-ink-900 mb-3">4. Confidentiality — never share</h2>
+        <p>
+          As a system administrator, you will have access to information that is strictly
+          confidential. You are <strong>legally required</strong> to never share, disclose,
+          discuss, or reveal any of the following:
+        </p>
+        <ul>
+          <li><strong>System administration rules and procedures:</strong> Internal security policies, access control lists, escalation paths, and operational runbooks.</li>
+          <li><strong>User data:</strong> Any personal information, account details, order history, or private communications belonging to COCOCE users.</li>
+          <li><strong>Organization's internal condition:</strong> Business strategies, financial performance, vendor relationships, partnership discussions, or any non-public operational information.</li>
+          <li><strong>Organization's dialect and internal language:</strong> Internal terminology, codenames, project names, or any proprietary vocabulary used within COCOCE.</li>
+          <li><strong>System assets:</strong> Server configurations, network topology, API keys, database schemas, infrastructure diagrams, and deployment details.</li>
+          <li><strong>Environmental assets:</strong> Physical security layouts, data center locations, hardware inventories, and environmental control systems.</li>
+          <li><strong>Security vulnerabilities:</strong> Known weaknesses, pending patches, incident reports, or any information that could be used to attack the platform.</li>
+        </ul>
+        <p>
+          This confidentiality obligation extends beyond your tenure. Even after you leave your
+          administrative role, you remain bound by these confidentiality requirements
+          indefinitely.
+        </p>
+      </section>
+
+      <section id="protected-assets" class="mt-10">
+        <h2 class="text-xl font-bold text-ink-900 mb-3">5. Protected assets — a complete list</h2>
+        <p>
+          For the avoidance of doubt, the following assets are protected under these terms:
+        </p>
+        <ul>
+          <li><strong>User data:</strong> Names, email addresses, phone numbers, delivery addresses, order details, and any other personal information.</li>
+          <li><strong>Authentication data:</strong> Password hashes, session tokens, MFA seeds, and recovery codes.</li>
+          <li><strong>Financial data:</strong> Payment records, payout schedules, commission structures, and vendor financial terms.</li>
+          <li><strong>System data:</strong> Logs, metrics, alerts, backup configurations, and disaster recovery plans.</li>
+          <li><strong>Source code:</strong> Application code, infrastructure-as-code, CI/CD pipelines, and deployment scripts.</li>
+          <li><strong>Business data:</strong> Contracts, agreements, pricing strategies, and vendor negotiations.</li>
+          <li><strong>Security data:</strong> Audit logs, incident reports, vulnerability scans, and penetration test results.</li>
+          <li><strong>Environmental data:</strong> Physical access records, CCTV footage, and facility layouts.</li>
+        </ul>
+      </section>
+
+      <section id="additional-conditions" class="mt-10">
+        <h2 class="text-xl font-bold text-ink-900 mb-3">6. Additional conditions</h2>
+        <p>Beyond the above, you also agree to:</p>
+        <ul>
+          <li><strong>Report suspicious activity:</strong> Immediately report any suspected breach, anomaly, or unusual system behavior to the security team.</li>
+          <li><strong>Complete mandatory training:</strong> Undergo regular security and privacy training as required by COCOCE.</li>
+          <li><strong>Use only approved tools:</strong> Never introduce unauthorized software, scripts, or third-party services into the administrative environment.</li>
+          <li><strong>Maintain device hygiene:</strong> Keep your administrative devices patched, encrypted, and free of unauthorized software.</li>
+          <li><strong>Cooperate with audits:</strong> Submit to regular access reviews, log audits, and compliance checks.</li>
+          <li><strong>Respect least privilege:</strong> Never attempt to escalate your privileges beyond what your role requires.</li>
+          <li><strong>No personal use:</strong> Never use administrative access for personal benefit, curiosity, or any non-COCOCE purpose.</li>
+          <li><strong>Immediate disclosure:</strong> Disclose any conflict of interest, legal issue, or personal circumstance that may affect your ability to comply with these terms.</li>
+        </ul>
+      </section>
+
+      <section id="non-compliance" class="mt-10">
+        <h2 class="text-xl font-bold text-ink-900 mb-3">7. Non-compliance measures — un-negotiable</h2>
+        <div class="bg-[#fff0f0] rounded-3xl p-5 md:p-7 border border-[#f5b5b5] shadow-md shadow-red-200/30">
+          <div class="flex items-center gap-3 text-xl md:text-2xl font-semibold text-[#9b1a1a] mb-5">
+            <i data-lucide="gavel" class="w-6 h-6 md:w-7 md:h-7 text-[#b52a2a]"></i>
+            ⚠️ Serious consequences. No negotiation.
+          </div>
+          <p class="text-slate-800 mb-5">
+            If any system administrator fails to comply with these terms — in whole or in part —
+            <strong>serious measures will be taken un-negotiation ably</strong>. These measures
+            are non-negotiable and will be enforced without exception.
+          </p>
+          <p class="font-semibold text-slate-900 mb-3">Measures include, but are not limited to:</p>
+          <ul class="space-y-3">
+            <li class="flex items-start gap-3">
+              <i data-lucide="shield-off" class="w-5 h-5 text-[#b52a2a] mt-0.5 flex-shrink-0"></i>
+              <div><strong>Direct termination of access:</strong> Immediate and permanent revocation of all system assets access, including administrative dashboards, servers, databases, and internal tools.</div>
+            </li>
+            <li class="flex items-start gap-3">
+              <i data-lucide="user-x" class="w-5 h-5 text-[#b52a2a] mt-0.5 flex-shrink-0"></i>
+              <div><strong>Immediate suspension:</strong> Suspension of all COCOCE accounts and privileges, including any personal or business accounts.</div>
+            </li>
+            <li class="flex items-start gap-3">
+              <i data-lucide="scale" class="w-5 h-5 text-[#b52a2a] mt-0.5 flex-shrink-0"></i>
+              <div><strong>Legal lawsuit:</strong> Legal action will be pursued to the fullest extent of the law, including civil and criminal proceedings where applicable.</div>
+            </li>
+            <li class="flex items-start gap-3">
+              <i data-lucide="banknote" class="w-5 h-5 text-[#b52a2a] mt-0.5 flex-shrink-0"></i>
+              <div><strong>Financial liability:</strong> Recovery of damages, legal costs, and any losses caused by the violation.</div>
+            </li>
+            <li class="flex items-start gap-3">
+              <i data-lucide="file-warning" class="w-5 h-5 text-[#b52a2a] mt-0.5 flex-shrink-0"></i>
+              <div><strong>Regulatory reporting:</strong> Notification to relevant authorities, including data protection regulators and law enforcement.</div>
+            </li>
+            <li class="flex items-start gap-3">
+              <i data-lucide="user-minus" class="w-5 h-5 text-[#b52a2a] mt-0.5 flex-shrink-0"></i>
+              <div><strong>Permanent blacklisting:</strong> Permanent disqualification from any future employment or contracting relationship with COCOCE.</div>
+            </li>
+            <li class="flex items-start gap-3">
+              <i data-lucide="megaphone" class="w-5 h-5 text-[#b52a2a] mt-0.5 flex-shrink-0"></i>
+              <div><strong>Public disclosure:</strong> Where legally permitted, disclosure of the violation to affected parties and the public.</div>
+            </li>
+          </ul>
+          <div class="mt-5 bg-white rounded-2xl px-4 py-3.5 flex items-center gap-3 text-[#a13d0a] border border-dashed border-[#d97c38]">
+            <i data-lucide="alert-triangle" class="w-6 h-6 text-[#c9621e] flex-shrink-0"></i>
+            <span class="text-sm font-medium">
+              These measures are not subject to appeal, negotiation, or exception. By accepting
+              a system administration role, you acknowledge and accept these consequences.
+            </span>
+          </div>
+        </div>
+      </section>
+
+      <section id="contact-admin-terms" class="mt-10">
+        <h2 class="text-xl font-bold text-ink-900 mb-3">8. Contact</h2>
+        <p>Questions about these system administration terms may be sent to:</p>
+        <ul>
+          <li>General support — <a href="mailto:sales@cococe.rw">sales@cococe.rw</a></li>
+          <li>Security concerns — <a href="mailto:sales@cococe.rw">sales@cococe.rw</a></li>
+          <li>Legal matters — <a href="mailto:sales@cococe.rw">sales@cococe.rw</a></li>
+        </ul>
+      </section>
+
+      <section class="mt-12 pt-6 border-t border-ink-200">
+        <p class="text-xs text-ink-400">
+          This document is provided for informational purposes and does not constitute legal
+          advice. COCOCE recommends that administrators seek independent legal advice where
+          appropriate. If anything here conflicts with mandatory law, the law prevails.
+        </p>
+      </section>
+
+    </article>
+  </div>
+
+  <footer class="border-t border-ink-200 bg-white/60 no-print">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 py-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-ink-400">
+      <span>© 2026 <span class="text-brand font-extrabold">COCOCE</span> — System Administration Terms</span>
+      <div class="flex flex-wrap gap-x-6 gap-y-2 justify-center">
+        <a href="/dashboard" class="hover:text-brand transition">Dashboard</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    lucide.createIcons();
+  </script>
+
+  <script src="/scripts/admin-privacy.js"></script>
+
+</body>
+
+</html>

@@ -18,7 +18,7 @@ const uploadConfig = require('./config/upload.config');
 
 const vhost = require('vhost');
 
-const storage = require('./src/configs/storage.config');
+//const storage = require('./src/configs/storage.config');
 
 const mainApp = require('./apps/main/main.app');
 const adminApp = require('./apps/admin/admin.app');

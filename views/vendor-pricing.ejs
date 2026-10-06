@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>COCOCE — Vendor Pricing</title>
+  <link rel="stylesheet" href="/styles/main.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <meta name="description" content="COCOCE — Admin portal, COCOCE Kigali Rwanda, Laptops, Desktops, Computer accessories, Smart tv, projectors, discover what you want about digital assets near you at Kigali">
+  <meta name="keywords" content="Laptops, Desktops, Memories, Storages, Servers, keyboards, Printers, Screens, Repair, Explore, Electronic, Digital, Kigali, Rwanda">
+  <meta name="author" content="COCOCE RW">
+
+  <meta property="og:image" content="https://cdn.cococe.rw/meta/cococe.png">
+  <meta property="og:url" content="https://www.cococe.rw">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Laptops, Printers, Accessories, Game consoles, Electronics, and much more, cococe, your wish our priority">
+  <meta property="og:description" content="COCOCE Kigali Rwanda, Laptops, Desktops, Computer accessories, Smart tv, projectors, discover what you want about digital assets near you at Kigali">
+  <meta property="og:logo" content="https://cdn.cococe.rw/meta/cococe.png" />
+
+  <meta name="twitter:card" content="https://cdn.cococe.rw/meta/cococe.png">
+  <meta property="twitter:domain" content="https://cococe.rw">
+  <meta property="twitter:url" content="https://cococe.rw">
+  <meta name="twitter:title" content="Laptops, Printers, Accessories, Game consoles, Electronics, and much more, cococe, your wish our priority">
+  <meta name="twitter:description" content="COCOCE Kigali Rwanda, Laptops, Desktops, Computer accessories, Smart tv, projectors, discover what you want about digital assets near you at Kigali">
+
+  <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.11.0/axios.min.js" integrity="sha512-h9644v03pHqrIHThkvXhB2PJ8zf5E9IyVnrSfZg8Yj8k4RsO4zldcQc4Bi9iVLUCCsqNY0b4WXVV4UB+wbWENA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+  <link rel="icon" href="/favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" href="/styles/pricing.css">
+</head>
+
+<body>
+
+  <nav class="nav-premium">
+    <div class="nav-inner">
+      <div class="nav-left">
+        <a href="/">
+          <img src="/images/logos/business.png" alt="COCOCE" class="logo">
+        </a>
+        <span class="badge">PRICING</span>
+      </div>
+      <div class="nav-right">
+        <a href="/dashboard" class="link hidden sm:inline">Dashboard</a>
+        <a href="/register" class="btn-nav">
+          Become a Vendor
+          <i class="fas fa-arrow-right text-xs"></i>
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <section class="hero-section bg-premium">
+    <div class="hero-inner">
+      <div class="hero-badge">
+        <i class="fas fa-tag"></i>
+        Vendor Pricing
+      </div>
+      <h1 class="hero-title">
+        Check our <span class="highlight">Vendor Plans</span>
+      </h1>
+      <p class="hero-subtitle">
+        Connecting <strong>retailers and wholesalers</strong> with exclusive <span class="text-brand">deals</span>.
+      </p>
+    </div>
+  </section>
+
+  <section class="types-section">
+    <div class="types-inner">
+      <div class="types-header">
+        <h2>Understanding Vendor Types</h2>
+        <p>Each vendor type is designed for different business models and partnership levels</p>
+      </div>
+      <div class="types-grid">
+        <div class="type-card">
+          <span class="type-icon"><i class="bi bi-person-fill"></i></span>
+          <div class="type-name">Internal Vendor</div>
+          <div class="type-desc">Fully integrated partner within the COCOCE ecosystem. Complete access to all features and tools.</div>
+          <span class="type-badge internal">0% Commission</span>
+        </div>
+        <div class="type-card">
+          <span class="type-icon"><i class="bi bi-briefcase-fill"></i></span>
+          <div class="type-name">Preferred Vendor</div>
+          <div class="type-desc">Trusted partner with proven track record. Enhanced visibility and priority support.</div>
+          <span class="type-badge preferred">5% Commission</span>
+        </div>
+        <div class="type-card">
+          <span class="type-icon"><i class="bi bi-building-fill-up"></i></span>
+          <div class="type-name">External Vendor</div>
+          <div class="type-desc">Partner operating outside the COCOCE ecosystem with standard integration and support.</div>
+          <span class="type-badge external">10% Commission</span>
+        </div>
+        <div class="type-card">
+          <span class="type-icon"><i class="bi bi-person-workspace"></i></span>
+          <div class="type-name">Standard Vendor</div>
+          <div class="type-desc">Regular vendor with basic integration and standard support features.</div>
+          <span class="type-badge standard">15% Commission</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="py-12 md:py-20">
+    <div class="container-centered">
+      <div class="pricing-grid">
+
+        <div class="pricing-card featured">
+          <span class="badge internal">Internal</span>
+          <h3 class="plan-title">Internal Vendor</h3>
+          <p class="plan-subtitle">Fully integrated vendor</p>
+
+          <div class="price">
+            <span class="zero">0</span><span class="percent">%</span>
+            <span class="period">commission</span>
+          </div>
+
+          <div class="commission-info">
+            <span class="commission-badge zero">✓ 0% fee</span>
+            <p class="commission-text">on every successful order</p>
+          </div>
+
+          <ul class="feature-list">
+            <li><span class="check"><i class="fas fa-check-circle"></i></span> 0% commission fee</li>
+            <li><span class="check"><i class="fas fa-check-circle"></i></span> Full COCOCE integration</li>
+            <li><span class="check"><i class="fas fa-check-circle"></i></span> Priority support</li>
+            <li><span class="check"><i class="fas fa-check-circle"></i></span> Featured listings</li>
+            <li><span class="check"><i class="fas fa-check-circle"></i></span> Analytics dashboard</li>
+            <li><span class="check"><i class="fas fa-check-circle"></i></span> Unlimited products</li>
+          </ul>
+
+          <a href="/register?type=internal" class="btn-primary-premium featured-btn">
+            Get Started
+            <i class="fas fa-arrow-right text-xs"></i>
+          </a>
+        </div>
+
+        <div class="pricing-card">
+          <span class="badge preferred">Preferred</span>
+          <h3 class="plan-title">Preferred Vendor</h3>
+          <p class="plan-subtitle">Trusted partner</p>
+
+          <div class="price">
+            <span class="currency">RWFR</span>5%
+            <span class="period">/ order</span>
+          </div>
+
+          <div class="commission-info">
+            <span class="commission-badge low">5% commission</span>
+            <p class="commission-text">per successful order</p>
+          </div>
+
+          <ul class="feature-list">
+            <li><span class="check"><i class="fas fa-check-circle"></i></span> 5% commission fee</li>
+            <li><span class="check"><i class="fas fa-check-circle"></i></span> Full COCOCE integration</li>
+            <li><span class="check"><i class="fas fa-check-circle"></i></span> Priority support</li>
+            <li><span class="check"><i class="fas fa-check-circle"></i></span> Featured listings</li>
+            <li><span class="check"><i class="fas fa-check-circle"></i></span> Analytics dashboard</li>
+            <li><span class="cross"><i class="fas fa-times-circle"></i></span> Limited product slots</li>
+          </ul>
+
+          <a href="/register?type=preferred" class="btn-primary-premium">
+            Get Started
+            <i class="fas fa-arrow-right text-xs"></i>
+          </a>
+        </div>
+
+        <div class="pricing-card">
+          <span class="badge external">External</span>
+          <h3 class="plan-title">External Vendor</h3>
+          <p class="plan-subtitle">External partnership</p>
+
+          <div class="price">
+            <span class="currency">RWFR</span>10%
+            <span class="period">/ order</span>
+          </div>
+
+          <div class="commission-info">
+            <span class="commission-badge medium">10% commission</span>
+            <p class="commission-text">per successful order</p>
+          </div>
+
+          <ul class="feature-list">
+            <li><span class="check"><i class="fas fa-check-circle"></i></span> 10% commission fee</li>
+            <li><span class="check"><i class="fas fa-check-circle"></i></span> Limited integration</li>
+            <li><span class="check"><i class="fas fa-check-circle"></i></span> Standard support</li>
+            <li><span class="cross"><i class="fas fa-times-circle"></i></span> Regular listings</li>
+            <li><span class="cross"><i class="fas fa-times-circle"></i></span> Basic analytics</li>
+            <li><span class="check"><i class="fas fa-check-circle"></i></span> 50 product limit</li>
+          </ul>
+
+          <a href="/register?type=external" class="btn-primary-premium">
+            Get Started
+            <i class="fas fa-arrow-right text-xs"></i>
+          </a>
+        </div>
+
+        <div class="pricing-card">
+          <span class="badge standard">Standard</span>
+          <h3 class="plan-title">Standard Vendor</h3>
+          <p class="plan-subtitle">Regular vendor</p>
+
+          <div class="price">
+            <span class="currency">RWFR</span>15%
+            <span class="period">/ order</span>
+          </div>
+
+          <div class="commission-info">
+            <span class="commission-badge high">15% commission</span>
+            <p class="commission-text">per successful order</p>
+          </div>
+
+          <ul class="feature-list">
+            <li><span class="check"><i class="fas fa-check-circle"></i></span> 15% commission fee</li>
+            <li><span class="check"><i class="fas fa-check-circle"></i></span> Basic integration</li>
+            <li><span class="check"><i class="fas fa-check-circle"></i></span> Standard support</li>
+            <li><span class="cross"><i class="fas fa-times-circle"></i></span> Regular listings</li>
+            <li><span class="cross"><i class="fas fa-times-circle"></i></span> Basic analytics</li>
+            <li><span class="cross"><i class="fas fa-times-circle"></i></span> 20 product limit</li>
+          </ul>
+
+          <a href="/register?type=standard" class="btn-outline-premium">
+            Get Started
+            <i class="fas fa-arrow-right text-xs"></i>
+          </a>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <section class="py-12 md:py-16 bg-white border-y border-slate-100/60">
+    <div class="container-centered">
+      <div class="text-center mb-10">
+        <h2 class="text-2xl md:text-3xl font-bold text-slate-900">Compare Vendor Plans</h2>
+        <p class="text-slate-500 text-sm mt-2">Detailed comparison of all vendor types and their benefits</p>
+      </div>
+
+      <div class="comparison-table">
+        <table>
+          <thead>
+            <tr>
+              <th>Feature</th>
+              <th>Internal</th>
+              <th>Preferred</th>
+              <th>External</th>
+              <th>Standard</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Commission Rate</strong></td>
+              <td><span class="commission-badge zero">0%</span></td>
+              <td><span class="commission-badge low">5%</span></td>
+              <td><span class="commission-badge medium">10%</span></td>
+              <td><span class="commission-badge high">15%</span></td>
+            </tr>
+            <tr>
+              <td><strong>Commission Type</strong></td>
+              <td>Per order</td>
+              <td>Per order</td>
+              <td>Per order</td>
+              <td>Per order</td>
+            </tr>
+            <tr>
+              <td>COCOCE Integration</td>
+              <td><span class="check"><i class="fas fa-check-circle"></i></span></td>
+              <td><span class="check"><i class="fas fa-check-circle"></i></span></td>
+              <td><span class="check"><i class="fas fa-check-circle"></i></span></td>
+              <td><span class="check"><i class="fas fa-check-circle"></i></span></td>
+            </tr>
+            <tr>
+              <td>Priority Support</td>
+              <td><span class="check"><i class="fas fa-check-circle"></i></span></td>
+              <td><span class="check"><i class="fas fa-check-circle"></i></span></td>
+              <td><span class="cross"><i class="fas fa-times-circle"></i></span></td>
+              <td><span class="cross"><i class="fas fa-times-circle"></i></span></td>
+            </tr>
+            <tr>
+              <td>Featured Listings</td>
+              <td><span class="check"><i class="fas fa-check-circle"></i></span></td>
+              <td><span class="check"><i class="fas fa-check-circle"></i></span></td>
+              <td><span class="cross"><i class="fas fa-times-circle"></i></span></td>
+              <td><span class="cross"><i class="fas fa-times-circle"></i></span></td>
+            </tr>
+            <tr>
+              <td>Analytics Dashboard</td>
+              <td><span class="check"><i class="fas fa-check-circle"></i></span></td>
+              <td><span class="check"><i class="fas fa-check-circle"></i></span></td>
+              <td><span class="check"><i class="fas fa-check-circle"></i></span></td>
+              <td><span class="check"><i class="fas fa-check-circle"></i></span></td>
+            </tr>
+            <tr>
+              <td>Product Limit</td>
+              <td><strong>Unlimited</strong></td>
+              <td>Limited</td>
+              <td>50</td>
+              <td>20</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== FAQ SECTION ===== -->
+  <section class="py-12 md:py-16">
+    <div class="faq-container">
+      <div class="text-center mb-10">
+        <h2 class="text-2xl md:text-3xl font-bold text-slate-900">Frequently Asked Questions</h2>
+        <p class="text-slate-500 text-sm mt-2">Everything you need to know about vendor pricing</p>
+      </div>
+
+      <div class="faq-item">
+        <button class="question" data-target="answer1">
+          <span>How is the commission calculated?</span>
+          <span class="icon"><i class="fas fa-chevron-down"></i></span>
+        </button>
+        <div id="answer1" class="answer">
+          Commission is calculated as a percentage of the total order value (excluding shipping and taxes). For example, a $100 order with a 5% commission would incur a $5 fee. Internal vendors pay <strong>0% commission</strong> on every successful order.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="question" data-target="answer2">
+          <span>What is the difference between Internal and External vendors?</span>
+          <span class="icon"><i class="fas fa-chevron-down"></i></span>
+        </button>
+        <div id="answer2" class="answer">
+          Internal vendors are fully integrated within the COCOCE ecosystem with <strong>0% commission</strong>, priority support, and unlimited product listings. External vendors are partners with limited integration and a <strong>10% commission</strong> fee per successful order.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="question" data-target="answer3">
+          <span>Can I upgrade or downgrade my vendor plan?</span>
+          <span class="icon"><i class="fas fa-chevron-down"></i></span>
+        </button>
+        <div id="answer3" class="answer">
+          Yes, you can upgrade or downgrade your vendor plan at any time. Changes take effect immediately, and you'll be billed at the new commission rate for future transactions.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="question" data-target="answer4">
+          <span>Are there any hidden fees?</span>
+          <span class="icon"><i class="fas fa-chevron-down"></i></span>
+        </button>
+        <div id="answer4" class="answer">
+          No. The commission structure is transparent. There are no setup fees, monthly fees, or hidden charges. You only pay when you make a successful sale at your chosen commission rate.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="question" data-target="answer5">
+          <span>How do I become a Preferred Vendor?</span>
+          <span class="icon"><i class="fas fa-chevron-down"></i></span>
+        </button>
+        <div id="answer5" class="answer">
+          Preferred Vendor status is granted to internal vendors with a proven track record of excellent performance, high customer satisfaction, and consistent sales volume. Contact our team for more details.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="cta-section">
+    <div class="cta-inner">
+      <h2 class="cta-title">Ready to Start Selling?</h2>
+      <p class="cta-subtitle">
+        Join COCOCE today and choose the vendor plan that works best for your business.
+      </p>
+      <div class="cta-buttons">
+        <a href="/register" class="cta-btn-primary">
+          Become a Vendor
+          <i class="fas fa-arrow-right text-xs"></i>
+        </a>
+        <a href="mailto:sales@cococe.rw" class="cta-btn-secondary">
+          <i class="bi bi-envelope"></i>
+          Contact Sales
+        </a>
+      </div>
+      <p class="cta-note">No hidden fees. Cancel anytime.</p>
+    </div>
+  </section>
+
+  <footer class="footer-premium">
+    <div class="footer-inner">
+      <span class="footer-copy">© 2026 <span class="text-brand font-extrabold">COCOCE</span> — Vendor Pricing</span>
+      <div class="footer-links">
+        <a href="/docs/marketplace-terms">Terms</a>
+        <a href="tel:+250787195425"><i class="bi bi-telephone"></i> Support</a>
+        <a href="/faqs">FAQs</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/scripts/pricing.js" defer></script>
+
+</body>
+
+</html>

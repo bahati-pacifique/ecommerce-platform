@@ -410,7 +410,10 @@ $(document).ready(function () {
         }
 
         if (!isValid) {
-            showToast(`Please complete: ${errors.join(', ')}`, 'error');
+            Notification.showNotification({
+                type: 'warning',
+                message: '<strong>Please fill the required fields!</strong>'
+            })
         }
 
         return isValid;
@@ -867,17 +870,6 @@ $(document).ready(function () {
             }
             document.body.removeChild(ta);
         }
-    });
-
-    Notification.showNotification({
-        type: "warning",
-        title: "Privacy & Terms",
-        message: `Thank you for visiting. 
-        By submitting this business application, 
-        you agree to our Business Terms, 
-        Privacy Policy, and Standard Pricing. 
-        Please review our <a href="/terms" class="font-bold text-brand hover:underline" target="_blank">Terms & Privacy</a> and 
-        <a href="/pricing" class="font-bold text-brand hover:underline" target="_blank">Pricing</a> before proceeding.`
     });
 
 });

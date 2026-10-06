@@ -3,246 +3,259 @@
 
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>COCOCE · Authentication Privacy</title>
-  <title>COCOCE — Sign in</title>
-  <meta name="description" content="COCOCE — Your Wish Is Our Priority, COCOCE Kigali Rwanda, Laptops, Desktops, Computer accessories, Smart tv, projectors, discover what you want about digital assets near you at Kigali">
-  <meta name="keywords" content="Laptops, Desktops, Memories, Storages, Servers, keyboards, Printers, Screens, Repair, Explore, Electronic, Digital, Kigali, Rwanda">
-  <meta name="author" content="COCOCE RW">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>COCOCE — Privacy & Authentication</title>
+  <meta name="description" content="COCOCE Privacy & Authentication — Your data, your control. Learn what we store, how we secure it, and best practices for keeping your account safe.">
+  <link rel="icon" href="/favicon.ico" type="image/x-icon">
 
-  <meta property="og:image" content="https://cdn.cococe.rw/meta/cococe.png">
+  <meta property="og:image" content="https://cdn.cococe.rw/branding/brand/logos/cococe.png">
   <meta property="og:url" content="https://www.cococe.rw">
   <meta property="og:type" content="website">
   <meta property="og:title" content="Laptops, Printers, Accessories, Game consoles, Electronics, and much more, cococe, your wish our priority">
   <meta property="og:description" content="COCOCE Kigali Rwanda, Laptops, Desktops, Computer accessories, Smart tv, projectors, discover what you want about digital assets near you at Kigali">
-  <meta property="og:logo" content="https://cdn.cococe.rw/meta/cococe.png" />
-
-  <meta name="twitter:card" content="https://cdn.cococe.rw/meta/cococe.png">
-  <meta property="twitter:domain" content="cococe.rw">
+  <meta property="og:logo" content="https://cdn.cococe.rw/branding/brand/logos/cococe.png" />
+  <meta name="twitter:card" content="https://cdn.cococe.rw/branding/brand/logos/cococe.png">
+  <meta property="twitter:domain" content="https://cococe.rw">
   <meta property="twitter:url" content="https://cococe.rw">
   <meta name="twitter:title" content="Laptops, Printers, Accessories, Game consoles, Electronics, and much more, cococe, your wish our priority">
   <meta name="twitter:description" content="COCOCE Kigali Rwanda, Laptops, Desktops, Computer accessories, Smart tv, projectors, discover what you want about digital assets near you at Kigali">
 
-  <link rel="icon" href="/favicon.ico" type="image/x-icon">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
-
-  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.11.0/axios.min.js" integrity="sha512-h9644v03pHqrIHThkvXhB2PJ8zf5E9IyVnrSfZg8Yj8k4RsO4zldcQc4Bi9iVLUCCsqNY0b4WXVV4UB+wbWENA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-
-  <link rel="stylesheet" href="/styles/components/notification.css">
-  <link rel="stylesheet" href="/styles/main.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz@14..32&display=swap" rel="stylesheet">
-  <style>
-    body {
-      font-family: 'Inter', system-ui, -apple-system, sans-serif;
-      background: linear-gradient(145deg, #f7f9fc 0%, #eef2f7 100%);
-    }
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="stylesheet" href="/styles/main.css">
 
-    .privacy-card {
-      background: rgba(255, 255, 255, 0.9);
-      backdrop-filter: blur(2px);
-      border: 1px solid rgba(255, 255, 255, 0.6);
-    }
-
-    .list-check li {
-      display: flex;
-      gap: 0.65rem;
-      align-items: flex-start;
-    }
-
-    .list-check i {
-      margin-top: 0.2rem;
-      flex-shrink: 0;
-    }
-
-    .cookie-item {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      background: #f2f8ff;
-      padding: 0.3rem 1rem;
-      border-radius: 30px;
-      border: 1px solid #cdddec;
-      font-size: 0.95rem;
-    }
-
-    .urgent-note {
-      background: #ffffff;
-      border-radius: 18px;
-      padding: 1rem 1.4rem;
-      font-weight: 600;
-      color: #a13d0a;
-      border: 1px dashed #d97c38;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .badge-encrypt {
-      background: #d0e6d9;
-      color: #0e4f2e;
-      border-radius: 30px;
-      padding: 0.2rem 1rem;
-      font-size: 0.8rem;
-      font-weight: 600;
-      display: inline-flex;
-      align-items: center;
-      gap: 0.4rem;
-    }
-  </style>
+  <link rel="stylesheet" href="/styles/at_pvc.css">
 </head>
 
-<body class="min-h-screen flex items-center justify-center p-4 md:p-6">
-  <div class="privacy-card max-w-7xl w-full rounded-[42px] shadow-2xl shadow-slate-400/20 p-6 md:p-10 lg:p-12 transition-all">
+<body>
 
-    <div class="flex flex-wrap items-center gap-4 mb-4">
-      <div class="text-2xl md:text-3xl font-bold tracking-tight flex gap-3">
-        <img src="https://cdn.cococe.rw/meta/fav.png" alt="COCOCE" class="h-16">
-        <h1 class="text-2xl md:text-3xl lg:text-4xl font-bold tracking-tight leading-tight">
-          Your data, your control.<br><span class="text-brand font-bold">What does it mean to us?</span>
-        </h1>
-      </div>
-      <div class="ml-auto bg-[#d9e6f2] text-[#0b2b4a] text-xs md:text-sm font-semibold px-4 py-1.5 rounded-full border border-[#b7cde0] whitespace-nowrap">
-        <i class="fas fa-lock mr-1"></i> Privacy & Authentication
+  <header class="sticky top-0 z-40 border-b border-ink-200/70 bg-white/85 backdrop-blur no-print">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between gap-3">
+      <a href="<%= locals.protocal %><%= locals.domainName %>" class="flex items-center gap-2 flex-shrink-0">
+        <img src="/images/logos/business.png" alt="COCOCE" class="h-12">
+      </a>
+      <nav class="flex items-center gap-2">
+        <a href="<%= locals.protocal %>business.<%= locals.domainName %>/dashboard" class="hidden sm:inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium text-ink-700 hover:bg-ink-100 transition" target="_blank">
+          <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
+          Dashboard
+        </a>
+        <a href="<%= locals.protocal %>admin.<%= locals.domainName %>/dashboard" class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-brand text-white text-xs font-semibold hover:bg-brand-dark transition">
+          <i data-lucide="shield-cog-corner" class="w-4 h-4"></i>
+          Admin Dashboard
+        </a>
+      </nav>
+    </div>
+  </header>
+
+  <section class="max-w-5xl mx-auto px-4 sm:px-6 pt-8 sm:pt-12">
+    <div class="max-w-3xl">
+      <p class="text-xs font-semibold uppercase tracking-wider text-brand">Privacy & Authentication</p>
+      <h1 class="mt-1 text-3xl sm:text-4xl font-bold tracking-tight text-ink-900">
+        Your Data, Your <span class="text-brand/70 font-extrbold">Control</span>.
+      </h1>
+      <p class="mt-3 text-base text-ink-500 leading-relaxed">
+        Transparency about what we store, how we secure it, and what you should know before signing in.
+        Your privacy is a priority — here's exactly how we handle your information.
+      </p>
+
+      <div class="mt-5 flex flex-wrap items-center gap-3 text-xs text-ink-400">
+        <span class="inline-flex items-center gap-1.5">
+          <i data-lucide="calendar" class="w-3.5 h-3.5"></i>
+          Last updated: <%= locals.updatedAt || 'Latest' %>
+        </span>
+        <span aria-hidden="true">·</span>
+        <span class="inline-flex items-center gap-1.5">
+          <i data-lucide="globe" class="w-3.5 h-3.5"></i>
+          Applies to: cococe.rw and all subdomains
+        </span>
       </div>
     </div>
+  </section>
 
-    <div class="text-base md:text-lg text-[#2d4b67] border-l-4 md:border-l-5 border-[#4a7fa7] pl-4 md:pl-5 mb-8 font-normal">
-      Transparency about what we store, how we secure it, and what you should know before signing in.
-    </div>
+  <div class="max-w-5xl mx-auto px-4 sm:px-6 py-10 sm:py-12 grid lg:grid-cols-[220px_1fr] gap-8">
 
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-    
-      <div class="bg-white/80 rounded-3xl p-5 md:p-6 border border-[#e2edf7] shadow-sm">
-        <div class="flex items-center gap-3 text-xl font-semibold text-brand border-b-2 border-brand pb-2.5 mb-4">
-          <i class="fas fa-id-card text-brand text-2xl w-7 text-center"></i>
-          What we store (minimal)
-        </div>
-        <ul class="space-y-3 text-slate-700">
-          <li class="list-check">
-            <i class="fas fa-check-circle text-[#1d7a4b] text-lg"></i>
-            <span><strong>Email address</strong> – used as your unique identifier and for critical security alerts.</span>
-          </li>
-          <li class="list-check">
-            <i class="fas fa-check-circle text-[#1d7a4b] text-lg"></i>
-            <span><strong>Password hash</strong> – we never store your plain password. Only a salted, slow hash.</span>
-          </li>
-          <li class="list-check">
-            <i class="fas fa-check-circle text-[#1d7a4b] text-lg"></i>
-            <span><strong>Account metadata</strong> – creation date, last sign-in, and basic device/browser info to detect anomalies.</span>
-          </li>
-          <li class="list-check">
-            <i class="fas fa-check-circle text-[#1d7a4b] text-lg"></i>
-            <span><strong>Display name (optional)</strong> – if you choose to provide it.</span>
-          </li>
+    <aside class="hidden lg:block no-print">
+      <nav class="sticky top-20 text-sm" aria-label="On this page">
+        <p class="text-[11px] uppercase tracking-wider font-semibold text-ink-400 mb-3">On this page</p>
+        <ul class="space-y-0.5">
+          <li><a href="#what-we-store" class="toc-link block border-l-2 border-transparent pl-3 py-1.5 text-ink-500 hover:text-ink-900 transition">1. What we store</a></li>
+          <li><a href="#how-we-secure" class="toc-link block border-l-2 border-transparent pl-3 py-1.5 text-ink-500 hover:text-ink-900 transition">2. How we secure it</a></li>
+          <li><a href="#cookies-auth" class="toc-link block border-l-2 border-transparent pl-3 py-1.5 text-ink-500 hover:text-ink-900 transition">3. Cookies &amp; authentication</a></li>
+          <li><a href="#security-cautions" class="toc-link block border-l-2 border-transparent pl-3 py-1.5 text-ink-500 hover:text-ink-900 transition">4. Security cautions</a></li>
+          <li><a href="#browser-cache" class="toc-link block border-l-2 border-transparent pl-3 py-1.5 text-ink-500 hover:text-ink-900 transition">5. Browser cache &amp; device safety</a></li>
+          <li><a href="#contact-privacy" class="toc-link block border-l-2 border-transparent pl-3 py-1.5 text-ink-500 hover:text-ink-900 transition">6. Contact</a></li>
         </ul>
-        <p class="mt-4 text-sm text-[#2b4d6a] flex items-start gap-2">
-          <i class="fas fa-info-circle mt-0.5 text-[#2a6496]"></i>
-          We never ask for your full address, phone number, or payment details unless you explicitly enable paid features.
-        </p>
-      </div>
+      </nav>
+    </aside>
 
-      <div class="bg-white/80 rounded-3xl p-5 md:p-6 border border-[#e2edf7] shadow-sm">
-        <div class="flex items-center gap-3 text-xl font-semibold text-brand border-b-2 border-brand pb-2.5 mb-4">
-          <i class="fas fa-shield-alt text-brand text-2xl w-7 text-center"></i>
-          How we keep it
-        </div>
-        <p class="flex items-center gap-2 mb-2">
-            <i class="fas fa-lock text-brand"></i> 
-            <strong>Your credentials are encrypted and stored more securely.</strong>
+    <article class="prose-doc min-w-0">
+
+      <section id="what-we-store">
+        <h2 class="text-xl font-bold text-ink-900 mb-3">1. What we store (minimal by design)</h2>
+        <p>
+          We believe in collecting only what is absolutely necessary to provide you with a secure
+          and functional experience. Here is exactly what we store when you create an account:
+        </p>
+        <ul>
+          <li><strong>Email address</strong> — used as your unique identifier and for critical security alerts.</li>
+          <li><strong>Password hash</strong> — we never store your plain password. Only a salted, slow hash (Argon2id).</li>
+          <li><strong>Account metadata</strong> — creation date, last sign-in, and basic device/browser info to detect anomalies.</li>
+          <li><strong>Display name (optional)</strong> — if you choose to provide it.</li>
+        </ul>
+        <p>
+          We never ask for your full address, phone number, or payment details unless you
+          explicitly enable paid features. Your data stays minimal — and that's intentional.
+        </p>
+      </section>
+
+      <section id="how-we-secure" class="mt-10">
+        <h2 class="text-xl font-bold text-ink-900 mb-3">2. How we keep it secure</h2>
+        <p>
+          <strong>Your credentials are encrypted and stored more securely.</strong> We employ
+          industry-leading practices to ensure that even in the unlikely event of a breach,
+          your data remains inaccessible.
         </p>
         <div class="bg-[#e2f0e9] rounded-2xl px-4 py-3 my-3 flex items-center gap-3 text-[#1e5a3a]">
-          <i class="fas fa-user-secret text-xl"></i>
+          <i data-lucide="user-secret" class="w-5 h-5 flex-shrink-0"></i>
           <strong>“Even our team cannot access your data.”</strong>
         </div>
-        <ul class="space-y-2 mt-3 text-slate-700">
-          <li class="list-check">
-            <i class="fas fa-check-circle text-[#1d7a4b] text-lg"></i>
-            <span>Passwords are hashed with <strong>Argon2id</strong> + unique salt.</span>
-          </li>
-          <li class="list-check">
-            <i class="fas fa-check-circle text-[#1d7a4b] text-lg"></i>
-            <span>All data is encrypted in transit (TLS 1.3) and at rest (AES-256).</span>
-          </li>
-          <li class="list-check">
-            <i class="fas fa-check-circle text-[#1d7a4b] text-lg"></i>
-            <span>Zero‑knowledge architecture for authentication secrets.</span>
-          </li>
+        <ul>
+          <li>Passwords are hashed with <strong>Argon2id</strong> + unique salt.</li>
+          <li>All data is encrypted in transit (TLS 1.3) and at rest (AES-256).</li>
+          <li>Zero‑knowledge architecture for authentication secrets.</li>
         </ul>
-      </div>
-    </div>
+      </section>
 
-    <div class="mb-8">
-      <div class="flex items-center gap-3 text-xl md:text-2xl font-semibold text-brand border-b-2 border-brand pb-2.5 mb-4">
-        <i class="fas fa-cookie-bite text-brand text-2xl w-7 text-center"></i>
-        Cookies & authentication
-      </div>
-      <div class="flex flex-col md:flex-row gap-6 md:gap-10">
-        <div class="flex-1">
-          <p class="font-semibold mb-2 flex items-center gap-2"><i class="fas fa-cookie text-[#2a6496]"></i> What cookies do we use?</p>
-          <div class="flex flex-wrap gap-2.5 mb-3">
-            <span class="cookie-item"><i class="fas fa-key text-[#b65f22]"></i> Session cookie (httpOnly, secure)</span>
-            <span class="cookie-item"><i class="fas fa-chart-simple text-[#b65f22]"></i> CSRF protection token</span>
-            <span class="cookie-item"><i class="fas fa-sliders text-[#b65f22]"></i> Preferences (e.g. dark mode)</span>
+      <section id="cookies-auth" class="mt-10">
+        <h2 class="text-xl font-bold text-ink-900 mb-3">3. Cookies &amp; authentication</h2>
+        <p>
+          We use a minimal set of cookies — strictly necessary for keeping you signed in and
+          protecting against cross‑site request forgery. We never use third‑party tracking
+          cookies for authentication.
+        </p>
+        <p><strong>What cookies do we use?</strong></p>
+        <div class="flex flex-wrap gap-2.5 mb-3">
+          <span class="inline-flex items-center gap-1.5 bg-[#f2f8ff] px-3 py-1.5 rounded-full border border-[#cdddec] text-xs font-medium text-[#1e4a6b]">
+            <i data-lucide="key" class="w-3.5 h-3.5 text-[#b65f22]"></i> Session cookie (httpOnly, secure)
+          </span>
+          <span class="inline-flex items-center gap-1.5 bg-[#f2f8ff] px-3 py-1.5 rounded-full border border-[#cdddec] text-xs font-medium text-[#1e4a6b]">
+            <i data-lucide="shield-check" class="w-3.5 h-3.5 text-[#b65f22]"></i> CSRF protection token
+          </span>
+          <span class="inline-flex items-center gap-1.5 bg-[#f2f8ff] px-3 py-1.5 rounded-full border border-[#cdddec] text-xs font-medium text-[#1e4a6b]">
+            <i data-lucide="sliders-horizontal" class="w-3.5 h-3.5 text-[#b65f22]"></i> Preferences (e.g. dark mode)
+          </span>
+        </div>
+        <p>
+          <strong>What authentication means for you:</strong> Authentication verifies that you
+          are who you claim to be. When you log in, COCOCE creates a temporary session — a
+          short‑lived key that tells our servers it’s really you. That session expires after a
+          set time of inactivity or when you sign out.
+        </p>
+      </section>
+
+      <section id="security-cautions" class="mt-10">
+        <h2 class="text-xl font-bold text-ink-900 mb-3">4. Important session &amp; security cautions</h2>
+        <div class="bg-[#fff8ee] rounded-3xl p-5 md:p-7 border border-[#ffd8b5] shadow-md shadow-amber-200/20">
+          <div class="flex items-center gap-3 text-xl font-semibold text-[#9b4a0e] mb-5">
+            <i data-lucide="alert-triangle" class="w-6 h-6 text-[#b55a1a]"></i>
+            ⚠️ Please read carefully
           </div>
-          <p class="text-sm text-slate-600">We never use third‑party tracking cookies for authentication. Our cookies are strictly necessary to keep you signed in and protect against cross‑site request forgery.</p>
+          <ul class="space-y-4">
+            <li class="flex items-start gap-3.5">
+              <i data-lucide="clock" class="w-5 h-5 text-[#b85e1c] mt-0.5 flex-shrink-0"></i>
+              <div><strong>Session lifetime:</strong> For your safety, sessions automatically expire after 30 minutes of inactivity. Always sign out manually when you’re done, especially on shared devices.</div>
+            </li>
+            <li class="flex items-start gap-3.5">
+              <i data-lucide="user-lock" class="w-5 h-5 text-[#b85e1c] mt-0.5 flex-shrink-0"></i>
+              <div><strong>Password sharing / protection:</strong> Never share your password — not with friends, not with support (we will never ask for it). Use a unique passphrase and a password manager.</div>
+            </li>
+            <li class="flex items-start gap-3.5">
+              <i data-lucide="bug" class="w-5 h-5 text-[#b85e1c] mt-0.5 flex-shrink-0"></i>
+              <div><strong>Browser data hijacks:</strong> Malicious extensions, cached credentials, or session tokens stored in your browser can be stolen if your device is compromised. Attackers may use your browser’s stored caches to enter or steal information.</div>
+            </li>
+            <li class="flex items-start gap-3.5">
+              <i data-lucide="wifi" class="w-5 h-5 text-[#b85e1c] mt-0.5 flex-shrink-0"></i>
+              <div><strong>Public networks &amp; shared machines:</strong> Avoid signing in from public computers, libraries, or uncontrolled Wi‑Fi. If you must, use a trusted VPN and always sign out and clear browser data afterwards.</div>
+            </li>
+          </ul>
+
+          <div class="mt-5 bg-white rounded-2xl px-4 py-3.5 flex items-center gap-3 text-[#a13d0a] border border-dashed border-[#d97c38]">
+            <i data-lucide="shield-virus" class="w-6 h-6 text-[#c9621e] flex-shrink-0"></i>
+            <span class="text-sm font-medium">Even if our system monitors your account security, login details and attacks may use your browser's stored caches to enter or steal information. We urge you to always sign out after using your account and avoid accessing or signing in from public uncontrollable machines or public networks.</span>
+          </div>
+
+          <div class="flex flex-wrap gap-2.5 mt-4">
+            <span class="inline-flex items-center gap-1.5 bg-[#d0e6d9] text-[#0e4f2e] rounded-full px-3 py-1 text-xs font-semibold">
+              <i data-lucide="check-circle" class="w-3.5 h-3.5"></i> Always sign out
+            </span>
+            <span class="inline-flex items-center gap-1.5 bg-[#d0e6d9] text-[#0e4f2e] rounded-full px-3 py-1 text-xs font-semibold">
+              <i data-lucide="check-circle" class="w-3.5 h-3.5"></i> Use private/incognito if needed
+            </span>
+            <span class="inline-flex items-center gap-1.5 bg-[#d0e6d9] text-[#0e4f2e] rounded-full px-3 py-1 text-xs font-semibold">
+              <i data-lucide="check-circle" class="w-3.5 h-3.5"></i> Keep browser updated
+            </span>
+          </div>
         </div>
-        <div class="flex-1">
-          <p class="font-semibold mb-2 flex items-center gap-2"><i class="fas fa-fingerprint text-[#2a6496]"></i> What authentication means for you</p>
-          <p class="text-slate-700">Authentication verifies that you are who you claim to be. When you log in, COCOCE creates a temporary session — a short‑lived key that tells our servers it’s really you. That session expires after a set time of inactivity or when you sign out.</p>
+      </section>
+
+      <section id="browser-cache" class="mt-10">
+        <h2 class="text-xl font-bold text-ink-900 mb-3">5. Browser cache &amp; device safety</h2>
+        <div class="bg-brand-light rounded-3xl p-5 md:p-6 border-l-4 border-brand flex items-center gap-4 shadow-sm">
+          <i data-lucide="database" class="w-8 h-8 md:w-10 md:h-10 text-brand flex-shrink-0"></i>
+          <div class="text-slate-800">
+            <strong>Browser cache can betray you:</strong> Even with our strict encryption, if you
+            save passwords in your browser or leave a session open, someone with access to your
+            device could impersonate you. Always lock your device and use a screen lock.
+          </div>
         </div>
-      </div>
-    </div>
+        <p class="mt-4">
+          We recommend using a password manager, enabling two-factor authentication where
+          available, and regularly clearing your browser's cache and saved passwords on shared
+          devices. Your security is a shared responsibility — we do our part, and we ask you
+          to do yours.
+        </p>
+      </section>
 
-    <div class="bg-[#fff8ee] rounded-3xl p-5 md:p-7 border border-[#ffd8b5] shadow-md shadow-amber-200/20">
-      <div class="flex items-center gap-3 text-xl md:text-2xl font-semibold text-[#9b4a0e] mb-5">
-        <i class="fas fa-exclamation-triangle text-2xl md:text-3xl text-[#b55a1a]"></i>
-        ⚠️ Important session & security cautions
-      </div>
-      <ul class="space-y-4">
-        <li class="flex items-start gap-3.5">
-          <i class="fas fa-clock text-[#b85e1c] text-xl mt-0.5 w-6 text-center"></i>
-          <div><strong>Session lifetime:</strong> For your safety, sessions automatically expire after 30 minutes of inactivity. Always sign out manually when you’re done, especially on shared devices.</div>
-        </li>
-        <li class="flex items-start gap-3.5">
-          <i class="fas fa-user-lock text-[#b85e1c] text-xl mt-0.5 w-6 text-center"></i>
-          <div><strong>Password sharing / protection:</strong> Never share your password — not with friends, not with support (we will never ask for it). Use a unique passphrase and a password manager.</div>
-        </li>
-        <li class="flex items-start gap-3.5">
-          <i class="fas fa-bug text-[#b85e1c] text-xl mt-0.5 w-6 text-center"></i>
-          <div><strong>Browser data hijacks:</strong> Malicious extensions, cached credentials, or session tokens stored in your browser can be stolen if your device is compromised. Attackers may use your browser’s stored caches to enter or steal information.</div>
-        </li>
-        <li class="flex items-start gap-3.5">
-          <i class="fas fa-wifi text-[#b85e1c] text-xl mt-0.5 w-6 text-center"></i>
-          <div><strong>Public networks & shared machines:</strong> Avoid signing in from public computers, libraries, or uncontrolled Wi‑Fi. If you must, use a trusted VPN and always sign out and clear browser data afterwards.</div>
-        </li>
-      </ul>
+      <section id="contact-privacy" class="mt-10">
+        <h2 class="text-xl font-bold text-ink-900 mb-3">6. Contact</h2>
+        <p>Questions about privacy or authentication may be sent to:</p>
+        <ul>
+          <li>General support — <a href="mailto:support@cococe.rw">sales@cococe.rw</a></li>
+          <li>Privacy matters — <a href="mailto:privacy@cococe.rw">sales@cococe.rw</a></li>
+          <li>Security concerns — <a href="mailto:security@cococe.rw">sales@cococe.rw</a></li>
+        </ul>
+      </section>
 
-      <div class="urgent-note mt-5">
-        <i class="fas fa-shield-virus text-2xl text-[#c9621e]"></i>
-        <span>Even if our system monitors your account security, login details, attacks may use your browser's stored caches to enter / stole information. We urge you to always sign out after using your account and avoid accessing / signing in from public uncontrollable machines or public networks.</span>
-      </div>
+      <section class="mt-12 pt-6 border-t border-ink-200">
+        <p class="text-xs text-ink-400">
+          This document is provided for informational purposes and does not constitute legal
+          advice. COCOCE recommends that users seek independent legal advice where appropriate.
+          If anything here conflicts with mandatory law, the law prevails.
+        </p>
+      </section>
 
-      <div class="flex flex-wrap gap-2.5 mt-4">
-        <span class="badge-encrypt"><i class="fas fa-check-circle"></i> Always sign out</span>
-        <span class="badge-encrypt"><i class="fas fa-check-circle"></i> Use private/incognito if needed</span>
-        <span class="badge-encrypt"><i class="fas fa-check-circle"></i> Keep browser updated</span>
-      </div>
-    </div>
-
-    <div class="mt-8 bg-brand-light rounded-3xl p-5 md:p-6 border-l-6 border-brand flex items-center gap-4 shadow-sm">
-      <i class="fas fa-database text-3xl md:text-4xl text-brand"></i>
-      <div class="text-slate-800"><strong>Browser cache can betray you:</strong> Even with our strict encryption, if you save passwords in your browser or leave a session open, someone with access to your device could impersonate you. Always lock your device and use a screen lock.</div>
-    </div>
-
-    <div class="mt-8 pt-5 border-t border-brand flex flex-wrap justify-between items-center gap-3 text-sm">
-      <div class="flex items-center gap-1.5"><img src="https://cdn.cococe.rw/meta/fav.png" alt="COCOCE" class="h-8"> <h1 class="text-brand text-lg font-extrabold">COCOCE &copy;</h1> · Your Wish Is Our Priority</div>
-      <div class="flex items-center gap-1.5"><i class="fas fa-envelope text-brand"></i> sales@cococe.rw</div>
-    </div>
+    </article>
   </div>
+
+  <footer class="border-t border-ink-200 bg-white/60 no-print">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 py-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-ink-400">
+      <span>© 2026 <span class="text-brand font-extrabold">COCOCE</span> — Privacy &amp; Authentication</span>
+      <div class="flex flex-wrap gap-x-6 gap-y-2 justify-center">
+        <a href="/terms" class="hover:text-brand transition">Terms</a>
+        <a href="/privacy" class="hover:text-brand transition">Privacy</a>
+        <a href="mailto:sales@cococe.rw" class="hover:text-brand transition">Support</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    lucide.createIcons();
+  </script>
+
+  <script src="/scripts/at_pvc.js"></script>
+
 </body>
 
 </html>

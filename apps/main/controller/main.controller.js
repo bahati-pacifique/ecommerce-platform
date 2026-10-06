@@ -1,10 +1,21 @@
 const path = require('path');
 
-const storage = require('../src/configs/storage.config');
-const console = require('console');
-const { logout } = require('../src/services/auth.services');
-const { clearAuthentication, acceptsHtml } = require('../util/helpers');
-const authServices = require('../src/services/auth.services');
+const storage = require('../../../src/configs/storage.config');
+const { logout } = require('../../../src/services/auth.services');
+const { clearAuthentication, acceptsHtml } = require('../../../util/helpers');
+const authServices = require('../../../src/services/auth.services');
+
+const isProduction = process.env.NODE_ENV === 'production';
+
+const sslUrlPrefix = isProduction ? 'https://' : 'http://';
+
+const portSuffix = isProduction ? '' : `:${process.env.PORT}`;
+
+const domain = `${sslUrlPrefix}business.${process.env.DOMAIN}${portSuffix}`;
+const authDomain = `${sslUrlPrefix}auth.${process.env.DOMAIN}${portSuffix}?r=${domain}/dashboard`;
+
+const protocal = sslUrlPrefix;
+const domainName = `${process.env.DOMAIN}${portSuffix}`;
 
 function renderLaunchPage(req, res) {
 
@@ -27,6 +38,10 @@ function renderLaunchPage(req, res) {
             message: `COCOCE - We're comming soon`
         });
     }
+}
+
+function renderCookieTerms(req, res) {
+    res.render('cookie-terms', {protocal, domainName});
 }
 
 const uploadProductImage = async (req, res) => {
@@ -82,6 +97,7 @@ const signout = async (req, res) => {
 
 module.exports = {
     renderLaunchPage,
+    renderCookieTerms,
     uploadProductImage,
     signout
 }

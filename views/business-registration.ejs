@@ -53,10 +53,10 @@
       </a>
 
       <div class="hidden md:flex items-center gap-4">
-        <a href="/business-status" class="text-sm text-gray-500 hover:text-brand transition">Business status</a>
-        <a href="/dashboard" class="text-sm text-gray-500 hover:text-brand transition">Dashboard</a>
-        <a href="/pricing" class="text-sm text-gray-500 hover:text-brand transition" target="_blank">Pricing</a>
-        <a href="/applications" class="text-sm text-gray-500 hover:text-brand transition" target="_blank">My application</a>
+        <a href="/business-status" class="text-sm text-gray-500 hover:text-brand hover:underline  transition">Status</a>
+        <a href="/dashboard" class="text-sm text-gray-500 hover:text-brand hover:underline  transition">Dashboard</a>
+        <a href="/pricing" class="text-sm text-gray-500 hover:text-brand hover:underline transition" target="_blank">Pricing</a>
+        <a href="/applications" class="text-sm text-gray-500 hover:text-brand hover:underline transition" target="_blank"><i class="bi bi-search"></i> Application</a>
         <%if (locals.user) {%>
         <form method="POST" action="<%= locals.protocal%>auth.<%=locals.domainName%>/signout" class="text-sm font-medium px-2 py-1 border border-brand rounded-lg bg-white hover:bg-black/3 text-gray-700 hover:text-brand transition">
           <input type="hidden" name="host" value="<%= locals.protocal%>business.<%= locals.domainName%>">
@@ -115,11 +115,11 @@
     <div class="max-w-7xl mx-auto px-4 md:px-6">
       <div class="flex flex-col md:flex-row items-center justify-between gap-6">
         <div class="flex-1 text-center md:text-left">
-          <h1 class="text-xl md:text-2xl font-bold text-gray-900">
-            <span class="text-brand font-extrabold">COCOCE</span> Business Application
+          <h1 class="text-xl md:text-2xl font-bold text-black/70">
+            Business Application
           </h1>
           <p class="text-gray-500 text-sm mt-1 max-w-lg">
-            Hi! Welcome to COCOCE Business — The Hub of Digital Vendors.
+            Hi! Welcome to <span class="text-brand font-bold">COCOCE</span> Business — The Hub of Digital Vendors.
           </p>
         </div>
         <div class="flex items-center gap-6 text-sm">
@@ -136,6 +136,16 @@
           <div class="text-center">
             <p class="text-2xl font-bold text-brand">24/7</p>
             <p class="text-xs text-gray-400">Support</p>
+          </div>
+          <div class="w-px h-10 bg-gray-200"></div>
+          <div class="text-center">
+            <p class="text-2xl font-bold text-brand">10000+</p>
+            <p class="text-xs text-gray-400">Catalogues</p>
+          </div>
+          <div class="w-px h-10 bg-gray-200"></div>
+          <div class="text-center">
+            <p class="text-2xl font-bold text-brand"><i class="bi bi-receipt"></i></p>
+            <p class="text-xs text-gray-400">Smart inventory</p>
           </div>
         </div>
       </div>
@@ -182,7 +192,7 @@
               <label class="form-label">
                 ID Number <span class="required">*</span>
               </label>
-              <input type="text" id="idNumber" placeholder="e.g., 19000..." class="form-input w-full px-4 py-2.5 rounded-xl border border-gray-200 text-gray-900 placeholder-gray-400 transition" value="<%= locals.user?.id_no ||  ''%>" required>
+              <input type="text" id="idNumber" placeholder="Your Identification number" class="form-input w-full px-4 py-2.5 rounded-xl border border-gray-200 text-gray-900 placeholder-gray-400 transition" value="<%= locals.user?.id_no ||  ''%>" required>
         <p class="form-hint">Unique identification number</p>
       </div>
 
@@ -190,14 +200,14 @@
         <label class="form-label">
           First Name <span class="required">*</span>
         </label>
-        <input type="text" id="firstName" placeholder="e.g., John" class="form-input w-full px-4 py-2.5 rounded-xl border border-gray-200 text-gray-900 placeholder-gray-400 transition" required>
+        <input type="text" id="firstName" placeholder="Your legal first name" class="form-input w-full px-4 py-2.5 rounded-xl border border-gray-200 text-gray-900 placeholder-gray-400 transition" required>
       </div>
 
       <div>
         <label class="form-label">
           Last Name <span class="required">*</span>
         </label>
-        <input type="text" id="lastName" placeholder="e.g., Doe" class="form-input w-full px-4 py-2.5 rounded-xl border border-gray-200 text-gray-900 placeholder-gray-400 transition" required>
+        <input type="text" id="lastName" placeholder="Your legal last name" class="form-input w-full px-4 py-2.5 rounded-xl border border-gray-200 text-gray-900 placeholder-gray-400 transition" required>
       </div>
 
       <div>
@@ -206,7 +216,7 @@
           <span class="suggestion" id="usernameSuggestion">Suggested: <span id="suggestedUsername" class="text-brand cursor-pointer hover:underline"></span></span>
         </label>
         <div class="relative">
-          <input type="text" id="username" placeholder="e.g., johndoe" class="form-input w-full px-4 py-2.5 rounded-xl border border-gray-200 text-gray-900 placeholder-gray-400 transition" required>
+          <input type="text" id="username" placeholder="Choose your username" class="form-input w-full px-4 py-2.5 rounded-xl border border-gray-200 text-gray-900 placeholder-gray-400 transition" required>
           <div id="usernameCheckIndicator" class="absolute right-3 top-1/2 -translate-y-1/2 hidden">
             <i class="fas fa-spinner fa-spin fa-spin-fast text-brand hidden" id="usernameChecking"></i>
           </div>
@@ -219,14 +229,14 @@
         <label class="form-label">
           Email <span class="required">*</span>
         </label>
-        <input type="email" id="email" placeholder="e.g., vendor@example.com" class="form-input w-full px-4 py-2.5 rounded-xl border border-gray-200 text-gray-900 placeholder-gray-400 transition" required>
+        <input type="email" id="email" placeholder="Your active email address" class="form-input w-full px-4 py-2.5 rounded-xl border border-gray-200 text-gray-900 placeholder-gray-400 transition" required>
       </div>
 
       <div>
         <label class="form-label">
           Phone Number <span class="required">*</span>
         </label>
-        <input type="tel" id="phoneNumber" placeholder="e.g., +250 788 123 456" class="form-input w-full px-4 py-2.5 rounded-xl border border-gray-200 text-gray-900 placeholder-gray-400 transition" required>
+        <input type="tel" id="phoneNumber" placeholder="Your active phone numbe" class="form-input w-full px-4 py-2.5 rounded-xl border border-gray-200 text-gray-900 placeholder-gray-400 transition" required>
       </div>
 
       <div>
@@ -262,7 +272,7 @@
       </button>
     </div>
     </div>
-    
+
     <div class="step-content" id="step2">
       <div class="section-title mb-4">
         <span class="icon"><i class="fas fa-store"></i></span>
@@ -317,7 +327,6 @@
         </div>
       </div>
 
-      <!-- Business Classification -->
       <div class="mt-6">
         <div class="section-title mb-4">
           <span class="icon"><i class="fas fa-tags"></i></span>
@@ -464,7 +473,7 @@
               <input type="checkbox" id="agreeTerms" class="mt-0.5" required>
               <div>
                 <label for="agreeTerms" class="text-sm font-medium text-gray-800 cursor-pointer">
-                  I agree to the <a href="/terms" class="text-brand hover:underline" target="_blank">Terms of Service</a>
+                  I agree to the <a href="/docs/marketplace-terms" class="text-brand hover:underline" target="_blank">Terms of Service</a>
                 </label>
                 <p class="text-xs text-gray-500 mt-0.5">Read our terms and conditions carefully</p>
               </div>
@@ -476,7 +485,7 @@
               <input type="checkbox" id="agreePrivacy" class="mt-0.5" required>
               <div>
                 <label for="agreePrivacy" class="text-sm font-medium text-gray-800 cursor-pointer">
-                  I accept the <a href="/privacy" class="text-brand hover:underline" target="_blank">Privacy Policy</a>
+                  I accept the <a href="<%=locals.protocal%>auth.<%=locals.domainName%>/terms" class="text-brand hover:underline" target="_blank">Terms</a>
                 </label>
                 <p class="text-xs text-gray-500 mt-0.5">How we handle your data</p>
               </div>
@@ -514,7 +523,9 @@
       <div class="flex items-start gap-3">
         <i class="fas fa-info-circle text-brand mt-0.5"></i>
         <div>
-          <p class="text-sm font-medium text-gray-900">Vendor Registration Process</p>
+          <p class="text-sm font-medium text-gray-900">
+            Vendor Registration Process
+          </p>
           <p class="text-xs text-gray-500 mt-0.5">
             Once registered, your application will be reviewed by our team.
             You will receive a confirmation email once your vendor account is approved.
@@ -523,6 +534,7 @@
         </div>
       </div>
     </div>
+
     </main>
 
     <footer class="bg-white border-t border-gray-100/60 mt-6">
@@ -533,15 +545,15 @@
             <span class="text-xs text-gray-400">© 2026 — Business Platform</span>
           </div>
           <div class="flex flex-wrap items-center gap-6 text-gray-400">
-            <a href="/privacy" class="hover:text-brand transition">Privacy</a>
-            <a href="/terms" class="hover:text-brand transition">Terms</a>
+            <a href="<%=locals.protocal%>auth.<%=locals.domainName%>/privacy" target="_blank" class="hover:text-brand transition">Privacy</a>
+            <a href="/docs/marketplace-terms" target="_blank" class="hover:text-brand transition">Terms</a>
             <a href="/support" class="hover:text-brand transition">Support</a>
             <a href="tel:+250787195425" class="hover:text-brand transition"><i class="bi bi-telephone"></i> Help</a>
             <span class="w-1.5 h-1.5 bg-green-500 rounded-full"></span>
           </div>
         </div>
         <div class="text-center text-xs text-gray-400 mt-3">
-          <p>COCOCE Vendor Management — Empowering businesses since 2024</p>
+          <p>COCOCE — Dominating Digital Market since 2019</p>
         </div>
       </div>
     </footer>
@@ -569,11 +581,11 @@
         </div>
 
         <div class="modal-actions flex flex-col md:flex-row items-center gap-3">
-          
+
           <a href="/" class="btn-primary" id="dashboardLink">
             <i class="fas fa-home"></i> Go Home
           </a>
-          
+
           <a class="btn-secondary" id="viewAppBtn" target="_blank">
             <i class="fas fa-file-alt"></i> View Application
           </a>

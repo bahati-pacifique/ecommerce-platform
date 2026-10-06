@@ -76,6 +76,14 @@ async function renderBusinessApplications(req, res) {
     return res.render('vendor-applications', { protocal, domainName, user });
 }
 
+async function renderAdminPrivacy(req, res) {
+    res.render('admin-privacy', { protocal, domainName });
+}
+
+async function renderAdminTerms(req, res) {
+    res.render('admin-terms', { protocal, domainName });
+}
+
 async function signout(req, res) {
 
     const { accessToken } = decodeAuthCookies(req);
@@ -142,5 +150,7 @@ module.exports = {
     renderLoginPage,
     renderAccountSelection,
     renderProductCatalog,
+    renderAdminPrivacy,
+    renderAdminTerms,
     signout
 }

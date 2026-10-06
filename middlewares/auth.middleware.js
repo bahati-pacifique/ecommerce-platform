@@ -32,157 +32,17 @@ const {
 
 const authServices = require('../src/services/auth.services');
 
-// function checkAuthentication({ acceptedTypes } = {}) {
+const isProduction = process.env.NODE_ENV === 'production';
 
-//     return async function (req, res, next) {
+const sslUrlPrefix = isProduction ? 'https://' : 'http://';
 
-//         const isProduction = process.env.NODE_ENV === 'production';
+const portSuffix = isProduction ? '' : `:${process.env.PORT}`;
 
-//         const sslUrlPrefix = isProduction ? 'https://' : 'http://';
+const domain = `${sslUrlPrefix}business.${process.env.DOMAIN}${portSuffix}`;
+const authDomain = `${sslUrlPrefix}auth.${process.env.DOMAIN}${portSuffix}?r=${domain}/dashboard`;
 
-//         const portSuffix = isProduction ? '' : `:${process.env.PORT}`;
-
-//         const redirectPayload = decodeRedirect(req.cookies.r);
-
-//         const redirect = redirectPayload?.redirectTo || req.session.redirectTo || req.query.r || `${sslUrlPrefix}${process.env.DOMAIN}`;
-
-//         const accessToken = req.cookies.uac_t;
-//         const refreshToken = req.cookies.c_t;
-
-//         const ua = normalizeUA(req.get('User-Agent'));
-//         const ip = req.ip;
-
-//         /* =======================
-//            1) CHECK ACCESS TOKEN
-//         ======================== */
-
-//         if (accessToken) {
-//             try {
-//                 const decoded = jwt.verify(accessToken, process.env.JWT_SECRET);
-
-//                 if (decoded.ua !== ua || !sameNetwork(decoded.ip, ip)) {
-
-//                     //TODO implement: Log activity
-//                     clearAuthentication(res);
-//                     req.session.message = 'Please log in to continue';
-//                     if (acceptsHtml(req)) {
-//                         return res.redirect(`${sslUrlPrefix}auth.${process.env.DOMAIN}`)
-//                     } else {
-//                         return res.status(401).json({
-//                             authenticated: false,
-//                             success: false,
-//                             message: 'Please login to continue',
-//                             redirectTo: `${sslUrlPrefix}auth.${process.env.DOMAIN}`
-//                         })
-//                     }
-//                     //return deny401(req, res, { message: 'Login to continue' });
-//                 }
-
-//                 req.auth = {
-//                     userId: decoded.u_id,
-//                     accountId: decoded.ac,
-//                     accountType: decoded.ac_type,
-//                     name: decoded.name,
-//                 };
-
-//                 if (acceptedTypes && !acceptedTypes.includes(req.auth.accountType)) {
-//                     return deny403(req, res, { message: 'Login to continue' });
-//                 }
-
-//                 return next();
-//             } catch (err) {
-//                 // access expired → fall through to refresh
-//                 console.error(err)
-//             }
-//         }
-
-//         /* =======================
-//            2) REFRESH TOKEN
-//         ======================== */
-//         if (!refreshToken) {
-//             clearAuthentication(res);
-//             req.session.message = 'Please log in to continue';
-//             if (acceptsHtml(req)) {
-//                 return res.redirect(`${sslUrlPrefix}auth.${process.env.DOMAIN}`)
-//             } else {
-//                 return res.status(401).json({
-//                     authenticated: false,
-//                     success: false,
-//                     message: 'Please login to continue',
-//                     redirectTo: `${sslUrlPrefix}auth.${process.env.DOMAIN}`
-//                 })
-//             }
-//             return deny401(req, res, { message: 'Please login to continue' });
-//         }
-
-//         let refreshDecoded;
-//         try {
-//             refreshDecoded = jwt.verify(
-//                 refreshToken,
-//                 process.env.JWT_SECRET_2
-//             );
-//         } catch {
-//             clearAuthentication(res);
-//             return deny401(req, res, { message: 'Login to continue' });
-//         }
-
-//         if (
-//             refreshDecoded.ua !== ua ||
-//             !sameNetwork(refreshDecoded.ip, ip)
-//         ) {
-//             //TODO implement: Log activity
-//             clearAuthentication(res);
-//             return deny401(req, res, { message: 'Login to continue' });
-//         }
-
-//         let stored;
-//         try {
-//             stored = await sessionModel.findOne(
-//                 refreshDecoded.userId,
-//                 refreshDecoded.jti,
-//                 hashToken(refreshToken)
-//             );
-//         } catch {
-//             clearAuthentication(res);
-//             return deny401(req, res, { message: 'Login to continue' });
-//         }
-
-//         if (!stored || stored.expires_at < new Date()) {
-//             clearAuthentication(res);
-//             return deny401(req, res, { message: 'Login to continue' });
-//         }
-
-//         /* =======================
-//            3) ISSUE NEW ACCESS
-//         ======================== */
-//         const newAccess = signAccessToken({
-//             ac: refreshDecoded.accountId,
-//             ac_type: refreshDecoded.accountType,
-//             u_id: refreshDecoded.userId,
-//             name: refreshDecoded.username,
-//             ua,
-//             ip,
-//         });
-
-//         setAuthCookies(res, {
-//             accessToken: newAccess,
-//             refreshToken,
-//         });
-
-//         req.auth = {
-//             userId: refreshDecoded.userId,
-//             accountId: refreshDecoded.accountId,
-//             accountType: refreshDecoded.accountType,
-//             name: refreshDecoded.username,
-//         };
-
-//         if (acceptedTypes && !acceptedTypes.includes(req.auth.accountType)) {
-//             return deny403(req, res, { message: 'Login to continue' });
-//         }
-
-//         return next();
-//     };
-// }
+const protocal = sslUrlPrefix;
+const domainName = `${process.env.DOMAIN}${portSuffix}`;
 
 function verifyPreAuth(req, res, next) {
 
@@ -289,24 +149,6 @@ function authPass({ acceptedTypes }) {
             //Validate account type
             if (acceptedTypes && !acceptedTypes.includes(accessToken.ac_type?.toLowerCase() || '')) {
 
-                // if (acceptsHtml(req)) {
-                //     return res.render('no-access', {
-                //         user,
-                //         title: 'Access Restricted',
-                //         message: `You don't currently have permission to access this page. 
-                //         Your account is signed in successfully, 
-                //         but your assigned role doesn't include access to this resource. `
-                //     })
-                //     //return res.redirect(`${sslUrlPrefix}auth.${process.env.DOMAIN}${portSuffix}`)
-                // } else {
-                //     return res.status(401).json({
-                //         authenticated: false,
-                //         success: false,
-                //         message: 'Please login to continue',
-                //         redirectTo: `${sslUrlPrefix}auth.${process.env.DOMAIN}`
-                //     })
-                // }
-
                 if (acceptsHtml(req)) {
                     return res.render('no-access', {
                         user,
@@ -314,6 +156,7 @@ function authPass({ acceptedTypes }) {
                         account: accessToken.ac_type,
                         title: 'Access Restricted',
                         domain,
+                        domainName,
                         protocal,
                         message: `You don't currently have permission to access this page. 
                         Your account is signed in successfully, 
@@ -368,7 +211,7 @@ function authPass({ acceptedTypes }) {
                     message: 'Authentication failed — Please login to continue'
                 })
             }
-            
+
         }
 
         const userId = refreshToken.userId;
@@ -419,6 +262,7 @@ function authPass({ acceptedTypes }) {
                     accepted: acceptedTypes,
                     account: user.account_category,
                     domain,
+                    domainName,
                     protocal,
                     title: 'Access Restricted',
                     message: `You don't currently have permission to access this page. 

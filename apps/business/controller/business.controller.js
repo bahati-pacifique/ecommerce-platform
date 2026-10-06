@@ -42,7 +42,7 @@ async function businessVendorPricing(req, res) {
         })
     }
 
-    return res.render('vendor_pricing', { message: "", user, authDomain, domain });
+    return res.render('vendor-pricing', { user, protocal, domainName });
 }
 
 async function renderVendorCreation(req, res) {

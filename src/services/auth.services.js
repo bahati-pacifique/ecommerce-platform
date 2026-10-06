@@ -106,7 +106,7 @@ class AuthService {
                     preauth
                 };
             }
-            console.log("***", error.message)
+            console.log("auth.service: login()", error.message)
             throw new Error(error.message || 'Something went wrong — Log in to continue')
         }
     }
@@ -256,7 +256,7 @@ class AuthService {
                 
                 try {
                     const vendorResult = await Vendor.getVendorByUserId(userAccount.user_id);
-                    console.log("Vendor Acc.",vendorResult, userAccount.user_id)
+                    
                     if (vendorResult) {
                         userAccount.vendor = vendorResult;
                     }

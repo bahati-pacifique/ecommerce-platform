@@ -108,8 +108,9 @@
           <i class="bi bi-arrow-right"></i>
         </a>
         <%}%>
-            <a href="/vending/pros" class="btn-outline-premium" target="_blank">
-              Explore more
+            <a href="/pricing" class="btn-outline-premium" target="_blank">
+              See Pricing
+              <i class="bi bi-tags"></i>
             </a>
           </div>
 
@@ -487,7 +488,7 @@
       <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mt-8">
 
         <% if (!locals.user) {%>
-        <a href="/register" class="btn-premium text-sm py-2 px-5">
+        <a href="/register" class="btn-premium text-sm rounded py-3 px-5">
           Get Started
           <i class="fas fa-arrow-right text-xs"></i>
         </a>
@@ -550,17 +551,21 @@
       <div class="border-t border-slate-800/50 mt-8 pt-8 flex flex-col md:flex-row items-center justify-between gap-4 text-sm">
         <p>© 2026 COCOCE Business. All rights reserved.</p>
         <div class="flex gap-6">
-          <a href="/privacy" class="hover:text-white transition">Privacy</a>
-          <a href="/terms" class="hover:text-white transition">Terms</a>
-          <a href="/cookies-terms" class="hover:text-white transition">Cookies</a>
-          <form action="<%=locals.protocal%>auth.<%=locals.domainName%>/signout" method="post">
-            <input type="hidden" value="<%=locals.protocal%>business.<%=locals.domainName%>" name="host">
-            <input type="hidden" name="userAccount" value="<=locals.user.userAccount%>">
-            <button class="flex items-center gap-2 hover:text-brand" type="submit">
-              <span class="hidden md:block">Signout</span>
-              <i class="bi bi-arrow-right"></i>
-            </button>
-          </form>
+          <a href="<%=locals.protocal%>auth.<%=locals.domainName%>/privacy" target="_blank" class="hover:text-white transition">Privacy</a>
+        <a href="/docs/marketplace-terms" class="hover:text-white transition">Terms</a>
+        <a href="<%=locals.protocal%><%=locals.domainName%>/docs/cookie-terms" class="hover:text-white transition">Cookies</a>
+        <%if (locals.user){%>
+
+        <form action="<%=locals.protocal%>auth.<%=locals.domainName%>/signout" method="post">
+          <input type="hidden" value="<%=locals.protocal%>business.<%=locals.domainName%>" name="host">
+          <input type="hidden" name="userAccount" value="<=locals.user.userAccount%>">
+          <button class="flex items-center gap-2 hover:text-brand" type="submit">
+            <span class="hidden md:block">Signout</span>
+            <i class="bi bi-arrow-right"></i>
+          </button>
+        </form>
+
+        <%}%>
       </div>
     </div>
     </div>
