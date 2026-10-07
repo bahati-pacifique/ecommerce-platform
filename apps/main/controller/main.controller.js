@@ -41,7 +41,13 @@ function renderLaunchPage(req, res) {
 }
 
 function renderCookieTerms(req, res) {
-    res.render('cookie-terms', {protocal, domainName});
+    res.render('cookie-terms', { protocal, domainName });
+}
+
+function renderFaqs(req, res) {
+    const user = req.user ?? null;
+
+    return res.render('faqs', { user, protocal, domainName });
 }
 
 const uploadProductImage = async (req, res) => {
@@ -65,6 +71,8 @@ const uploadProductImage = async (req, res) => {
         imagePath: `products/${fileName}`
     });
 };
+
+
 
 const signout = async (req, res) => {
     try {
@@ -98,6 +106,7 @@ const signout = async (req, res) => {
 module.exports = {
     renderLaunchPage,
     renderCookieTerms,
+    renderFaqs,
     uploadProductImage,
     signout
 }

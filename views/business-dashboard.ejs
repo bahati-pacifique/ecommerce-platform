@@ -2430,7 +2430,7 @@
                   <h4 class="font-medium text-gray-900">Store Currency</h4>
                   <p class="text-sm text-gray-500">Set your preferred currency for transactions</p>
                 </div>
-                <select class="px-3 py-2 rounded-xl border border-gray-200 bg-gray-50 text-sm text-gray-700 focus:outline-none focus:border-brand">
+                <select id="vendorCurrency" class="vendor-setting px-3 py-2 rounded-xl border border-gray-200 bg-gray-50 text-sm text-gray-700 focus:outline-none focus:border-brand">
                   <option>RWF - Rwandan Franc</option>
                   <option>USD - US Dollar</option>
                   <option>EUR - Euro</option>
@@ -2441,21 +2441,21 @@
                   <h4 class="font-medium text-gray-900">Tax Settings</h4>
                   <p class="text-sm text-gray-500">Configure tax rates and rules</p>
                 </div>
-                <button class="px-4 py-2 bg-gray-100 text-gray-700 rounded-xl text-sm font-medium hover:bg-gray-200 transition">Configure</button>
+                <button id="taxSettingBtn" class="vendor-setting px-4 py-2 bg-gray-100 text-gray-700 rounded-xl text-sm font-medium hover:bg-gray-200 transition">Configure</button>
               </div>
               <div class="flex items-center justify-between p-4 border border-gray-200 rounded-xl">
                 <div>
                   <h4 class="font-medium text-gray-900">Shipping Methods</h4>
                   <p class="text-sm text-gray-500">Manage shipping options and rates</p>
                 </div>
-                <button class="px-4 py-2 bg-gray-100 text-gray-700 rounded-xl text-sm font-medium hover:bg-gray-200 transition">Configure</button>
+                <button id="vendorShippingBtn" class="vendor-setting px-4 py-2 bg-gray-100 text-gray-700 rounded-xl text-sm font-medium hover:bg-gray-200 transition">Configure</button>
               </div>
               <div class="flex items-center justify-between p-4 border border-gray-200 rounded-xl">
                 <div>
                   <h4 class="font-medium text-gray-900">Payment Gateways</h4>
                   <p class="text-sm text-gray-500">Connect payment providers</p>
                 </div>
-                <button class="px-4 py-2 bg-gray-100 text-gray-700 rounded-xl text-sm font-medium hover:bg-gray-200 transition">Configure</button>
+                <button id="vendorPaymentGatewayBtn" class="vendor-setting px-4 py-2 bg-gray-100 text-gray-700 rounded-xl text-sm font-medium hover:bg-gray-200 transition">Configure</button>
               </div>
             </div>
           </div>
@@ -2630,7 +2630,7 @@
                 <h4 class="font-medium text-gray-900">Contact Support</h4>
                 <p class="text-sm text-gray-500">Email & chat</p>
               </a>
-              <a href="/community/discussions" target="_blank" class="p-4 border border-gray-200 rounded-xl hover:border-brand/30 transition text-center">
+              <a href="<%=locals.protocal%><%=locals.domainName%>/faqs" target="_blank" class="p-4 border border-gray-200 rounded-xl hover:border-brand/30 transition text-center">
                 <div class="w-12 h-12 bg-brand-light rounded-xl flex items-center justify-center text-brand text-xl mx-auto mb-3">
                   <i data-lucide="messages-square"></i>
                 </div>
@@ -2658,7 +2658,7 @@
             <a href="/docs/catalog-terms" target="_blank" class="hover:text-brand transition">Catalog terms</a>
             <a href="/docs/marketplace-terms" class="hover:text-brand transition">Terms</a>
             <a href="mailto:sales@cococe.rw" class="hover:text-brand transition">Support</a>
-            <a href="/docs" class="hover:text-brand transition">Docs</a>
+            <a href="<%=locals.protocal%><%=locals.domainName%>/docs/cookie-terms" target="_blank" class="hover:text-brand transition">Cookies</a>
           </div>
         </div>
       </footer>
@@ -2710,10 +2710,10 @@
             <p class="text-xs text-gray-400">Get support?</p>
           </div>
         </a>
-        <a href="/marketplace/faqs" target="_blank" class="flex items-center gap-3 p-3 rounded-xl border border-gray-100 hover:border-brand/20 hover:bg-brand-light transition">
+        <a href="<%=locals.protocal%><%=locals.domainName%>/faqs" target="_blank" class="flex items-center gap-3 p-3 rounded-xl border border-gray-100 hover:border-brand/20 hover:bg-brand-light transition">
           <span class="text-xl"><i data-lucide="file-question-mark"></i></span>
           <div>
-            <p class="text-sm font-semibold text-gray-800">Visit ou FAQs</p>
+            <p class="text-sm font-semibold text-gray-800">Visit FAQs</p>
             <p class="text-xs text-gray-400">Have a question?</p>
           </div>
         </a>
@@ -2735,6 +2735,7 @@
   <script src="/scripts/vd-attributes.js"></script>
   <script src="/scripts/vd-analytics.js"></script>
   <script src="/scripts/vd-overview.js"></script>
+  <script src="/scripts/vd-settings.js"></script>
   <script src="/scripts/bdsh.js"></script>
 
   <script>

@@ -32,18 +32,14 @@
 <body>
 
   <header class="sticky top-0 z-40 border-b border-ink-200/70 bg-white/85 backdrop-blur no-print">
-    <div class="max-w-5xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between gap-3">
-      <a href="<%= locals.protocal %><%= locals.domainName %>" class="flex items-center gap-2 flex-shrink-0">
-        <img src="/images/logos/business.png" alt="COCOCE" class="h-12">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 h-18 flex items-center justify-between gap-3">
+      <a href="<%=locals.protocal%><%=locals.domainName%>" class="flex items-center gap-2 flex-shrink-0">
+        <img src="/images/logos/cococe.png" alt="COCOCE" class="h-12">
       </a>
       <nav class="flex items-center gap-2">
-        <a href="<%= locals.protocal %>business.<%= locals.domainName %>/dashboard" class="hidden sm:inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium text-ink-700 hover:bg-ink-100 transition" target="_blank">
-          <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
-          Dashboard
-        </a>
-        <a href="<%= locals.protocal %>admin.<%= locals.domainName %>/dashboard" class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-brand text-white text-xs font-semibold hover:bg-brand-dark transition">
+        <a href="/faqs" target="_blank" class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-brand text-white text-xs font-semibold hover:bg-brand-dark transition">
           <i data-lucide="shield-cog-corner" class="w-4 h-4"></i>
-          Admin Dashboard
+          FAQs
         </a>
       </nav>
     </div>

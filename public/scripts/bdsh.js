@@ -95,6 +95,7 @@ let brandsManager = null;
 let attributesManager = null;
 let analyticsManager = null;
 let overViewManager = null;
+let settingManager = null;
 
 if (activeTab === 'overview') {
     overViewManager = new OverviewManager();
@@ -170,6 +171,10 @@ sidebarLinks.forEach(link => {
                     overViewManager = new OverviewManager();
                 }
                 break;
+            case 'settings':
+                if (!settingManager) {
+                    settingManager = new SettingManager();
+                }
         }
 
         if (tabContents[tabId]) {

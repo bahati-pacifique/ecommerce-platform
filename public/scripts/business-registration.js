@@ -419,9 +419,6 @@ $(document).ready(function () {
         return isValid;
     }
 
-    // ============================================================
-    // NEXT/PREV STEP HANDLERS
-    // ============================================================
     $('.next-step').on('click', function () {
         const next = parseInt($(this).data('next').replace('step', ''));
         const current = next - 1;
@@ -435,9 +432,6 @@ $(document).ready(function () {
         goToStep(prev);
     });
 
-    // ============================================================
-    // AVATAR UPLOAD
-    // ============================================================
     const avatarUpload = document.getElementById('avatarUpload');
     const avatarInput = document.getElementById('user-profile-image');
     const avatarPreview = document.getElementById('avatarPreview');
@@ -462,9 +456,6 @@ $(document).ready(function () {
         }
     });
 
-    // ============================================================
-    // PASSWORD TOGGLE
-    // ============================================================
     function togglePasswordVisibility(inputId, iconId) {
         const input = document.getElementById(inputId);
         const icon = document.getElementById(iconId);
@@ -485,9 +476,6 @@ $(document).ready(function () {
         togglePasswordVisibility('confirmPassword', 'confirmPasswordIcon');
     });
 
-    // ============================================================
-    // PASSWORD MATCH VALIDATION
-    // ============================================================
     const passwordInput = document.getElementById('password');
     const confirmPasswordInput = document.getElementById('confirmPassword');
     const passwordMatchHint = document.getElementById('passwordMatchHint');
@@ -519,9 +507,7 @@ $(document).ready(function () {
     passwordInput.addEventListener('input', validatePasswordMatch);
     confirmPasswordInput.addEventListener('input', validatePasswordMatch);
 
-    // ============================================================
-    // VENDOR TYPE INFO CARDS
-    // ============================================================
+
     const vendorTypeInfo = {
         retailer: {
             title: 'Retailer',
@@ -676,7 +662,7 @@ $(document).ready(function () {
                     type: 'error',
                     message: error.response?.data?.message || 'Unable to submit application — Internal Server Error'
                 })
-                console.error(error.response ? error.response.data : error.message);
+                console.error(error);
             }).finally(() => {
                 $submitBtn.prop('disabled', false);
                 $submitBtn.html('Submit');

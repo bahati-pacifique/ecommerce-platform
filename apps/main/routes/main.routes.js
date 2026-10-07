@@ -14,5 +14,6 @@ router.get('/upload', (req, res) => {
 });
 
 router.get('/docs/cookie-terms', session, mainController.renderCookieTerms);
+router.get('/faqs', session, mainController.renderFaqs);
 
 module.exports = router;
