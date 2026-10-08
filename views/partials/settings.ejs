@@ -1,0 +1,51 @@
+<div class="mb-6">
+  <div class="mb-1 flex items-center gap-2 text-brand">
+    <i data-lucide="settings" class="h-4 w-4"></i>
+    <span class="text-sm font-semibold"><%= store.name %></span>
+  </div>
+  <h1 class="text-2xl font-bold tracking-tight">Store Settings</h1>
+  <p class="mt-1 text-sm text-slate-500">Configuration scoped to this store</p>
+</div>
+
+<div class="space-y-5">
+  <section class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+    <div class="mb-4 flex items-start justify-between">
+      <div>
+        <h2 class="font-semibold">Store Information</h2>
+        <p class="text-xs text-slate-500">Basic details shown to customers</p>
+      </div>
+      <i data-lucide="store" class="h-5 w-5 text-slate-400"></i>
+    </div>
+    <div class="grid gap-4 sm:grid-cols-2">
+      <div>
+        <label class="mb-1 block text-xs font-semibold text-slate-600">Store Name</label>
+        <input value="<%= store.name %>" class="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm" />
+      </div>
+      <div>
+        <label class="mb-1 block text-xs font-semibold text-slate-600">Contact Email</label>
+        <input type="email" value="store@bahati.rw" class="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm" />
+      </div>
+    </div>
+  </section>
+
+  <section class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+    <div class="mb-4 flex items-start justify-between">
+      <div>
+        <h2 class="font-semibold">Security</h2>
+        <p class="text-xs text-slate-500">Authentication and session settings</p>
+      </div>
+      <i data-lucide="shield-check" class="h-5 w-5 text-slate-400"></i>
+    </div>
+    <div class="grid gap-4 sm:grid-cols-2">
+      <div>
+        <label class="mb-1 block text-xs font-semibold text-slate-600">Session Timeout (minutes)</label>
+        <input type="number" value="30" class="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm" />
+      </div>
+    </div>
+    <div class="mt-5 flex gap-2 border-t border-slate-100 pt-4">
+      <button class="rounded-lg bg-brand px-4 py-2 text-sm font-semibold text-white hover:bg-brand-dark">
+        Save changes
+      </button>
+    </div>
+  </section>
+</div>

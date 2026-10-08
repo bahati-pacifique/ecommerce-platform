@@ -29,7 +29,7 @@ async function businessHomePage(req, res) {
         })
     }
 
-    return res.render('business', { message: "Welcome to COCOCE business", user, authDomain, domain, protocal, domainName });
+    return res.render('business', { layout: false, message: "Welcome to COCOCE business", user, authDomain, domain, protocal, domainName });
 }
 
 async function businessVendorPricing(req, res) {
@@ -42,7 +42,7 @@ async function businessVendorPricing(req, res) {
         })
     }
 
-    return res.render('vendor-pricing', { user, protocal, domainName });
+    return res.render('vendor-pricing', { layout: false, user, protocal, domainName });
 }
 
 async function renderVendorCreation(req, res) {
@@ -57,13 +57,13 @@ async function renderVendorCreation(req, res) {
         })
     }
 
-    return res.render('business-registration', { message: "Join hundreds of happy vendors", domain, domainName, protocal, authDomain, ...(user && { user }) });
+    return res.render('business-registration', {layout: false, message: "Join hundreds of happy vendors", domain, domainName, protocal, authDomain, ...(user && { user }) });
 }
 
 async function renderApplicationConfirmation(req, res) {
     const user = req.user || null;
 
-    return res.render('business-application-confirmation', user);
+    return res.render('business-application-confirmation', {layout: false, user});
 }
 
 function redirectedToDashboard(req, res) {
@@ -86,7 +86,7 @@ function redirectedToDashboard(req, res) {
 async function renderAttributeRegistryTerms(req, res) {
     const user = req.user;
 
-    res.render('attribute-registry-terms', { protocal, domainName, user });
+    res.render('attribute-registry-terms', { layout: false, protocal, domainName, user });
 }
 
 async function renderDashboard(req, res) {
@@ -121,6 +121,7 @@ async function renderDashboard(req, res) {
 
     return res.render('business-dashboard',
         {
+            layout: false,
             user,
             protocal,
             domainName
@@ -137,7 +138,7 @@ async function renderApplicationReview(req, res) {
     }
 
     const applicationIdentifier = req.session.applicationIdentifier || '';
-    return res.render('business-application-review', { protocal, domainName, applicationIdentifier });
+    return res.render('business-application-review', { layout: false, protocal, domainName, applicationIdentifier });
 }
 
 async function renderStoreCreation(req, res) {
@@ -156,17 +157,100 @@ async function renderStoreCreation(req, res) {
     }
 
     //const vendor = await VendorService.getVendorByUserId(user.userId || user.user_id || user.id, { includeUser: false });
-    return res.render('store-creation', { user, protocal, domainName });
+    return res.render('store-creation', { layout: false, user, protocal, domainName });
 }
 
 async function renderTerms(req, res) {
     const user = req.user;
-    return res.render('store-terms', { user, protocal, domainName });
+    return res.render('store-terms', { layout: false, user, protocal, domainName });
 }
 
 async function renderStoreDashboard(req, res) {
     const user = req.user;
-    return res.render('store-dashboard', { user, protocal, domainName });
+    const storeId = req.params.storeId;
+
+    try {
+
+        const vendorStore = await StoreService.getVendorStore(storeId, user.vendor?.id || null);
+
+        if (!vendorStore) {
+            return res.render('store-no-access', {
+                layout: false,
+                message: `<span class="text-black/70">Oops!</span> <span class="text-brand">${user.username}</span>, we're unable to get you authenticated to this Store.`,
+                details: `<h1 class="text-left text-ink-700 text-lg">It's seems like:</h1><p class="text-sm sm:text-base text-left text-ink-500 leading-relaxed"><br>● This store does not belongs to you, <br>● This store have been disabled or does not exist. <br><br><i>Please contact our support team for clarification</i></p>`,
+                code: 'STORE_NOT_FOUND',
+                protocal,
+                domainName
+            });
+        }
+
+        res.locals.layout = 'store-center';
+
+        return res.render('partials/dashboard', { layout: 'store-center', store: vendorStore, user, protocal, domainName, title: 'home' });
+    } catch (error) {
+        console.log(error);
+        return res.render('store-no-access', {
+            layout: false,
+            message: `<span class="text-black/70">Oops!</span> <span class="text-brand">${user.username}</span>, we're unable to get you authenticated to this Store.`,
+            details: `<h1 class="text-left text-ink-700 text-lg">It's seems like:</h1><p class="text-sm sm:text-base text-left text-ink-500 leading-relaxed"><br>● This store does not belongs to you, <br>● This store have been disabled or does not exist. <br><br><i>Please contact our support team for clarification</i></p>`,
+            code: error.message.toUpperCase(),
+            protocal,
+            domainName
+        });
+
+    }
+}
+
+async function renderStoreOrders(req, res) {
+  const user = req.user;
+  const storeId = req.params.storeId;
+
+  try {
+    const vendorStore = await StoreService.getVendorStore(
+      storeId,
+      user.vendor?.id || null
+    );
+
+    if (!vendorStore) {
+      return res.render('store-no-access', {
+        layout: false,
+        message: `<span class="text-black/70">Oops!</span> <span class="text-brand">${user.username}</span>, we're unable to get you authenticated to this Store.`,
+        details: `<h1 class="text-left text-ink-700 text-lg">It seems like:</h1>
+          <p class="text-sm sm:text-base text-left text-ink-500 leading-relaxed">
+            <br>● This store does not belong to you, <br>
+            ● This store has been disabled or does not exist. <br><br>
+            <i>Please contact our support team for clarification</i>
+          </p>`,
+        code: 'STORE_NOT_FOUND',
+        protocal,
+        domainName,
+      });
+    }
+
+    return res.render('partials/orders', {
+      title: 'Orders',
+      store: vendorStore,
+      user,
+      protocal,
+      domainName,
+    });
+  } catch (error) {
+    console.error(error);
+
+    return res.render('store-no-access', {
+      layout: false,
+      message: `<span class="text-black/70">Oops!</span> <span class="text-brand">${user.username}</span>, we're unable to get you authenticated to this Store.`,
+      details: `<h1 class="text-left text-ink-700 text-lg">It seems like:</h1>
+        <p class="text-sm sm:text-base text-left text-ink-500 leading-relaxed">
+          <br>● This store does not belong to you, <br>
+          ● This store has been disabled or does not exist. <br><br>
+          <i>Please contact our support team for clarification</i>
+        </p>`,
+      code: (error.message || 'UNKNOWN_ERROR').toUpperCase(),
+      protocal,
+      domainName
+    });
+  }
 }
 
 async function renderInvontoryForm(req, res) {
@@ -181,7 +265,7 @@ async function renderInvontoryForm(req, res) {
 
     const { stores } = await StoreService.getPaginatedStoresByVendorId(user.vendor.id);
 
-    return res.render('inventory-form', { user, protocal, domainName, stores });
+    return res.render('inventory-form', { layout: false, user, protocal, domainName, stores });
 }
 
 async function getVendorOrderDashboard(req, res) {
@@ -245,7 +329,7 @@ async function getVendorOverviewData(req, res) {
 
 async function renderProductCataloging(req, res) {
     const user = req.user;
-    res.render('product-cataloging', { user, protocal, domainName });
+    res.render('product-cataloging', { layout: false, user, protocal, domainName });
 }
 
 async function renderProductCatalog(req, res) {
@@ -255,17 +339,17 @@ async function renderProductCatalog(req, res) {
 
 async function renderMarketplacePolicy(req, res) {
     const user = req.user;
-    res.render('marketplace-terms', { user, protocal, domainName })
+    res.render('marketplace-terms', { layout: false, user, protocal, domainName })
 }
 
 async function renderCatalogPolicy(req, res) {
     const user = req.user;
-    res.render('catalog-policy', { user, protocal, domainName })
+    res.render('catalog-policy', { layout: false, user, protocal, domainName })
 }
 
 async function renderCatalogTerms(req, res) {
     const user = req.user;
-    res.render('catalog-terms', { user, protocal, domainName })
+    res.render('catalog-terms', { layout: false, user, protocal, domainName })
 }
 
 async function insertProductCatalog(req, res) {
@@ -834,6 +918,7 @@ module.exports = {
     renderAttributeRegistryTerms,
     redirectedToDashboard,
     renderStoreDashboard,
+    renderStoreOrders,
     renderInvontoryForm,
     getVendorOrderDashboard,
     getAnalyticVendorDashboardData,

@@ -26,7 +26,6 @@
       domainName: "<%= locals.domainName || 'cococe.rw' %>",
       vendorId: "<%= (locals.user && locals.user.vendor && locals.user.vendor.id) || '' %>",
       draftId: "<%= (locals.draft && locals.draft.id) || '' %>",
-      user: <%- JSON.stringify(locals.user || null) %>
     };
   </script>
   <script>

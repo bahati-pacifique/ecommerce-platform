@@ -1,0 +1,13 @@
+<div id="drawerOverlay" class="fixed inset-0 z-50 hidden bg-slate-950/30"></div>
+<aside id="orderDrawer" class="fixed inset-y-0 right-0 z-[60] hidden w-full max-w-xl border-l border-slate-200 bg-white shadow-2xl">
+  <div class="flex h-16 items-center justify-between border-b border-slate-200 px-5">
+    <div>
+      <div class="text-xs text-slate-500">Order details</div>
+      <h2 id="drawerOrderId" class="font-bold">—</h2>
+    </div>
+    <button id="closeOrderButton" class="rounded-lg p-2 hover:bg-slate-100"><i data-lucide="x" class="h-5 w-5"></i></button>
+  </div>
+  <div id="drawerContent" class="h-[calc(100%-4rem)] overflow-y-auto p-5">
+    <!-- filled dynamically -->
+  </div>
+</aside>

@@ -1,0 +1,157 @@
+<div class="mb-6 flex flex-col justify-between gap-4 md:flex-row md:items-end">
+  <div>
+    <div class="mb-1 text-sm font-medium text-[var(--color-brand)]"><%= store.name %></div>
+    <h1 class="text-2xl font-bold tracking-tight sm:text-3xl">Store Dashboard</h1>
+    <p class="mt-1 text-sm text-slate-500">Here's what's happening with your store today.</p>
+  </div>
+  <div class="flex flex-wrap gap-2">
+    <button id="viewStoreButton" class="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium shadow-sm hover:bg-slate-50">
+      <i data-lucide="external-link" class="h-4 w-4"></i>View Store
+    </button>
+    <button id="addProductButton" class="inline-flex items-center gap-2 rounded-lg bg-[var(--color-brand)] px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[var(--color-brand-dark)]">
+      <i data-lucide="plus" class="h-4 w-4"></i>Add Product
+    </button>
+    <select id="dateRange" class="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium shadow-sm outline-none">
+      <option>Today</option><option>Last 7 Days</option><option>Last 30 Days</option>
+      <option>This Year</option><option>Custom Range</option>
+    </select>
+  </div>
+</div>
+
+<!-- KPI cards -->
+<div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+  <%- include('../partials/metric-card', { label: 'Sales', value: '$24,580', change: '+12.5%', icon: 'banknote', tone: 'brand' }) %>
+  <%- include('../partials/metric-card', { label: 'Orders', value: '1,284', change: '+8.2%', icon: 'shopping-cart', tone: 'violet' }) %>
+  <%- include('../partials/metric-card', { label: 'Customers', value: '892', change: '+14.4%', icon: 'users', tone: 'emerald' }) %>
+  <%- include('../partials/metric-card', { label: 'Products', value: '246', icon: 'package', tone: 'amber' }) %>
+  <%- include('../partials/metric-card', { label: 'Pending Orders', value: '38', icon: 'clock-3', tone: 'orange' }) %>
+  <%- include('../partials/metric-card', { label: 'Store Rating', value: '4.8 / 5', icon: 'star', tone: 'amber' }) %>
+</div>
+
+<!-- Sales chart -->
+<div class="mt-6 rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+  <div class="mb-5 flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
+    <div>
+      <h2 class="font-semibold">Sales Overview</h2>
+      <p class="text-xs text-slate-500">Revenue performance for <%= store.name %></p>
+    </div>
+    <div class="flex gap-1 rounded-lg bg-slate-100 p-1">
+      <button class="chart-btn rounded-md bg-white px-3 py-1.5 text-xs font-semibold shadow-sm" data-range="7">7 Days</button>
+      <button class="chart-btn rounded-md px-3 py-1.5 text-xs text-slate-500" data-range="30">30 Days</button>
+      <button class="chart-btn rounded-md px-3 py-1.5 text-xs text-slate-500" data-range="90">90 Days</button>
+      <button class="chart-btn hidden rounded-md px-3 py-1.5 text-xs text-slate-500 sm:block" data-range="365">1 Year</button>
+    </div>
+  </div>
+  <div class="grid gap-6 lg:grid-cols-[1fr_220px]">
+    <div class="min-w-0">
+      <div class="relative h-64 rounded-lg border border-slate-100 chart-grid">
+        <svg viewBox="0 0 700 250" preserveAspectRatio="none" class="absolute inset-0 h-full w-full">
+          <polyline class="line" points="0,190 100,155 200,168 300,105 400,125 500,70 600,92 700,42" stroke="var(--color-brand)" />
+          <polyline class="line" points="0,215 100,202 200,185 300,190 400,162 500,180 600,140 700,132" stroke="#94a3b8" stroke-dasharray="5 5" />
+        </svg>
+        <div class="absolute bottom-2 left-3 right-3 flex justify-between text-[10px] text-slate-400">
+          <span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span>
+        </div>
+      </div>
+    </div>
+    <div class="grid grid-cols-1 gap-3 sm:grid-cols-3 lg:grid-cols-1">
+      <div class="rounded-lg bg-slate-50 p-4">
+        <div class="text-xs text-slate-500">Revenue</div>
+        <div class="mt-1 text-lg font-bold">$24,580</div>
+        <div class="mt-1 text-xs font-semibold text-emerald-600">+12.5%</div>
+      </div>
+      <div class="rounded-lg bg-slate-50 p-4">
+        <div class="text-xs text-slate-500">Orders</div>
+        <div class="mt-1 text-lg font-bold">1,284</div>
+        <div class="mt-1 text-xs font-semibold text-emerald-600">+8.2%</div>
+      </div>
+      <div class="rounded-lg bg-slate-50 p-4">
+        <div class="text-xs text-slate-500">Avg. Order Value</div>
+        <div class="mt-1 text-lg font-bold">$19.14</div>
+        <div class="mt-1 text-xs font-semibold text-emerald-600">+3.8%</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Recent orders + inventory alerts -->
+<div class="mt-6 grid gap-6 xl:grid-cols-3">
+  <div class="xl:col-span-2 rounded-xl border border-slate-200 bg-white shadow-sm">
+    <div class="flex items-center justify-between border-b border-slate-100 p-5">
+      <div>
+        <h2 class="font-semibold">Orders Requiring Attention</h2>
+        <p class="text-xs text-slate-500">Items that need action today</p>
+      </div>
+      <button class="text-sm font-semibold text-[var(--color-brand)] hover:text-[var(--color-brand-dark)]">View all</button>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="w-full text-left text-sm">
+        <thead class="bg-slate-50 text-xs uppercase tracking-wider text-slate-500">
+          <tr>
+            <th class="px-5 py-3">Order</th>
+            <th class="px-5 py-3">Customer</th>
+            <th class="px-5 py-3">Items</th>
+            <th class="px-5 py-3">Total</th>
+            <th class="px-5 py-3">Status</th>
+            <th class="px-5 py-3"></th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100">
+          <tr class="hover:bg-slate-50 cursor-pointer" data-action="open-order" data-order-id="ORD-10245">
+            <td class="px-5 py-4 font-semibold">#ORD-10245</td>
+            <td class="px-5 py-4">Jean M.</td>
+            <td class="px-5 py-4">2</td>
+            <td class="px-5 py-4 font-medium">$120</td>
+            <td class="px-5 py-4"><span class="rounded-full bg-amber-50 px-2.5 py-1 text-xs font-semibold text-amber-700">To Ship</span></td>
+            <td class="px-5 py-4"><button class="font-semibold text-[var(--color-brand)]">View</button></td>
+          </tr>
+          <tr class="hover:bg-slate-50 cursor-pointer" data-action="open-order" data-order-id="ORD-10244">
+            <td class="px-5 py-4 font-semibold">#ORD-10244</td>
+            <td class="px-5 py-4">Alice K.</td>
+            <td class="px-5 py-4">1</td>
+            <td class="px-5 py-4 font-medium">$85</td>
+            <td class="px-5 py-4"><span class="rounded-full bg-[var(--color-brand-ultralight)] px-2.5 py-1 text-xs font-semibold text-[var(--color-brand-dark)]">Processing</span></td>
+            <td class="px-5 py-4"><button class="font-semibold text-[var(--color-brand)]">View</button></td>
+          </tr>
+          <tr class="hover:bg-slate-50 cursor-pointer" data-action="open-order" data-order-id="ORD-10241">
+            <td class="px-5 py-4 font-semibold">#ORD-10241</td>
+            <td class="px-5 py-4">Eric N.</td>
+            <td class="px-5 py-4">3</td>
+            <td class="px-5 py-4 font-medium">$240</td>
+            <td class="px-5 py-4"><span class="rounded-full bg-rose-50 px-2.5 py-1 text-xs font-semibold text-rose-700">Return</span></td>
+            <td class="px-5 py-4"><button class="font-semibold text-[var(--color-brand)]">View</button></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="rounded-xl border border-slate-200 bg-white shadow-sm">
+    <div class="flex items-center justify-between border-b border-slate-100 p-5">
+      <div>
+        <h2 class="font-semibold">Inventory Alerts</h2>
+        <p class="text-xs text-slate-500">12 low · 3 out of stock</p>
+      </div>
+      <i data-lucide="triangle-alert" class="h-5 w-5 text-amber-500"></i>
+    </div>
+    <div class="divide-y divide-slate-100">
+      <div class="flex items-center justify-between p-4">
+        <div><div class="text-sm font-medium">iPhone 15 Case</div><div class="text-xs text-slate-500">SKU IP15P-BLK</div></div>
+        <span class="text-sm font-bold text-amber-600">4 left</span>
+      </div>
+      <div class="flex items-center justify-between p-4">
+        <div><div class="text-sm font-medium">USB-C Charger</div><div class="text-xs text-slate-500">SKU USBC-45W</div></div>
+        <span class="text-sm font-bold text-amber-600">2 left</span>
+      </div>
+      <div class="flex items-center justify-between p-4">
+        <div><div class="text-sm font-medium">Wireless Mouse</div><div class="text-xs text-slate-500">SKU WM-204</div></div>
+        <span class="text-sm font-bold text-rose-600">Out of stock</span>
+      </div>
+    </div>
+    <div class="p-4">
+      <button class="w-full rounded-lg border border-slate-200 py-2 text-sm font-semibold hover:bg-slate-50">Manage Inventory</button>
+    </div>
+  </div>
+</div>
+
+<% pageScript = '/scripts/store-center-dashboard.js'; %>

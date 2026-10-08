@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>COCOCE — Store Center</title>
+
+  <meta name="description" content="COCOCE — Store Center. You do not have access to this store.">
+  <link rel="icon" href="/favicon.ico" type="image/x-icon">
+
+  <meta property="og:image" content="https://cdn.cococe.rw/branding/brand/logos/cococe.png">
+  <meta property="og:url" content="https://www.cococe.rw">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Laptops, Printers, Accessories, Game consoles, Electronics, and much more, cococe, your wish our priority">
+  <meta property="og:description" content="COCOCE Kigali Rwanda, Laptops, Desktops, Computer accessories, Smart tv, projectors, discover what you want about digital assets near you at Kigali">
+  <meta property="og:logo" content="https://cdn.cococe.rw/branding/brand/logos/cococe.png" />
+  <meta name="twitter:card" content="https://cdn.cococe.rw/branding/brand/logos/cococe.png">
+  <meta property="twitter:domain" content="https://cococe.rw">
+  <meta property="twitter:url" content="https://cococe.rw">
+  <meta name="twitter:title" content="Laptops, Printers, Accessories, Game consoles, Electronics, and much more, cococe, your wish our priority">
+  <meta name="twitter:description" content="COCOCE Kigali Rwanda, Laptops, Desktops, Computer accessories, Smart tv, projectors, discover what you want about digital assets near you at Kigali">
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.11.0/axios.min.js" integrity="sha512-h9644v03pHqrIHThkvXhB2PJ8zf5E9IyVnrSfZg8Yj8k4RsO4zldcQc4Bi9iVLUCCsqNY0b4WXVV4UB+wbWENA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <link rel="stylesheet" href="/styles/components/notification.css">
+  <link rel="stylesheet" href="/styles/components/main-snackbar.css">
+  <link rel="stylesheet" href="/styles/components/loaders.css">
+  <link rel="stylesheet" href="/styles/components/animations.css">
+  <link rel="stylesheet" href="/styles/main.css">
+
+  <style>
+    :root {
+      --sidebar-width: 288px;
+      --color-brand: #ED1B24;
+      --color-brand-dark: #C9171F;
+      --color-brand-light: #FEE2E3;
+      --color-brand-ultralight: #FFF5F5;
+    }
+
+    html,
+    body {
+      margin: 0;
+      min-height: 100%;
+      font-family: 'Inter', system-ui, sans-serif;
+    }
+
+    #sidebar {
+      width: var(--sidebar-width);
+      overflow-x: hidden;
+    }
+
+    .sidebar-collapsed {
+      --sidebar-width: 76px;
+    }
+
+    .sidebar-collapsed .nav-label,
+    .sidebar-collapsed .section-label,
+    .sidebar-collapsed .store-details,
+    .sidebar-collapsed .account-details {
+      display: none;
+    }
+
+    .sidebar-collapsed .nav-item {
+      justify-content: center;
+    }
+
+    .sidebar-collapsed .store-switcher {
+      padding: 10px;
+    }
+
+    .sidebar-collapsed .store-switcher>div:last-child {
+      display: none;
+    }
+
+    .nav-item.active {
+      background: var(--color-brand-ultralight);
+      color: var(--color-brand-dark);
+      font-weight: 600;
+    }
+
+    .profile-menu {
+      transform-origin: top right;
+      z-index: 60;
+      transition: opacity .15s ease, transform .15s ease;
+    }
+
+    .profile-menu.open {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      pointer-events: auto;
+    }
+
+    .profile-menu.closed {
+      opacity: 0;
+      transform: translateY(4px) scale(.98);
+      pointer-events: none;
+    }
+
+    .chart-grid {
+      background-image: linear-gradient(to right, #e5e7eb 1px, transparent 1px),
+        linear-gradient(to bottom, #e5e7eb 1px, transparent 1px);
+      background-size: 12.5% 25%;
+    }
+
+    .line {
+      fill: none;
+      stroke-width: 3;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+  </style>
+</head>
+<script>
+  const protocal = "<%-locals.protocal%>";
+  const domainName = "<%-locals.domainName%>";
+  const storeId = "<%-locals.store.id%>";
+
+  console.log(protocal, domainName)
+</script>
+
+<body class="bg-slate-50 text-slate-900">
+  <div id="appShell" class="min-h-screen">
+
+    <%- include('partials/sidebar', { store, user, title }) %>
+
+    <div id="sidebarBackdrop" class="fixed inset-0 z-40 hidden bg-slate-950/30 lg:hidden"></div>
+
+    <div id="main" class="min-h-screen min-w-0 transition-[margin] duration-300 ease-in-out lg:ml-[var(--sidebar-width)]">
+      <%- include('partials/header',  { store, user }) %>
+      <main id="content" class="p-4 sm:p-6 lg:p-8">
+        <%- body %>
+      </main>
+    </div>
+  </div>
+
+  <%- include('partials/order-drawer') %>
+  <div id="toast" class="fixed bottom-5 right-5 z-[80] hidden rounded-lg bg-slate-900 px-4 py-3 text-sm font-medium text-white shadow-xl"></div>
+
+  <script type="module" src="/scripts/shell.js"></script>
+  <% if (typeof pageScript !== 'undefined' && pageScript) { %>
+  <script type="module" src="<%= pageScript %>"></script>
+  <% } %>
+
+  <script src="/scripts/components/notification.js"></script>
+  <script src="/scripts/components/main-snackbar.js"></script>
+</body>
+
+</html>

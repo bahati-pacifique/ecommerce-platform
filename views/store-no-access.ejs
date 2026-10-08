@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>COCOCE — Access Restricted</title>
+  <meta name="description" content="COCOCE — Access restricted. You do not have access to this store.">
+  <link rel="icon" href="/favicon.ico" type="image/x-icon">
+
+  <meta property="og:image" content="https://cdn.cococe.rw/branding/brand/logos/cococe.png">
+  <meta property="og:url" content="https://www.cococe.rw">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Laptops, Printers, Accessories, Game consoles, Electronics, and much more, cococe, your wish our priority">
+  <meta property="og:description" content="COCOCE Kigali Rwanda, Laptops, Desktops, Computer accessories, Smart tv, projectors, discover what you want about digital assets near you at Kigali">
+  <meta property="og:logo" content="https://cdn.cococe.rw/branding/brand/logos/cococe.png" />
+  <meta name="twitter:card" content="https://cdn.cococe.rw/branding/brand/logos/cococe.png">
+  <meta property="twitter:domain" content="https://cococe.rw">
+  <meta property="twitter:url" content="https://cococe.rw">
+  <meta name="twitter:title" content="Laptops, Printers, Accessories, Game consoles, Electronics, and much more, cococe, your wish our priority">
+  <meta name="twitter:description" content="COCOCE Kigali Rwanda, Laptops, Desktops, Computer accessories, Smart tv, projectors, discover what you want about digital assets near you at Kigali">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="stylesheet" href="/styles/main.css">
+
+  <style>
+    html {
+      -webkit-text-size-adjust: 100%;
+      scroll-behavior: smooth;
+      scrollbar-gutter: stable;
+      overflow-x: clip;
+    }
+
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: #F8FAFC;
+      color: #0F172A;
+      min-height: 100vh;
+      margin: 0;
+      overflow-x: clip;
+    }
+
+    html,
+    body {
+      min-width: 0;
+      max-width: 100%;
+    }
+
+    .bg-canvas {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      background:
+        radial-gradient(circle at 20% 20%, rgba(237, 27, 36, 0.06) 0%, transparent 45%),
+        radial-gradient(circle at 80% 70%, rgba(237, 27, 36, 0.05) 0%, transparent 50%),
+        radial-gradient(circle at 50% 50%, rgba(237, 27, 36, 0.04) 0%, transparent 60%),
+        #F8FAFC;
+      pointer-events: none;
+    }
+
+    .bg-grid {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      background-image:
+        linear-gradient(rgba(15, 23, 42, 0.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(15, 23, 42, 0.035) 1px, transparent 1px);
+      background-size: 48px 48px;
+      mask-image: radial-gradient(ellipse 80% 60% at 50% 40%, black 30%, transparent 75%);
+      -webkit-mask-image: radial-gradient(ellipse 80% 60% at 50% 40%, black 30%, transparent 75%);
+      pointer-events: none;
+    }
+
+    .blur-orb {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(90px);
+      opacity: 0.45;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .orb-1 {
+      width: 520px;
+      height: 520px;
+      top: -160px;
+      left: -120px;
+      background: radial-gradient(circle, rgba(237, 27, 36, 0.35) 0%, transparent 70%);
+    }
+
+    .orb-2 {
+      width: 640px;
+      height: 640px;
+      bottom: -220px;
+      right: -180px;
+      background: radial-gradient(circle, rgba(237, 27, 36, 0.28) 0%, transparent 70%);
+    }
+
+    .orb-3 {
+      width: 380px;
+      height: 380px;
+      top: 40%;
+      left: 55%;
+      background: radial-gradient(circle, rgba(237, 27, 36, 0.18) 0%, transparent 70%);
+    }
+
+    /* Glass card */
+    .glass-card {
+      background: rgba(255, 255, 255, 0.72);
+      backdrop-filter: blur(24px) saturate(160%);
+      -webkit-backdrop-filter: blur(24px) saturate(160%);
+      border: 1px solid rgba(255, 255, 255, 0.85);
+      box-shadow:
+        0 24px 60px -20px rgba(15, 23, 42, 0.18),
+        0 8px 24px -12px rgba(15, 23, 42, 0.10),
+        inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    }
+
+    @media (prefers-reduced-motion: no-preference) {
+      .blur-orb {
+        animation: float 14s ease-in-out infinite;
+      }
+
+      .orb-2 {
+        animation-delay: -4s;
+      }
+
+      .orb-3 {
+        animation-delay: -8s;
+      }
+
+      @keyframes float {
+
+        0%,
+        100% {
+          transform: translate(0, 0) scale(1);
+        }
+
+        50% {
+          transform: translate(20px, -20px) scale(1.05);
+        }
+      }
+    }
+
+    /* Fade-in animation for the card */
+    .fade-in {
+      animation: fadeIn 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(12px) scale(0.985);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    @media print {
+
+      .bg-canvas,
+      .bg-grid,
+      .blur-orb {
+        display: none !important;
+      }
+
+      body {
+        background: white;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="bg-canvas" aria-hidden="true"></div>
+  <div class="bg-grid" aria-hidden="true"></div>
+  <div class="blur-orb orb-1" aria-hidden="true"></div>
+  <div class="blur-orb orb-2" aria-hidden="true"></div>
+  <div class="blur-orb orb-3" aria-hidden="true"></div>
+
+  <header class="relative z-10 no-print">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+      <a href="<%= locals.protocal %><%= locals.domainName %>" class="flex items-center gap-2 flex-shrink-0">
+        <img src="/images/logos/business.png" alt="COCOCE" class="h-12">
+      </a>
+      <div class="flex items-center gap-2">
+        <a href="<%= locals.protocal %>business.<%= locals.domainName %>/" class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium text-ink-600 hover:text-ink-900 hover:bg-white/60 transition">
+          <i data-lucide="home" class="w-4 h-4"></i>
+          Home
+        </a>
+        <a href="mailto:support@cococe.rw" class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium text-ink-600 hover:text-ink-900 hover:bg-white/60 transition">
+          <i data-lucide="life-buoy" class="w-4 h-4"></i>
+          Support
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main class="relative z-10 min-h-[calc(100vh-4rem)] flex items-center justify-center px-4 sm:px-6 pb-16">
+    <div class="glass-card fade-in max-w-xl w-full rounded-[32px] sm:rounded-[36px] p-8 sm:p-10 text-center">
+
+      <div class="mx-auto w-16 h-16 rounded-2xl bg-brand/10 flex items-center justify-center mb-6 ring-1 ring-brand/15">
+        <i data-lucide="circle-off" class="w-8 h-8 text-brand"></i>
+      </div>
+
+      <h1 class="text-2xl sm:text-3xl font-bold tracking-tight text-ink-900 leading-snug">
+        <%-locals.message%>
+      </h1>
+      <div class="border border-slate-300 w-full px-4 py-2 rounded-lg mt-5 mb-3">
+        <%-locals.details%>
+      </div>
+
+      <div class="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
+        <a href="<%= locals.protocal %>business.<%= locals.domainName %>/dashboard" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-3 rounded-2xl bg-brand text-white text-sm font-semibold hover:bg-brand-dark transition shadow-lg shadow-brand/25">
+          <i data-lucide="arrow-left" class="w-4 h-4"></i>
+          Back to Dashboard
+        </a>
+        <a href="mailto:sales@cococe.rw" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-3 rounded-2xl bg-white/80 border border-ink-200 text-ink-700 text-sm font-semibold hover:bg-white hover:border-ink-300 transition">
+          <i data-lucide="mail" class="w-4 h-4"></i>
+          Contact support
+        </a>
+      </div>
+
+      <div class="mt-7 pt-5 border-t border-ink-200/70">
+        <p class="text-xs text-ink-400 inline-flex items-center gap-1.5">
+          <i data-lucide="info" class="w-3.5 h-3.5"></i>
+          Error code: <span class="font-semibold text-ink-500"><%-locals.code%></span>
+        </p>
+      </div>
+
+    </div>
+  </main>
+
+  <script>
+    lucide.createIcons();
+  </script>
+
+</body>
+
+</html>

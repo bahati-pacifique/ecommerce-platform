@@ -4,28 +4,29 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>COCOCE Store Center</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            cococe: {
-              50: '#eff6ff',
-              100: '#dbeafe',
-              500: '#2563eb',
-              600: '#1d4ed8',
-              700: '#1e40af',
-              900: '#172554'
-            }
-          }
-        }
-      }
-    }
-  </script>
-  
+  <title>COCOCE — Store Center</title>
+
+  <meta name="description" content="COCOCE — Access restricted. You do not have access to this store.">
+  <link rel="icon" href="/favicon.ico" type="image/x-icon">
+
+  <meta property="og:image" content="https://cdn.cococe.rw/branding/brand/logos/cococe.png">
+  <meta property="og:url" content="https://www.cococe.rw">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Laptops, Printers, Accessories, Game consoles, Electronics, and much more, cococe, your wish our priority">
+  <meta property="og:description" content="COCOCE Kigali Rwanda, Laptops, Desktops, Computer accessories, Smart tv, projectors, discover what you want about digital assets near you at Kigali">
+  <meta property="og:logo" content="https://cdn.cococe.rw/branding/brand/logos/cococe.png" />
+  <meta name="twitter:card" content="https://cdn.cococe.rw/branding/brand/logos/cococe.png">
+  <meta property="twitter:domain" content="https://cococe.rw">
+  <meta property="twitter:url" content="https://cococe.rw">
+  <meta name="twitter:title" content="Laptops, Printers, Accessories, Game consoles, Electronics, and much more, cococe, your wish our priority">
+  <meta name="twitter:description" content="COCOCE Kigali Rwanda, Laptops, Desktops, Computer accessories, Smart tv, projectors, discover what you want about digital assets near you at Kigali">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&display=swap" rel="stylesheet">
   <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="stylesheet" href="/styles/main.css">
+
   <style>
     :root {
       --sidebar-width: 288px;
@@ -210,23 +211,20 @@
 <body class="bg-[var(--color-bg-soft)] text-slate-900">
   <div id="appShell" class="min-h-screen">
 
-    <!-- Sidebar -->
     <aside id="sidebar" class="fixed inset-y-0 left-0 z-50 flex -translate-x-full flex-col border-r border-slate-200 bg-white transition-[width,transform] duration-300 ease-in-out lg:translate-x-0">
       <div class="flex h-16 min-w-0 items-center justify-between overflow-hidden border-b border-slate-200 px-5">
-        <div>
-          <div class="text-xl font-extrabold tracking-tight text-slate-950">COCOCE</div>
-          <div class="section-label text-[10px] font-bold tracking-[.18em] text-[var(--color-brand)]">STORE CENTER</div>
+        <div class="flex items-center gap-1">
+          <img src="/images/logos/fav.png" alt="Logo-brand" class="h-8">
+          <div class="section-label text-lg font-extrabold tracking-[.05em] text-brand">STORE CENTER</div>
         </div>
       </div>
 
       <div class="p-3">
         <button id="storeSwitcherButton" class="store-switcher flex w-full items-center gap-3 rounded-xl border border-slate-200 bg-slate-50 p-3 text-left hover:bg-slate-100">
-          <div class="flex h-9 w-9 shrink-0 items-start justify-center rounded-lg bg-[var(--color-brand-light)] text-[var(--color-brand-dark)]">
-            <i data-lucide="store" class="h-5 w-5"></i>
-          </div>
+          <img src="https://cdn.cococe.rw/business/images/stores/<%=locals.store.id%>.png" alt="Store Logo" class="h-7">
           <div class="store-details min-w-0 flex-1">
             <div class="text-[10px] font-semibold uppercase tracking-wider text-slate-500">Current store</div>
-            <div class="truncate text-sm font-semibold">Bahati Electronics</div>
+            <div class="truncate text-sm font-semibold"><%=locals.store?.name%></div>
           </div>
           <i data-lucide="chevrons-up-down" class="h-4 w-4 text-slate-400"></i>
         </button>
@@ -302,10 +300,10 @@
         </button>
         <div class="relative mt-2">
           <button id="sidebarProfileButton" class="flex w-full items-center gap-3 rounded-xl bg-slate-50 p-3 text-left hover:bg-[var(--color-brand-ultralight)]" aria-expanded="false" aria-controls="sidebarProfileMenu">
-            <div class="flex h-9 w-9 shrink-0 items-start justify-center rounded-full bg-slate-900 text-xs font-bold text-white">BN</div>
+            <img src="https://cdn.cococe.rw/images/profiles/<%=locals.user.userId%>.jpg" alt="Profile" class="w-12 h-12 rounded-full border-1 border-gray-200 object-cover transition group-hover:border-brand">
             <div class="account-details min-w-0 flex-1">
-              <div class="text-sm font-semibold">Bahati N.</div>
-              <div class="text-xs text-slate-500">Store Owner</div>
+              <div class="text-sm font-semibold"><%=locals.user.username%></div>
+              <div class="text-xs text-slate-500"><%=locals.user.vendor.business_name%></div>
             </div>
             <i data-lucide="chevron-up" class="account-details ml-auto h-4 w-4 text-slate-400"></i>
           </button>
@@ -345,18 +343,18 @@
         <button class="rounded-lg p-2 text-slate-500 hover:bg-[var(--color-brand-ultralight)]"><i data-lucide="circle-help" class="h-5 w-5"></i></button>
         <div class="relative shrink-0 hidden sm:block">
           <button id="headerProfileButton" type="button" class="relative z-50 flex items-center gap-2 rounded-lg px-2 py-1.5 text-left hover:bg-slate-50" aria-expanded="false" aria-controls="headerProfileMenu" aria-haspopup="menu">
-            <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-900 text-xs font-bold text-white">BN</div>
+            <img src="https://cdn.cococe.rw/images/profiles/<%=locals.user.userId%>.jpg" alt="Profile" class="w-12 h-12 rounded-full border-1 border-gray-200 object-cover transition group-hover:border-brand">
             <div class="min-w-0">
-              <div class="text-xs font-semibold">Bahati N.</div>
+              <div class="text-xs font-semibold"><%=locals.user.vendor.business_name%></div>
               <div class="text-[10px] text-slate-500">Store Owner</div>
             </div>
             <i data-lucide="chevron-down" class="h-4 w-4 shrink-0 text-slate-400"></i>
           </button>
           <div id="headerProfileMenu" class="profile-menu closed absolute right-0 top-full z-[60] mt-2 w-52 rounded-xl border border-slate-200 bg-white p-1.5 shadow-xl" role="menu">
-            <button type="button" data-profile-action="business-dashboard" class="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-slate-700 hover:bg-[var(--color-brand-ultralight)] hover:text-[var(--color-brand-dark)]">
+            <a href="/dashboard" type="button" data-profile-action="business-dashboard" class="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-slate-700 hover:bg-[var(--color-brand-ultralight)] hover:text-[var(--color-brand-dark)]">
               <i data-lucide="layout-dashboard" class="h-4 w-4"></i>
               Business Dashboard
-            </button>
+            </a>
             <div class="my-1 border-t border-slate-100"></div>
             <button type="button" data-profile-action="sign-out" class="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50">
               <i data-lucide="log-out" class="h-4 w-4"></i>

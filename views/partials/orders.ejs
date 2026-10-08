@@ -1,0 +1,49 @@
+<div class="mb-6 flex flex-col md:flex-row md:items-end md:justify-between gap-4">
+  <div>
+    <div class="mb-1 flex items-center gap-2 text-brand">
+      <i data-lucide="shopping-bag" class="h-4 w-4"></i>
+      <span class="text-sm font-semibold"><%= store.name %></span>
+    </div>
+    <h1 class="text-2xl font-bold tracking-tight">Orders</h1>
+    <p class="mt-1 text-sm text-slate-500">Manage fulfillment, returns, and disputes</p>
+  </div>
+</div>
+
+<!-- Filter bar -->
+<div class="rounded-xl border border-slate-200 bg-white shadow-sm">
+  <div class="flex flex-col md:flex-row gap-3 p-4 border-b border-slate-100">
+    <div class="relative flex-1">
+      <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400"></i>
+      <input id="ordersSearch" placeholder="Search orders by ID, customer..." class="w-full rounded-lg border border-slate-200 bg-slate-50 py-2 pl-9 pr-3 text-sm outline-none focus:border-brand focus:bg-white" />
+    </div>
+    <select id="ordersStatus" class="rounded-lg border border-slate-200 px-3 py-2 text-sm">
+      <option value="">All statuses</option>
+      <option value="to ship">To Ship</option>
+      <option value="processing">Processing</option>
+      <option value="shipped">Shipped</option>
+      <option value="delivered">Delivered</option>
+    </select>
+  </div>
+
+  <div class="overflow-x-auto">
+    <table class="w-full text-left text-sm">
+      <thead class="bg-slate-50 text-xs uppercase tracking-wider text-slate-500">
+        <tr>
+          <th class="px-5 py-3">Order</th>
+          <th class="px-5 py-3">Date</th>
+          <th class="px-5 py-3">Customer</th>
+          <th class="px-5 py-3">Items</th>
+          <th class="px-5 py-3">Total</th>
+          <th class="px-5 py-3">Status</th>
+          <th class="px-5 py-3"></th>
+        </tr>
+      </thead>
+      <tbody id="ordersTbody" class="divide-y divide-slate-100">
+      </tbody>
+    </table>
+  </div>
+
+  <div id="ordersPagination" class="border-t border-slate-100 p-4"></div>
+</div>
+
+<% pageScript = '/scripts/pages/orders.js' %>

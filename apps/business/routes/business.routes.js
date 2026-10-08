@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 
+
 const businessController = require('../controller/business.controller');
 
 const { dashboard, session, business, vendorBusinessRegister } = require('../../../middlewares/authGuards');
@@ -17,7 +18,9 @@ router.get('/inventories/:vendor/new-inventory', business, businessController.re
 router.get('/:vendor/dashboard', business, businessController.renderDashboard);
 
 router.get('/stores/:vendorId/create', business, businessController.renderStoreCreation);
-router.get('/stores/:storeId/dashboard', business, businessController.renderStoreDashboard);
+
+router.get('/stores/:storeId/dashboard/home', business, businessController.renderStoreDashboard);
+router.get('/stores/:storeId/dashboard/orders', business, businessController.renderStoreOrders);
 // router.get('/stores/:vendorId/:storeId', business, businessController.renderVendorStorePage);
 router.get('/register', vendorBusinessRegister, businessController.renderVendorCreation);
 router.get('/pricing', businessController.businessVendorPricing);

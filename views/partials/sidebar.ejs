@@ -1,0 +1,107 @@
+<aside id="sidebar" class="fixed inset-y-0 left-0 z-50 flex -translate-x-full flex-col border-r border-slate-200 bg-white transition-[width,transform] duration-300 ease-in-out lg:translate-x-0">
+  <div class="flex h-16 min-w-0 items-center justify-between overflow-hidden border-b border-slate-200 px-5">
+    <div class="flex items-center gap-1">
+      <img src="/images/logos/fav.png" alt="Logo" class="h-8">
+      <div class="section-label text-lg font-extrabold tracking-[.05em] text-brand">STORE CENTER</div>
+    </div>
+  </div>
+
+  <div class="p-3">
+    <button id="storeSwitcherButton" class="store-switcher flex w-full items-center gap-3 rounded-xl border border-slate-200 bg-slate-50 p-3 text-left hover:bg-slate-100">
+      <img src="https://cdn.cococe.rw/business/images/stores/<%= store.id %>.png" alt="Store" class="h-7" onerror="this.style.display='none'">
+      <div class="store-details min-w-0 flex-1">
+        <div class="text-[10px] font-semibold uppercase tracking-wider text-slate-500">Current store</div>
+        <div class="truncate text-sm font-semibold"><%= store.name %></div>
+      </div>
+      <i data-lucide="chevrons-up-down" class="h-4 w-4 text-slate-400"></i>
+    </button>
+    <div id="storeMenu" class="mt-2 hidden rounded-xl border border-slate-200 bg-white p-2 shadow-lg">
+      <div class="px-2 py-1.5 text-xs font-semibold uppercase tracking-wider text-slate-400">My Stores</div>
+      <button class="flex w-full items-center gap-2 rounded-lg bg-[var(--color-brand-ultralight)] px-3 py-2 text-sm font-medium text-[var(--color-brand-dark)]">
+        <i data-lucide="check" class="h-4 w-4"></i> <%= store.name %>
+      </button>
+      <div class="my-2 border-t border-slate-100"></div>
+      <button class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm hover:bg-slate-50"><i data-lucide="plus" class="h-4 w-4"></i>Create New Store</button>
+      <button class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm hover:bg-slate-50"><i data-lucide="settings-2" class="h-4 w-4"></i>Manage All Stores</button>
+    </div>
+  </div>
+
+  <nav class="flex-1 overflow-y-auto px-3 pb-4">
+    <div class="mb-5">
+      <div class="section-label px-3 pb-2 text-[10px] font-bold uppercase tracking-widest text-slate-400">Store</div>
+      <a href="/stores/<%= store.id %>/dashboard/home" class="nav-item <%= title === 'home' ? 'active' : 'text-slate-600 hover:bg-slate-50' %> flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm">
+        <i data-lucide="layout-dashboard" class="h-4 w-4"></i><span class="nav-label">Dashboard</span>
+      </a>
+    </div>
+    <div class="mb-5">
+      <div class="section-label px-3 pb-2 text-[10px] font-bold uppercase tracking-widest text-slate-400">Catalog</div>
+      <a href="/stores/<%= store.id %>/products" class="nav-item <%= title === 'Products' ? 'active' : 'text-slate-600 hover:bg-slate-50' %> flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm">
+        <i data-lucide="package" class="h-4 w-4"></i><span class="nav-label">Products</span>
+      </a>
+      <a href="/stores/<%= store.id %>/categories" class="nav-item <%= title === 'Categories' ? 'active' : 'text-slate-600 hover:bg-slate-50' %> flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm">
+        <i data-lucide="folder-tree" class="h-4 w-4"></i><span class="nav-label">Categories</span>
+      </a>
+      <a href="/stores/<%= store.id %>/inventory" class="nav-item <%= title === 'Inventory' ? 'active' : 'text-slate-600 hover:bg-slate-50' %> flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm">
+        <i data-lucide="boxes" class="h-4 w-4"></i><span class="nav-label">Inventory</span>
+      </a>
+    </div>
+    <div class="mb-5">
+      <div class="section-label px-3 pb-2 text-[10px] font-bold uppercase tracking-widest text-slate-400">Sales</div>
+      <a href="/stores/<%= store.id %>/dashboard/orders" class="nav-item <%= title === 'Orders' ? 'active' : 'text-slate-600 hover:bg-slate-50' %> flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm">
+        <i data-lucide="shopping-bag" class="h-4 w-4"></i><span class="nav-label">Orders</span>
+        <span class="nav-label ml-auto rounded-full bg-[var(--color-brand-light)] px-2 py-0.5 text-[10px] font-bold text-[var(--color-brand-dark)]">38</span>
+      </a>
+      <a href="/stores/<%= store.id %>/returns" class="nav-item <%= title === 'Returns' ? 'active' : 'text-slate-600 hover:bg-slate-50' %> flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm">
+        <i data-lucide="package-open" class="h-4 w-4"></i><span class="nav-label">Returns</span>
+      </a>
+      <a href="/stores/<%= store.id %>/refunds" class="nav-item <%= title === 'Refunds' ? 'active' : 'text-slate-600 hover:bg-slate-50' %> flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm">
+        <i data-lucide="rotate-ccw" class="h-4 w-4"></i><span class="nav-label">Refunds</span>
+      </a>
+      <a href="/stores/<%= store.id %>/disputes" class="nav-item <%= title === 'Disputes' ? 'active' : 'text-slate-600 hover:bg-slate-50' %> flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm">
+        <i data-lucide="triangle-alert" class="h-4 w-4"></i><span class="nav-label">Disputes</span>
+      </a>
+    </div>
+    <div class="mb-5">
+      <div class="section-label px-3 pb-2 text-[10px] font-bold uppercase tracking-widest text-slate-400">Customer</div>
+      <a href="/stores/<%= store.id %>/customers" class="nav-item <%= title === 'Customers' ? 'active' : 'text-slate-600 hover:bg-slate-50' %> flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm">
+        <i data-lucide="users" class="h-4 w-4"></i><span class="nav-label">Customers</span>
+      </a>
+      <a href="/stores/<%= store.id %>/reviews" class="nav-item <%= title === 'Reviews' ? 'active' : 'text-slate-600 hover:bg-slate-50' %> flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm">
+        <i data-lucide="star" class="h-4 w-4"></i><span class="nav-label">Reviews</span>
+      </a>
+    </div>
+    <div class="mb-5">
+      <div class="section-label px-3 pb-2 text-[10px] font-bold uppercase tracking-widest text-slate-400">Settings</div>
+      <a href="/stores/<%= store.id %>/settings" class="nav-item <%= title === 'Settings' ? 'active' : 'text-slate-600 hover:bg-slate-50' %> flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm">
+        <i data-lucide="settings" class="h-4 w-4"></i><span class="nav-label">Settings</span>
+      </a>
+    </div>
+  </nav>
+
+  <div class="border-t border-slate-200 p-3">
+    <div class="relative">
+      <button id="sidebarProfileButton" class="flex w-full items-center gap-3 rounded-xl bg-slate-50 p-3 text-left hover:bg-[var(--color-brand-ultralight)]" aria-expanded="false" aria-controls="sidebarProfileMenu">
+        <img src="https://cdn.cococe.rw/images/profiles/<%= user.userId %>.jpg"
+             onerror="this.src='https://ui-avatars.com/api/?name=<%= user.username %>'"
+             alt="Profile" class="h-8 w-8 rounded-full border border-gray-200">
+        <div class="account-details min-w-0 flex-1">
+          <div class="text-sm font-semibold"><%= user.username %></div>
+          <div class="text-xs text-slate-500">Store Owner</div>
+        </div>
+        <i data-lucide="chevron-up" class="account-details h-4 w-4 text-slate-400"></i>
+      </button>
+      <div id="sidebarProfileMenu" class="profile-menu closed absolute bottom-full left-0 mb-2 w-full rounded-xl border border-slate-200 bg-white p-1.5 shadow-xl">
+        <a href="/dashboard" class="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-slate-700 hover:bg-[var(--color-brand-ultralight)]">
+          <i data-lucide="layout-dashboard" class="h-4 w-4"></i> Business Dashboard
+        </a>
+        <div class="my-1 border-t border-slate-100"></div>
+        <button data-profile-action="sign-out" class="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-rose-600 hover:bg-rose-50">
+          <i data-lucide="log-out" class="h-4 w-4"></i> Sign out
+        </button>
+      </div>
+    </div>
+  </div>
+</aside>
+<script>
+  console.log("<%=locals.title%>")
+</script>
