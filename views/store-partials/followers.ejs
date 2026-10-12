@@ -1,0 +1,909 @@
+<%
+  /**
+   * Followers Page — self-contained
+   *
+   * Renders stats + search + filters + grid of follower cards + pagination.
+   * Mock data lives here; swap for a server query when backend is ready.
+   */
+
+  // ───────────────────────────────────────────────────────────
+  // MOCK DATA — replace with: const followers = await FollowerService.listForStore(...)
+  // ───────────────────────────────────────────────────────────
+  const mockFollowers = [
+    { id: 'f-001', customer_id: 'c-001', store_id: store.id, notify_products: true,  notify_promotions: true,  notify_discounts: true,  followed_at: new Date(Date.now() - 86400000 * 2).toISOString(),  username: 'Jean Mugisha',     email: 'jean.m@example.com',    phone: '+250 788 111 222', avatar_url: 'https://i.pravatar.cc/100?u=jean',    orders_count: 12, total_spent: 142000, currency: 'USD', last_order_at: new Date(Date.now() - 86400000 * 3).toISOString() },
+    { id: 'f-002', customer_id: 'c-002', store_id: store.id, notify_products: true,  notify_promotions: false, notify_discounts: true,  followed_at: new Date(Date.now() - 86400000 * 5).toISOString(),  username: 'Alice Kamau',      email: 'alice.k@example.com',   phone: '+250 788 333 444', avatar_url: 'https://i.pravatar.cc/100?u=alice',   orders_count: 8,  total_spent: 84000,  currency: 'USD', last_order_at: new Date(Date.now() - 86400000 * 1).toISOString() },
+    { id: 'f-003', customer_id: 'c-003', store_id: store.id, notify_products: false, notify_promotions: false, notify_discounts: false, followed_at: new Date(Date.now() - 86400000 * 12).toISOString(), username: 'Eric Ndayisaba',   email: 'eric.n@example.com',    phone: null,                avatar_url: null,                                  orders_count: 3,  total_spent: 21000,  currency: 'USD', last_order_at: null },
+    { id: 'f-004', customer_id: 'c-004', store_id: store.id, notify_products: true,  notify_promotions: true,  notify_discounts: false, followed_at: new Date(Date.now() - 86400000 * 20).toISOString(), username: 'Diane Uwase',      email: 'diane.u@example.com',   phone: '+250 788 555 666', avatar_url: 'https://i.pravatar.cc/100?u=diane',   orders_count: 5,  total_spent: 61000,  currency: 'USD', last_order_at: new Date(Date.now() - 86400000 * 8).toISOString() },
+    { id: 'f-005', customer_id: 'c-005', store_id: store.id, notify_products: true,  notify_promotions: true,  notify_discounts: true,  followed_at: new Date(Date.now() - 86400000 * 1).toISOString(),  username: 'Kevin Rwema',      email: 'kevin.r@example.com',   phone: '+250 788 777 888', avatar_url: 'https://i.pravatar.cc/100?u=kevin',   orders_count: 2,  total_spent: 12000,  currency: 'USD', last_order_at: new Date(Date.now() - 86400000 * 1).toISOString() },
+    { id: 'f-006', customer_id: 'c-006', store_id: store.id, notify_products: false, notify_promotions: true,  notify_discounts: true,  followed_at: new Date(Date.now() - 86400000 * 45).toISOString(), username: 'Grace Mukamana',   email: 'grace.m@example.com',   phone: '+250 788 999 000', avatar_url: null,                                  orders_count: 0,  total_spent: 0,      currency: 'USD', last_order_at: null },
+    { id: 'f-007', customer_id: 'c-007', store_id: store.id, notify_products: true,  notify_promotions: true,  notify_discounts: true,  followed_at: new Date(Date.now() - 86400000 * 8).toISOString(),  username: 'Patrick Habimana', email: 'patrick.h@example.com', phone: '+250 787 111 333', avatar_url: 'https://i.pravatar.cc/100?u=patrick', orders_count: 21, total_spent: 310000, currency: 'USD', last_order_at: new Date(Date.now() - 86400000 * 2).toISOString() },
+    { id: 'f-008', customer_id: 'c-008', store_id: store.id, notify_products: true,  notify_promotions: false, notify_discounts: false, followed_at: new Date(Date.now() - 86400000 * 60).toISOString(), username: 'Sarah Iradukunda', email: 'sarah.i@example.com',   phone: null,                avatar_url: null,                                  orders_count: 1,  total_spent: 4500,   currency: 'USD', last_order_at: new Date(Date.now() - 86400000 * 60).toISOString() },
+  ];
+
+  const followers = mockFollowers;
+
+  // ───────────────────────────────────────────────────────────
+  // Helpers scoped to this page
+  // ───────────────────────────────────────────────────────────
+  const initials = (name) => (name || '?').trim().charAt(0).toUpperCase();
+
+  const relTime = (date) => {
+    if (!date) return '';
+    const diff = Date.now() - new Date(date).getTime();
+    const day = 86400000;
+    if (diff < day) return 'today';
+    if (diff < day * 2) return 'yesterday';
+    if (diff < day * 7) return `${Math.floor(diff / day)} days ago`;
+    if (diff < day * 30) return `${Math.floor(diff / (day * 7))} weeks ago`;
+    if (diff < day * 365) return `${Math.floor(diff / (day * 30))} months ago`;
+    return `${Math.floor(diff / (day * 365))} years ago`;
+  };
+
+  const fmtDate = (d) => d
+    ? new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+    : '—';
+
+  const fmtMoney = (amount, currency = 'USD') => amount == null
+    ? null
+    : new Intl.NumberFormat('en-US', { style: 'currency', currency }).format(amount / 100);
+
+  // Notification pill (green = on, gray strike = off)
+  const notifyPill = (on, label, icon) => on
+    ? `<span class="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-semibold text-emerald-700">
+         <i data-lucide="${icon}" class="h-3 w-3"></i>${label}
+       </span>`
+    : `<span class="inline-flex items-center gap-1 rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-semibold text-slate-400 line-through">
+         <i data-lucide="${icon}" class="h-3 w-3"></i>${label}
+       </span>`;
+
+  // Aggregate stats for the header cards
+  const stats = {
+    total:             followers.length,
+    notify_products:   followers.filter(f => f.notify_products).length,
+    notify_promotions: followers.filter(f => f.notify_promotions).length,
+    notify_discounts:  followers.filter(f => f.notify_discounts).length,
+    new_this_week:     followers.filter(f => (Date.now() - new Date(f.followed_at)) < 86400000 * 7).length,
+  };
+  const pct = (part, whole) => whole ? Math.round((part / whole) * 100) : 0;
+%>
+
+<!-- ─── Page header ─── -->
+<div class="mb-6 flex flex-col justify-between gap-4 md:flex-row md:items-end">
+  <div>
+    <div class="mb-1 flex items-center gap-2 text-[var(--color-brand)]">
+      <i data-lucide="users" class="h-4 w-4"></i>
+      <span class="text-sm font-semibold"><%= store.name %></span>
+    </div>
+    <h1 class="text-2xl font-bold tracking-tight">Followers</h1>
+    <p class="mt-1 text-sm text-slate-500">
+      Customers who follow your store and their notification preferences.
+    </p>
+  </div>
+  <div class="flex gap-2">
+    <button id="exportFollowersButton" class="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium hover:bg-slate-50">
+      <i data-lucide="download" class="h-4 w-4"></i>Export CSV
+    </button>
+    <button id="broadcastButton" class="inline-flex items-center gap-2 rounded-lg bg-[var(--color-brand)] px-3 py-2 text-sm font-semibold text-white hover:bg-[var(--color-brand-dark)]">
+      <i data-lucide="megaphone" class="h-4 w-4"></i>Broadcast
+    </button>
+  </div>
+</div>
+
+<!-- ─── Stats (server-rendered once) ─── -->
+<div id="followersStats" class="mb-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+  <div class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm" data-stat="total">
+    <div class="flex items-center justify-between">
+      <span class="text-sm text-slate-500">Total followers</span>
+      <span class="rounded-lg bg-[var(--color-brand-ultralight)] p-2 text-[var(--color-brand)]">
+        <i data-lucide="users" class="h-4 w-4"></i>
+      </span>
+    </div>
+    <div class="mt-4 text-2xl font-bold" data-stat-value><%= stats.total.toLocaleString() %></div>
+    <div class="mt-1 text-xs">
+      <span class="font-semibold text-emerald-600">+<%= stats.new_this_week %></span>
+      <span class="ml-1 text-slate-400">this week</span>
+    </div>
+  </div>
+
+  <div class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm" data-stat="notify_products">
+    <div class="flex items-center justify-between">
+      <span class="text-sm text-slate-500">Product alerts</span>
+      <span class="rounded-lg bg-violet-50 p-2 text-violet-600">
+        <i data-lucide="package" class="h-4 w-4"></i>
+      </span>
+    </div>
+    <div class="mt-4 text-2xl font-bold" data-stat-value><%= stats.notify_products.toLocaleString() %></div>
+    <div class="mt-1 text-xs text-slate-400"><span data-stat-pct><%= pct(stats.notify_products, stats.total) %></span>% of followers</div>
+  </div>
+
+  <div class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm" data-stat="notify_promotions">
+    <div class="flex items-center justify-between">
+      <span class="text-sm text-slate-500">Promotion alerts</span>
+      <span class="rounded-lg bg-amber-50 p-2 text-amber-600">
+        <i data-lucide="megaphone" class="h-4 w-4"></i>
+      </span>
+    </div>
+    <div class="mt-4 text-2xl font-bold" data-stat-value><%= stats.notify_promotions.toLocaleString() %></div>
+    <div class="mt-1 text-xs text-slate-400"><span data-stat-pct><%= pct(stats.notify_promotions, stats.total) %></span>% of followers</div>
+  </div>
+
+  <div class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm" data-stat="notify_discounts">
+    <div class="flex items-center justify-between">
+      <span class="text-sm text-slate-500">Discount alerts</span>
+      <span class="rounded-lg bg-emerald-50 p-2 text-emerald-600">
+        <i data-lucide="percent" class="h-4 w-4"></i>
+      </span>
+    </div>
+    <div class="mt-4 text-2xl font-bold" data-stat-value><%= stats.notify_discounts.toLocaleString() %></div>
+    <div class="mt-1 text-xs text-slate-400"><span data-stat-pct><%= pct(stats.notify_discounts, stats.total) %></span>% of followers</div>
+  </div>
+</div>
+
+<!-- ─── Search + filters ─── -->
+<div class="mb-5 flex flex-col gap-3 md:flex-row md:items-center">
+  <div class="relative flex-1">
+    <i data-lucide="search" class="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"></i>
+    <input type="search" id="followersSearch" placeholder="Search by name, email, or phone..." class="w-full rounded-lg border border-slate-200 bg-white py-2.5 pl-10 pr-4 text-sm outline-none transition focus:border-[var(--color-brand)] focus:ring-2 focus:ring-[var(--color-brand-light)]" autocomplete="off" />
+  </div>
+
+  <select id="followersNotify" class="rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm outline-none transition focus:border-[var(--color-brand)]">
+    <option value="">All followers</option>
+    <option value="products">Notifying: Products</option>
+    <option value="promotions">Notifying: Promotions</option>
+    <option value="discounts">Notifying: Discounts</option>
+    <option value="all-notify">All notifications on</option>
+    <option value="none">All notifications off</option>
+  </select>
+
+  <select id="followersSort" class="rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm outline-none transition focus:border-[var(--color-brand)]">
+    <option value="followed_desc">Recently followed</option>
+    <option value="followed_asc">Oldest first</option>
+    <option value="name_asc">Name A → Z</option>
+    <option value="name_desc">Name Z → A</option>
+  </select>
+
+  <select id="followersLimit" class="rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm outline-none transition focus:border-[var(--color-brand)]">
+    <option value="10" selected>10 / page</option>
+    <option value="24">24 / page</option>
+    <option value="48">48 / page</option>
+    <option value="96">96 / page</option>
+  </select>
+</div>
+
+<!-- Count + active filter chips -->
+<div class="mb-4 flex items-center justify-between text-sm">
+  <span id="followersCount" class="text-slate-500">
+    Showing <%= followers.length %> follower<%= followers.length === 1 ? '' : 's' %>
+  </span>
+  <div id="followersActiveFilters" class="flex items-center gap-2"></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!--  GRID CONTAINER with multiple, class-toggled states         -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div id="followersGrid" class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+
+  <!-- ── State A: server-rendered cards (default visible) ── -->
+  <%
+    // Server renders up to `followers.length` cards
+    // JS will HIDE these when it fetches fresh data, then render fresh
+    // OR we can keep them and use them as the initial page
+  %>
+  <% followers.forEach(f => {
+      const followedAt = f.followed_at ? new Date(f.followed_at) : null;
+      const isActive = f.last_order_at && (Date.now() - new Date(f.last_order_at).getTime()) < 86400000 * 30;
+      const spentLabel = fmtMoney(f.total_spent, f.currency);
+  %>
+  <article class="follower-card group flex flex-col rounded-xl border border-slate-200 bg-white p-4 shadow-sm transition hover:border-slate-300 hover:shadow-md" data-follower-id="<%= f.id %>" data-customer-id="<%= f.customer_id %>">
+    <!-- Avatar -->
+    <div class="flex items-start gap-3">
+      <div class="relative shrink-0">
+        <% if (f.avatar_url) { %>
+        <img src="<%= f.avatar_url %>" alt="<%= f.username %>" class="h-12 w-12 rounded-full object-cover ring-2 ring-slate-100" data-fallback-hide="true" />
+        <div class="hidden h-12 w-12 items-center justify-center rounded-full bg-[var(--color-brand-ultralight)] text-[var(--color-brand)] font-bold ring-2 ring-slate-100">
+          <%= initials(f.username) %>
+        </div>
+        <% } else { %>
+        <div class="flex h-12 w-12 items-center justify-center rounded-full bg-[var(--color-brand-ultralight)] text-[var(--color-brand)] font-bold ring-2 ring-slate-100">
+          <%= initials(f.username) %>
+        </div>
+        <% } %>
+
+        <% if (isActive) { %>
+        <span class="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-white bg-emerald-500"></span>
+        <% } %>
+      </div>
+
+      <div class="min-w-0 flex-1">
+        <h3 class="truncate text-sm font-semibold text-slate-900" title="<%= f.username %>">
+          <%= f.username %>
+        </h3>
+        <div class="mt-0.5 flex flex-col gap-0.5 text-xs text-slate-500">
+          <span class="flex items-center gap-1.5 truncate" title="<%= f.email %>">
+            <i data-lucide="mail" class="h-3 w-3 shrink-0 text-slate-400"></i>
+            <span class="truncate"><%= f.email %></span>
+          </span>
+          <% if (f.phone) { %>
+          <span class="flex items-center gap-1.5 truncate" title="<%= f.phone %>">
+            <i data-lucide="phone" class="h-3 w-3 shrink-0 text-slate-400"></i>
+            <span class="truncate"><%= f.phone %></span>
+          </span>
+          <% } %>
+        </div>
+      </div>
+    </div>
+
+    <!-- Followed date -->
+    <div class="mt-3 flex items-center gap-1.5 text-[11px] text-slate-400">
+      <i data-lucide="user-plus" class="h-3 w-3"></i>
+      <span>Followed <%= fmtDate(followedAt) %></span>
+      <% const rel = relTime(followedAt); %>
+      <% if (rel) { %>
+      <span class="text-slate-300">·</span>
+      <span><%= rel %></span>
+      <% } %>
+    </div>
+
+    <!-- Notification pills -->
+    <div class="mt-3 flex flex-wrap gap-1.5">
+      <%- notifyPill(f.notify_products,   'Products',  'package')   %>
+      <%- notifyPill(f.notify_promotions, 'Promos',    'megaphone') %>
+      <%- notifyPill(f.notify_discounts,  'Discounts', 'percent')   %>
+    </div>
+
+    <!-- Order stats -->
+    <% if (f.orders_count != null || spentLabel != null) { %>
+    <dl class="mt-3 grid grid-cols-2 gap-x-3 gap-y-1.5 border-t border-slate-100 pt-3 text-xs">
+      <% if (f.orders_count != null) { %>
+      <div>
+        <dt class="text-slate-400">Orders</dt>
+        <dd class="font-semibold text-slate-700"><%= f.orders_count %></dd>
+      </div>
+      <% } %>
+      <% if (spentLabel != null) { %>
+      <div>
+        <dt class="text-slate-400">Total spent</dt>
+        <dd class="font-semibold text-slate-700"><%= spentLabel %></dd>
+      </div>
+      <% } %>
+    </dl>
+    <% } %>
+
+    <!-- Actions -->
+    <div class="mt-4 flex items-center justify-between gap-2 border-t border-slate-100 pt-3">
+      <span class="truncate font-mono text-[10px] text-slate-400" title="<%= f.customer_id %>">
+        #<%= String(f.customer_id).slice(0, 8) %>
+      </span>
+      <div class="flex gap-1.5">
+        <a href="/stores/<%= f.store_id %>/customers/<%= f.customer_id %>" class="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50">
+          <i data-lucide="eye" class="h-3.5 w-3.5"></i>View
+        </a>
+        <button type="button" class="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-rose-600 hover:bg-rose-50" data-action="remove-follower" data-follower-id="<%= f.id %>" data-follower-name="<%= f.username %>">
+          <i data-lucide="user-minus" class="h-3.5 w-3.5"></i>Remove
+        </button>
+      </div>
+    </div>
+  </article>
+  <% }) %>
+
+  <!-- ── State B: skeleton loading (hidden by default) ── -->
+  <div id="followersSkeleton" class="hidden col-span-full">
+    <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      <% for (let i = 0; i < 8; i++) { %>
+      <div class="rounded-xl border border-slate-200 bg-white p-4">
+        <div class="flex items-start gap-3">
+          <div class="h-12 w-12 animate-pulse rounded-full bg-slate-100"></div>
+          <div class="flex-1 space-y-2">
+            <div class="h-4 w-2/3 animate-pulse rounded bg-slate-100"></div>
+            <div class="h-3 w-1/2 animate-pulse rounded bg-slate-100"></div>
+          </div>
+        </div>
+        <div class="mt-3 space-y-2">
+          <div class="h-3 w-1/3 animate-pulse rounded bg-slate-100"></div>
+          <div class="h-6 w-full animate-pulse rounded-full bg-slate-100"></div>
+        </div>
+      </div>
+      <% } %>
+    </div>
+  </div>
+
+  <!-- ── State C: empty (hidden by default) ── -->
+  <div id="followersEmpty" class="hidden col-span-full rounded-xl border-2 border-dashed border-slate-200 py-16 text-center">
+    <div class="inline-flex flex-col items-center gap-2">
+      <div class="flex h-12 w-12 items-center justify-center rounded-full bg-[var(--color-brand-ultralight)]">
+        <i data-lucide="user-x" class="h-6 w-6 text-[var(--color-brand)]"></i>
+      </div>
+      <p class="text-sm font-medium text-slate-700">No followers found</p>
+      <p class="text-xs text-slate-500">Try adjusting your search or filters.</p>
+    </div>
+  </div>
+
+  <!-- ── State D: error (hidden by default) ── -->
+  <div id="followersError" class="hidden col-span-full rounded-xl border border-rose-200 bg-rose-50 py-16 text-center">
+    <i data-lucide="alert-circle" class="mx-auto h-8 w-8 text-rose-500"></i>
+    <p class="mt-2 text-sm font-medium text-rose-700">Failed to load followers</p>
+    <button type="button" data-action="reload-page" class="mt-3 rounded-lg bg-rose-600 px-4 py-2 text-xs font-semibold text-white hover:bg-rose-700">
+      Retry
+    </button>
+  </div>
+
+</div>
+
+<!-- ─── Pagination ─── -->
+<nav id="followersPagination" class="mt-8 flex flex-col items-center justify-between gap-4 sm:flex-row" aria-label="Followers pagination">
+  <p class="text-xs text-slate-500" id="followersPageInfo">
+    Page 1 of <%= Math.max(1, Math.ceil(followers.length / 10)) %>
+  </p>
+  <div class="flex items-center gap-2" id="followersPageControls">
+    <button type="button" class="pagination-btn" data-page-action="prev" disabled>
+      <i data-lucide="chevron-left" class="h-4 w-4"></i>
+      <span>Previous</span>
+    </button>
+    <span class="px-3 text-sm font-medium text-slate-600">
+      Page <span class="font-bold text-slate-900" id="followersCurrentPage">1</span>
+      of <span id="followersTotalPages"><%= Math.max(1, Math.ceil(followers.length / 10)) %></span>
+    </span>
+    <button type="button" class="pagination-btn" data-page-action="next" disabled>
+      <span>Next</span>
+      <i data-lucide="chevron-right" class="h-4 w-4"></i>
+    </button>
+  </div>
+</nav>
+<script type="module">
+  // public/js/pages/followers.js
+  // public/js/pages/followers.js
+//
+// Followers page — mock data + reference-based UI updates
+// CSP-safe (no inline handlers), no full-grid innerHTML.
+//
+// To switch from mock to real API:
+//   1. Set USE_MOCK = false (below)
+//   2. Ensure your API endpoint returns the shape documented in `load()`.
+//
+
+document.addEventListener('DOMContentLoaded', () => {
+  const { toast } = window.__shell || {};
+
+  // ─────────────────────────────────────────────────────────────
+  // Config
+  // ─────────────────────────────────────────────────────────────
+  const USE_MOCK = true; // ← flip to false when backend is ready
+
+  // ─────────────────────────────────────────────────────────────
+  // Mock dataset (full schema + joined customer fields)
+  // Replace with real API when backend is ready.
+  // ─────────────────────────────────────────────────────────────
+  const MOCK_FOLLOWERS = [
+    { id: 'f-001', customer_id: 'c-001', store_id: 'store-001', notify_products: true,  notify_promotions: true,  notify_discounts: true,  followed_at: new Date(Date.now() - 86400000 * 2).toISOString(),  username: 'Jean Mugisha',     email: 'jean.m@example.com',    phone: '+250 788 111 222', avatar_url: 'https://i.pravatar.cc/100?u=jean',    orders_count: 12, total_spent: 142000, currency: 'USD', last_order_at: new Date(Date.now() - 86400000 * 3).toISOString() },
+    { id: 'f-002', customer_id: 'c-002', store_id: 'store-001', notify_products: true,  notify_promotions: false, notify_discounts: true,  followed_at: new Date(Date.now() - 86400000 * 5).toISOString(),  username: 'Alice Kamau',      email: 'alice.k@example.com',   phone: '+250 788 333 444', avatar_url: 'https://i.pravatar.cc/100?u=alice',   orders_count: 8,  total_spent: 84000,  currency: 'USD', last_order_at: new Date(Date.now() - 86400000 * 1).toISOString() },
+    { id: 'f-003', customer_id: 'c-003', store_id: 'store-001', notify_products: false, notify_promotions: false, notify_discounts: false, followed_at: new Date(Date.now() - 86400000 * 12).toISOString(), username: 'Eric Ndayisaba',   email: 'eric.n@example.com',    phone: null,                avatar_url: null,                                  orders_count: 3,  total_spent: 21000,  currency: 'USD', last_order_at: null },
+    { id: 'f-004', customer_id: 'c-004', store_id: 'store-001', notify_products: true,  notify_promotions: true,  notify_discounts: false, followed_at: new Date(Date.now() - 86400000 * 20).toISOString(), username: 'Diane Uwase',      email: 'diane.u@example.com',   phone: '+250 788 555 666', avatar_url: 'https://i.pravatar.cc/100?u=diane',   orders_count: 5,  total_spent: 61000,  currency: 'USD', last_order_at: new Date(Date.now() - 86400000 * 8).toISOString() },
+    { id: 'f-005', customer_id: 'c-005', store_id: 'store-001', notify_products: true,  notify_promotions: true,  notify_discounts: true,  followed_at: new Date(Date.now() - 86400000 * 1).toISOString(),  username: 'Kevin Rwema',      email: 'kevin.r@example.com',   phone: '+250 788 777 888', avatar_url: 'https://i.pravatar.cc/100?u=kevin',   orders_count: 2,  total_spent: 12000,  currency: 'USD', last_order_at: new Date(Date.now() - 86400000 * 1).toISOString() },
+    { id: 'f-006', customer_id: 'c-006', store_id: 'store-001', notify_products: false, notify_promotions: true,  notify_discounts: true,  followed_at: new Date(Date.now() - 86400000 * 45).toISOString(), username: 'Grace Mukamana',   email: 'grace.m@example.com',   phone: '+250 788 999 000', avatar_url: null,                                  orders_count: 0,  total_spent: 0,      currency: 'USD', last_order_at: null },
+    { id: 'f-007', customer_id: 'c-007', store_id: 'store-001', notify_products: true,  notify_promotions: true,  notify_discounts: true,  followed_at: new Date(Date.now() - 86400000 * 8).toISOString(),  username: 'Patrick Habimana', email: 'patrick.h@example.com', phone: '+250 787 111 333', avatar_url: 'https://i.pravatar.cc/100?u=patrick', orders_count: 21, total_spent: 310000, currency: 'USD', last_order_at: new Date(Date.now() - 86400000 * 2).toISOString() },
+    { id: 'f-008', customer_id: 'c-008', store_id: 'store-001', notify_products: true,  notify_promotions: false, notify_discounts: false, followed_at: new Date(Date.now() - 86400000 * 60).toISOString(), username: 'Sarah Iradukunda', email: 'sarah.i@example.com',   phone: null,                avatar_url: null,                                  orders_count: 1,  total_spent: 4500,   currency: 'USD', last_order_at: new Date(Date.now() - 86400000 * 60).toISOString() },
+  ];
+
+  // ─────────────────────────────────────────────────────────────
+  // State
+  // ─────────────────────────────────────────────────────────────
+  const state = {
+    page: 1,
+    limit: 10,
+    search: '',
+    notify: '',
+    sort: 'followed_desc',
+    pagination: {
+      page: 1,
+      hasNextPage: false,
+      hasPreviousPage: false,
+      totalPages: 1,
+      totalListings: 0,
+      limit: 10,
+    },
+  };
+
+  // ─────────────────────────────────────────────────────────────
+  // DOM references
+  // ─────────────────────────────────────────────────────────────
+  const els = {
+    grid:          document.getElementById('followersGrid'),
+    skeleton:      document.getElementById('followersSkeleton'),
+    empty:         document.getElementById('followersEmpty'),
+    error:         document.getElementById('followersError'),
+    stats:         document.getElementById('followersStats'),
+    search:        document.getElementById('followersSearch'),
+    notify:        document.getElementById('followersNotify'),
+    sort:          document.getElementById('followersSort'),
+    limit:         document.getElementById('followersLimit'),
+    count:         document.getElementById('followersCount'),
+    activeFilters: document.getElementById('followersActiveFilters'),
+    pageInfo:      document.getElementById('followersPageInfo'),
+    pageControls:  document.getElementById('followersPageControls'),
+    currentPage:   document.getElementById('followersCurrentPage'),
+    totalPages:    document.getElementById('followersTotalPages'),
+    prevBtn:       document.querySelector('[data-page-action="prev"]'),
+    nextBtn:       document.querySelector('[data-page-action="next"]'),
+    exportBtn:     document.getElementById('exportFollowersButton'),
+    broadcastBtn:  document.getElementById('broadcastButton'),
+  };
+
+  // ─────────────────────────────────────────────────────────────
+  // Utils
+  // ─────────────────────────────────────────────────────────────
+  function getStoreId() {
+    const match = window.location.pathname.match(/\/stores\/([^/]+)/);
+    return match ? match[1] : null;
+  }
+
+  function debounce(fn, ms) {
+    let t;
+    return (...args) => { clearTimeout(t); t = setTimeout(() => fn(...args), ms); };
+  }
+
+  function escapeHtml(str) {
+    const div = document.createElement('div');
+    div.textContent = str ?? '';
+    return div.innerHTML;
+  }
+
+  function relTime(date) {
+    if (!date) return '';
+    const diff = Date.now() - new Date(date).getTime();
+    const day = 86400000;
+    if (diff < day) return 'today';
+    if (diff < day * 2) return 'yesterday';
+    if (diff < day * 7) return `${Math.floor(diff / day)} days ago`;
+    if (diff < day * 30) return `${Math.floor(diff / (day * 7))} weeks ago`;
+    if (diff < day * 365) return `${Math.floor(diff / (day * 30))} months ago`;
+    return `${Math.floor(diff / (day * 365))} years ago`;
+  }
+
+  // ─────────────────────────────────────────────────────────────
+  // State visibility
+  // Toggles between: 'cards' | 'skeleton' | 'empty' | 'error'
+  // ─────────────────────────────────────────────────────────────
+  function showState(name) {
+    // Hide discrete state elements
+    els.skeleton.classList.add('hidden');
+    els.empty.classList.add('hidden');
+    els.error.classList.add('hidden');
+
+    // Toggle grid mode (used by CSS to hide server-rendered cards)
+    els.grid.classList.toggle('state-cards',    name === 'cards');
+    els.grid.classList.toggle('state-skeleton', name === 'skeleton');
+    els.grid.classList.toggle('state-empty',    name === 'empty');
+    els.grid.classList.toggle('state-error',    name === 'error');
+
+    if (name === 'skeleton') els.skeleton.classList.remove('hidden');
+    if (name === 'empty')    els.empty.classList.remove('hidden');
+    if (name === 'error')    els.error.classList.remove('hidden');
+
+    window.lucide?.createIcons();
+  }
+
+  // ─────────────────────────────────────────────────────────────
+  // Stats — update by reference (no innerHTML)
+  // ─────────────────────────────────────────────────────────────
+  function updateStats(stats) {
+    const pct = (part, whole) => (whole ? Math.round((part / whole) * 100) : 0);
+
+    const setValue = (key, value) => {
+      const card = els.stats?.querySelector(`[data-stat="${key}"]`);
+      card?.querySelector('[data-stat-value]')?.replaceChildren(
+        document.createTextNode(Number(value || 0).toLocaleString())
+      );
+    };
+    const setPct = (key, value) => {
+      const card = els.stats?.querySelector(`[data-stat="${key}"]`);
+      card?.querySelector('[data-stat-pct]')?.replaceChildren(
+        document.createTextNode(String(value))
+      );
+    };
+
+    setValue('total',            stats.total);
+    setValue('notify_products',  stats.notify_products);
+    setValue('notify_promotions', stats.notify_promotions);
+    setValue('notify_discounts', stats.notify_discounts);
+
+    setPct('notify_products',   pct(stats.notify_products,   stats.total));
+    setPct('notify_promotions', pct(stats.notify_promotions, stats.total));
+    setPct('notify_discounts',  pct(stats.notify_discounts,  stats.total));
+  }
+
+  // ─────────────────────────────────────────────────────────────
+  // Count line — textContent
+  // ─────────────────────────────────────────────────────────────
+  function updateCount({ page, limit, totalListings }) {
+    const from = totalListings ? (page - 1) * limit + 1 : 0;
+    const to   = Math.min(page * limit, totalListings);
+    els.count.textContent = totalListings
+      ? `Showing ${from}–${to} of ${totalListings} followers`
+      : 'No followers';
+  }
+
+  // ─────────────────────────────────────────────────────────────
+  // Pagination — update by reference
+  // ─────────────────────────────────────────────────────────────
+  function updatePagination({ page, hasNextPage, hasPreviousPage, totalPages }) {
+    if (els.currentPage) els.currentPage.textContent = page;
+    if (els.totalPages)  els.totalPages.textContent  = totalPages;
+    if (els.prevBtn) els.prevBtn.disabled = !hasPreviousPage;
+    if (els.nextBtn) els.nextBtn.disabled = !hasNextPage;
+    if (els.pageInfo) els.pageInfo.textContent = `Page ${page} of ${totalPages}`;
+  }
+
+  // ─────────────────────────────────────────────────────────────
+  // Card markup — one place, used by both server render (EJS)
+  // and client render (below). Keep them in sync.
+  // ─────────────────────────────────────────────────────────────
+  function renderFollowerHTML(f) {
+    const username = f.username || 'Unknown user';
+    const email    = f.email    || '—';
+    const phone    = f.phone    || null;
+
+    const followedAt = f.followed_at ? new Date(f.followed_at) : null;
+    const followedLabel = followedAt
+      ? followedAt.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+      : '—';
+    const rel = relTime(followedAt);
+
+    const avatar   = f.avatar_url;
+    const initial  = username.charAt(0).toUpperCase();
+    const isActive = f.last_order_at
+      && (Date.now() - new Date(f.last_order_at).getTime()) < 86400000 * 30;
+
+    const avatarHTML = avatar
+      ? `<img src="${escapeHtml(avatar)}" alt="${escapeHtml(username)}"
+              class="h-12 w-12 rounded-full object-cover ring-2 ring-slate-100"
+              data-fallback-hide="true" />
+         <div class="hidden h-12 w-12 items-center justify-center rounded-full bg-[var(--color-brand-ultralight)] text-[var(--color-brand)] font-bold ring-2 ring-slate-100">${initial}</div>`
+      : `<div class="flex h-12 w-12 items-center justify-center rounded-full bg-[var(--color-brand-ultralight)] text-[var(--color-brand)] font-bold ring-2 ring-slate-100">${initial}</div>`;
+
+    const pill = (on, label, icon) => on
+      ? `<span class="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-semibold text-emerald-700"><i data-lucide="${icon}" class="h-3 w-3"></i>${label}</span>`
+      : `<span class="inline-flex items-center gap-1 rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-semibold text-slate-400 line-through"><i data-lucide="${icon}" class="h-3 w-3"></i>${label}</span>`;
+
+    const spentLabel = f.total_spent != null
+      ? new Intl.NumberFormat('en-US', { style: 'currency', currency: f.currency || 'USD' }).format(f.total_spent / 100)
+      : null;
+
+    return `
+      <article class="follower-card group flex flex-col rounded-xl border border-slate-200 bg-white p-4 shadow-sm transition hover:border-slate-300 hover:shadow-md"
+               data-follower-id="${escapeHtml(f.id)}"
+               data-customer-id="${escapeHtml(f.customer_id || '')}">
+        <div class="flex items-start gap-3">
+          <div class="relative shrink-0">
+            ${avatarHTML}
+            ${isActive ? '<span class="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-white bg-emerald-500"></span>' : ''}
+          </div>
+          <div class="min-w-0 flex-1">
+            <h3 class="truncate text-sm font-semibold text-slate-900">${escapeHtml(username)}</h3>
+            <div class="mt-0.5 flex flex-col gap-0.5 text-xs text-slate-500">
+              <span class="flex items-center gap-1.5 truncate"><i data-lucide="mail" class="h-3 w-3 shrink-0 text-slate-400"></i><span class="truncate">${escapeHtml(email)}</span></span>
+              ${phone ? `<span class="flex items-center gap-1.5 truncate"><i data-lucide="phone" class="h-3 w-3 shrink-0 text-slate-400"></i><span class="truncate">${escapeHtml(phone)}</span></span>` : ''}
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-3 flex items-center gap-1.5 text-[11px] text-slate-400">
+          <i data-lucide="user-plus" class="h-3 w-3"></i>
+          <span>Followed ${followedLabel}</span>
+          ${rel ? `<span class="text-slate-300">·</span><span>${rel}</span>` : ''}
+        </div>
+
+        <div class="mt-3 flex flex-wrap gap-1.5">
+          ${pill(f.notify_products,   'Products',  'package')}
+          ${pill(f.notify_promotions, 'Promos',    'megaphone')}
+          ${pill(f.notify_discounts,  'Discounts', 'percent')}
+        </div>
+
+        ${(f.orders_count != null || spentLabel != null) ? `
+          <dl class="mt-3 grid grid-cols-2 gap-x-3 gap-y-1.5 border-t border-slate-100 pt-3 text-xs">
+            ${f.orders_count != null ? `<div><dt class="text-slate-400">Orders</dt><dd class="font-semibold text-slate-700">${f.orders_count}</dd></div>` : ''}
+            ${spentLabel != null ? `<div><dt class="text-slate-400">Total spent</dt><dd class="font-semibold text-slate-700">${spentLabel}</dd></div>` : ''}
+          </dl>` : ''}
+
+        <div class="mt-4 flex items-center justify-between gap-2 border-t border-slate-100 pt-3">
+          <span class="truncate font-mono text-[10px] text-slate-400">#${escapeHtml(String(f.customer_id || f.id).slice(0, 8))}</span>
+          <div class="flex gap-1.5">
+            <a href="/stores/${escapeHtml(f.store_id || getStoreId() || '')}/customers/${escapeHtml(f.customer_id || '')}"
+               class="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50">
+              <i data-lucide="eye" class="h-3.5 w-3.5"></i>View
+            </a>
+            <button type="button"
+                    class="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-rose-600 hover:bg-rose-50"
+                    data-action="remove-follower"
+                    data-follower-id="${escapeHtml(f.id)}"
+                    data-follower-name="${escapeHtml(username)}">
+              <i data-lucide="user-minus" class="h-3.5 w-3.5"></i>Remove
+            </button>
+          </div>
+        </div>
+      </article>`;
+  }
+
+  // ─────────────────────────────────────────────────────────────
+  // Replace cards — only touches .follower-card elements
+  // ─────────────────────────────────────────────────────────────
+  function replaceCards(items) {
+    // Remove existing cards
+    els.grid.querySelectorAll('.follower-card').forEach(el => el.remove());
+
+    if (!items || !items.length) {
+      showState('empty');
+      return;
+    }
+
+    // Build fragment of new cards
+    const frag = document.createDocumentFragment();
+    for (const f of items) {
+      const wrapper = document.createElement('div');
+      wrapper.innerHTML = renderFollowerHTML(f).trim();
+      const node = wrapper.firstElementChild;
+      if (node) frag.appendChild(node);
+    }
+
+    // Insert before the first state element (skeleton / empty / error)
+    els.grid.insertBefore(frag, els.skeleton || null);
+
+    showState('cards');
+  }
+
+  // ─────────────────────────────────────────────────────────────
+  // Mock fetcher — returns the same shape the real API will
+  // ─────────────────────────────────────────────────────────────
+  async function mockFetchFollowers(params) {
+    await new Promise(r => setTimeout(r, 250));
+
+    const search = (params.get('search') || '').toLowerCase();
+    const notify = params.get('notify') || '';
+    const sort   = params.get('sort')   || 'followed_desc';
+    const page   = parseInt(params.get('page')  || '1', 10);
+    const limit  = parseInt(params.get('limit') || '10', 10);
+
+    let filtered = MOCK_FOLLOWERS.slice();
+
+    if (search) {
+      filtered = filtered.filter(f =>
+        (f.username || '').toLowerCase().includes(search) ||
+        (f.email    || '').toLowerCase().includes(search) ||
+        (f.phone    || '').toLowerCase().includes(search)
+      );
+    }
+
+    if (notify) {
+      filtered = filtered.filter(f => {
+        if (notify === 'products')   return f.notify_products;
+        if (notify === 'promotions') return f.notify_promotions;
+        if (notify === 'discounts')  return f.notify_discounts;
+        if (notify === 'all-notify') return f.notify_products && f.notify_promotions && f.notify_discounts;
+        if (notify === 'none')       return !f.notify_products && !f.notify_promotions && !f.notify_discounts;
+        return true;
+      });
+    }
+
+    const SORTERS = {
+      followed_desc: (a, b) => new Date(b.followed_at) - new Date(a.followed_at),
+      followed_asc:  (a, b) => new Date(a.followed_at) - new Date(b.followed_at),
+      name_asc:      (a, b) => (a.username || '').localeCompare(b.username || ''),
+      name_desc:     (a, b) => (b.username || '').localeCompare(a.username || ''),
+    };
+    filtered.sort(SORTERS[sort] || SORTERS.followed_desc);
+
+    const stats = {
+      total:             MOCK_FOLLOWERS.length,
+      notify_products:   MOCK_FOLLOWERS.filter(f => f.notify_products).length,
+      notify_promotions: MOCK_FOLLOWERS.filter(f => f.notify_promotions).length,
+      notify_discounts:  MOCK_FOLLOWERS.filter(f => f.notify_discounts).length,
+      new_this_week:     MOCK_FOLLOWERS.filter(f => (Date.now() - new Date(f.followed_at)) < 86400000 * 7).length,
+    };
+
+    const totalListings = filtered.length;
+    const totalPages    = Math.max(1, Math.ceil(totalListings / limit));
+    const safePage      = Math.min(Math.max(page, 1), totalPages);
+    const start         = (safePage - 1) * limit;
+    const items         = filtered.slice(start, start + limit);
+
+    return {
+      items,
+      stats,
+      page:            safePage,
+      hasNextPage:     safePage < totalPages,
+      hasPreviousPage: safePage > 1,
+      totalPages,
+      totalListings,
+      limit,
+    };
+  }
+
+  // ─────────────────────────────────────────────────────────────
+  // Real API fetcher — used when USE_MOCK = false
+  // Expected response:
+  //   {
+  //     items: [ { ...follower, username, email, phone } ],
+  //     stats: { total, notify_products, notify_promotions, notify_discounts, new_this_week },
+  //     page, hasNextPage, hasPreviousPage, totalPages, totalListings, limit
+  //   }
+  // ─────────────────────────────────────────────────────────────
+  async function apiFetchFollowers(params) {
+    const storeId = getStoreId();
+    const res = await fetch(`/api/stores/${storeId}/followers?${params}`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return res.json();
+  }
+
+  // ─────────────────────────────────────────────────────────────
+  // Load
+  // ─────────────────────────────────────────────────────────────
+  async function load() {
+    showState('skeleton');
+    updateCount({ page: state.page, limit: state.limit, totalListings: 0 });
+
+    try {
+      const params = new URLSearchParams({
+        page:   state.page,
+        limit:  state.limit,
+        search: state.search,
+        notify: state.notify,
+        sort:   state.sort,
+      });
+
+      const payload = USE_MOCK
+        ? await mockFetchFollowers(params)
+        : await apiFetchFollowers(params);
+
+      // ── Defensive guard ──
+      if (!payload || typeof payload !== 'object') {
+        console.error('[followers] Fetcher returned invalid payload:', payload);
+        throw new Error('Invalid payload');
+      }
+
+      const stats = payload.stats || {
+        total: 0, notify_products: 0, notify_promotions: 0,
+        notify_discounts: 0, new_this_week: 0,
+      };
+      const items = Array.isArray(payload.items) ? payload.items : [];
+      const page            = payload.page            ?? 1;
+      const limit           = payload.limit           ?? state.limit;
+      const totalPages      = payload.totalPages      ?? 1;
+      const totalListings   = payload.totalListings   ?? items.length;
+      const hasNextPage     = !!payload.hasNextPage;
+      const hasPreviousPage = !!payload.hasPreviousPage;
+
+      updateStats(stats);
+      replaceCards(items);
+      updatePagination({ page, hasNextPage, hasPreviousPage, totalPages });
+      updateCount({ page, limit, totalListings });
+
+      state.pagination = {
+        page, hasNextPage, hasPreviousPage, totalPages, totalListings, limit,
+      };
+
+      window.lucide?.createIcons();
+    } catch (err) {
+      console.error('[followers] load failed:', err);
+      showState('error');
+    }
+  }
+
+  // ─────────────────────────────────────────────────────────────
+  // Active filter chips
+  // ─────────────────────────────────────────────────────────────
+  function renderActiveFilters() {
+    const chips = [];
+
+    if (state.search) {
+      chips.push(`
+        <span class="inline-flex items-center gap-1.5 rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-700">
+          Search: "${escapeHtml(state.search)}"
+          <button type="button" data-clear="search" class="text-slate-400 hover:text-rose-600">×</button>
+        </span>`);
+    }
+    if (state.notify) {
+      chips.push(`
+        <span class="inline-flex items-center gap-1.5 rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-700">
+          Notify: ${escapeHtml(state.notify)}
+          <button type="button" data-clear="notify" class="text-slate-400 hover:text-rose-600">×</button>
+        </span>`);
+    }
+
+    els.activeFilters.innerHTML = chips.join('');
+
+    els.activeFilters.querySelectorAll('[data-clear]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const key = btn.dataset.clear;
+        if (key === 'search') { state.search = ''; if (els.search) els.search.value = ''; }
+        if (key === 'notify') { state.notify = ''; if (els.notify) els.notify.value = ''; }
+        state.page = 1;
+        renderActiveFilters();
+        load();
+      });
+    });
+  }
+
+  // ─────────────────────────────────────────────────────────────
+  // Events — page-specific (shell handles generic [data-action])
+  // ─────────────────────────────────────────────────────────────
+  els.search?.addEventListener('input', debounce((e) => {
+    state.search = e.target.value.trim();
+    state.page = 1;
+    renderActiveFilters();
+    load();
+  }, 300));
+
+  els.notify?.addEventListener('change', (e) => {
+    state.notify = e.target.value;
+    state.page = 1;
+    renderActiveFilters();
+    load();
+  });
+
+  els.sort?.addEventListener('change', (e) => {
+    state.sort = e.target.value;
+    state.page = 1;
+    load();
+  });
+
+  els.limit?.addEventListener('change', (e) => {
+    state.limit = parseInt(e.target.value, 10);
+    state.page = 1;
+    load();
+  });
+
+  els.exportBtn?.addEventListener('click', () => {
+    toast?.('Preparing CSV export...', 'info');
+    // window.location.href = `/api/stores/${getStoreId()}/followers/export`;
+  });
+
+  els.broadcastBtn?.addEventListener('click', () => {
+    toast?.('Broadcast composer opened');
+  });
+
+  els.prevBtn?.addEventListener('click', () => {
+    if (state.pagination.hasPreviousPage) {
+      state.page = state.pagination.page - 1;
+      load();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  });
+
+  els.nextBtn?.addEventListener('click', () => {
+    if (state.pagination.hasNextPage) {
+      state.page = state.pagination.page + 1;
+      load();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  });
+
+  // ── Delegated: remove-follower (only this page listens for it) ──
+  els.grid?.addEventListener('click', (e) => {
+    const btn = e.target.closest('[data-action="remove-follower"]');
+    if (!btn) return;
+
+    const name = btn.dataset.followerName || 'this follower';
+    const id   = btn.dataset.followerId;
+
+    if (!confirm(`Remove ${name} from this store's followers?`)) return;
+
+    // Optimistic UI: hide the card immediately
+    const card = btn.closest('.follower-card');
+    card?.classList.add('opacity-40', 'pointer-events-none');
+
+    toast?.(`Removed ${name}`, 'success');
+
+    // TODO: replace with real request when backend is ready:
+    // await fetch(`/api/stores/${getStoreId()}/followers/${id}`, { method: 'DELETE' });
+    // then: card?.remove(); load();
+
+    // Mock: just remove from DOM
+    card?.remove();
+  });
+
+  // ─────────────────────────────────────────────────────────────
+  // Init
+  // ─────────────────────────────────────────────────────────────
+  renderActiveFilters();
+  load();
+});
+</script>

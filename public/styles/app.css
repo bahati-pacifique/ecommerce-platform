@@ -30,3 +30,83 @@
         transform: translateY(0);
     }
 }
+
+.pagination-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 36px;
+    height: 36px;
+    padding: 0 0.5rem;
+    border-radius: 10px;
+    border: 1px solid #E2E8F0;
+    background: #fff;
+    color: #475569;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    font-family: inherit;
+}
+
+.pagination-btn:hover:not(:disabled) {
+    border-color: var(--color-brand);
+    color: var(--color-brand);
+}
+
+.pagination-btn.is-active {
+    background: var(--color-brand);
+    border-color: var(--color-brand);
+    color: #fff;
+}
+
+.pagination-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+/* Hide server-rendered cards when grid is in a non-"cards" state */
+#followersGrid.state-skeleton > .follower-card,
+#followersGrid.state-empty    > .follower-card,
+#followersGrid.state-error    > .follower-card {
+  display: none;
+}
+
+/* Subtle fade-in for newly inserted cards */
+.follower-card {
+  animation: followerCardFadeIn 0.2s ease both;
+}
+@keyframes followerCardFadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Pagination button styling */
+.pagination-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.375rem;
+  min-width: 40px;
+  height: 38px;
+  padding: 0 0.875rem;
+  border-radius: 10px;
+  border: 1px solid #E2E8F0;
+  background: #fff;
+  color: #475569;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  font-family: inherit;
+  white-space: nowrap;
+}
+.pagination-btn:hover:not(:disabled) {
+  border-color: var(--color-brand);
+  color: var(--color-brand);
+  background: var(--color-brand-ultralight);
+}
+.pagination-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}

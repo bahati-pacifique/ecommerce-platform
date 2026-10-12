@@ -1,0 +1,33 @@
+<section class="welcome-panel">
+  <div class="welcome-inner">
+
+    <div class="welcome-eyebrow">
+      <img src="/images/logos/business.png" alt="Logo-brand" class="max-h-[100px]">
+    </div>
+
+    <h1 class="welcome-title">
+      <span class="text-black/70">Welcome Back to</span> <span class="store-name"><%=locals.store?.name%></span>
+    </h1>
+
+    <p class="welcome-slogan pb-3 border-b border-slate-200">
+      Easy access to everything you need for managing store — all in one place.
+    </p>
+
+  </div>
+  <div class="w-full p-2 flex flex-col items-center justify-center gap-2">
+    <nav class="welcome-nav" aria-label="Store terms">
+      <a href="/docs/marketplace-terms" target="_blank" class="welcome-nav-link">Marketplace Terms</a>
+      <span class="welcome-nav-divider" aria-hidden="true"></span>
+      <a href="/listing-terms" class="welcome-nav-link">Listing Terms</a>
+      <span class="welcome-nav-divider" aria-hidden="true"></span>
+      <a href="/pricing" class="welcome-nav-link" target="_blank">Pricing</a>
+      <span class="welcome-nav-divider" aria-hidden="true"></span>
+      <a href="/dashboard" class="welcome-nav-link">Vendor Dashboard</a>
+    </nav>
+    <div class="flex items-center justify-center gap-2">
+        <span class="text-brand/70 font-bold">COCOCE &copy;</span> <span class="text-black/70">2026. All right reserved</span>
+    </div>
+  </div>
+</section>
+
+<% pageScript = '/scripts/pages/welcome.js' %>

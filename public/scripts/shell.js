@@ -1,6 +1,3 @@
-// ─────────────────────────────────────────────────────────────
-// Toast
-// ─────────────────────────────────────────────────────────────
 export function toast(message, type = 'info', timeout = 2200) {
     const host = document.getElementById('toast');
     if (!host) return;
@@ -16,9 +13,6 @@ export function toast(message, type = 'info', timeout = 2200) {
     window.__toastTimer = setTimeout(() => host.classList.add('hidden'), timeout);
 }
 
-// ─────────────────────────────────────────────────────────────
-// Sidebar (desktop collapse + mobile drawer)
-// ─────────────────────────────────────────────────────────────
 function toggleDesktopSidebar() {
     const sidebar = document.getElementById('sidebar');
     const button = document.getElementById('sidebarToggleButton');
@@ -110,9 +104,6 @@ export function closeOrderDrawer() {
     document.body.classList.remove('overflow-hidden');
 }
 
-// ─────────────────────────────────────────────────────────────
-// Event binding
-// ─────────────────────────────────────────────────────────────
 function bindShellEvents() {
     // Sidebar
     document.getElementById('sidebarToggleButton')?.addEventListener('click', toggleDesktopSidebar);
@@ -162,24 +153,9 @@ function bindShellEvents() {
         if (trigger) openOrderDrawer({ id: trigger.dataset.orderId });
     });
 
-    // Handle resize → reset mobile drawer state
-    window.addEventListener('resize', () => {
-        if (window.matchMedia('(min-width: 1024px)').matches) {
-            document.getElementById('sidebar')?.classList.remove('-translate-x-full', 'translate-x-0');
-            document.getElementById('sidebarBackdrop')?.classList.add('hidden');
-            document.body.classList.remove('overflow-hidden');
-            const sidebar = document.getElementById('sidebar');
-            document.documentElement.style.setProperty(
-                '--sidebar-width',
-                sidebar?.classList.contains('sidebar-collapsed') ? '76px' : '288px'
-            );
-        }
-    });
+    
 }
 
-// ─────────────────────────────────────────────────────────────
-// Bootstrap
-// ─────────────────────────────────────────────────────────────
 function init() {
     bindShellEvents();
     window.lucide?.createIcons();
@@ -191,5 +167,37 @@ if (document.readyState === 'loading') {
     init();
 }
 
-// Expose for page scripts
+// 1. Generic [data-action] click router
+document.addEventListener('click', (e) => {
+  const trigger = e.target.closest('[data-action]');
+  if (!trigger) return;
+
+  const ACTIONS = {
+    'reload-page': () => location.reload(),
+    // add other global actions here
+  };
+
+  const fn = ACTIONS[trigger.dataset.action];
+  if (fn) fn(trigger, e);
+});
+
+
+document.addEventListener('error', (e) => {
+  const img = e.target;
+  if (!(img instanceof HTMLImageElement)) return;
+
+  // Case 1: explicit fallback URL
+  if (img.dataset.fallback && img.src !== img.dataset.fallback) {
+    img.src = img.dataset.fallback;
+    return;
+  }
+
+  // Case 2: hide the image, reveal sibling placeholder
+  if (img.dataset.fallbackHide === 'true') {
+    img.style.display = 'none';
+    const sib = img.nextElementSibling;
+    if (sib && sib.nodeType === 1) sib.style.display = 'flex';
+  }
+}, true);
+
 window.__shell = { toast, openOrderDrawer, closeOrderDrawer };

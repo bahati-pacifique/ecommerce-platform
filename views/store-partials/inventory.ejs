@@ -4,12 +4,11 @@
       <i data-lucide="shopping-bag" class="h-4 w-4"></i>
       <span class="text-sm font-semibold"><%= store.name %></span>
     </div>
-    <h1 class="text-2xl font-bold tracking-tight">Orders</h1>
-    <p class="mt-1 text-sm text-slate-500">Manage fulfillment, returns, and disputes</p>
+    <h1 class="text-2xl font-bold tracking-tight">Inventories</h1>
+    <p class="mt-1 text-sm text-slate-500">Inventory overview</p>
   </div>
 </div>
 
-<!-- Filter bar -->
 <div class="rounded-xl border border-slate-200 bg-white shadow-sm">
   <div class="flex flex-col md:flex-row gap-3 p-4 border-b border-slate-100">
     <div class="relative flex-1">
@@ -29,21 +28,24 @@
     <table class="w-full text-left text-sm">
       <thead class="bg-slate-50 text-xs uppercase tracking-wider text-slate-500">
         <tr>
-          <th class="px-5 py-3">Order</th>
-          <th class="px-5 py-3">Date</th>
-          <th class="px-5 py-3">Customer</th>
-          <th class="px-5 py-3">Items</th>
-          <th class="px-5 py-3">Total</th>
+          <th class="px-5 py-3">Title</th>
           <th class="px-5 py-3">Status</th>
+          <th class="px-5 py-3">L. Stock</th>
+          <th class="px-5 py-3">O. Stock</th>
+          <th class="px-5 py-3">Reserved</th>
+          <th class="px-5 py-3">Items</th>
+          <th class="px-5 py-3">Qty.</th>
           <th class="px-5 py-3"></th>
         </tr>
       </thead>
-      <tbody id="ordersTbody" class="divide-y divide-slate-100">
+      <tbody id="inventoriesTbody" class="divide-y divide-slate-100">
       </tbody>
     </table>
   </div>
 
   <div id="ordersPagination" class="border-t border-slate-100 p-4"></div>
 </div>
-
-<% pageScript = '/scripts/pages/orders.js' %>
+<script>
+  console.log("<%=locals.title%>")
+</script>
+<% pageScript = '/scripts/pages/store-inventory.js' %>

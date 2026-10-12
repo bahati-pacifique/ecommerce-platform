@@ -1,5 +1,5 @@
 const { openDrawer } = window.__shell;
-
+console.log('from orders: HI')
 const state = {
     page: 1,
     limit: 10,
@@ -13,9 +13,7 @@ const searchInput = document.getElementById('ordersSearch');
 const statusSelect = document.getElementById('ordersStatus');
 
 async function load() {
-    tbody.innerHTML = `
-    <tr><td colspan="7" class="px-5 py-10 text-center text-slate-400">Loading…</td></tr>
-  `;
+    tbody.innerHTML = `<tr><td colspan="7" class="px-5 py-10 text-center text-slate-400">Loading…</td></tr>`;
 
     const params = new URLSearchParams({
         page: state.page,
@@ -45,33 +43,34 @@ async function load() {
 function renderRows(rows) {
     if (!rows.length) {
         tbody.innerHTML = `
-      <tr><td colspan="7" class="px-5 py-16 text-center">
-        <div class="inline-flex flex-col items-center gap-2">
-          <i data-lucide="inbox" class="h-8 w-8 text-slate-300"></i>
-          <p class="text-sm font-medium text-slate-700">No orders found</p>
-          <p class="text-xs text-slate-500">Try changing filters.</p>
-        </div>
-      </td></tr>`;
+            <tr><td colspan="7" class="px-5 py-16 text-center">
+                <div class="inline-flex flex-col items-center gap-2">
+                <i data-lucide="inbox" class="h-8 w-8 text-slate-300"></i>
+                <p class="text-sm font-medium text-slate-700">No orders found</p>
+                <p class="text-xs text-slate-500">Try changing filters.</p>
+                </div>
+            </td></tr>
+        `;
         return;
     }
 
     tbody.innerHTML = rows.map(r => `
-    <tr class="hover:bg-slate-50 cursor-pointer" data-order-id="${r.id}">
-      <td class="px-5 py-4 font-semibold">#${r.id}</td>
-      <td class="px-5 py-4">${r.date}</td>
-      <td class="px-5 py-4">${r.customer}</td>
-      <td class="px-5 py-4">${r.items}</td>
-      <td class="px-5 py-4">${r.total}</td>
-      <td class="px-5 py-4">
-        <span class="rounded-full px-2.5 py-1 text-xs font-semibold ${r.status === 'Delivered' ? 'bg-emerald-50 text-emerald-700' :
-            r.status === 'Shipped' ? 'bg-brand-ultralight text-brand-dark' :
-                'bg-amber-50 text-amber-700'
-        }">${r.status}</span>
-      </td>
-      <td class="px-5 py-4">
-        <button class="font-semibold text-brand">View</button>
-      </td>
-    </tr>
+        <tr class="hover:bg-slate-50 cursor-pointer" data-order-id="${r.id}">
+        <td class="px-5 py-4 font-semibold">#${r.id}</td>
+        <td class="px-5 py-4">${r.date}</td>
+        <td class="px-5 py-4">${r.customer}</td>
+        <td class="px-5 py-4">${r.items}</td>
+        <td class="px-5 py-4">${r.total}</td>
+        <td class="px-5 py-4">
+            <span class="rounded-full px-2.5 py-1 text-xs font-semibold ${r.status === 'Delivered' ? 'bg-emerald-50 text-emerald-700' :
+                r.status === 'Shipped' ? 'bg-brand-ultralight text-brand-dark' :
+                    'bg-amber-50 text-amber-700'
+            }">${r.status}</span>
+        </td>
+        <td class="px-5 py-4">
+            <button class="font-semibold text-brand">View</button>
+        </td>
+        </tr>
   `).join('');
 
     tbody.querySelectorAll('tr[data-order-id]').forEach(tr => {

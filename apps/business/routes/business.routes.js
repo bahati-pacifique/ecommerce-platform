@@ -19,8 +19,14 @@ router.get('/:vendor/dashboard', business, businessController.renderDashboard);
 
 router.get('/stores/:vendorId/create', business, businessController.renderStoreCreation);
 
+router.get('/stores/:storeId/dashboard/', business, businessController.renderStoreDashboardWelcome);
 router.get('/stores/:storeId/dashboard/home', business, businessController.renderStoreDashboard);
 router.get('/stores/:storeId/dashboard/orders', business, businessController.renderStoreOrders);
+router.get('/stores/:storeId/dashboard/inventory', business, businessController.renderStoreInventory);
+router.get('/stores/:storeId/dashboard/listings', business, businessController.renderStoreListing);
+router.get('/stores/:storeId/dashboard/products', business, businessController.renderStoreProducts);
+router.get('/stores/:storeId/dashboard/followers', business, businessController.renderStoreFollowers);
+
 // router.get('/stores/:vendorId/:storeId', business, businessController.renderVendorStorePage);
 router.get('/register', vendorBusinessRegister, businessController.renderVendorCreation);
 router.get('/pricing', businessController.businessVendorPricing);
@@ -36,5 +42,8 @@ router.get('/products/catalog/list', businessController.getPaginatedProductsCata
 router.get('/products/catalog/s', businessController.deepSearchProductsCatalog);
 router.post('/products/catalog/s', businessController.searchProductByImage);
 router.get('/products/catalog/:id', businessController.getProductById);
+
+router.get('/messages', business, businessController.renderMessages);
+router.get('/notifications', business, businessController.renderNotifications);
 
 module.exports = router;

@@ -26,7 +26,7 @@ module.exports = (
             message
         });
     } else {
-        res.render('er', { message });
+        res.render('er', {layout: false, message });
     }
 
 };

@@ -481,7 +481,8 @@ class StoreModel {
     }
 
     static async setLastActive(storeId) {
-        const { rows } = db.query(`UPDATE stores SET last_active = NOW() WHERE id = $1 RETURNING *`, [storeId]);
+    
+        const { rows } = await db.query(`UPDATE stores SET last_active = NOW() WHERE id = $1 RETURNING *`, [storeId]);
 
         return rows[0] ?? null;
     }

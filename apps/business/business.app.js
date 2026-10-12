@@ -11,6 +11,7 @@ const app = express();
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, '../../views'));
 app.use(expressLayouts);
+
 app.set('layout', 'store-center');
 
 app.use((req, res, next) => {

@@ -1,0 +1,641 @@
+<!-- Page header -->
+<div class="mb-6 flex flex-col justify-between gap-4 md:flex-row md:items-end">
+  <div>
+    <div class="mb-1 flex items-center gap-2 text-[var(--color-brand)]">
+      <i data-lucide="list-checks" class="h-4 w-4"></i>
+      <span class="text-sm font-semibold"><%= store.name %></span>
+    </div>
+    <h1 class="text-2xl font-bold tracking-tight">Listings</h1>
+    <p class="mt-1 text-sm text-slate-500">
+      Manage how your products appear in this store.
+    </p>
+  </div>
+  <div class="flex gap-2">
+    <button class="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium hover:bg-slate-50">
+      <i data-lucide="download" class="h-4 w-4"></i>Export
+    </button>
+    <button id="createListingButton" class="inline-flex items-center gap-2 rounded-lg bg-[var(--color-brand)] px-3 py-2 text-sm font-semibold text-white hover:bg-[var(--color-brand-dark)]">
+      <i data-lucide="plus" class="h-4 w-4"></i>New Listing
+    </button>
+  </div>
+</div>
+
+<!-- Search + filters -->
+<div class="mb-5 flex flex-col gap-3 md:flex-row md:items-center">
+
+  <!-- Search -->
+  <div class="relative flex-1">
+    <i data-lucide="search" class="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"></i>
+    <input type="search" id="listingsSearch" placeholder="Search listings by title, SKU, or product..." class="w-full rounded-lg border border-slate-200 bg-white py-2.5 pl-10 pr-4 text-sm outline-none transition focus:border-[var(--color-brand)] focus:ring-2 focus:ring-[var(--color-brand-light)]" autocomplete="off" />
+  </div>
+
+  <!-- Status filter -->
+  <select id="listingsStatus" class="rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm outline-none transition focus:border-[var(--color-brand)]">
+    <option value="">All statuses</option>
+    <option value="active">Active</option>
+    <option value="draft">Draft</option>
+    <option value="archived">Archived</option>
+  </select>
+
+  <!-- Sort -->
+  <select id="listingsSort" class="rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm outline-none transition focus:border-[var(--color-brand)]">
+    <option value="updated_desc">Recently updated</option>
+    <option value="updated_asc">Oldest first</option>
+    <option value="title_asc">Title A → Z</option>
+    <option value="title_desc">Title Z → A</option>
+    <option value="stock_asc">Stock (low first)</option>
+    <option value="stock_desc">Stock (high first)</option>
+  </select>
+
+  <!-- Per page -->
+  <select id="listingsLimit" class="rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm outline-none transition focus:border-[var(--color-brand)]">
+    <option value="12">12 / page</option>
+    <option value="24" selected>24 / page</option>
+    <option value="48">48 / page</option>
+    <option value="96">96 / page</option>
+  </select>
+</div>
+
+<!-- Results count -->
+<div class="mb-4 flex items-center justify-between text-sm">
+  <span id="listingsCount" class="text-slate-500">Loading…</span>
+  <div id="listingsActiveFilters" class="flex items-center gap-2"></div>
+</div>
+
+<!-- Grid host -->
+<div id="listingsGrid" class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+  <!-- Server-rendered cards OR skeletons on first paint -->
+  <%
+    const mockListings = [
+      { id: 'a1b2c3d4-1111-4aaa-8bbb-000000000001', store_id: store.id, product_id: 'p-001', product_variant_id: 'v-001', title: 'iPhone 15 Pro Case — Black', product_name: 'iPhone 15 Pro Case', product_image: 'https://images.unsplash.com/photo-1601784551446-20c9e07cdbdb?w=600', variant_name: 'Black', sku: 'IP15P-BLK', price: 3500, currency: 'USD', stock: 42, status: 'active', updated_at: new Date().toISOString() },
+      { id: 'a1b2c3d4-2222-4aaa-8bbb-000000000002', store_id: store.id, product_id: 'p-002', product_variant_id: 'v-002', title: 'USB-C Fast Charger 45W', product_name: 'USB-C Fast Charger', product_image: 'https://images.unsplash.com/photo-1583863788434-e58a36330cf0?w=600', variant_name: '45W', sku: 'USBC-45W', price: 2500, currency: 'USD', stock: 18, status: 'active', updated_at: new Date(Date.now() - 86400000).toISOString() },
+      { id: 'a1b2c3d4-3333-4aaa-8bbb-000000000003', store_id: store.id, product_id: 'p-003', product_variant_id: null, title: 'Wireless Mouse', product_name: 'Wireless Mouse', product_image: null, variant_name: null, sku: 'WM-204', price: 2900, currency: 'USD', stock: 0, status: 'draft', updated_at: new Date(Date.now() - 86400000 * 3).toISOString() },
+      { id: 'a1b2c3d4-4444-4aaa-8bbb-000000000004', store_id: store.id, product_id: 'p-004', product_variant_id: 'v-004', title: 'Wireless Headphones — Midnight Blue', product_name: 'Wireless Headphones', product_image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600', variant_name: 'Midnight Blue', sku: 'WH-800-MB', price: 8900, currency: 'USD', stock: 31, status: 'active', updated_at: new Date(Date.now() - 86400000 * 5).toISOString() },
+      { id: 'a1b2c3d4-5555-4aaa-8bbb-000000000005', store_id: store.id, product_id: 'p-005', product_variant_id: 'v-005', title: 'Aluminium Laptop Stand', product_name: 'Aluminium Laptop Stand', product_image: 'https://images.unsplash.com/photo-1618384887929-16ec33fab9ef?w=600', variant_name: 'Silver', sku: 'LS-AL-SV', price: 4500, currency: 'USD', stock: 8, status: 'active', updated_at: new Date(Date.now() - 86400000 * 2).toISOString() },
+      { id: 'a1b2c3d4-6666-4aaa-8bbb-000000000006', store_id: store.id, product_id: 'p-006', product_variant_id: null, title: 'Webcam 1080p HD', product_name: 'Webcam 1080p', product_image: 'https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=600', variant_name: null, sku: 'WC-1080', price: 6500, currency: 'USD', stock: 0, status: 'archived', updated_at: new Date(Date.now() - 86400000 * 14).toISOString() },
+    ];
+  %>
+
+  <div id="listingsGrid" class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"></div>
+</div>
+
+<!-- Pagination -->
+<nav id="listingsPagination" class="mt-8 flex flex-col items-center justify-between gap-4 sm:flex-row" aria-label="Listings pagination">
+  <p class="text-xs text-slate-500" id="listingsPageInfo">—</p>
+  <div class="flex items-center gap-2" id="listingsPageControls"></div>
+</nav>
+
+<script type="module">
+  $(document).ready(() => {
+    // public/js/pages/listings.js
+    const {
+      toast
+    } = window.__shell;
+
+    // ─────────────────────────────────────────────────────────────
+    // Mock dataset — full fields, defined once
+    // Replace with real API call when backend is ready.
+    // ─────────────────────────────────────────────────────────────
+    const MOCK_LISTINGS = [{
+        id: 'a1b2c3d4-1111-4aaa-8bbb-000000000001',
+        store_id: 'store-001',
+        product_id: 'p-001',
+        product_variant_id: 'v-001',
+        title: 'iPhone 15 Pro Case — Black',
+        product_name: 'iPhone 15 Pro Case',
+        product_image: 'https://images.unsplash.com/photo-1601784551446-20c9e07cdbdb?w=600',
+        variant_name: 'Black',
+        sku: 'IP15P-BLK',
+        price: 3500,
+        currency: 'USD',
+        stock: 42,
+        status: 'active',
+        updated_at: new Date().toISOString(),
+      },
+      {
+        id: 'a1b2c3d4-2222-4aaa-8bbb-000000000002',
+        store_id: 'store-001',
+        product_id: 'p-002',
+        product_variant_id: 'v-002',
+        title: 'USB-C Fast Charger 45W',
+        product_name: 'USB-C Fast Charger',
+        product_image: 'https://images.unsplash.com/photo-1583863788434-e58a36330cf0?w=600',
+        variant_name: '45W',
+        sku: 'USBC-45W',
+        price: 2500,
+        currency: 'USD',
+        stock: 18,
+        status: 'active',
+        updated_at: new Date(Date.now() - 86400000).toISOString(),
+      },
+      {
+        id: 'a1b2c3d4-3333-4aaa-8bbb-000000000003',
+        store_id: 'store-001',
+        product_id: 'p-003',
+        product_variant_id: null,
+        title: 'Wireless Mouse',
+        product_name: 'Wireless Mouse',
+        product_image: null,
+        variant_name: null,
+        sku: 'WM-204',
+        price: 2900,
+        currency: 'USD',
+        stock: 0,
+        status: 'draft',
+        updated_at: new Date(Date.now() - 86400000 * 3).toISOString(),
+      },
+      {
+        id: 'a1b2c3d4-4444-4aaa-8bbb-000000000004',
+        store_id: 'store-001',
+        product_id: 'p-004',
+        product_variant_id: 'v-004',
+        title: 'Wireless Headphones — Midnight Blue',
+        product_name: 'Wireless Headphones',
+        product_image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600',
+        variant_name: 'Midnight Blue',
+        sku: 'WH-800-MB',
+        price: 8900,
+        currency: 'USD',
+        stock: 31,
+        status: 'active',
+        updated_at: new Date(Date.now() - 86400000 * 5).toISOString(),
+      },
+      {
+        id: 'a1b2c3d4-5555-4aaa-8bbb-000000000005',
+        store_id: 'store-001',
+        product_id: 'p-005',
+        product_variant_id: 'v-005',
+        title: 'Aluminium Laptop Stand',
+        product_name: 'Aluminium Laptop Stand',
+        product_image: 'https://images.unsplash.com/photo-1618384887929-16ec33fab9ef?w=600',
+        variant_name: 'Silver',
+        sku: 'LS-AL-SV',
+        price: 4500,
+        currency: 'USD',
+        stock: 8,
+        status: 'active',
+        updated_at: new Date(Date.now() - 86400000 * 2).toISOString(),
+      },
+      {
+        id: 'a1b2c3d4-6666-4aaa-8bbb-000000000006',
+        store_id: 'store-001',
+        product_id: 'p-006',
+        product_variant_id: null,
+        title: 'Webcam 1080p HD',
+        product_name: 'Webcam 1080p',
+        product_image: 'https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=600',
+        variant_name: null,
+        sku: 'WC-1080',
+        price: 6500,
+        currency: 'USD',
+        stock: 0,
+        status: 'archived',
+        updated_at: new Date(Date.now() - 86400000 * 14).toISOString(),
+      },
+    ];
+
+    // ─────────────────────────────────────────────────────────────
+    // State
+    // ─────────────────────────────────────────────────────────────
+    const state = {
+      page: 1,
+      limit: 10,
+      search: '',
+      status: '',
+      sort: 'updated_desc',
+      // Pagination metadata (filled after each load)
+      pagination: {
+        page: 1,
+        hasNextPage: false,
+        hasPreviousPage: false,
+        totalPages: 1,
+        totalListings: 0,
+        limit: 10,
+      },
+    };
+
+    // ─────────────────────────────────────────────────────────────
+    // DOM
+    // ─────────────────────────────────────────────────────────────
+    const els = {
+      grid: document.getElementById('listingsGrid'),
+      search: document.getElementById('listingsSearch'),
+      status: document.getElementById('listingsStatus'),
+      sort: document.getElementById('listingsSort'),
+      limit: document.getElementById('listingsLimit'),
+      count: document.getElementById('listingsCount'),
+      activeFilters: document.getElementById('listingsActiveFilters'),
+      pageInfo: document.getElementById('listingsPageInfo'),
+      pageControls: document.getElementById('listingsPageControls'),
+    };
+
+    // ─────────────────────────────────────────────────────────────
+    // Utils
+    // ─────────────────────────────────────────────────────────────
+    function getStoreId() {
+      const match = window.location.pathname.match(/\/stores\/([^/]+)/);
+      return match ? match[1] : null;
+    }
+
+    function debounce(fn, ms) {
+      let t;
+      return (...args) => {
+        clearTimeout(t);
+        t = setTimeout(() => fn(...args), ms);
+      };
+    }
+
+    function escapeHtml(str) {
+      const div = document.createElement('div');
+      div.textContent = str ?? '';
+      return div.innerHTML;
+    }
+
+    function skeletonGrid(count) {
+      return Array(count).fill(`
+    <div class="overflow-hidden rounded-xl border border-slate-200 bg-white">
+      <div class="aspect-[4/3] animate-pulse bg-slate-100"></div>
+      <div class="space-y-3 p-4">
+        <div class="h-4 animate-pulse rounded bg-slate-100"></div>
+        <div class="h-3 w-2/3 animate-pulse rounded bg-slate-100"></div>
+        <div class="h-3 w-1/2 animate-pulse rounded bg-slate-100"></div>
+      </div>
+    </div>
+  `).join('');
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // Load
+    // ─────────────────────────────────────────────────────────────
+    async function load() {
+      els.grid.innerHTML = skeletonGrid(state.limit);
+      els.count.textContent = 'Loading…';
+      els.pageInfo.textContent = '—';
+      els.pageControls.innerHTML = '';
+
+      try {
+        const params = new URLSearchParams({
+          page: state.page,
+          limit: state.limit,
+          search: state.search,
+          status: state.status,
+          sort: state.sort,
+        });
+
+        // ── REAL BACKEND (uncomment when ready) ──────────────────
+        // const res = await fetch(`/api/stores/${getStoreId()}/listings?${params}`);
+        // if (!res.ok) throw new Error('Failed to load listings');
+        // const payload = await res.json();
+        //
+        // // Expected payload shape:
+        // // {
+        // //   items: [...],               // or `listings` / `data`
+        // //   page: 1,
+        // //   hasNextPage: true,
+        // //   hasPreviousPage: false,
+        // //   totalPages: 3,
+        // //   totalListings: 30,
+        // //   limit: 10,
+        // // }
+        //
+        // state.pagination = {
+        //   page: payload.page,
+        //   hasNextPage: payload.hasNextPage,
+        //   hasPreviousPage: payload.hasPreviousPage,
+        //   totalPages: payload.totalPages,
+        //   totalListings: payload.totalListings,
+        //   limit: payload.limit,
+        // };
+        // renderCards(payload.items);
+        // renderPagination(state.pagination);
+
+        // ── MOCK (current) ──────────────────────────────────────
+        const payload = await mockFetchListings(params);
+        state.pagination = {
+          page: payload.page,
+          hasNextPage: payload.hasNextPage,
+          hasPreviousPage: payload.hasPreviousPage,
+          totalPages: payload.totalPages,
+          totalListings: payload.totalListings,
+          limit: payload.limit,
+        };
+        renderCards(payload.items);
+        renderPagination(state.pagination);
+
+      } catch (err) {
+        console.error(err);
+        els.grid.innerHTML = `
+      <div class="col-span-full rounded-xl border border-rose-200 bg-rose-50 py-16 text-center">
+        <i data-lucide="alert-circle" class="mx-auto h-8 w-8 text-rose-500"></i>
+        <p class="mt-2 text-sm font-medium text-rose-700">Failed to load listings</p>
+        <button onclick="location.reload()" class="mt-3 rounded-lg bg-rose-600 px-4 py-2 text-xs font-semibold text-white">
+          Retry
+        </button>
+      </div>`;
+        window.lucide?.createIcons();
+      }
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // Mock backend — returns full listings + new pagination payload
+    // ─────────────────────────────────────────────────────────────
+    async function mockFetchListings(params) {
+      await new Promise(r => setTimeout(r, 250));
+
+      const search = params.get('search')?.toLowerCase() || '';
+      const status = params.get('status') || '';
+      const sort = params.get('sort') || 'updated_desc';
+      const page = parseInt(params.get('page') || '1', 10);
+      const limit = parseInt(params.get('limit') || '10', 10);
+
+      let filtered = MOCK_LISTINGS.slice();
+
+      if (search) {
+        filtered = filtered.filter(l =>
+          (l.title || '').toLowerCase().includes(search) ||
+          (l.sku || '').toLowerCase().includes(search) ||
+          (l.product_name || '').toLowerCase().includes(search)
+        );
+      }
+
+      if (status) {
+        filtered = filtered.filter(l => l.status === status);
+      }
+
+      const SORTERS = {
+        updated_desc: (a, b) => new Date(b.updated_at || 0) - new Date(a.updated_at || 0),
+        updated_asc: (a, b) => new Date(a.updated_at || 0) - new Date(b.updated_at || 0),
+        title_asc: (a, b) => (a.title || '').localeCompare(b.title || ''),
+        title_desc: (a, b) => (b.title || '').localeCompare(a.title || ''),
+        stock_asc: (a, b) => (a.stock ?? 0) - (b.stock ?? 0),
+        stock_desc: (a, b) => (b.stock ?? 0) - (a.stock ?? 0),
+      };
+      filtered.sort(SORTERS[sort] || SORTERS.updated_desc);
+
+      const totalListings = filtered.length;
+      const totalPages = Math.max(1, Math.ceil(totalListings / limit));
+      const safePage = Math.min(Math.max(page, 1), totalPages);
+      const start = (safePage - 1) * limit;
+      const items = filtered.slice(start, start + limit);
+
+      return {
+        items,
+        page: safePage,
+        hasNextPage: safePage < totalPages,
+        hasPreviousPage: safePage > 1,
+        totalPages,
+        totalListings,
+        limit,
+      };
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // Render cards
+    // ─────────────────────────────────────────────────────────────
+    function renderCards(items) {
+      if (!items.length) {
+        els.grid.innerHTML = `
+      <div class="col-span-full rounded-xl border-2 border-dashed border-slate-200 py-16 text-center">
+        <div class="inline-flex flex-col items-center gap-2">
+          <div class="flex h-12 w-12 items-center justify-center rounded-full bg-[var(--color-brand-ultralight)]">
+            <i data-lucide="search-x" class="h-6 w-6 text-[var(--color-brand)]"></i>
+          </div>
+          <p class="text-sm font-medium text-slate-700">No listings found</p>
+          <p class="text-xs text-slate-500">Try adjusting your search or filters.</p>
+          <button id="clearFiltersBtn" class="mt-3 rounded-lg border border-slate-200 bg-white px-4 py-2 text-xs font-semibold hover:bg-slate-50">
+            Clear filters
+          </button>
+        </div>
+      </div>`;
+        document.getElementById('clearFiltersBtn')?.addEventListener('click', clearFilters);
+        window.lucide?.createIcons();
+        return;
+      }
+
+      els.grid.innerHTML = items.map(renderCardHTML).join('');
+      window.lucide?.createIcons();
+    }
+
+    function renderCardHTML(l) {
+      const statusTone = {
+        active: 'bg-emerald-50 text-emerald-700',
+        draft: 'bg-slate-100 text-slate-600',
+        archived: 'bg-rose-50 text-rose-700',
+      } [l.status] || 'bg-slate-100 text-slate-600';
+
+      const priceLabel = l.price != null ?
+        new Intl.NumberFormat('en-US', {
+          style: 'currency',
+          currency: l.currency || 'USD'
+        })
+        .format(l.price / 100) :
+        '—';
+
+      const updatedLabel = l.updated_at ?
+        new Date(l.updated_at).toLocaleDateString('en-US', {
+          month: 'short',
+          day: 'numeric'
+        }) :
+        '—';
+
+      const image = l.product_image ?
+        `<img src="${escapeHtml(l.product_image)}" alt="${escapeHtml(l.title)}" class="h-full w-full object-cover transition duration-300 group-hover:scale-[1.02]" loading="lazy" />` :
+        `<div class="flex h-full w-full items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100"><i data-lucide="image" class="h-10 w-10 text-slate-300"></i></div>`;
+
+      const variantBadge = l.variant_name ?
+        `<span class="absolute right-3 top-3 rounded-full bg-slate-900/80 px-2.5 py-1 text-[10px] font-semibold text-white backdrop-blur">${escapeHtml(l.variant_name)}</span>` :
+        '';
+
+      const storeId = l.store_id || getStoreId();
+      const manageUrl = `/stores/${storeId}/listings/${l.id}`;
+
+      return `
+    <article class="group relative flex flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition hover:border-slate-300 hover:shadow-md"
+             data-listing-id="${escapeHtml(l.id)}">
+      <div class="relative aspect-[4/3] w-full overflow-hidden bg-slate-100">
+        ${image}
+        <span class="absolute left-3 top-3 rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide ${statusTone}">${escapeHtml(l.status || 'draft')}</span>
+        ${variantBadge}
+      </div>
+      <div class="flex flex-1 flex-col p-4">
+        <h3 class="line-clamp-2 text-sm font-semibold text-slate-900">${escapeHtml(l.title)}</h3>
+        <p class="mt-1 line-clamp-1 text-xs text-slate-500">${escapeHtml(l.product_name || '—')}</p>
+        <dl class="mt-3 grid grid-cols-2 gap-x-3 gap-y-2 text-xs">
+          ${l.sku ? `<div><dt class="text-slate-400">SKU</dt><dd class="truncate font-medium text-slate-700">${escapeHtml(l.sku)}</dd></div>` : ''}
+          <div><dt class="text-slate-400">Price</dt><dd class="font-medium text-slate-700">${priceLabel}</dd></div>
+          ${l.stock != null ? `<div><dt class="text-slate-400">Stock</dt><dd class="font-medium ${l.stock === 0 ? 'text-rose-600' : (l.stock < 10 ? 'text-amber-600' : 'text-slate-700')}">${l.stock === 0 ? 'Out of stock' : `${l.stock} available`}</dd></div>` : ''}
+          <div><dt class="text-slate-400">Updated</dt><dd class="font-medium text-slate-700">${updatedLabel}</dd></div>
+        </dl>
+        <div class="mt-4 flex items-center justify-between gap-2 border-t border-slate-100 pt-3">
+          <span class="truncate font-mono text-[10px] text-slate-400">#${escapeHtml(String(l.id).slice(0, 8))}</span>
+          <a href="${manageUrl}"
+             class="inline-flex items-center gap-1.5 rounded-lg bg-[var(--color-brand)] px-3 py-2 text-xs font-semibold text-white hover:bg-[var(--color-brand-dark)]">
+            <i data-lucide="settings-2" class="h-3.5 w-3.5"></i>Manage
+          </a>
+        </div>
+      </div>
+    </article>`;
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // Render pagination — prev/next buttons only
+    // ─────────────────────────────────────────────────────────────
+    function renderPagination({
+      page,
+      hasNextPage,
+      hasPreviousPage,
+      totalPages,
+      totalListings,
+      limit
+    }) {
+      const from = totalListings ? (page - 1) * limit + 1 : 0;
+      const to = Math.min(page * limit, totalListings);
+
+      // Results count
+      els.count.textContent = totalListings ?
+        `Showing ${from}–${to} of ${totalListings} listings` :
+        'No listings';
+
+      // Page info
+      els.pageInfo.textContent = totalListings ?
+        `Page ${page} of ${totalPages}` :
+        '—';
+
+      // Buttons
+      els.pageControls.innerHTML = `
+    <button
+      type="button"
+      class="pagination-btn"
+      data-page="${page - 1}"
+      ${!hasPreviousPage ? 'disabled' : ''}
+      aria-label="Previous page"
+    >
+      <i data-lucide="chevron-left" class="h-4 w-4"></i>
+      <span>Previous</span>
+    </button>
+
+    <span class="px-3 text-sm font-medium text-slate-600">
+      Page <span class="font-bold text-slate-900">${page}</span> of ${totalPages}
+    </span>
+
+    <button
+      type="button"
+      class="pagination-btn"
+      data-page="${page + 1}"
+      ${!hasNextPage ? 'disabled' : ''}
+      aria-label="Next page"
+    >
+      <span>Next</span>
+      <i data-lucide="chevron-right" class="h-4 w-4"></i>
+    </button>
+  `;
+
+      window.lucide?.createIcons();
+
+      els.pageControls.querySelectorAll('[data-page]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const p = parseInt(btn.dataset.page, 10);
+          if (p >= 1 && p <= totalPages && p !== page) {
+            state.page = p;
+            load();
+            window.scrollTo({
+              top: 0,
+              behavior: 'smooth'
+            });
+          }
+        });
+      });
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // Active filter chips
+    // ─────────────────────────────────────────────────────────────
+    function renderActiveFilters() {
+      const chips = [];
+
+      if (state.search) {
+        chips.push(`
+      <span class="inline-flex items-center gap-1.5 rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-700">
+        Search: "${escapeHtml(state.search)}"
+        <button data-clear="search" class="text-slate-400 hover:text-rose-600">×</button>
+      </span>`);
+      }
+      if (state.status) {
+        chips.push(`
+      <span class="inline-flex items-center gap-1.5 rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-700">
+        Status: ${escapeHtml(state.status)}
+        <button data-clear="status" class="text-slate-400 hover:text-rose-600">×</button>
+      </span>`);
+      }
+
+      els.activeFilters.innerHTML = chips.join('');
+
+      els.activeFilters.querySelectorAll('[data-clear]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const key = btn.dataset.clear;
+          if (key === 'search') {
+            state.search = '';
+            els.search.value = '';
+          }
+          if (key === 'status') {
+            state.status = '';
+            els.status.value = '';
+          }
+          state.page = 1;
+          renderActiveFilters();
+          load();
+        });
+      });
+    }
+
+    function clearFilters() {
+      state.search = '';
+      state.status = '';
+      state.page = 1;
+      els.search.value = '';
+      els.status.value = '';
+      renderActiveFilters();
+      load();
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // Events
+    // ─────────────────────────────────────────────────────────────
+    els.search?.addEventListener('input', debounce((e) => {
+      state.search = e.target.value.trim();
+      state.page = 1;
+      renderActiveFilters();
+      load();
+    }, 300));
+
+    els.status?.addEventListener('change', (e) => {
+      state.status = e.target.value;
+      state.page = 1;
+      renderActiveFilters();
+      load();
+    });
+
+    els.sort?.addEventListener('change', (e) => {
+      state.sort = e.target.value;
+      state.page = 1;
+      load();
+    });
+
+    els.limit?.addEventListener('change', (e) => {
+      state.limit = parseInt(e.target.value, 10);
+      state.page = 1;
+      load();
+    });
+
+    document.getElementById('createListingButton')?.addEventListener('click', () => {
+      toast('Create listing flow opened');
+    });
+
+    // ─────────────────────────────────────────────────────────────
+    // Init — hide server-rendered cards, then load through the mock fetcher
+    // (so search/filter/pagination all work through one code path)
+    // ─────────────────────────────────────────────────────────────
+    renderActiveFilters();
+    load();
+  })
+</script>

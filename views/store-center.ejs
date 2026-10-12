@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>COCOCE — Store Center</title>
 
-  <meta name="description" content="COCOCE — Store Center. You do not have access to this store.">
+  <meta name="description" content="COCOCE — Store Center. COCOCE Kigali, Rwanda For Laptop, desktop, electronic digital gadgets.">
   <link rel="icon" href="/favicon.ico" type="image/x-icon">
 
   <meta property="og:image" content="https://cdn.cococe.rw/branding/brand/logos/cococe.png">
@@ -23,6 +23,8 @@
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.11.0/axios.min.js" integrity="sha512-h9644v03pHqrIHThkvXhB2PJ8zf5E9IyVnrSfZg8Yj8k4RsO4zldcQc4Bi9iVLUCCsqNY0b4WXVV4UB+wbWENA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
+  <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -34,6 +36,10 @@
   <link rel="stylesheet" href="/styles/components/loaders.css">
   <link rel="stylesheet" href="/styles/components/animations.css">
   <link rel="stylesheet" href="/styles/main.css">
+
+  <script>
+    const username = '<%=locals.user.username%>';
+  </script>
 
   <style>
     :root {
@@ -115,41 +121,142 @@
       stroke-linecap: round;
       stroke-linejoin: round;
     }
+
+    /* WELCOME PARTIALS */
+    .welcome-panel {
+      height: 80vh;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      padding: 1rem 2.5px;
+      background: linear-gradient(180deg, #f8fafc 0%, #ffffff 100%);
+    }
+
+    .welcome-inner {
+      max-width: 720px;
+      width: 100%;
+      text-align: center;
+    }
+
+    .welcome-eyebrow {
+      margin: 0 0 8px;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #6b7280;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .welcome-title {
+      margin: 0 0 12px;
+      font-size: 32px;
+      line-height: 1.25;
+      font-weight: 700;
+      color: #111827;
+    }
+
+    .store-name {
+      color: var(--color-brand);
+      font-weight: 900;
+    }
+
+    .welcome-slogan {
+      margin: 0 0 24px;
+      font-size: 16px;
+      line-height: 1.6;
+      color: #4b5563;
+    }
+
+    .welcome-nav {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
+      gap: 12px;
+      font-size: 14px;
+    }
+
+    .welcome-nav-link {
+      color: #374151;
+      text-decoration: none;
+      padding: 6px 10px;
+      border-radius: 6px;
+      transition: background-color 0.15s ease, color 0.15s ease;
+    }
+
+    .welcome-nav-link:hover,
+    .welcome-nav-link:focus-visible {
+      background-color: var(--color-brand-light);
+      color: var(--color-brand);
+      outline: none;
+    }
+
+    .welcome-nav-divider {
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background-color: #d1d5db;
+    }
+
+    @media (max-width: 480px) {
+      .welcome-title {
+        font-size: 24px;
+      }
+
+      .welcome-slogan {
+        font-size: 15px;
+      }
+
+      .welcome-nav-divider {
+        display: none;
+      }
+
+      .welcome-nav {
+        flex-direction: column;
+        gap: 6px;
+      }
+    }
   </style>
 </head>
 <script>
   const protocal = "<%-locals.protocal%>";
   const domainName = "<%-locals.domainName%>";
   const storeId = "<%-locals.store.id%>";
-
-  console.log(protocal, domainName)
 </script>
 
 <body class="bg-slate-50 text-slate-900">
   <div id="appShell" class="min-h-screen">
 
-    <%- include('partials/sidebar', { store, user, title }) %>
+    <%- include('store-partials/sidebar', { store, user, title }) %>
 
     <div id="sidebarBackdrop" class="fixed inset-0 z-40 hidden bg-slate-950/30 lg:hidden"></div>
 
     <div id="main" class="min-h-screen min-w-0 transition-[margin] duration-300 ease-in-out lg:ml-[var(--sidebar-width)]">
-      <%- include('partials/header',  { store, user }) %>
+      <%- include('store-partials/header',  { store, user }) %>
       <main id="content" class="p-4 sm:p-6 lg:p-8">
         <%- body %>
       </main>
     </div>
   </div>
 
-  <%- include('partials/order-drawer') %>
+  <%- include('store-partials/order-drawer') %>
   <div id="toast" class="fixed bottom-5 right-5 z-[80] hidden rounded-lg bg-slate-900 px-4 py-3 text-sm font-medium text-white shadow-xl"></div>
 
   <script type="module" src="/scripts/shell.js"></script>
+  
   <% if (typeof pageScript !== 'undefined' && pageScript) { %>
   <script type="module" src="<%= pageScript %>"></script>
   <% } %>
 
   <script src="/scripts/components/notification.js"></script>
   <script src="/scripts/components/main-snackbar.js"></script>
+  
 </body>
 
 </html>

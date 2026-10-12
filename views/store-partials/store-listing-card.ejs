@@ -1,0 +1,149 @@
+<%
+  /**
+   * Listing Card Component
+   *
+   * Expected props:
+   *   listing = {
+   *     id:                 "UUID",
+   *     store_id:           "UUID",
+   *     product_id:         "UUID",
+   *     product_variant_id: "UUID | null",
+   *     title:              "String",
+   *
+   *     // optional enrichments (from joins, when backend ready)
+   *     product_name:       "String",
+   *     product_image:      "URL | null",
+   *     variant_name:       "String | null",
+   *     sku:                "String | null",
+   *     price:              Number | null,     // in smallest unit (cents)
+   *     currency:           "USD" | "RWF" | ...,
+   *     stock:              Number | null,
+   *     status:             "active" | "draft" | "archived",
+   *     updated_at:         ISOString | null,
+   *   }
+   *
+   * Optional flags:
+   *   manageUrl = '/stores/:storeId/listings/:id'
+   */
+
+  const id     = listing?.id     || '00000000-0000-0000-0000-000000000000';
+  const title  = listing?.title  || 'Untitled listing';
+
+  const productName  = listing?.product_name  || 'Product name pending';
+  const variantName  = listing?.product_variant_id ? (listing?.variant_name || 'Variant') : null;
+  const sku          = listing?.sku           || null;
+  const image        = listing?.product_image || null;
+
+  const price    = listing?.price;
+  const currency = listing?.currency || 'USD';
+  const stock    = listing?.stock;
+
+  const status     = listing?.status     || 'draft';
+  const updatedAt  = listing?.updated_at || null;
+
+  // Link target — override via prop, or fall back to a sensible default
+  const storeId = listing?.store_id || store?.id || null;
+  const link    = typeof manageUrl !== 'undefined'
+                    ? manageUrl
+                    : (storeId ? `/stores/${storeId}/listings/${id}` : `/listings/${id}`);
+
+  // Status pill styles
+  const STATUS_TONES = {
+    active:   'bg-emerald-50 text-emerald-700',
+    draft:    'bg-slate-100 text-slate-600',
+    archived: 'bg-rose-50 text-rose-700',
+    paused:   'bg-amber-50 text-amber-700',
+  };
+  const statusTone = STATUS_TONES[status] || STATUS_TONES.draft;
+
+  // Price formatting
+  const priceLabel = price != null
+    ? new Intl.NumberFormat('en-US', { style: 'currency', currency })
+        .format(price / 100)
+    : '—';
+
+  // Updated label
+  const updatedLabel = updatedAt
+    ? new Date(updatedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+    : '—';
+%>
+
+<article class="group relative flex flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition hover:border-slate-300 hover:shadow-md" data-listing-id="<%= id %>" data-product-id="<%= listing?.product_id || '' %>" data-variant-id="<%= listing?.product_variant_id || '' %>" data-status="<%= status %>">
+  <!-- Image / placeholder -->
+  <div class="relative aspect-[4/3] w-full overflow-hidden bg-slate-100">
+    <% if (image) { %>
+    <img src="<%= image %>" alt="<%= title %>" class="h-full w-full object-cover transition duration-300 group-hover:scale-[1.02]" loading="lazy" />
+    <% } else { %>
+    <div class="flex h-full w-full items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100">
+      <i data-lucide="image" class="h-10 w-10 text-slate-300"></i>
+    </div>
+    <% } %>
+
+    <!-- Status pill -->
+    <span class="absolute left-3 top-3 rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide <%= statusTone %>">
+      <%= status %>
+    </span>
+
+    <!-- Variant badge (only if variant) -->
+    <% if (variantName) { %>
+    <span class="absolute right-3 top-3 rounded-full bg-slate-900/80 px-2.5 py-1 text-[10px] font-semibold text-white backdrop-blur">
+      <%= variantName %>
+    </span>
+    <% } %>
+  </div>
+
+  <!-- Body -->
+  <div class="flex flex-1 flex-col p-4">
+
+    <!-- Title (schema field) -->
+    <h3 class="line-clamp-2 text-sm font-semibold text-slate-900" title="<%= title %>">
+      <%= title %>
+    </h3>
+
+    <!-- Product name (enriched, optional) -->
+    <p class="mt-1 line-clamp-1 text-xs text-slate-500">
+      <%= productName %>
+    </p>
+
+    <!-- Meta row: SKU + price + stock -->
+    <dl class="mt-3 grid grid-cols-2 gap-x-3 gap-y-2 text-xs">
+      <% if (sku) { %>
+      <div class="min-w-0">
+        <dt class="text-slate-400">SKU</dt>
+        <dd class="truncate font-medium text-slate-700"><%= sku %></dd>
+      </div>
+      <% } %>
+
+      <div class="min-w-0">
+        <dt class="text-slate-400">Price</dt>
+        <dd class="font-medium text-slate-700"><%= priceLabel %></dd>
+      </div>
+
+      <% if (stock != null) { %>
+      <div class="min-w-0">
+        <dt class="text-slate-400">Stock</dt>
+        <dd class="font-medium <%= stock === 0 ? 'text-rose-600' : (stock < 10 ? 'text-amber-600' : 'text-slate-700') %>">
+          <%= stock === 0 ? 'Out of stock' : `${stock} available` %>
+        </dd>
+      </div>
+      <% } %>
+
+      <div class="min-w-0">
+        <dt class="text-slate-400">Updated</dt>
+        <dd class="font-medium text-slate-700"><%= updatedLabel %></dd>
+      </div>
+    </dl>
+
+    <!-- Footer / action -->
+    <div class="mt-4 flex items-center justify-between gap-2 border-t border-slate-100 pt-3">
+      <span class="truncate font-mono text-[10px] text-slate-400" title="<%= id %>">
+        #<%= String(id).slice(0, 8) %>
+      </span>
+
+      <a href="<%= link %>" class="inline-flex items-center gap-1.5 rounded-lg bg-[var(--color-brand)] px-3 py-2 text-xs font-semibold text-white transition hover:bg-[var(--color-brand-dark)]" data-action="manage-listing">
+        <i data-lucide="settings-2" class="h-3.5 w-3.5"></i>
+        Manage
+      </a>
+    </div>
+  </div>
+</article>

@@ -22,5 +22,5 @@ module.exports = (req, res, next) => {
         });
     }
 
-    return res.render('404', {message: `The requested URL could not be found`, status_code: 404});
+    return res.render('404', {layout: false, message: `The requested URL could not be found`, status_code: 404});
 };

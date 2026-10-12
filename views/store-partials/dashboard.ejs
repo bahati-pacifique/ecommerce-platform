@@ -18,17 +18,57 @@
   </div>
 </div>
 
-<!-- KPI cards -->
 <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-  <%- include('../partials/metric-card', { label: 'Sales', value: '$24,580', change: '+12.5%', icon: 'banknote', tone: 'brand' }) %>
-  <%- include('../partials/metric-card', { label: 'Orders', value: '1,284', change: '+8.2%', icon: 'shopping-cart', tone: 'violet' }) %>
-  <%- include('../partials/metric-card', { label: 'Customers', value: '892', change: '+14.4%', icon: 'users', tone: 'emerald' }) %>
-  <%- include('../partials/metric-card', { label: 'Products', value: '246', icon: 'package', tone: 'amber' }) %>
-  <%- include('../partials/metric-card', { label: 'Pending Orders', value: '38', icon: 'clock-3', tone: 'orange' }) %>
-  <%- include('../partials/metric-card', { label: 'Store Rating', value: '4.8 / 5', icon: 'star', tone: 'amber' }) %>
+  <%- include('../store-partials/metric-card', { label: 'Sales', value: '$24,580', change: '+12.5%', icon: 'banknote', tone: 'brand' }) %>
+  <%- include('../store-partials/metric-card', { label: 'Orders', value: '1,284', change: '+8.2%', icon: 'shopping-cart', tone: 'violet' }) %>
+  <%- include('../store-partials/metric-card', { label: 'Customers', value: '892', change: '+14.4%', icon: 'users', tone: 'emerald' }) %>
+  <%- include('../store-partials/metric-card', { label: 'Products', value: '246', icon: 'package', tone: 'amber' }) %>
+  <%- include('../store-partials/metric-card', { label: 'Pending Orders', value: '38', icon: 'clock-3', tone: 'orange' }) %>
+  <%- include('../store-partials/metric-card', { label: 'Store Rating', value: '4.8 / 5', icon: 'star', tone: 'amber' }) %>
 </div>
 
-<!-- Sales chart -->
+<!-- Store Review section -->
+<div class="mt-6">
+  <%- include('../store-partials/store-reviews', { store, review: {
+    rating: {
+      average: 4.8,
+      total: 342,
+      breakdown: { 5: 240, 4: 70, 3: 20, 2: 8, 1: 4 }
+    },
+    visits: {
+      total: 12480,
+      change_pct: 12.4,
+      weekly: [
+        { day: 'Sun', visits: 1200 },
+        { day: 'Mon', visits: 1580 },
+        { day: 'Tue', visits: 1720 },
+        { day: 'Wed', visits: 1420 },
+        { day: 'Thu', visits: 1980 },
+        { day: 'Fri', visits: 2360 },
+        { day: 'Sat', visits: 2220 },
+      ]
+    },
+    search_appearances: { total: 8620, change_pct: 8.1 },
+    most_visited_listing: {
+      id: 'l-001',
+      title: 'iPhone 15 Pro Case — Black',
+      image: 'https://images.unsplash.com/photo-1601784551446-20c9e07cdbdb?w=200',
+      visits: 1840,
+      ctr: 4.2,
+      change_pct: 18.3
+    },
+    followers: { total: 128, change_pct: 6.7, new_this_week: 9 },
+    response: { rate: 96, avg_minutes: 18 },
+    conversion: { rate: 3.4, change_pct: 0.6 },
+    top_listings: [
+      { id: 'l-001', title: 'iPhone 15 Pro Case — Black', image: 'https://images.unsplash.com/photo-1601784551446-20c9e07cdbdb?w=80', visits: 1840, ctr: 4.2, orders: 26 },
+      { id: 'l-002', title: 'USB-C Fast Charger 45W', image: 'https://images.unsplash.com/photo-1583863788434-e58a36330cf0?w=80', visits: 1420, ctr: 3.8, orders: 18 },
+      { id: 'l-004', title: 'Wireless Headphones — Midnight Blue', image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=80', visits: 1180, ctr: 3.1, orders: 11 },
+      { id: 'l-005', title: 'Aluminium Laptop Stand', image: 'https://images.unsplash.com/photo-1618384887929-16ec33fab9ef?w=80', visits: 940, ctr: 2.9, orders: 8 },
+    ]
+  } }) %>
+</div>
+
 <div class="mt-6 rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
   <div class="mb-5 flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
     <div>
@@ -74,7 +114,6 @@
   </div>
 </div>
 
-<!-- Recent orders + inventory alerts -->
 <div class="mt-6 grid gap-6 xl:grid-cols-3">
   <div class="xl:col-span-2 rounded-xl border border-slate-200 bg-white shadow-sm">
     <div class="flex items-center justify-between border-b border-slate-100 p-5">

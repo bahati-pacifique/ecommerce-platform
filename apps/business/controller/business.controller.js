@@ -19,6 +19,14 @@ const authDomain = `${sslUrlPrefix}auth.${process.env.DOMAIN}${portSuffix}?r=${d
 const protocal = sslUrlPrefix;
 const domainName = `${process.env.DOMAIN}${portSuffix}`;
 
+async function updateStoreLastActive(id) {
+    try {
+        await StoreService.setStoreLastActive(id);
+    } catch (error) {
+        console.log("setting store active status", error)
+    }
+}
+
 async function businessHomePage(req, res) {
     const user = req.user || null;
 
@@ -57,13 +65,13 @@ async function renderVendorCreation(req, res) {
         })
     }
 
-    return res.render('business-registration', {layout: false, message: "Join hundreds of happy vendors", domain, domainName, protocal, authDomain, ...(user && { user }) });
+    return res.render('business-registration', { layout: false, message: "Join hundreds of happy vendors", domain, domainName, protocal, authDomain, ...(user && { user }) });
 }
 
 async function renderApplicationConfirmation(req, res) {
     const user = req.user || null;
 
-    return res.render('business-application-confirmation', {layout: false, user});
+    return res.render('business-application-confirmation', { layout: false, user });
 }
 
 function redirectedToDashboard(req, res) {
@@ -165,6 +173,74 @@ async function renderTerms(req, res) {
     return res.render('store-terms', { layout: false, user, protocal, domainName });
 }
 
+async function renderStoreDashboardWelcome(req, res) {
+    const user = req.user;
+    const storeId = req.params.storeId;
+    try {
+
+        const vendorStore = await StoreService.getVendorStore(storeId, user.vendor?.id || null);
+
+        if (!vendorStore) {
+            return res.render('store-no-access', {
+                layout: false,
+                message: `<span class="text-black/70">Oops!</span> <span class="text-brand">${user.username}</span>, we're unable to get you authenticated to this Store.`,
+                details: `<h1 class="text-left text-ink-700 text-lg">It's seems like:</h1><p class="text-sm sm:text-base text-left text-ink-500 leading-relaxed"><br>● This store does not belongs to you, <br>● This store have been disabled or does not exist. <br><br><i>Please contact our support team for clarification</i></p>`,
+                code: 'STORE_NOT_FOUND',
+                protocal,
+                domainName
+            });
+        }
+        res.locals.layout = 'store-center';
+        updateStoreLastActive(vendorStore.id);
+        return res.render('store-partials/welcome', { layout: 'store-center', store: vendorStore, user, protocal, domainName, title: 'dashboard-welcome' });
+    } catch (error) {
+        console.log(error);
+        return res.render('store-no-access', {
+            layout: false,
+            message: `<span class="text-black/70">Oops!</span> <span class="text-brand">${user.username}</span>, we're unable to get you authenticated to this Store.`,
+            details: `<h1 class="text-left text-ink-700 text-lg">It's seems like:</h1><p class="text-sm sm:text-base text-left text-ink-500 leading-relaxed"><br>● This store does not belongs to you, <br>● This store have been disabled or does not exist. <br><br><i>Please contact our support team for clarification</i></p>`,
+            code: error.message.toUpperCase(),
+            protocal,
+            domainName
+        });
+
+    }
+}
+
+async function renderStoreInventory(req, res) {
+    const user = req.user;
+    const storeId = req.params.storeId;
+    try {
+
+        const vendorStore = await StoreService.getVendorStore(storeId, user.vendor?.id || null);
+
+        if (!vendorStore) {
+            return res.render('store-no-access', {
+                layout: false,
+                message: `<span class="text-black/70">Oops!</span> <span class="text-brand">${user.username}</span>, we're unable to get you authenticated to this Store.`,
+                details: `<h1 class="text-left text-ink-700 text-lg">It's seems like:</h1><p class="text-sm sm:text-base text-left text-ink-500 leading-relaxed"><br>● This store does not belongs to you, <br>● This store have been disabled or does not exist. <br><br><i>Please contact our support team for clarification</i></p>`,
+                code: 'STORE_NOT_FOUND',
+                protocal,
+                domainName
+            });
+        }
+        res.locals.layout = 'store-center';
+        updateStoreLastActive(vendorStore.id);
+        return res.render('store-partials/inventory', { layout: 'store-center', store: vendorStore, user, protocal, domainName, title: 'inventory' });
+    } catch (error) {
+        console.log(error);
+        return res.render('store-no-access', {
+            layout: false,
+            message: `<span class="text-black/70">Oops!</span> <span class="text-brand">${user.username}</span>, we're unable to get you authenticated to this Store.`,
+            details: `<h1 class="text-left text-ink-700 text-lg">It's seems like:</h1><p class="text-sm sm:text-base text-left text-ink-500 leading-relaxed"><br>● This store does not belongs to you, <br>● This store have been disabled or does not exist. <br><br><i>Please contact our support team for clarification</i></p>`,
+            code: error.message.toUpperCase(),
+            protocal,
+            domainName
+        });
+
+    }
+}
+
 async function renderStoreDashboard(req, res) {
     const user = req.user;
     const storeId = req.params.storeId;
@@ -185,8 +261,45 @@ async function renderStoreDashboard(req, res) {
         }
 
         res.locals.layout = 'store-center';
+        updateStoreLastActive(vendorStore.id);
+        return res.render('store-partials/dashboard', { layout: 'store-center', store: vendorStore, user, protocal, domainName, title: 'home' });
+    } catch (error) {
+        console.log(error);
+        return res.render('store-no-access', {
+            layout: false,
+            message: `<span class="text-black/70">Oops!</span> <span class="text-brand">${user.username}</span>, we're unable to get you authenticated to this Store.`,
+            details: `<h1 class="text-left text-ink-700 text-lg">It's seems like:</h1><p class="text-sm sm:text-base text-left text-ink-500 leading-relaxed"><br>● This store does not belongs to you, <br>● This store have been disabled or does not exist. <br><br><i>Please contact our support team for clarification</i></p>`,
+            code: error.message.toUpperCase(),
+            protocal,
+            domainName
+        });
 
-        return res.render('partials/dashboard', { layout: 'store-center', store: vendorStore, user, protocal, domainName, title: 'home' });
+    }
+}
+
+async function renderStoreListing(req, res) {
+    const user = req.user;
+    const storeId = req.params.storeId;
+
+    try {
+
+        const vendorStore = await StoreService.getVendorStore(storeId, user.vendor?.id || null);
+
+        if (!vendorStore) {
+            return res.render('store-no-access', {
+                layout: false,
+                message: `<span class="text-black/70">Oops!</span> <span class="text-brand">${user.username}</span>, we're unable to get you authenticated to this Store.`,
+                details: `<h1 class="text-left text-ink-700 text-lg">It's seems like:</h1><p class="text-sm sm:text-base text-left text-ink-500 leading-relaxed"><br>● This store does not belongs to you, <br>● This store have been disabled or does not exist. <br><br><i>Please contact our support team for clarification</i></p>`,
+                code: 'STORE_NOT_FOUND',
+                protocal,
+                domainName
+            });
+        }
+
+        //Update store last active
+        res.locals.layout = 'store-center';
+        updateStoreLastActive(vendorStore.id);
+        return res.render('store-partials/listings', { layout: 'store-center', store: vendorStore, user, protocal, domainName, title: 'listings' });
     } catch (error) {
         console.log(error);
         return res.render('store-no-access', {
@@ -202,55 +315,164 @@ async function renderStoreDashboard(req, res) {
 }
 
 async function renderStoreOrders(req, res) {
-  const user = req.user;
-  const storeId = req.params.storeId;
+    const user = req.user;
+    const storeId = req.params.storeId;
 
-  try {
-    const vendorStore = await StoreService.getVendorStore(
-      storeId,
-      user.vendor?.id || null
-    );
+    try {
+        const vendorStore = await StoreService.getVendorStore(
+            storeId,
+            user.vendor?.id || null
+        );
 
-    if (!vendorStore) {
-      return res.render('store-no-access', {
-        layout: false,
-        message: `<span class="text-black/70">Oops!</span> <span class="text-brand">${user.username}</span>, we're unable to get you authenticated to this Store.`,
-        details: `<h1 class="text-left text-ink-700 text-lg">It seems like:</h1>
+        if (!vendorStore) {
+            return res.render('store-no-access', {
+                layout: false,
+                message: `<span class="text-black/70">Oops!</span> <span class="text-brand">${user.username}</span>, we're unable to get you authenticated to this Store.`,
+                details: `<h1 class="text-left text-ink-700 text-lg">It seems like:</h1>
           <p class="text-sm sm:text-base text-left text-ink-500 leading-relaxed">
             <br>● This store does not belong to you, <br>
             ● This store has been disabled or does not exist. <br><br>
             <i>Please contact our support team for clarification</i>
           </p>`,
-        code: 'STORE_NOT_FOUND',
-        protocal,
-        domainName,
-      });
-    }
+                code: 'STORE_NOT_FOUND',
+                protocal,
+                domainName,
+            });
+        }
 
-    return res.render('partials/orders', {
-      title: 'Orders',
-      store: vendorStore,
-      user,
-      protocal,
-      domainName,
-    });
-  } catch (error) {
-    console.error(error);
+        return res.render('store-partials/orders', {
+            layout: 'store-center',
+            title: 'Orders',
+            store: vendorStore,
+            user,
+            protocal,
+            domainName,
+        });
+    } catch (error) {
+        console.error(error);
 
-    return res.render('store-no-access', {
-      layout: false,
-      message: `<span class="text-black/70">Oops!</span> <span class="text-brand">${user.username}</span>, we're unable to get you authenticated to this Store.`,
-      details: `<h1 class="text-left text-ink-700 text-lg">It seems like:</h1>
+        return res.render('store-no-access', {
+            layout: false,
+            message: `<span class="text-black/70">Oops!</span> <span class="text-brand">${user.username}</span>, we're unable to get you authenticated to this Store.`,
+            details: `<h1 class="text-left text-ink-700 text-lg">It seems like:</h1>
         <p class="text-sm sm:text-base text-left text-ink-500 leading-relaxed">
           <br>● This store does not belong to you, <br>
           ● This store has been disabled or does not exist. <br><br>
           <i>Please contact our support team for clarification</i>
         </p>`,
-      code: (error.message || 'UNKNOWN_ERROR').toUpperCase(),
-      protocal,
-      domainName
-    });
-  }
+            code: (error.message || 'UNKNOWN_ERROR').toUpperCase(),
+            protocal,
+            domainName
+        });
+    }
+}
+
+async function renderStoreProducts(req, res) {
+    const user = req.user;
+    const storeId = req.params.storeId;
+
+    try {
+        const vendorStore = await StoreService.getVendorStore(
+            storeId,
+            user.vendor?.id || null
+        );
+
+        if (!vendorStore) {
+            return res.render('store-no-access', {
+                layout: false,
+                message: `<span class="text-black/70">Oops!</span> <span class="text-brand">${user.username}</span>, we're unable to get you authenticated to this Store.`,
+                details: `<h1 class="text-left text-ink-700 text-lg">It seems like:</h1>
+                            <p class="text-sm sm:text-base text-left text-ink-500 leading-relaxed">
+                                <br>● This store does not belong to you, <br>
+                                ● This store has been disabled or does not exist. <br><br>
+                                <i>Please contact our support team for clarification</i>
+                            </p>
+                `,
+                code: 'STORE_NOT_FOUND',
+                protocal,
+                domainName,
+            });
+        }
+        updateStoreLastActive(vendorStore.id);
+        return res.render('store-partials/products', {
+            layout: 'store-center',
+            title: 'Products',
+            store: vendorStore,
+            user,
+            protocal,
+            domainName,
+        });
+    } catch (error) {
+        console.error(error);
+
+        return res.render('store-no-access', {
+            layout: false,
+            message: `<span class="text-black/70">Oops!</span> <span class="text-brand">${user.username}</span>, we're unable to get you authenticated to this Store.`,
+            details: `<h1 class="text-left text-ink-700 text-lg">It seems like:</h1>
+        <p class="text-sm sm:text-base text-left text-ink-500 leading-relaxed">
+          <br>● This store does not belong to you, <br>
+          ● This store has been disabled or does not exist. <br><br>
+          <i>Please contact our support team for clarification</i>
+        </p>`,
+            code: (error.message || 'UNKNOWN_ERROR').toUpperCase(),
+            protocal,
+            domainName
+        });
+    }
+}
+
+async function renderStoreFollowers(req, res) {
+    const user = req.user;
+    const storeId = req.params.storeId;
+
+    try {
+        const vendorStore = await StoreService.getVendorStore(
+            storeId,
+            user.vendor?.id || null
+        );
+
+        if (!vendorStore) {
+            return res.render('store-no-access', {
+                layout: false,
+                message: `<span class="text-black/70">Oops!</span> <span class="text-brand">${user.username}</span>, we're unable to get you authenticated to this Store.`,
+                details: `<h1 class="text-left text-ink-700 text-lg">It seems like:</h1>
+                            <p class="text-sm sm:text-base text-left text-ink-500 leading-relaxed">
+                                <br>● This store does not belong to you, <br>
+                                ● This store has been disabled or does not exist. <br><br>
+                                <i>Please contact our support team for clarification</i>
+                            </p>
+                `,
+                code: 'STORE_NOT_FOUND',
+                protocal,
+                domainName,
+            });
+        }
+
+        return res.render('store-partials/followers', {
+            layout: 'store-center',
+            title: 'Followers',
+            store: vendorStore,
+            user,
+            protocal,
+            domainName,
+        });
+    } catch (error) {
+        console.error(error);
+
+        return res.render('store-no-access', {
+            layout: false,
+            message: `<span class="text-black/70">Oops!</span> <span class="text-brand">${user.username}</span>, we're unable to get you authenticated to this Store.`,
+            details: `<h1 class="text-left text-ink-700 text-lg">It seems like:</h1>
+        <p class="text-sm sm:text-base text-left text-ink-500 leading-relaxed">
+          <br>● This store does not belong to you, <br>
+          ● This store has been disabled or does not exist. <br><br>
+          <i>Please contact our support team for clarification</i>
+        </p>`,
+            code: (error.message || 'UNKNOWN_ERROR').toUpperCase(),
+            protocal,
+            domainName
+        });
+    }
 }
 
 async function renderInvontoryForm(req, res) {
@@ -266,6 +488,24 @@ async function renderInvontoryForm(req, res) {
     const { stores } = await StoreService.getPaginatedStoresByVendorId(user.vendor.id);
 
     return res.render('inventory-form', { layout: false, user, protocal, domainName, stores });
+}
+
+async function renderMessages(req, res) {
+    //const vendorId = req.params.vendor;
+
+    const user = req.user;
+
+    const conversations = [];
+    return res.render('messaging', { layout: false, user, conversations });
+}
+
+async function renderNotifications(req, res) {
+    //const vendorId = req.params.vendor;
+
+    const user = req.user;
+
+    const conversations = [];
+    return res.render('notification-center', { layout: false, user, conversations });
 }
 
 async function getVendorOrderDashboard(req, res) {
@@ -323,18 +563,18 @@ async function getVendorOverviewData(req, res) {
         return res.json(result);
     } catch (error) {
         console.log('getVendorOrderDashboard():', error);
-        res.status(500).json({ message: !error.code ? error.message : 'Failed — Internal Server Error' });
+        return res.status(500).json({ message: !error.code ? error.message : 'Failed — Internal Server Error' });
     }
 }
 
 async function renderProductCataloging(req, res) {
     const user = req.user;
-    res.render('product-cataloging', { layout: false, user, protocal, domainName });
+    return res.render('product-cataloging', { layout: false, user, protocal, domainName });
 }
 
 async function renderProductCatalog(req, res) {
     const user = req.user;
-    res.render('product-catalog', { user, protocal, domainName, type: 'vendor' });
+    return res.render('product-catalog', { layout: false, user, protocal, domainName, type: 'vendor' });
 }
 
 async function renderMarketplacePolicy(req, res) {
@@ -917,8 +1157,17 @@ module.exports = {
     renderTerms,
     renderAttributeRegistryTerms,
     redirectedToDashboard,
+
     renderStoreDashboard,
     renderStoreOrders,
+    renderStoreDashboardWelcome,
+    renderStoreInventory,
+    renderStoreListing,
+    renderStoreProducts,
+    renderStoreFollowers,
+    renderMessages,
+    renderNotifications,
+
     renderInvontoryForm,
     getVendorOrderDashboard,
     getAnalyticVendorDashboardData,
