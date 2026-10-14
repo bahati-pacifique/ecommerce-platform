@@ -1145,6 +1145,18 @@ async function activateProduct(req, res) {
     }
 }
 
+async function getStoreDashboardAnalytics(req, res) {
+    try {
+        const storeId = req.params.storeId;
+        const { period } = req.query;
+        const result = await StoreService.getStoreDashboardAnalytics(storeId, period);
+        return res.json(result)
+    } catch (error) {
+        console.log('getStoreDashboardAnalytics()', error);
+        return res.status(500).json({ message: 'Unable to get Dashboard data — Internal Error' })
+    }
+}
+
 
 module.exports = {
     businessHomePage,
@@ -1167,6 +1179,8 @@ module.exports = {
     renderStoreFollowers,
     renderMessages,
     renderNotifications,
+
+    getStoreDashboardAnalytics,
 
     renderInvontoryForm,
     getVendorOrderDashboard,

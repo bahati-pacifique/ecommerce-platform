@@ -484,6 +484,10 @@ class StoreService {
     static async setStoreLastActive(id) {
         return StoreModel.setLastActive(id);
     }
+
+    static async getStoreDashboardAnalytics(storeId, period){
+        return await StoreModel.getStoreDashboardAnalytics(storeId, period);
+    }
 }
 
 module.exports = StoreService;

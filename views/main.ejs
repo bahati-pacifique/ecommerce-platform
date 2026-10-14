@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <%- include('partials/main/head') %>
+</head>
+
+<body class="bg-bg-soft font-sans text-gray-900">
+
+  <%- include('partials/main/header') %>
+  <%- include('partials/main/nav-desktop') %>
+  <%- include('partials/main/nav-mobile') %>
+
+  <main>
+    <%- body %>
+  </main>
+
+  <%- include('partials/main/footer') %>
+
+  <!-- Libraries (once, globally) -->
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+  <!-- Global behavior (cart, menu, smooth scroll, etc.) -->
+  <script src="/scripts/main/app.js"></script>
+
+  <!-- Per-page scripts (only loaded if the page defines `pageScripts`) -->
+  <% if (typeof pageScripts !== 'undefined') { %>
+  <% pageScripts.forEach(src => { %>
+  <script src="<%= src %>"></script>
+  <% }) %>
+  <% } %>
+
+  <%- include('partials/main/notice-modal') %>
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <script src="/scripts/main/app.js"></script>
+  <% if (typeof pageScripts !== 'undefined' && Array.isArray(pageScripts)) { %>
+  <% pageScripts.forEach(src => { %><script src="<%= src %>" defer></script><% }) %>
+  <% } %>
+</body>
+
+</html>

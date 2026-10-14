@@ -1,0 +1,12 @@
+<a href="/category/<%= category.slug %>"
+   class="category-card group overflow-hidden rounded-xl border border-gray-200 bg-white transition duration-200 hover:-translate-y-0.5 hover:border-gray-300 hover:shadow-md">
+  <div class="relative aspect-square overflow-hidden">
+    <img src="<%= category.image %>" alt="<%= category.name %>"
+         class="category-card-img h-full w-full object-cover" loading="lazy">
+    <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+  </div>
+  <div class="p-4 sm:p-5">
+    <h3 class="text-sm font-bold text-gray-900"><%= category.name %></h3>
+    <p class="mt-1 text-xs text-gray-500"><%= category.subtitle %></p>
+  </div>
+</a>

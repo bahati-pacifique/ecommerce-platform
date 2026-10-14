@@ -106,6 +106,16 @@
       font-weight: 600;
     }
 
+    .btn-link {
+      color: var(--color-brand) !important;
+      border: 1px solid var(--color-brand) !important;
+    }
+
+    .btn-link:hover {
+      color: var(--color-brand-dark);
+      border: 1px solid var(--color-brand-dark) !important;
+    }
+
     @media print {
 
       header,
@@ -143,9 +153,8 @@
           <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
           Dashboard
         </a>
-        <a href="<%= locals.protocal %>admin.<%= locals.domainName %>/dashboard" class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-brand text-white text-xs font-semibold hover:bg-brand-dark transition">
-          <i data-lucide="shield-cog-corner" class="w-4 h-4"></i>
-          Admin Dashboard
+        <a href="<%= locals.protocal %><%= locals.domainName %>/faqs" target="_blank" class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-brand text-white text-xs font-semibold hover:bg-brand-dark transition">
+          FAQs
         </a>
       </nav>
     </div>
@@ -461,6 +470,7 @@
         </p>
       </section>
 
+
       <section id="contact" class="mt-10">
         <h2 class="text-xl font-bold text-ink-900 mb-3">18. Contact</h2>
         <p>Questions about these Terms may be sent to:</p>
@@ -479,6 +489,19 @@
         </p>
       </section>
 
+      <%if (!locals.user?.vendor){%>
+      <section id="register" class="mt-10">
+        <div class=" flex flex-row items-center gap-3 w-full p-2">
+          <a href="<%= locals.protocal %>business.<%= locals.domainName %>/register" class="ml-auto inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-brand hover:bg-brand-dark transition">
+            <span class="text-white text-sm font-semibold">Register Now</span>
+          </a>
+          OR
+          <a href="<%= locals.protocal %>auth.<%= locals.domainName %>?r=<%= locals.protocal %>business.<%= locals.domainName %>/dashboard" class="inline-flex items-center gap-1.5 px-3 py-2 m-2 rounded-xl transition btn-link">
+            Sign in to Dashboard
+          </a>
+        </div>
+      </section>
+      <%}%>
     </article>
   </div>
 

@@ -27,6 +27,8 @@ router.get('/stores/:storeId/dashboard/listings', business, businessController.r
 router.get('/stores/:storeId/dashboard/products', business, businessController.renderStoreProducts);
 router.get('/stores/:storeId/dashboard/followers', business, businessController.renderStoreFollowers);
 
+router.get('/stores/:storeId/data/analytics', businessController.getStoreDashboardAnalytics);
+
 // router.get('/stores/:vendorId/:storeId', business, businessController.renderVendorStorePage);
 router.get('/register', vendorBusinessRegister, businessController.renderVendorCreation);
 router.get('/pricing', businessController.businessVendorPricing);

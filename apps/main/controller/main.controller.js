@@ -5,6 +5,16 @@ const { logout } = require('../../../src/services/auth.services');
 const { clearAuthentication, acceptsHtml } = require('../../../util/helpers');
 const authServices = require('../../../src/services/auth.services');
 
+const {
+    navLinks,
+    heroSlides,
+    categories,
+    featuredProducts,
+    dealProducts,
+    brands,
+    benefits
+} = require('../../../src/configs/mockups-data');
+
 const isProduction = process.env.NODE_ENV === 'production';
 
 const sslUrlPrefix = isProduction ? 'https://' : 'http://';
@@ -30,7 +40,7 @@ function renderLaunchPage(req, res) {
     const user = req.user;
 
     if (req.accepts('html')) {
-        return res.render('maintenance-mode', { authDOMAIN, user })
+        return res.render('maintenance-mode', { user, protocal, domain, layout: false })
     }
 
     if (req.accepts('json')) {
@@ -40,14 +50,33 @@ function renderLaunchPage(req, res) {
     }
 }
 
+async function renderMain(req, res) {
+    return res.render('partials/main/home', {
+        layout: 'main',
+        title: 'COCOCE — Technology for the Way You Live',
+        description: 'Shop laptops, computers, gaming products, accessories and more at COCOCE.',
+        navLinks,
+        cartCount: 0,
+        heroSlides,
+        categories,
+        featuredProducts,
+        dealProducts,
+        brands,
+        benefits,
+        pageScripts: ['/scripts/main/hero.js', '/scripts/main/products.js', '/scripts/main/deals.js'],
+        protocal,
+        domainName
+    });
+}
+
 function renderCookieTerms(req, res) {
-    res.render('cookie-terms', { protocal, domainName });
+    res.render('cookie-terms', { layout: false, protocal, domainName });
 }
 
 function renderFaqs(req, res) {
     const user = req.user ?? null;
 
-    return res.render('faqs', { user, protocal, domainName });
+    return res.render('faqs', { layout: false, user, protocal, domainName });
 }
 
 const uploadProductImage = async (req, res) => {
@@ -106,6 +135,7 @@ const signout = async (req, res) => {
 module.exports = {
     renderLaunchPage,
     renderCookieTerms,
+    renderMain,
     renderFaqs,
     uploadProductImage,
     signout

@@ -1,0 +1,87 @@
+.scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+    display: none;
+}
+
+.hero-slide {
+    transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+.product-card,
+.deal-card {
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.product-card:hover,
+.deal-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.08);
+}
+
+.hero-dot {
+    transition: all 0.2s ease;
+}
+
+.hero-dot.active {
+    background-color: #ED1B24;
+    width: 1.5rem;
+}
+
+.line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.star-filled {
+    color: #FBBF24;
+}
+
+.star-empty {
+    color: #D1D5DB;
+}
+
+.hero-gradient-bg {
+    background: linear-gradient(135deg, #A80F16 0%, #C9171F 25%, #ED1B24 50%, #C9171F 75%, #A80F16 100%);
+    background-size: 200% 200%;
+    animation: gradientShift 8s ease infinite;
+}
+
+@keyframes gradientShift {
+    0% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+.hero-pattern-overlay {
+    background-image:
+        radial-gradient(circle at 20% 80%, rgba(255, 255, 255, 0.08) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.06) 0%, transparent 50%),
+        radial-gradient(circle at 40% 40%, rgba(255, 255, 255, 0.04) 0%, transparent 50%);
+}
+
+.category-card-img {
+    transition: transform 0.3s ease, filter 0.3s ease;
+}
+
+.category-card:hover .category-card-img {
+    transform: scale(1.05);
+    filter: brightness(1.05);
+}
+
+.w-img {
+    filter: brightness(0) invert(1);
+}

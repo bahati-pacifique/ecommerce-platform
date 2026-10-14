@@ -1,0 +1,16 @@
+<div id="mobile-menu" class="hidden border-b border-gray-200 bg-white md:hidden">
+  <nav class="mx-auto max-w-cococe px-4 py-4">
+    <p class="mb-3 text-xs font-semibold uppercase tracking-wider text-gray-500">Shop</p>
+    <div class="grid grid-cols-2 gap-2">
+      <% navLinks.forEach(link => { %>
+        <a href="<%= link.href %>"
+           class="rounded-lg px-4 py-3 text-sm font-medium transition
+                  <%= link.active
+                        ? 'bg-brand-light font-semibold text-brand hover:bg-brand-light/80'
+                        : 'bg-gray-50 hover:bg-brand-light hover:text-brand' %>">
+          <%= link.label %>
+        </a>
+      <% }) %>
+    </div>
+  </nav>
+</div>
