@@ -4640,6 +4640,11 @@
       width: calc(var(--spacing) * 80);
     }
   }
+  .sm\:w-\[240px\] {
+    @media (width >= 40rem) {
+      width: 240px;
+    }
+  }
   .sm\:w-\[calc\(100\%-32px\)\] {
     @media (width >= 40rem) {
       width: calc(100% - 32px);
@@ -4658,6 +4663,26 @@
   .sm\:min-w-\[300px\] {
     @media (width >= 40rem) {
       min-width: 300px;
+    }
+  }
+  .sm\:shrink-0 {
+    @media (width >= 40rem) {
+      flex-shrink: 0;
+    }
+  }
+  .sm\:snap-x {
+    @media (width >= 40rem) {
+      scroll-snap-type: x var(--tw-scroll-snap-strictness);
+    }
+  }
+  .sm\:snap-mandatory {
+    @media (width >= 40rem) {
+      --tw-scroll-snap-strictness: mandatory;
+    }
+  }
+  .sm\:snap-start {
+    @media (width >= 40rem) {
+      scroll-snap-align: start;
     }
   }
   .sm\:grid-cols-2 {
@@ -4723,6 +4748,11 @@
   .sm\:gap-\[18px\] {
     @media (width >= 40rem) {
       gap: 18px;
+    }
+  }
+  .sm\:overflow-x-auto {
+    @media (width >= 40rem) {
+      overflow-x: auto;
     }
   }
   .sm\:rounded-\[36px\] {
@@ -4833,6 +4863,11 @@
   .sm\:pt-12 {
     @media (width >= 40rem) {
       padding-top: calc(var(--spacing) * 12);
+    }
+  }
+  .sm\:pb-4 {
+    @media (width >= 40rem) {
+      padding-bottom: calc(var(--spacing) * 4);
     }
   }
   .sm\:pb-10 {

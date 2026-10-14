@@ -1,26 +1,43 @@
-// public/js/app.js
+$(function () {
 
-// ── Global behavior (runs on every page) ─────────────────────
-(function () {
-  // Mobile menu toggle
-  $('#mobile-menu-button').on('click', function () {
-    const expanded = $(this).attr('aria-expanded') === 'true';
-    $(this).attr('aria-expanded', !expanded);
-    $('#mobile-menu').toggleClass('hidden');
+  // ── Mobile menu toggle ─────────────────────────────────────
+  const $menuBtn = $('#mobile-menu-button');
+  const $menu    = $('#mobile-menu');
+
+  $menuBtn.on('click', function () {
+    const isOpen = $(this).attr('aria-expanded') === 'true';
+    $(this).attr('aria-expanded', String(!isOpen));
+    $menu.toggleClass('hidden');
   });
 
-  // Cart count (delegated)
+  // Auto-close when a link inside the mobile menu is tapped
+  $menu.on('click', 'a', function () {
+    $menu.addClass('hidden');
+    $menuBtn.attr('aria-expanded', 'false');
+  });
+
+  // Close on Escape (nice touch for accessibility)
+  $(document).on('keydown', function (e) {
+    if (e.key === 'Escape' && $menuBtn.attr('aria-expanded') === 'true') {
+      $menu.addClass('hidden');
+      $menuBtn.attr('aria-expanded', 'false');
+    }
+  });
+
+  // ── Cart count (delegated) ─────────────────────────────────
   let cart = parseInt($('#cart-count').text(), 10) || 0;
+
   $(document).on('click', '.add-to-cart', function () {
     cart++;
     $('#cart-count').text(cart);
-    const $btn = $(this);
+
+    const $btn     = $(this);
     const original = $btn.text();
     $btn.text('Added ✓').prop('disabled', true);
     setTimeout(() => $btn.text(original).prop('disabled', false), 1000);
   });
 
-  // Newsletter (demo)
+  // ── Newsletter (demo) ──────────────────────────────────────
   $('#newsletter-form').on('submit', function (e) {
     e.preventDefault();
     const email = $('#newsletter-email').val().trim();
@@ -30,22 +47,25 @@
     }
   });
 
-  // Smooth scroll for internal anchors
+  // ── Smooth scroll for internal anchors ─────────────────────
   $('a[href^="#"]').on('click', function (e) {
     const href = this.getAttribute('href');
-    if (href === '#') return;               // skip bare "#"
+    if (href === '#') return;
     const target = $(href);
     if (target.length) {
       e.preventDefault();
       $('html, body').animate({ scrollTop: target.offset().top - 80 }, 500);
     }
   });
-})();
 
-// ── Notice modal (runs only if the modal is present) ─────────
-(function () {
+});
+
+// ══════════════════════════════════════════════════════════════
+//  NOTICE MODAL (only if the modal is in the DOM)
+// ══════════════════════════════════════════════════════════════
+$(function () {
   const modal = document.getElementById('notice-modal');
-  if (!modal) return;                       // ✅ safe now — separate IIFE
+  if (!modal) return;
 
   const backdrop = document.getElementById('notice-modal-backdrop');
   const dismiss  = document.getElementById('notice-modal-dismiss');
@@ -91,9 +111,6 @@
   backdrop?.addEventListener('click', close);
   dismiss?.addEventListener('click', close);
 
-  // Open on load (with a tiny delay so the page paints first)
+  // Open on next paint so the page renders first
   window.requestAnimationFrame(open);
-  
-})();
-
-console.log('APP')
+});

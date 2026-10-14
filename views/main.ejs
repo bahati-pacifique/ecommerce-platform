@@ -31,8 +31,6 @@
   <% } %>
 
   <%- include('partials/main/notice-modal') %>
-  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-  <script src="/scripts/main/app.js"></script>
   <% if (typeof pageScripts !== 'undefined' && Array.isArray(pageScripts)) { %>
   <% pageScripts.forEach(src => { %><script src="<%= src %>" defer></script><% }) %>
   <% } %>
