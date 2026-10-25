@@ -217,7 +217,7 @@ async function login(req, res) {
 
     } catch (error) {
         console.log('auth.controller login()', error);
-        return deny401(req, res, { message: error.message || 'Something Went Wrong' })
+        return deny401(req, res, { message: 'We\'re unable to get you logged in — Please try again' })
     }
 }
 

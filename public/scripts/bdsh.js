@@ -274,10 +274,7 @@ async function fetchAndFillStore() {
         withCredentials: true
     })
         .then((response) => {
-            console.log(response.data)
             const stores = response.data.stores || [];
-
-            console.log(stores)
 
             $('#storeContainer').html(stores.map((store) =>
                 `

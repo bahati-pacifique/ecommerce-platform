@@ -139,7 +139,6 @@ body {
     }
 }
 
-/* Stat cards */
 .stat-card {
     transition: all 0.3s ease;
 }
@@ -149,13 +148,12 @@ body {
     box-shadow: 0 12px 40px rgba(0, 0, 0, 0.06);
 }
 
-/* Tab content */
 .tab-content {
     display: none;
     overflow: hidden;
     height: 100%;
     overflow-y: auto;
-    padding: 0.5rem 1.5rem;
+    padding: 0.5rem;
 }
 
 .tab-content.active {
