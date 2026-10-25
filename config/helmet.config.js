@@ -87,6 +87,9 @@ module.exports = {
             "connect-src": [
                 "'self'",
                 "https://cdn.cococe.rw",
+                'https://cdnjs.cloudflare.com',
+                'https://cdn.jsdelivr.net',
+                'https://unpkg.com',
                 isProduction ? domain : domainWithPort,
                 isProduction ? `${wsProtocol}://*.${DOMAIN}` : wsDomainWithPort
             ],
