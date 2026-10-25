@@ -64,29 +64,16 @@
 
         <div class="relative inline-block text-left">
 
-          <button id="dropdownButton" class="inline-flex justify-center w-full rounded-md border border-gray-300 shadow-sm px-4 py-1 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-1 focus:ring-offset-1 focus:ring-brand">
-            <span class="flex items-center gap-1">
-              <i data-lucide="user-round"></i>
-              <span class="capitalize hidden md:block"><%-locals.type%></span>
-            </span>
-            <svg class="-mr-1 ml-2 h-5 w-5" xmlns="http://w3.org" viewBox="0 0 20 20" fill="currentColor">
-              <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-            </svg>
-          </button>
-
-
-          <div id="dropdownMenu" class="hidden absolute right-0 mt-2 min-w-16 rounded-md shadow-lg bg-white focus:outline-none border border-slate-300 z-10 px-3 py-2">
-            <form action="<%=locals.protocal%>auth.<%=locals.domainName%>/signout" method="POST" class="popup-item danger">
-              <input type="hidden" value="<%=locals.protocal%>business.<%=locals.domainName%>" name="host">
-              <input type="hidden" name="userAccount" value="<=locals.user.userAccount%>">
-              <button type="submit" class="w-full flex items-center gap-3">
-                <span>
-                  Signout
-                </span>
-                <i data-lucide="LogOut" class="ml-auto"></i>
-              </button>
-            </form>
-          </div>
+          <form action="<%=locals.protocal%>auth.<%=locals.domainName%>/signout" method="POST" class="popup-item danger">
+            <input type="hidden" value="<%=locals.protocal%>business.<%=locals.domainName%>" name="host">
+            <input type="hidden" name="userAccount" value="<=locals.user.userAccount%>">
+            <button type="submit" class="inline-flex justify-center w-full rounded-md border border-gray-300 shadow-sm px-4 py-1 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-1 focus:ring-offset-1 focus:ring-brand gap-1">
+              <span>
+                Signout
+              </span>
+              <i data-lucide="arrow-right" class="ml-auto"></i>
+            </button>
+          </form>
         </div>
 
 
@@ -229,7 +216,14 @@
 
             <h3 class="mt-2 px-3 py-2 flex flex-col items-center gap-3 text-lg text-gray-500">
               Click on product catalog to view the details
-              <span class="flex items-center gap-2 text-sm"><span class="text-brand font-bold">COCOCE</span> All right reserved.</span>
+              <div class="flex items-center flex-wrap gap-2 text-sm">
+
+                <a href="/docs/catalog-terms me-1" class="text-brand gap-2 text-sm hover:underline">Catalog Terms</a>
+                —
+                <span class="text-brand font-bold">COCOCE &copy;</span> All right reserved.
+                
+              </div>
+
             </h3>
           </div>
 

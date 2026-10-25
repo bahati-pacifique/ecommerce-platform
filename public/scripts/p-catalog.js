@@ -995,21 +995,6 @@
         activateProduct(e.target);
     });
 
-
-    const button = document.getElementById('dropdownButton');
-    const menu = document.getElementById('dropdownMenu');
-
-    button.addEventListener('click', () => {
-        menu.classList.toggle('hidden');
-    });
-
-    // Optional: Close the dropdown when clicking outside
-    window.addEventListener('click', (e) => {
-        if (!button.contains(e.target) && !menu.contains(e.target)) {
-            menu.classList.add('hidden');
-        }
-    });
-
     ImageSearch.init();
     showDetailState('empty');
     loadList();
