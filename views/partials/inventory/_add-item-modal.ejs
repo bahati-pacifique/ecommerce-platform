@@ -1,0 +1,342 @@
+<div id="addItemModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+
+  <div id="addItemBackdrop" class="absolute inset-0 bg-slate-950/40 backdrop-blur-sm"></div>
+
+  <div class="relative w-full max-w-lg max-h-[90vh] flex flex-col">
+    <div class="rounded-2xl border border-slate-200 bg-white shadow-2xl overflow-hidden flex flex-col">
+
+      <div class="flex items-center justify-between border-b border-slate-100 px-5 py-4 shrink-0">
+        <div>
+          <div class="text-sm font-semibold text-slate-900">Add item</div>
+          <div class="text-xs text-slate-500">to <%= inventory.title %></div>
+        </div>
+        <button type="button" id="addItemClose" class="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100">
+          <i data-lucide="x" class="h-4 w-4"></i>
+        </button>
+      </div>
+
+      <form id="addItemForm" class="flex-1 overflow-y-auto">
+
+        <div class="p-5 space-y-5">
+
+          <div>
+            <label class="mb-2 block text-xs font-semibold text-slate-600">
+              Listing <span class="text-rose-500">*</span>
+            </label>
+
+            <div class="relative">
+              <i data-lucide="search" class="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"></i>
+              <input type="search" id="listingSearchInput" placeholder="Search your listings by title or SKU..." class="w-full rounded-lg border border-slate-200 bg-slate-50 py-2 pl-9 pr-3 text-sm outline-none focus:border-[var(--color-brand)] focus:bg-white" autocomplete="off" />
+            </div>
+
+            <input type="hidden" name="listing_id" id="selectedListingId" value="" />
+
+            <div id="listingResults" class="mt-2 max-h-56 overflow-y-auto rounded-lg border border-slate-200 bg-white hidden">
+            </div>
+
+            <div id="selectedListing" class="mt-2 hidden rounded-lg border border-emerald-200 bg-emerald-50 p-3">
+              <div class="flex items-center gap-3">
+                <img id="selectedListingImage" src="" alt="" class="h-10 w-10 rounded object-cover ring-1 ring-slate-200 hidden" />
+                <div class="min-w-0 flex-1">
+                  <div id="selectedListingTitle" class="text-sm font-semibold text-slate-900 truncate"></div>
+                  <div id="selectedListingSku" class="text-xs text-slate-500 font-mono"></div>
+                </div>
+                <button type="button" id="clearSelectedListing" class="rounded p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-700">
+                  <i data-lucide="x" class="h-3.5 w-3.5"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="mb-1.5 block text-xs font-semibold text-slate-600">
+                Quantity <span class="text-rose-500">*</span>
+              </label>
+              <input type="number" name="quantity" id="quantityInput" min="1" step="1" value="1" required class="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-[var(--color-brand)]" />
+            </div>
+
+            <div>
+              <label class="mb-1.5 block text-xs font-semibold text-slate-600">
+                Batch number <span class="text-slate-400 font-normal">(optional)</span>
+              </label>
+              <input type="text" name="batch_number" placeholder="B-2026-10" class="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-[var(--color-brand)]" />
+            </div>
+          </div>
+
+          <!-- Dates -->
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="mb-1.5 block text-xs font-semibold text-slate-600">
+                Manufactured <span class="text-slate-400 font-normal">(optional)</span>
+              </label>
+              <input type="date" name="mfg_at" class="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-[var(--color-brand)]" />
+            </div>
+
+            <div>
+              <label class="mb-1.5 block text-xs font-semibold text-slate-600">
+                Expires <span class="text-slate-400 font-normal">(optional)</span>
+              </label>
+              <input type="date" name="expires_at" class="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-[var(--color-brand)]" />
+            </div>
+          </div>
+
+          <div id="addItemError" class="hidden rounded-lg border border-rose-200 bg-rose-50 p-3 text-xs text-rose-700"></div>
+
+        </div>
+
+        <div class="flex items-center justify-end gap-2 border-t border-slate-100 bg-slate-50 px-5 py-3 shrink-0">
+          <button type="button" id="addItemCancel" class="rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">
+            Cancel
+          </button>
+          <button type="submit" id="addItemSubmit" class="inline-flex items-center gap-2 rounded-lg bg-[var(--color-brand)] px-4 py-2 text-sm font-semibold text-white hover:bg-[var(--color-brand-dark)] disabled:opacity-50">
+            <i data-lucide="plus" class="h-4 w-4"></i>
+            Add item
+          </button>
+        </div>
+
+      </form>
+
+    </div>
+  </div>
+</div>
+
+<script type="module">
+  document.addEventListener('DOMContentLoaded', () => {
+    initAddItemModal();
+  });
+
+  function initAddItemModal() {
+    const {
+      storeId,
+      inventoryId
+    } = window.__ADD_ITEM__ || {};
+    if (!storeId || !inventoryId) return;
+
+    const modal = document.getElementById('addItemModal');
+    const backdrop = document.getElementById('addItemBackdrop');
+    const openBtn = document.querySelector('[data-action="add-item"]');
+    const closeBtn = document.getElementById('addItemClose');
+    const cancelBtn = document.getElementById('addItemCancel');
+    const form = document.getElementById('addItemForm');
+    const submitBtn = document.getElementById('addItemSubmit');
+    const errorBox = document.getElementById('addItemError');
+
+    // Listing search
+    const searchInput = document.getElementById('listingSearchInput');
+    const resultsBox = document.getElementById('listingResults');
+    const hiddenInput = document.getElementById('selectedListingId');
+    const selectedPanel = document.getElementById('selectedListing');
+    const selectedTitle = document.getElementById('selectedListingTitle');
+    const selectedSku = document.getElementById('selectedListingSku');
+    const selectedImage = document.getElementById('selectedListingImage');
+    const clearBtn = document.getElementById('clearSelectedListing');
+
+    let searchTimer;
+    let searchAbort = null;
+
+    // ─── Open / close ─────────────────────────────────────────
+    function openModal() {
+      modal.classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+      setTimeout(() => searchInput?.focus(), 50);
+    }
+
+    function closeModal() {
+      modal.classList.add('hidden');
+      document.body.style.overflow = '';
+      form.reset();
+      hiddenInput.value = '';
+      resultsBox.classList.add('hidden');
+      resultsBox.innerHTML = '';
+      selectedPanel.classList.add('hidden');
+      errorBox.classList.add('hidden');
+    }
+
+    openBtn?.addEventListener('click', openModal);
+    backdrop?.addEventListener('click', closeModal);
+    closeBtn?.addEventListener('click', closeModal);
+    cancelBtn?.addEventListener('click', closeModal);
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
+        closeModal();
+      }
+    });
+
+    // ─── Listing search ───────────────────────────────────────
+    searchInput?.addEventListener('input', (e) => {
+      clearTimeout(searchTimer);
+      const q = e.target.value.trim();
+
+      if (q.length < 2) {
+        resultsBox.classList.add('hidden');
+        resultsBox.innerHTML = '';
+        return;
+      }
+
+      searchTimer = setTimeout(() => searchListings(q), 250);
+    });
+
+    async function searchListings(q) {
+      if (searchAbort) searchAbort.abort();
+      searchAbort = new AbortController();
+
+      resultsBox.innerHTML = `<div class="p-3 text-xs text-slate-400 flex items-center gap-2">
+      <i data-lucide="loader-circle" class="animate-lucide-spin w-4 h-4"></i> Searching…
+    </div>`;
+      window.lucide?.createIcons?.();
+      resultsBox.classList.remove('hidden');
+
+      try {
+
+        const response = await axios.get(`/stores/${__ADD_ITEM__.storeId}/listings/search`, {
+          params: {
+            query: q,
+            limit: 100
+          }
+        });
+
+        renderListingResults(response.data || []);
+      } catch (err) {
+
+        console.error(err);
+        resultsBox.innerHTML = `<div class="p-3 text-xs text-rose-600">${err.response?.data?.message || 'Search failed — Internal Server Error'}</div>`;
+      }
+    }
+
+    function renderListingResults(items) {
+      if (!items.length) {
+        resultsBox.innerHTML = `<div class="p-3 text-xs text-slate-400">No listings found</div>`;
+        return;
+      }
+
+      resultsBox.innerHTML = items.map(l => `
+      <button type="button"
+              class="listing-option w-full flex items-center gap-3 px-3 py-2 hover:bg-slate-50 text-left"
+              data-id="${escapeHtml(l.id)}"
+              data-title="${escapeHtml(l.title)}"
+              data-sku="${escapeHtml(l.sku || '')}"
+              data-image="${escapeHtml(l.image || '')}">
+        ${l.image_url
+          ? `<img src="http://localhost:9000/${escapeHtml(l.image_url)}" class="h-8 w-8 rounded object-cover ring-1 ring-slate-200" />`
+          : `<div class="flex h-8 w-8 items-center justify-center rounded bg-slate-100"><i data-lucide="package" class="h-3.5 w-3.5 text-slate-400"></i></div>`}
+        <div class="min-w-0 flex-1">
+          <div class="text-sm font-medium text-slate-900 truncate">${escapeHtml(l.title)}</div>
+          ${l.sku ? `<div class="text-xs text-slate-500 font-mono">${escapeHtml(l.sku)}</div>` : ''}
+        </div>
+      </button>
+    `).join('');
+
+      window.lucide?.createIcons();
+
+      resultsBox.querySelectorAll('.listing-option').forEach(btn => {
+        btn.addEventListener('click', () => {
+          selectListing({
+            id: btn.dataset.id,
+            title: btn.dataset.title,
+            sku: btn.dataset.sku,
+            image: btn.dataset.image,
+          });
+        });
+      });
+    }
+
+    function selectListing(listing) {
+      hiddenInput.value = listing.id;
+
+      selectedTitle.textContent = listing.title;
+      selectedSku.textContent = listing.sku ? `SKU: ${listing.sku}` : '';
+
+      if (listing.image) {
+        selectedImage.src = listing.image;
+        selectedImage.classList.remove('hidden');
+      } else {
+        selectedImage.classList.add('hidden');
+      }
+
+      selectedPanel.classList.remove('hidden');
+      resultsBox.classList.add('hidden');
+      searchInput.value = '';
+    }
+
+    clearBtn?.addEventListener('click', () => {
+      hiddenInput.value = '';
+      selectedPanel.classList.add('hidden');
+      searchInput.focus();
+    });
+
+    // Close results dropdown on outside click
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('#listingSearchInput') && !e.target.closest('#listingResults')) {
+        resultsBox.classList.add('hidden');
+      }
+    });
+
+    // ─── Submit ───────────────────────────────────────────────
+    form?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      errorBox.classList.add('hidden');
+
+      const listingId = hiddenInput.value;
+      if (!listingId) {
+        showError('Please select a listing.');
+        return;
+      }
+
+      const formData = new FormData(form);
+      const payload = {
+        listing_id: listingId,
+        quantity: parseInt(formData.get('quantity'), 10),
+        batch_number: formData.get('batch_number')?.toString().trim() || null,
+        mfg_at: formData.get('mfg_at')?.toString() || null,
+        expires_at: formData.get('expires_at')?.toString() || null,
+      };
+
+      console.log("Item payload: ", payload);
+
+      if (!payload.quantity || payload.quantity < 1) {
+        showError('Quantity must be at least 1.');
+        return;
+      }
+
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = `<i data-lucide="loader-2" class="h-4 w-4 animate-spin"></i> Adding…`;
+      window.lucide?.createIcons();
+
+      try {
+
+        const response = await axios.post(`/inventories/${inventoryId}/${storeId}/items`, payload, {
+          withCredentials: true
+        });
+
+        const data = response.data;
+
+        if (data.success) window.location.reload();
+        else {
+          Notification.showNotification({
+            type: 'success',
+            message: data.message || 'Listing items set'
+          })
+        }
+      } catch (err) {
+        console.error(err);
+        showError(err.response?.data?.message || err.message || 'Failed to add item. Please try again.');
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = `<i data-lucide="plus" class="h-4 w-4"></i> Add item`;
+        window.lucide?.createIcons();
+      }
+    });
+
+    function showError(message) {
+      errorBox.textContent = message;
+      errorBox.classList.remove('hidden');
+    }
+
+    function escapeHtml(str) {
+      const div = document.createElement('div');
+      div.textContent = str ?? '';
+      return div.innerHTML;
+    }
+  }
+</script>

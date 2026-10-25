@@ -1,8 +1,5 @@
 const { toast, openOrderDrawer } = window.__shell;
 
-// ─────────────────────────────────────────────────────────────
-// Chart range buttons
-// ─────────────────────────────────────────────────────────────
 document.querySelectorAll('.chart-btn').forEach(button => {
     button.addEventListener('click', () => {
         document.querySelectorAll('.chart-btn').forEach(b => {
@@ -18,9 +15,6 @@ document.querySelectorAll('.chart-btn').forEach(button => {
     });
 });
 
-// ─────────────────────────────────────────────────────────────
-// Header buttons
-// ─────────────────────────────────────────────────────────────
 document.getElementById('viewStoreButton')?.addEventListener('click', () => {
     toast('Storefront preview opened');
 });
@@ -33,12 +27,4 @@ document.getElementById('dateRange')?.addEventListener('change', (e) => {
     toast(`Date range: ${e.target.value}`);
 });
 
-// ─────────────────────────────────────────────────────────────
-// Order rows — open drawer (delegated, so still works after re-renders)
-// ─────────────────────────────────────────────────────────────
-// (Already handled by shell.js via [data-action="open-order"])
-
-// ─────────────────────────────────────────────────────────────
-// Icons
-// ─────────────────────────────────────────────────────────────
 window.lucide?.createIcons();

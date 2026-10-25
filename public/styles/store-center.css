@@ -1,0 +1,79 @@
+:root {
+    --sidebar-width: 288px;
+    --color-brand: #ED1B24;
+    --color-brand-dark: #C9171F;
+    --color-brand-light: #FEE2E3;
+    --color-brand-ultralight: #FFF5F5;
+}
+
+html,
+body {
+    margin: 0;
+    min-height: 100%;
+    font-family: 'Inter', system-ui, sans-serif;
+}
+
+#sidebar {
+    width: var(--sidebar-width);
+    overflow-x: hidden;
+}
+
+.sidebar-collapsed {
+    --sidebar-width: 76px;
+}
+
+.sidebar-collapsed .nav-label,
+.sidebar-collapsed .section-label,
+.sidebar-collapsed .store-details,
+.sidebar-collapsed .account-details {
+    display: none;
+}
+
+.sidebar-collapsed .nav-item {
+    justify-content: center;
+}
+
+.sidebar-collapsed .store-switcher {
+    padding: 10px;
+}
+
+.sidebar-collapsed .store-switcher>div:last-child {
+    display: none;
+}
+
+.nav-item.active {
+    background: var(--color-brand-ultralight);
+    color: var(--color-brand-dark);
+    font-weight: 600;
+}
+
+.profile-menu {
+    transform-origin: top right;
+    z-index: 60;
+    transition: opacity .15s ease, transform .15s ease;
+}
+
+.profile-menu.open {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    pointer-events: auto;
+}
+
+.profile-menu.closed {
+    opacity: 0;
+    transform: translateY(4px) scale(.98);
+    pointer-events: none;
+}
+
+.chart-grid {
+    background-image: linear-gradient(to right, #e5e7eb 1px, transparent 1px),
+        linear-gradient(to bottom, #e5e7eb 1px, transparent 1px);
+    background-size: 12.5% 25%;
+}
+
+.line {
+    fill: none;
+    stroke-width: 3;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}

@@ -2164,12 +2164,12 @@ const Wizard = {
                   View Product
                 </a>
               ` : `
-                <a href="/products" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-brand text-white text-sm font-semibold hover:bg-brand-dark transition">
+                <a href="/products/catalog" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-brand text-white text-sm font-semibold hover:bg-brand-dark transition">
                   <i data-lucide="package" class="w-4 h-4"></i>
-                  My Products
+                  Go to Catalog
                 </a>
               `}
-              <a href="/products/new" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl border border-ink-200 bg-white text-sm font-medium text-ink-700 hover:bg-ink-50 transition">
+              <a href="/cataloging/product" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl border border-ink-200 bg-white text-sm font-medium text-ink-700 hover:bg-ink-50 transition">
                 <i data-lucide="plus" class="w-4 h-4"></i>
                 Register another
               </a>

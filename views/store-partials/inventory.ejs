@@ -1,51 +1,517 @@
-<div class="mb-6 flex flex-col md:flex-row md:items-end md:justify-between gap-4">
+<div class="mb-6 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
   <div>
     <div class="mb-1 flex items-center gap-2 text-brand">
-      <i data-lucide="shopping-bag" class="h-4 w-4"></i>
+      <i data-lucide="warehouse" class="h-4 w-4"></i>
       <span class="text-sm font-semibold"><%= store.name %></span>
     </div>
-    <h1 class="text-2xl font-bold tracking-tight">Inventories</h1>
-    <p class="mt-1 text-sm text-slate-500">Inventory overview</p>
+
+    <h1 class="text-2xl font-bold tracking-tight">Inventory Overview</h1>
+    <p class="mt-1 text-sm text-slate-500">
+      Monitor stock levels, reserved quantities, and inventory availability.
+    </p>
+  </div>
+
+  <div class="flex gap-2">
+    <button type="button" id="inventoryDataRefreshBtn" title="Refresh inventory" aria-label="Refresh inventory" class="inline-flex items-center gap-2 rounded-lg border border-slate-200
+             bg-white px-3 py-2 text-sm font-medium hover:bg-slate-50">
+      <i data-lucide="refresh-cw" class="h-4 w-4"></i>
+      <span>Refresh</span>
+    </button>
   </div>
 </div>
 
-<div class="rounded-xl border border-slate-200 bg-white shadow-sm">
-  <div class="flex flex-col md:flex-row gap-3 p-4 border-b border-slate-100">
-    <div class="relative flex-1">
-      <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400"></i>
-      <input id="ordersSearch" placeholder="Search orders by ID, customer..." class="w-full rounded-lg border border-slate-200 bg-slate-50 py-2 pl-9 pr-3 text-sm outline-none focus:border-brand focus:bg-white" />
+<div class="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+  <div class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+    <div class="flex items-center justify-between">
+      <p class="text-sm font-medium text-slate-500">Inventories</p>
+      <i data-lucide="warehouse" class="h-5 w-5 text-slate-400"></i>
     </div>
-    <select id="ordersStatus" class="rounded-lg border border-slate-200 px-3 py-2 text-sm">
-      <option value="">All statuses</option>
-      <option value="to ship">To Ship</option>
-      <option value="processing">Processing</option>
-      <option value="shipped">Shipped</option>
-      <option value="delivered">Delivered</option>
-    </select>
+    <p id="inventoryTotal" class="mt-3 text-2xl font-bold text-slate-900">—</p>
+    <p class="mt-1 text-xs text-slate-500">Matching inventories</p>
+  </div>
+
+  <div class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+    <div class="flex items-center justify-between">
+      <p class="text-sm font-medium text-slate-500">Low-stock records</p>
+      <i data-lucide="alert-triangle" class="h-5 w-5 text-amber-500"></i>
+    </div>
+    <p id="inventoryLowStock" class="mt-3 text-2xl font-bold text-amber-600">—</p>
+    <p class="mt-1 text-xs text-slate-500">Records needing attention</p>
+  </div>
+
+  <div class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+    <div class="flex items-center justify-between">
+      <p class="text-sm font-medium text-slate-500">Out-of-stock records</p>
+      <i data-lucide="package-x" class="h-5 w-5 text-rose-500"></i>
+    </div>
+    <p id="inventoryOutOfStock" class="mt-3 text-2xl font-bold text-rose-600">—</p>
+    <p class="mt-1 text-xs text-slate-500">Records with no available units</p>
+  </div>
+
+  <div class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+    <div class="flex items-center justify-between">
+      <p class="text-sm font-medium text-slate-500">Reserved units</p>
+      <i data-lucide="package-check" class="h-5 w-5 text-slate-400"></i>
+    </div>
+    <p id="inventoryReserved" class="mt-3 text-2xl font-bold text-slate-900">—</p>
+    <p class="mt-1 text-xs text-slate-500">Units reserved across inventories</p>
+  </div>
+</div>
+
+<div class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+  <div class="flex flex-col gap-3 border-b border-slate-100 p-4 lg:flex-row lg:items-center lg:justify-between">
+    <div class="relative w-full lg:max-w-md">
+      <i data-lucide="search" class="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"></i>
+      <input id="inventoryDataSearch" type="search" autocomplete="off" placeholder="Search inventory title..." class="w-full rounded-lg border border-slate-200 bg-slate-50 py-2 pl-9 pr-3
+               text-sm outline-none focus:border-brand focus:bg-white" />
+    </div>
+
+    <div class="flex flex-col gap-2 sm:flex-row">
+      <select id="inventoryDataStatus" class="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm">
+        <option value="">All statuses</option>
+        <option value="active">Active</option>
+        <option value="inactive">Inactive</option>
+      </select>
+
+      <select id="inventoryDataStock" class="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm">
+        <option value="">All stock levels</option>
+        <option value="low">Low stock</option>
+        <option value="out_of_stock">Out of stock</option>
+        <option value="available">Available</option>
+      </select>
+    </div>
   </div>
 
   <div class="overflow-x-auto">
     <table class="w-full text-left text-sm">
       <thead class="bg-slate-50 text-xs uppercase tracking-wider text-slate-500">
         <tr>
-          <th class="px-5 py-3">Title</th>
-          <th class="px-5 py-3">Status</th>
-          <th class="px-5 py-3">L. Stock</th>
-          <th class="px-5 py-3">O. Stock</th>
-          <th class="px-5 py-3">Reserved</th>
-          <th class="px-5 py-3">Items</th>
-          <th class="px-5 py-3">Qty.</th>
-          <th class="px-5 py-3"></th>
+          <th class="whitespace-nowrap px-5 py-3 font-semibold">Inventory</th>
+          <th class="whitespace-nowrap px-5 py-3 font-semibold">Status</th>
+          <th class="whitespace-nowrap px-5 py-3 font-semibold">Low stock</th>
+          <th class="whitespace-nowrap px-5 py-3 font-semibold">Out of stock</th>
+          <th class="whitespace-nowrap px-5 py-3 font-semibold">Reserved</th>
+          <th class="whitespace-nowrap px-5 py-3 font-semibold">Items</th>
+          <th class="whitespace-nowrap px-5 py-3 font-semibold">Quantity</th>
+          <th class="whitespace-nowrap px-5 py-3 text-right font-semibold">Actions</th>
         </tr>
       </thead>
-      <tbody id="inventoriesTbody" class="divide-y divide-slate-100">
+
+      <tbody id="inventoryTbody" class="divide-y divide-slate-100">
+        <tr>
+          <td colspan="8" class="px-5 py-10 text-center text-slate-400">
+            Loading inventories...
+          </td>
+        </tr>
       </tbody>
     </table>
   </div>
 
-  <div id="ordersPagination" class="border-t border-slate-100 p-4"></div>
+  <div id="inventoryPagination" class="border-t border-slate-100 p-4"></div>
 </div>
+
 <script>
-  console.log("<%=locals.title%>")
+  document.addEventListener('DOMContentLoaded', () => {
+    const state = {
+      page: 1,
+      limit: 20,
+      search: '',
+      status: '',
+      stock: '',
+      inventories: [],
+      pagination: {
+        page: 1,
+        limit: 20,
+        total: 0,
+        totalPages: 0
+      },
+      expanded: new Set()
+    };
+
+    const tbody = document.getElementById('inventoryTbody');
+    const paginationEl = document.getElementById('inventoryPagination');
+    const searchInput = document.getElementById('inventoryDataSearch');
+    const statusSelect = document.getElementById('inventoryDataStatus');
+    const stockSelect = document.getElementById('inventoryDataStock');
+    const refreshBtn = document.getElementById('inventoryDataRefreshBtn');
+
+    const totalEl = document.getElementById('inventoryTotal');
+    const lowStockEl = document.getElementById('inventoryLowStock');
+    const outOfStockEl = document.getElementById('inventoryOutOfStock');
+    const reservedEl = document.getElementById('inventoryReserved');
+
+    const formatNumber = value =>
+      Number(value ?? 0).toLocaleString();
+
+    function escapeHtml(value) {
+      return String(value ?? '').replace(/[&<>"']/g, char => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;'
+      })[char]);
+    }
+
+    function renderStatus(status) {
+      const normalized = String(status ?? '').toLowerCase();
+
+      const styles = {
+        active: 'bg-emerald-50 text-emerald-700',
+        inactive: 'bg-slate-100 text-slate-600',
+        pending: 'bg-amber-50 text-amber-700',
+        disabled: 'bg-rose-50 text-rose-700',
+        deleted: 'bg-rose-50 text-rose-700'
+      };
+
+      return `
+      <span class="inline-flex rounded-full px-2.5 py-1 text-xs font-semibold
+        ${styles[normalized] || 'bg-slate-100 text-slate-600'}">
+        ${escapeHtml(status || 'unknown')}
+      </span>
+    `;
+    }
+
+    function updateSummary() {
+      // These are page-filtered values for the currently returned data.
+      totalEl.textContent = formatNumber(state.pagination.total);
+
+      lowStockEl.textContent = formatNumber(
+        state.inventories.reduce((sum, item) => sum + Number(item.low_stock || 0), 0)
+      );
+
+      outOfStockEl.textContent = formatNumber(
+        state.inventories.reduce((sum, item) => sum + Number(item.out_of_stock || 0), 0)
+      );
+
+      reservedEl.textContent = formatNumber(
+        state.inventories.reduce((sum, item) => sum + Number(item.reserved || 0), 0)
+      );
+    }
+
+    function renderListings(inventory) {
+      const listings = inventory.listings || [];
+
+      if (!listings.length) {
+        return `
+        <div class="py-5 text-center text-sm text-slate-500">
+          No listings have stock records in this inventory.
+        </div>
+      `;
+      }
+
+      return `
+      <div class="overflow-x-auto rounded-lg border border-slate-200 bg-white">
+        <table class="w-full text-left text-sm">
+          <thead class="bg-slate-50 text-xs uppercase text-slate-500">
+            <tr>
+              <th class="px-4 py-3">Listing / Product</th>
+              <th class="px-4 py-3">Status</th>
+              <th class="px-4 py-3">Records</th>
+              <th class="px-4 py-3">Quantity</th>
+              <th class="px-4 py-3">Reserved</th>
+              <th class="px-4 py-3">Available</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100">
+            ${listings.map(listing => `
+              <tr>
+                <td class="px-4 py-3">
+                  <div class="font-medium text-slate-800">
+                    ${escapeHtml(listing.listing_title)}
+                  </div>
+                  <div class="mt-1 text-xs text-slate-500">
+                    ${escapeHtml(listing.product_title)}
+                  </div>
+                </td>
+                <td class="px-4 py-3">${renderStatus(listing.listing_status)}</td>
+                <td class="px-4 py-3">${formatNumber(listing.inventory_records)}</td>
+                <td class="px-4 py-3">${formatNumber(listing.quantity)}</td>
+                <td class="px-4 py-3">${formatNumber(listing.reserved)}</td>
+                <td class="px-4 py-3 font-semibold text-emerald-700">
+                  ${formatNumber(listing.available_quantity)}
+                </td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>
+    `;
+    }
+
+    function renderRows() {
+      const inventories = state.inventories;
+
+      if (!inventories.length) {
+        tbody.innerHTML = `
+        <tr>
+          <td colspan="8" class="px-5 py-16 text-center">
+            <div class="inline-flex flex-col items-center gap-2">
+              <i data-lucide="package-open" class="h-8 w-8 text-slate-300"></i>
+              <p class="text-sm font-medium text-slate-700">
+                No inventories found
+              </p>
+              <p class="text-xs text-slate-500">
+                Try adjusting your filters or create an inventory.
+              </p>
+            </div>
+          </td>
+        </tr>
+      `;
+
+        window.lucide?.createIcons();
+        return;
+      }
+
+      tbody.innerHTML = inventories.map(inventory => {
+        const id = String(inventory.id);
+        const expanded = state.expanded.has(id);
+
+        return `
+        <tr class="hover:bg-slate-50">
+          <td class="px-5 py-4">
+            <div class="font-semibold text-slate-800">
+              ${escapeHtml(inventory.title)}
+            </div>
+            <div class="mt-1 text-xs text-slate-500">
+              ${inventory.is_default ? 'Default inventory' : 'Store inventory'}
+            </div>
+          </td>
+
+          <td class="px-5 py-4">${renderStatus(inventory.status)}</td>
+
+          <td class="px-5 py-4 ${
+            Number(inventory.low_stock) > 0
+              ? 'font-semibold text-amber-600'
+              : 'text-slate-500'
+          }">${formatNumber(inventory.low_stock)}</td>
+
+          <td class="px-5 py-4 ${
+            Number(inventory.out_of_stock) > 0
+              ? 'font-semibold text-rose-600'
+              : 'text-slate-500'
+          }">${formatNumber(inventory.out_of_stock)}</td>
+
+          <td class="px-5 py-4">${formatNumber(inventory.reserved)}</td>
+          <td class="px-5 py-4">${formatNumber(inventory.items)}</td>
+          <td class="px-5 py-4 font-medium">${formatNumber(inventory.quantity)}</td>
+
+          <td class="px-5 py-4 text-right flex items-center gap-2">
+            <button
+              type="button"
+              data-toggle-inventory="${escapeHtml(id)}"
+              aria-expanded="${expanded}"
+              class="inline-flex items-center gap-1 rounded-lg border
+                border-slate-200 px-3 py-2 text-xs font-semibold hover:bg-slate-50">
+              <i data-lucide="${expanded ? 'chevron-up' : 'chevron-down'}"
+                class="h-3.5 w-3.5"></i>
+              ${expanded ? 'Hide listings' : 'View listings'}
+            </button>
+          </td>
+        </tr>
+
+        ${expanded ? `
+          <tr class="bg-slate-50/70">
+            <td colspan="8" class="px-5 py-4">
+              <div class="mb-3 text-sm font-semibold text-slate-700 flex items-center justify-between">
+                <span>Stock records — ${escapeHtml(inventory.title)}</span>
+                <a href="/inventories/${id}/<%-store.id%>" target="_blank" class="inline-flex items-center gap-1 rounded-lg border border-slate-200 px-3 py-2 text-xs font-semibold hover:bg-slate-50">
+                  <i data-lucide="arrow-up-right"></i>
+                </a>
+              </div>
+              ${renderListings(inventory)}
+            </td>
+          </tr>
+        ` : ''}
+      `;
+      }).join('');
+
+      window.lucide?.createIcons();
+    }
+
+    function renderPagination(payload) {
+      const total = Number(payload.total || 0);
+      const page = Number(payload.page || 1);
+      const limit = Number(payload.limit || state.limit);
+      const totalPages = Number(payload.totalPages || 0);
+
+      if (total === 0) {
+        paginationEl.innerHTML = '';
+        return;
+      }
+
+      const from = (page - 1) * limit + 1;
+      const to = Math.min(page * limit, total);
+      const startPage = Math.max(1, Math.min(page - 2, totalPages - 4));
+      const endPage = Math.min(totalPages, startPage + 4);
+
+      let pageButtons = '';
+
+      for (let p = startPage; p <= endPage; p++) {
+        pageButtons += `
+        <button type="button" data-page="${p}"
+          class="rounded-lg border px-3 py-1.5 text-sm ${
+            p === page
+              ? 'border-brand bg-brand text-white'
+              : 'hover:bg-slate-50'
+          }">
+          ${p}
+        </button>
+      `;
+      }
+
+      paginationEl.innerHTML = `
+      <div class="flex flex-col items-center justify-between gap-3
+        text-sm text-slate-500 sm:flex-row">
+        <span>Showing ${from}–${to} of ${total} inventories</span>
+        <div class="flex flex-wrap justify-center gap-1">
+          <button type="button" data-page="${page - 1}"
+            ${page <= 1 ? 'disabled' : ''}
+            class="rounded-lg border px-3 py-1.5 ${
+              page <= 1 ? 'cursor-not-allowed opacity-40' : 'hover:bg-slate-50'
+            }">Prev</button>
+          ${pageButtons}
+          <button type="button" data-page="${page + 1}"
+            ${page >= totalPages ? 'disabled' : ''}
+            class="rounded-lg border px-3 py-1.5 ${
+              page >= totalPages ? 'cursor-not-allowed opacity-40' : 'hover:bg-slate-50'
+            }">Next</button>
+        </div>
+      </div>
+    `;
+    }
+
+    async function load() {
+      tbody.innerHTML = `
+      <tr>
+        <td colspan="8" class="px-5 py-10 text-center text-slate-400">
+          Loading inventories...
+        </td>
+      </tr>
+    `;
+
+      const params = new URLSearchParams({
+        page: String(state.page),
+        limit: String(state.limit)
+      });
+
+      if (state.search) params.set('search', state.search);
+      if (state.status) params.set('status', state.status);
+      if (state.stock) params.set('stock', state.stock);
+
+      try {
+        const response = await axios.get(
+          `${protocal}business.${domainName}/stores/<%- store.id %>/data/product-listing/inventories`, {
+            params,
+            withCredentials: true
+          }
+        );
+
+        // Expected response: { data: [...], pagination: {...} }
+        state.inventories = response.data.data || [];
+        state.pagination = response.data.pagination || {
+          page: state.page,
+          limit: state.limit,
+          total: state.inventories.length,
+          totalPages: 1
+        };
+
+        renderRows();
+        renderPagination(state.pagination);
+        updateSummary();
+      } catch (error) {
+        console.error('Failed to load inventory data:', error);
+
+        state.inventories = [];
+        state.expanded.clear();
+        state.pagination = {
+          page: state.page,
+          limit: state.limit,
+          total: 0,
+          totalPages: 0
+        };
+
+        renderRows();
+        renderPagination(state.pagination);
+        updateSummary();
+
+        Notification.showNotification({
+          type: 'warning',
+          message: error.response?.data?.message ||
+            'Unable to load inventory data.'
+        });
+      }
+    }
+
+    tbody.addEventListener('click', event => {
+      const button = event.target.closest('[data-toggle-inventory]');
+      if (!button) return;
+
+      const id = button.dataset.toggleInventory;
+
+      if (state.expanded.has(id)) {
+        state.expanded.delete(id);
+      } else {
+        state.expanded.add(id);
+      }
+
+      renderRows();
+    });
+
+    paginationEl.addEventListener('click', event => {
+      const button = event.target.closest('[data-page]');
+      if (!button || button.disabled) return;
+
+      const page = Number(button.dataset.page);
+
+      if (
+        page >= 1 &&
+        page <= state.pagination.totalPages &&
+        page !== state.page
+      ) {
+        state.page = page;
+        load();
+      }
+    });
+
+    refreshBtn.addEventListener('click', () => {
+      state.page = 1;
+      state.search = '';
+      state.status = '';
+      state.stock = '';
+      state.expanded.clear();
+
+      searchInput.value = '';
+      statusSelect.value = '';
+      stockSelect.value = '';
+
+      load();
+    });
+
+    let searchDebounce;
+
+    searchInput.addEventListener('input', event => {
+      clearTimeout(searchDebounce);
+
+      searchDebounce = setTimeout(() => {
+        state.search = event.target.value.trim();
+        state.page = 1;
+        load();
+      }, 400);
+    });
+
+    statusSelect.addEventListener('change', event => {
+      state.status = event.target.value;
+      state.page = 1;
+      load();
+    });
+
+    stockSelect.addEventListener('change', event => {
+      state.stock = event.target.value;
+      state.page = 1;
+      load();
+    });
+
+    load();
+  });
 </script>
-<% pageScript = '/scripts/pages/store-inventory.js' %>

@@ -35,13 +35,7 @@
 
     const editor = new Quill('#detailDescription', {
         readOnly: true,
-        theme: 'snow', // or 'bubble'
-        // modules: {
-        //     toolbar: [
-        //         [{ 'size': ['12px', '14px', '16px', '18px', '24px'] }],
-        //         ['bold', 'italic', 'underline']
-        //     ]
-        // }
+        theme: 'snow',
         modules: {
             toolbar: false
         }
@@ -566,7 +560,7 @@
             const id = p.id;
             const isActive = String(id) === String(State.selectedId);
             const image = p.primary_image || p.image_url || '';
-            console.log(image)
+            
             const title = p.title || 'Untitled';
             const subtitle = [
                 p.category_title || p.category?.title,
@@ -576,7 +570,7 @@
             const status = p.status || 'requested';
 
             const thumb = image ?
-                `<img class="product-row-thumb" src="http://localhost:9000/${escapeHtml(image)}" alt="" loading="lazy">` :
+                `<img class="product-row-thumb" src="https://cdn.cococe.rw/${escapeHtml(image)}" alt="Image" loading="lazy">` :
                 `<div class="product-row-placeholder"><i data-lucide="package" class="w-4 h-4"></i></div>`;
 
             return `
@@ -685,7 +679,7 @@
             product.images ||
             (product.primary_image_url ? [product.primary_image_url] : []);
 
-        const heroSrc = `http://localhost:9000/${images[0].storage_key}`;
+        const heroSrc = `https://cdn.cococe.rw/${images[0].storage_key}`;
         if (heroSrc) {
             els.detailHeroImage.src = heroSrc;
             els.detailHeroImage.alt = title;
@@ -697,8 +691,8 @@
 
         els.detailThumbs.innerHTML = images.length > 1 ?
             images.map((media, i) => `
-              <button class="detail-thumb ${i === 0 ? 'is-active' : ''}" data-url="http://localhost:9000/${media.storage_key}" type="button">
-                <img src="http://localhost:9000/${media.storage_key}" alt="Thumbnail">
+              <button class="detail-thumb ${i === 0 ? 'is-active' : ''}" data-url="https://cdn.cococe.rw/${media.storage_key}" type="button">
+                <img src="https://cdn.cococe.rw/${media.storage_key}" alt="Thumbnail">
               </button>
             `).join('') :
             '';

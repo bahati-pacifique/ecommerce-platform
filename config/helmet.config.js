@@ -144,7 +144,8 @@ module.exports = {
 
             "media-src": [
                 "'self'",
-                "https://www.w3schools.com"
+                "https://www.w3schools.com",
+                "blob:"
             ],
 
             "frame-src": [

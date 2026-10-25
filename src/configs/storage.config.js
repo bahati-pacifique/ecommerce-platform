@@ -29,6 +29,8 @@ module.exports = {
     // Product media
     products: '/var/www/cococe-storage/products',
 
+    listings: '/var/www/cococe-storage/listings',
+
     productImages: '/var/www/cococe-storage/products/images',
 
 

@@ -1,0 +1,150 @@
+html,
+body {
+    margin: 0;
+    min-height: 100%;
+    font-family: 'Inter', system-ui, sans-serif;
+}
+
+.modal-backdrop {
+    animation: modalFadeIn 0.15s ease;
+}
+
+.modal-panel {
+    animation: modalSlideIn 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes modalFadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes modalSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(12px) scale(0.98);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+:root {
+    --sidebar-width: 288px;
+   
+}
+
+html,
+body {
+    margin: 0;
+    min-height: 100%;
+    font-family: 'Inter', system-ui, sans-serif;
+}
+
+#sidebar {
+    width: var(--sidebar-width);
+    overflow-x: hidden;
+}
+
+.sidebar-collapsed {
+    --sidebar-width: 76px;
+}
+
+.sidebar-collapsed .nav-label,
+.sidebar-collapsed .section-label,
+.sidebar-collapsed .store-details,
+.sidebar-collapsed .account-details {
+    display: none;
+}
+
+.sidebar-collapsed .nav-item {
+    justify-content: center;
+}
+
+.sidebar-collapsed .store-switcher {
+    padding: 10px;
+}
+
+.sidebar-collapsed .store-switcher>div:last-child {
+    display: none;
+}
+
+.nav-item.active {
+    background: var(--color-brand-ultralight);
+    color: var(--color-brand-dark);
+    font-weight: 600;
+}
+
+.profile-menu {
+    transform-origin: top right;
+    z-index: 60;
+    transition: opacity .15s ease, transform .15s ease;
+}
+
+.profile-menu.open {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    pointer-events: auto;
+}
+
+.profile-menu.closed {
+    opacity: 0;
+    transform: translateY(4px) scale(.98);
+    pointer-events: none;
+}
+
+.chart-grid {
+    background-image: linear-gradient(to right, #e5e7eb 1px, transparent 1px),
+        linear-gradient(to bottom, #e5e7eb 1px, transparent 1px);
+    background-size: 12.5% 25%;
+}
+
+.line {
+    fill: none;
+    stroke-width: 3;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+
+.animate-lucide-spin {
+  animation: lucide-spin 2s linear infinite;
+}
+@keyframes lucide-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Pulse Scale (Great for alerts, hearts, or bells) */
+.animate-lucide-pulse {
+  animation: lucide-pulse 1.5s ease-in-out infinite;
+  transform-origin: center;
+}
+@keyframes lucide-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+}
+
+/* Hover Bounce (Great for interactive buttons) */
+.animate-lucide-hover-bounce {
+  transition: transform 0.2s ease-in-out;
+}
+.animate-lucide-hover-bounce:hover {
+  transform: translateY(-3px);
+}
+
+/* Drawing Effect (Animate the icon lines drawing themselves) */
+.animate-lucide-draw * {
+  stroke-dasharray: 100;
+  stroke-dashoffset: 100;
+  animation: lucide-draw 2s ease-in-out forwards;
+}
+@keyframes lucide-draw {
+  to { stroke-dashoffset: 0; }
+}

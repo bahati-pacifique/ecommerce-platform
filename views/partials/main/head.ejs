@@ -1,37 +1,90 @@
+<%
+  // ── All values come from res.locals — set in server middleware ──
+  const baseUrl   = locals.baseUrl   || 'https://cococe.rw';
+  const cleanPath = locals.currentPath || '/';
+
+  // Per-page override wins; otherwise derive from current request path
+  const canonicalHref = (typeof canonicalUrl !== 'undefined' && canonicalUrl)
+    ? canonicalUrl
+    : baseUrl + cleanPath;
+
+  // ── Page-level SEO values (with sensible defaults) ─────────────
+  const pageTitle = (typeof title !== 'undefined' && title)
+    ? title
+    : 'COCOCE — Laptops, Printers & Electronics in Kigali';
+
+  const pageDesc = (typeof description !== 'undefined' && description)
+    ? description
+    : 'Shop laptops, desktops, printers and accessories from top brands. Fast delivery across Kigali.';
+
+  const pageImage = (typeof ogImage !== 'undefined' && ogImage)
+    ? ogImage
+    : 'https://cdn.cococe.rw/meta/cococe.png';
+
+  const pageType = (typeof ogType !== 'undefined' && ogType)
+    ? ogType
+    : 'website';
+
+  const pageLocale = (typeof ogLocale !== 'undefined' && ogLocale)
+    ? ogLocale
+    : 'en_RW';
+%>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title><%= typeof title !== 'undefined' ? title : 'Discover Next-Gen Tech, All in One Place' %></title>
-<meta name="description" content="<%= typeof description !== 'undefined' ? description : 'Shop tech at COCOCE.' %>">
-
-<meta name="description" content="Shop premium laptops, desktops, smart TVs, and computer accessories at COCOCE in Kigali, Rwanda. Discover the latest tech appliances near you today!">
-<meta name="keywords" content="Laptops, Desktops, Memories, Storages, Servers, keyboards, Printers, Screens, Repair, Explore, Electronic, Digital, Kigali, Rwanda">
+<!-- ── Primary ──────────────────────────────────────────────────── -->
+<title><%= pageTitle %></title>
+<meta name="description" content="<%= pageDesc %>">
+<link rel="canonical" href="<%= canonicalHref %>">
 <meta name="author" content="COCOCE RW">
 
-<meta property="og:image" content="https://cdn.cococe.rw/meta/cococe.png">
-<meta property="og:url" content="https://www.cococe.rw">
-<meta property="og:type" content="website">
-<meta property="og:title" content="Laptops, Printers, Accessories, Game consoles, Electronics, and much more, cococe, your wish our priority">
-<meta property="og:description" content="COCOCE Kigali Rwanda, Laptops, Desktops, Computer accessories, Smart tv, projectors, discover what you want about digital assets near you at Kigali">
-<meta property="og:logo" content="https://cdn.cococe.rw/meta/cococe.png" />
+<!-- ── OpenGraph ────────────────────────────────────────────────── -->
+<meta property="og:type"         content="<%= pageType %>">
+<meta property="og:site_name"    content="COCOCE">
+<meta property="og:locale"       content="<%= pageLocale %>">
+<meta property="og:title"        content="<%= pageTitle %>">
+<meta property="og:description"  content="<%= pageDesc %>">
+<meta property="og:url"          content="<%= canonicalHref %>">
+<meta property="og:image"        content="<%= pageImage %>">
+<meta property="og:image:width"  content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt"    content="<%= pageTitle %>">
 
-<meta name="twitter:card" content="https://cdn.cococe.rw/meta/cococe.png">
-<meta property="twitter:domain" content="cococe.rw">
-<meta property="twitter:url" content="https://cococe.rw">
-<meta name="twitter:title" content="Laptops, Printers, Accessories, Game consoles, Electronics, and much more, cococe, your wish our priority">
-<meta name="twitter:description" content="COCOCE Kigali Rwanda, Laptops, Desktops, Computer accessories, Smart tv, projectors, discover what you want about digital assets near you at Kigali">
+<!-- ── Twitter ──────────────────────────────────────────────────── -->
+<meta name="twitter:card"        content="summary_large_image">
+<meta name="twitter:title"       content="<%= pageTitle %>">
+<meta name="twitter:description" content="<%= pageDesc %>">
+<meta name="twitter:image"       content="<%= pageImage %>">
+<%# Uncomment when you have a handle: %>
+<%# <meta name="twitter:site" content="@cococe_rw"> %>
 
+<!-- ── Favicon / brand ──────────────────────────────────────────── -->
 <link rel="icon" href="/favicon.ico" type="image/x-icon">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
-<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.11.0/axios.min.js" integrity="sha512-h9644v03pHqrIHThkvXhB2PJ8zf5E9IyVnrSfZg8Yj8k4RsO4zldcQc4Bi9iVLUCCsqNY0b4WXVV4UB+wbWENA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+<link rel="manifest" href="/site.webmanifest">
+<meta name="theme-color" content="#ED1B24">
 
+<!-- ── Libraries ────────────────────────────────────────────────── -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.11.0/axios.min.js"
+        integrity="sha512-h9644v03pHqrIHThkvXhB2PJ8zf5E9IyVnrSfZg8Yj8k4RsO4zldcQc4Bi9iVLUCCsqNY0b4WXVV4UB+wbWENA=="
+        crossorigin="anonymous"
+        referrerpolicy="no-referrer"></script>
+
+<link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+
+<!-- ── Styles ───────────────────────────────────────────────────── -->
 <link rel="stylesheet" href="/styles/components/notification.css">
 <link rel="stylesheet" href="/styles/components/main-snackbar.css">
 <link rel="stylesheet" href="/styles/components/loaders.css">
 <link rel="stylesheet" href="/styles/main.css">
+<link rel="stylesheet" href="/styles/main/app.css">
 
+<!-- ── Fonts ────────────────────────────────────────────────────── -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-
-<link rel="stylesheet" href="/styles/main/app.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet">

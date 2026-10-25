@@ -186,8 +186,182 @@ class FileServices {
         const storageKey =
             path.posix.join(
                 'products',
-                productId,
                 'images',
+                productId,
+                fileName
+            );
+
+
+        return {
+            storageKey,
+            path: destination,
+            fileName,
+            size: buffer.length
+        };
+    }
+
+    /**
+     * Saves a processed listing image.
+     *
+     * Listing images are already processed by Sharp,
+     * so this method receives a Buffer instead of
+     * the original express-fileupload file.
+     *
+     * Storage structure:
+     *
+     * listings/
+     *   {lisitingId}/
+     *     images/
+     *       {mediaId}.webp
+     *
+     * @param {Buffer} buffer
+     * @param {string} listingVariantId
+     * @param {string} mediaId
+     * @returns {Promise<Object>}
+     */
+    static async saveListingImage(
+        buffer,
+        listingVariantId,
+        mediaId
+    ) {
+
+        if (!Buffer.isBuffer(buffer)) {
+            throw new TypeError(
+                'Product image buffer is required'
+            );
+        }
+
+        if (!listingVariantId) {
+            throw new Error(
+                'Product ID is required'
+            );
+        }
+
+        if (!mediaId) {
+            throw new Error(
+                'Media ID is required'
+            );
+        }
+
+
+        const directory = path.join(
+            storage.listings,
+            'images',
+            listingVariantId
+            
+        );
+
+
+        await mkdir(directory, {
+            recursive: true
+        });
+
+
+        const fileName =
+            `${mediaId}.webp`;
+
+
+        const destination =
+            path.join(
+                directory,
+                fileName
+            );
+
+
+        await writeFile(
+            destination,
+            buffer
+        );
+
+
+        const storageKey =
+            path.posix.join(
+                'listings',
+                'images',
+                listingVariantId,
+                fileName
+            );
+
+
+        return {
+            storageKey,
+            path: destination,
+            fileName,
+            size: buffer.length
+        };
+    }
+
+    /**
+     * Saves a processed listing image.
+     *
+     * Listing images are already processed by Sharp,
+     * so this method receives a Buffer instead of
+     * the original express-fileupload file.
+     *
+     * Storage structure:
+     *
+     * listings/
+     *   {lisitingId}/
+     *     images/
+     *       {mediaId}.webp
+     *
+     * @param {Buffer} buffer
+     * @param {string} listingVariantId
+     * @param {string} mediaId
+     * @returns {Promise<Object>}
+     */
+    static async saveListingVideo(
+        buffer,
+        listingId
+    ) {
+
+        if (!Buffer.isBuffer(buffer)) {
+            throw new TypeError(
+                'buffer/data is required'
+            );
+        }
+
+        if (!listingId) {
+            throw new Error(
+                'ID is required'
+            );
+        }
+
+        const directory = path.join(
+            storage.listings,
+            'videos',
+            listingId
+            
+        );
+
+
+        await mkdir(directory, {
+            recursive: true
+        });
+
+
+        const fileName =
+            `${listingId}.mp4`;
+
+
+        const destination =
+            path.join(
+                directory,
+                fileName
+            );
+
+
+        await writeFile(
+            destination,
+            buffer
+        );
+
+
+        const storageKey =
+            path.posix.join(
+                'listings',
+                listingId,
+                'videos',
                 fileName
             );
 

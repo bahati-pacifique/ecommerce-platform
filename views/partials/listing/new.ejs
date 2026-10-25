@@ -1,0 +1,384 @@
+<%
+  const _fmt = (n, c = 'RWF') => new Intl.NumberFormat('en-US', {
+    style: 'currency', currency: c, maximumFractionDigits: 0,
+  }).format(Number(n || 0));
+%>
+
+<div class="flex flex-col h-full">
+
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <!-- HEADER                                                      -->
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <div class="shrink-0 border-b border-slate-200 bg-white px-4 sm:px-6 py-4">
+    <nav class="mb-2 flex items-center gap-1.5 text-xs text-slate-500">
+      <a href="/stores/<%= store.id %>/dashboard/listings" class="hover:text-brand">Listings</a>
+      <span class="text-slate-300">/</span>
+      <span class="text-slate-900 font-medium">New listing</span>
+    </nav>
+    <h1 class="text-xl sm:text-2xl font-bold tracking-tight flex items-center gap-2">
+      <img src="/images/logos/fav.png" alt="Logo" class="h-7">
+      <span class="hidden md:block text-black/70">List</span>
+    </h1>
+    <p class="mt-0.5 text-sm text-slate-500">
+      Pick a product, add details, upload a video, then add variants with images.
+    </p>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <!-- TABS                                                        -->
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <div class="shrink-0 border-b border-slate-200 bg-white px-4 sm:px-6">
+    <nav id="tabs" class="flex gap-1 overflow-x-auto" role="tablist">
+      <button type="button" data-tab="welcome" class="tab-button whitespace-nowrap border-b-2 border-brand px-4 py-3 text-sm font-medium text-brand">
+        Start
+      </button>
+      <button type="button" data-tab="product" disabled class="tab-button whitespace-nowrap border-b-2 border-transparent px-4 py-3 text-sm font-medium text-slate-300 cursor-not-allowed">
+        <span class="inline-flex h-5 w-5 items-center justify-center rounded-full bg-slate-100 text-[10px] font-bold mr-1.5">1</span>
+        Product
+      </button>
+      <button type="button" data-tab="details" disabled class="tab-button whitespace-nowrap border-b-2 border-transparent px-4 py-3 text-sm font-medium text-slate-300 cursor-not-allowed">
+        <span class="inline-flex h-5 w-5 items-center justify-center rounded-full bg-slate-100 text-[10px] font-bold mr-1.5">2</span>
+        Details
+      </button>
+      <button type="button" data-tab="variants" disabled class="tab-button whitespace-nowrap border-b-2 border-transparent px-4 py-3 text-sm font-medium text-slate-300 cursor-not-allowed">
+        <span class="inline-flex h-5 w-5 items-center justify-center rounded-full bg-slate-100 text-[10px] font-bold mr-1.5">3</span>
+        Variants
+        <span id="tabVariantCount" class="ml-1.5 hidden rounded-full bg-slate-100 px-1.5 py-0.5 text-[10px] font-bold text-slate-600">0</span>
+      </button>
+      <button type="button" data-tab="review" disabled class="tab-button whitespace-nowrap border-b-2 border-transparent px-4 py-3 text-sm font-medium text-slate-300 cursor-not-allowed">
+        <span class="inline-flex h-5 w-5 items-center justify-center rounded-full bg-slate-100 text-[10px] font-bold mr-1.5">4</span>
+        Review
+      </button>
+    </nav>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <!-- FORM                                                        -->
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <form id="createListingForm" class="flex-1 min-h-0 flex flex-col">
+    <div class="flex-1 min-h-0 overflow-y-auto px-4 sm:px-6 py-6">
+      <div class="max-w-3xl mx-auto space-y-6">
+
+        <!-- ─── TAB: WELCOME ──────────────────────────────── -->
+        <section data-panel="welcome">
+          <div class="rounded-xl border border-slate-200 bg-gradient-to-br from-white to-slate-50 p-6 shadow-sm">
+            <div class="flex items-start gap-4">
+              <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-brand-ultralight text-brand">
+                <i data-lucide="sparkles" class="h-6 w-6"></i>
+              </div>
+              <div>
+                <h2 class="text-lg font-bold text-slate-900">Before you start</h2>
+                <p class="mt-1 text-sm text-slate-600">Here's what you'll do:</p>
+              </div>
+            </div>
+
+            <ul class="mt-5 space-y-3">
+              <li class="flex items-start gap-3">
+                <span class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-emerald-700">
+                  <i data-lucide="check" class="h-3.5 w-3.5"></i>
+                </span>
+                <div>
+                  <div class="text-sm font-medium text-slate-900">Pick a product from the catalog</div>
+                  <div class="text-xs text-slate-500">Products are shared across all vendors.</div>
+                </div>
+              </li>
+              <li class="flex items-start gap-3">
+                <span class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-emerald-700">
+                  <i data-lucide="check" class="h-3.5 w-3.5"></i>
+                </span>
+                <div>
+                  <div class="text-sm font-medium text-slate-900">Add listing details and a promo video</div>
+                  <div class="text-xs text-slate-500">Title, description, condition. Video is optional (≤ 1 min).</div>
+                </div>
+              </li>
+              <li class="flex items-start gap-3">
+                <span class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-emerald-700">
+                  <i data-lucide="check" class="h-3.5 w-3.5"></i>
+                </span>
+                <div>
+                  <div class="text-sm font-medium text-slate-900">Add variants with price and images</div>
+                  <div class="text-xs text-slate-500">Each variant needs at least 1 image.</div>
+                </div>
+              </li>
+            </ul>
+
+            <div class="mt-6 rounded-lg border border-slate-200 bg-white p-4">
+              <label class="flex items-start gap-3 cursor-pointer">
+                <input type="checkbox" id="acceptTerms" class="mt-0.5 h-4 w-4 rounded border-slate-300 text-brand focus:ring-brand" />
+                <div class="text-xs text-slate-600 leading-relaxed">
+                  By creating a listing, I confirm I agree to the
+                  <a href="/terms" target="_blank" class="font-medium text-brand hover:underline">Marketplace Terms</a>,
+                  <a href="/privacy" target="_blank" class="font-medium text-brand hover:underline">Privacy Policy</a>,
+                  and
+                  <a href="/listing-terms" target="_blank" class="font-medium text-brand hover:underline">Listing Terms</a>.
+                </div>
+              </label>
+            </div>
+          </div>
+        </section>
+
+        <!-- ─── TAB: PRODUCT ──────────────────────────────── -->
+        <section data-panel="product" hidden>
+          <div class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="mb-4 flex items-center gap-3">
+              <span class="flex h-7 w-7 items-center justify-center rounded-full bg-brand text-xs font-bold text-white">1</span>
+              <div>
+                <h2 class="text-base font-semibold">Pick a product</h2>
+                <p class="text-xs text-slate-500">Search the catalog by name, brand, or category.</p>
+              </div>
+            </div>
+
+            <!-- Selected product -->
+            <div id="selectedProduct" class="hidden rounded-lg border border-emerald-200 bg-emerald-50 p-4">
+              <div class="flex items-start gap-3">
+                <img id="selectedProductImg" src="" alt="" class="h-14 w-14 shrink-0 rounded-lg object-cover ring-1 ring-slate-200" />
+                <div class="min-w-0 flex-1">
+                  <div class="text-[10px] font-bold uppercase tracking-wider text-emerald-700">Selected product</div>
+                  <div id="selectedProductName" class="text-sm font-semibold text-slate-900"></div>
+                  <div id="selectedProductMeta" class="mt-0.5 text-xs text-slate-500"></div>
+                </div>
+                <button type="button" id="clearProductBtn" class="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100" title="Change product">
+                  <i data-lucide="x" class="h-4 w-4"></i>
+                </button>
+              </div>
+            </div>
+
+            <!-- Search -->
+            <div id="productSearchPanel">
+              <div class="flex items-center gap-2">
+                <div class="relative flex-1">
+                  <i data-lucide="search" class="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"></i>
+                  <input type="search" id="productSearchInput" placeholder="Search by product name, brand, or category..." class="w-full rounded-lg border border-slate-200 bg-slate-50 py-2.5 pl-9 pr-10 text-sm outline-none focus:border-brand focus:bg-white" autocomplete="off" />
+                  <button type="button" id="productSearchClear" class="absolute right-2 top-1/2 hidden -translate-y-1/2 rounded p-1 text-slate-400 hover:bg-slate-100">
+                    <i data-lucide="x" class="h-3.5 w-3.5"></i>
+                  </button>
+                </div>
+
+                <button type="button" id="imageSearchButton" class="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50 shrink-0" title="Search by image">
+                  <i data-lucide="image-up" class="h-4 w-4"></i>
+                  <span class="hidden sm:inline">Image</span>
+                </button>
+                <input type="file" id="imageSearchInput" accept="image/jpeg,image/png,image/webp" class="hidden" />
+              </div>
+
+              <div id="imageSearchPreview" class="mt-2 hidden flex items-center gap-3 rounded-lg border border-brand/30 bg-brand-ultralight p-2">
+                <img id="imageSearchThumb" src="" alt="" class="h-12 w-12 shrink-0 rounded object-cover ring-1 ring-slate-200 bg-white" />
+                <div class="min-w-0 flex-1">
+                  <div class="text-xs font-medium text-brand-dark">Searching by image</div>
+                  <div id="imageSearchStatus" class="truncate text-xs text-slate-500">Analyzing…</div>
+                </div>
+                <button type="button" id="imageSearchClear" class="shrink-0 rounded p-1 text-slate-400 hover:bg-white hover:text-slate-700">
+                  <i data-lucide="x" class="h-4 w-4"></i>
+                </button>
+              </div>
+
+              <div id="productResults" class="mt-2 max-h-80 overflow-y-auto rounded-lg border border-slate-200 bg-white shadow-sm hidden"></div>
+            </div>
+
+            <input type="hidden" id="productId" />
+
+            <div class="mt-4 flex items-center justify-between border-t border-slate-100 pt-4">
+              <div class="text-xs text-slate-500">Can't find your product?</div>
+              <a href="/stores/<%= store.id %>/products/new" target="_blank" class="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50">
+                <i data-lucide="plus" class="h-3.5 w-3.5"></i>
+                Add to catalog
+              </a>
+            </div>
+          </div>
+        </section>
+
+        <!-- ─── TAB: DETAILS ──────────────────────────────── -->
+        <section data-panel="details" hidden>
+          <div class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="mb-4 flex items-center gap-3">
+              <span class="flex h-7 w-7 items-center justify-center rounded-full bg-brand text-xs font-bold text-white">2</span>
+              <div>
+                <h2 class="text-base font-semibold">Listing details</h2>
+                <p class="text-xs text-slate-500">How this listing appears in search and the storefront.</p>
+              </div>
+            </div>
+
+            <div class="space-y-4">
+              <div>
+                <label for="titleInput" class="mb-1.5 block text-xs font-semibold text-slate-600">
+                  Title <span class="text-rose-500">*</span>
+                </label>
+                <input type="text" id="titleInput" maxlength="255" placeholder="e.g. iPhone 15 Pro Case — Premium Protection" class="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-brand" />
+              </div>
+
+              <div>
+                <label for="descriptionInput" class="mb-1.5 block text-xs font-semibold text-slate-600">
+                  Description <span class="text-slate-400 font-normal">(optional)</span>
+                </label>
+                <textarea id="descriptionInput" rows="4" placeholder="Features, materials, warranty..." class="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-brand"></textarea>
+              </div>
+
+              <div class="grid gap-4 sm:grid-cols-2">
+                <div>
+                  <label for="conditionInput" class="mb-1.5 block text-xs font-semibold text-slate-600">Condition</label>
+                  <select id="conditionInput" class="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm">
+                    <option value="new">New</option>
+                    <option value="used">Used</option>
+                    <option value="refurbished">Refurbished</option>
+                  </select>
+                </div>
+                <div>
+                  <label for="statusInput" class="mb-1.5 block text-xs font-semibold text-slate-600">Status</label>
+                  <select id="statusInput" class="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm">
+                    <option value="active">Active — visible to customers</option>
+                    <option value="draft">Draft — hidden</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- ═══ CUSTOM PARAMETERS (meta) ═══ -->
+              <div class="border-t border-slate-100 pt-4">
+                <div class="mb-3 flex items-center justify-between">
+                  <div>
+                    <label class="text-xs font-semibold text-slate-600">
+                      Custom parameters <span class="text-slate-400 font-normal">(optional)</span>
+                    </label>
+                    <p class="mt-0.5 text-xs text-slate-400">
+                      Add any key-value pairs specific to this product (e.g. Color, Material, Warranty).
+                    </p>
+                  </div>
+                </div>
+
+                <!-- Parameter rows -->
+                <div id="metaList" class="space-y-2"></div>
+
+                <!-- Add row button -->
+                <button type="button" id="addMetaBtn" class="mt-2 inline-flex items-center gap-1.5 rounded-lg border border-dashed border-slate-300 bg-white px-3 py-2 text-xs font-medium text-slate-600 hover:border-brand hover:bg-brand-ultralight hover:text-brand">
+                  <i data-lucide="plus" class="h-3.5 w-3.5"></i>
+                  Add parameter
+                </button>
+              </div>
+
+              <!-- ═══ LISTING VIDEO ═══ -->
+              <div class="border-t border-slate-100 pt-4">
+                <div class="mb-2 flex items-center justify-between">
+                  <label class="text-xs font-semibold text-slate-600">
+                    Listing video <span class="text-slate-400 font-normal">(optional, max 1 min)</span>
+                  </label>
+                  <button type="button" id="addListingVideoBtn" class="inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-medium hover:bg-slate-50">
+                    <i data-lucide="video" class="h-3.5 w-3.5"></i>
+                    Add video
+                  </button>
+                  <input type="file" id="listingVideoInput" accept="video/mp4,video/webm,video/quicktime" class="hidden" />
+                </div>
+
+                <div id="listingVideoPreview" class="hidden overflow-hidden rounded-lg border border-slate-200 bg-slate-900">
+                  <div class="relative">
+                    <video id="listingVideoElement" controls playsinline class="w-full aspect-video"></video>
+                    <button type="button" id="removeListingVideoBtn" class="absolute right-2 top-2 rounded-lg bg-black/60 p-1.5 text-white hover:bg-rose-600">
+                      <i data-lucide="x" class="h-4 w-4"></i>
+                    </button>
+                  </div>
+                  <div class="flex items-center justify-between bg-slate-800 px-3 py-2 text-xs text-slate-300">
+                    <span id="listingVideoName" class="truncate"></span>
+                    <span id="listingVideoMeta" class="shrink-0 text-slate-400"></span>
+                  </div>
+                </div>
+
+                <div id="listingVideoEmpty" class="rounded-lg border-2 border-dashed border-slate-200 py-4 text-center text-xs text-slate-400">
+                  No video — optional, but improves conversion
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section data-panel="variants" hidden>
+          <div class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="mb-4 flex items-start justify-between gap-3">
+              <div class="flex items-center gap-3">
+                <span class="flex h-7 w-7 items-center justify-center rounded-full bg-brand text-xs font-bold text-white">3</span>
+                <div>
+                  <h2 class="text-base font-semibold">Variants</h2>
+                  <p class="text-xs text-slate-500">
+                    Add at least one variant. Each variant needs a SKU, a price, and at least one image.
+                  </p>
+                </div>
+              </div>
+              <button type="button" id="addVariantBtn" class="shrink-0 inline-flex items-center gap-1.5 rounded-lg bg-brand px-3 py-2 text-sm font-semibold text-white hover:bg-brand-dark">
+                <i data-lucide="plus" class="h-4 w-4"></i>
+                Add variant
+              </button>
+            </div>
+
+            <div id="variantsList" class="space-y-4"></div>
+
+            <div id="variantsEmpty" class="rounded-xl border-2 border-dashed border-slate-200 py-12 text-center">
+              <div class="inline-flex flex-col items-center gap-2">
+                <div class="flex h-12 w-12 items-center justify-center rounded-full bg-brand-ultralight">
+                  <i data-lucide="layers" class="h-6 w-6 text-brand"></i>
+                </div>
+                <p class="text-sm font-medium text-slate-700">No variants yet</p>
+                <p class="text-xs text-slate-500">Click "Add variant" to get started.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section data-panel="review" hidden>
+          <div class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm flex flex-col">
+            <div class="mb-4 flex items-center gap-3">
+              <span class="flex h-7 w-7 items-center justify-center rounded-full bg-brand text-xs font-bold text-white">4</span>
+              <div>
+                <h2 class="text-base font-semibold">Review &amp; publish</h2>
+                <p class="text-xs text-slate-500">Confirm everything looks right.</p>
+              </div>
+            </div>
+
+            <div id="reviewSummary" class="space-y-4"></div>
+
+            <button type="submit" id="submitBtn" disabled class="hidden inline-flex items-center gap-2 rounded-lg bg-brand px-5 py-2.5 text-sm font-semibold text-white hover:bg-brand-dark disabled:cursor-not-allowed disabled:opacity-40 mt-3 ml-auto">
+              <i data-lucide="check" class="h-4 w-4"></i>
+              Publish listing
+            </button>
+          </div>
+        </section>
+
+        <!-- ─── ERROR ─────────────────────────────────────── -->
+        <div id="formError" class="hidden rounded-lg border border-rose-200 bg-rose-50 p-3 text-sm text-rose-700"></div>
+      </div>
+    </div>
+
+    <!-- ─── STICKY FOOTER ─────────────────────────────────── -->
+    <div class="shrink-0 border-t border-slate-200 bg-white px-4 sm:px-6 py-3">
+      <div class="max-w-3xl mx-auto flex items-center justify-between gap-3">
+        <a href="/stores/<%= store.id %>/listings" class="rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">
+          Cancel
+        </a>
+
+        <div class="flex items-center gap-2">
+          <button type="button" id="prevTabBtn" class="hidden rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">
+            <i data-lucide="chevron-left" class="inline h-4 w-4 mr-1 -mt-0.5"></i>
+            Back
+          </button>
+
+          <button type="button" id="nextTabBtn" class="inline-flex items-center gap-1.5 rounded-lg bg-slate-100 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-200">
+            Next
+            <i data-lucide="chevron-right" class="h-4 w-4 -mt-0.5"></i>
+          </button>
+
+          <!-- <button type="submit" id="submitBtn" disabled class="hidden inline-flex items-center gap-2 rounded-lg bg-brand px-5 py-2.5 text-sm font-semibold text-white hover:bg-brand-dark disabled:cursor-not-allowed disabled:opacity-40">
+            <i data-lucide="check" class="h-4 w-4"></i>
+            Publish listing
+          </button> -->
+        </div>
+      </div>
+    </div>
+  </form>
+</div>
+
+<script>
+  window.__LISTING__ = {
+    storeId: "<%= store.id %>",
+    currency: "<%= store.currency || 'RWF' %>",
+    currencyId: "<%= store.currency_id || '' %>",
+    cdnBase: "<%= process.env.CDN_BASE || 'http://localhost:9000' %>",
+  };
+</script>
+
+<% pageScript = '/scripts/pages/listing-new.js'; %>

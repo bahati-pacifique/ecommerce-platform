@@ -107,7 +107,7 @@ class AuthService {
                 };
             }
             console.log("auth.service: login()", error.message)
-            throw new Error(error.message || 'Something went wrong — Log in to continue')
+            throw new Error(error.message || 'Something went wrong — Please to login again')
         }
     }
 

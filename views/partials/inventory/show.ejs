@@ -1,0 +1,172 @@
+<%
+  // Guard against missing data (should never happen, but safe)
+  const loc     = data.location || {};
+  const st      = data.stats    || {};
+  const itms    = Array.isArray(data.items) ? data.items : [];
+  const pag     = data.pagination || { page: 1, limit: 20, total: 0, totalPages: 1, hasNextPage: false, hasPreviousPage: false };
+
+  const fmtNum = (n) => n == null || n === '' ? '0' : Number(n).toLocaleString('en-US');
+%>
+
+
+<div class="mb-6 flex flex-col justify-between gap-4 md:flex-row md:items-end">
+  <div>
+    <div class="mb-1 flex items-center gap-2">
+      <a href="/stores/<%= store.id %>/inventory" class="flex items-center gap-1 text-xs text-slate-500 hover:text-[var(--color-brand)]">
+        <i data-lucide="chevron-left" class="h-3 w-3"></i>
+        Back to locations
+      </a>
+    </div>
+    <div class="flex items-center gap-2">
+      <h1 class="text-2xl font-bold tracking-tight"><%= loc.title %></h1>
+      <% if (loc.is_default) { %>
+        <span class="rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-semibold text-emerald-700">Default</span>
+      <% } %>
+    </div>
+    <p class="mt-1 text-sm text-slate-500"><%= loc.address || loc.description || '—' %></p>
+  </div>
+  <div class="flex gap-2">
+    <button data-action="add-item" type="button"
+            data-action="add-item"
+            class="inline-flex items-center gap-2 rounded-lg bg-[var(--color-brand)] px-3 py-2 text-sm font-semibold text-white hover:bg-[var(--color-brand-dark)]">
+      <i data-lucide="plus" class="h-4 w-4"></i>Add Item
+    </button>
+  </div>
+</div>
+
+<div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+
+  <div class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+    <div class="flex items-center justify-between">
+      <span class="text-sm text-slate-500">Total units</span>
+      <span class="rounded-lg bg-[var(--color-brand-ultralight)] p-2 text-[var(--color-brand)]">
+        <i data-lucide="package" class="h-4 w-4"></i>
+      </span>
+    </div>
+    <div class="mt-4 text-2xl font-bold"><%= fmtNum(st.total_units) %></div>
+    <div class="mt-1 text-xs text-slate-400"><%= fmtNum(st.item_records) %> item<%= st.item_records === 1 ? '' : 's' %></div>
+  </div>
+
+  <div class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+    <div class="flex items-center justify-between">
+      <span class="text-sm text-slate-500">Available</span>
+      <span class="rounded-lg bg-emerald-50 p-2 text-emerald-600">
+        <i data-lucide="check-circle" class="h-4 w-4"></i>
+      </span>
+    </div>
+    <div class="mt-4 text-2xl font-bold text-emerald-600"><%= fmtNum(st.available_units) %></div>
+  </div>
+
+  <div class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+    <div class="flex items-center justify-between">
+      <span class="text-sm text-slate-500">Reserved</span>
+      <span class="rounded-lg bg-amber-50 p-2 text-amber-600">
+        <i data-lucide="lock" class="h-4 w-4"></i>
+      </span>
+    </div>
+    <div class="mt-4 text-2xl font-bold text-amber-600"><%= fmtNum(st.reserved_units) %></div>
+  </div>
+
+  <div class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+    <div class="flex items-center justify-between">
+      <span class="text-sm text-slate-500">Low stock</span>
+      <span class="rounded-lg bg-orange-50 p-2 text-orange-600">
+        <i data-lucide="alert-triangle" class="h-4 w-4"></i>
+      </span>
+    </div>
+    <div class="mt-4 text-2xl font-bold text-orange-600"><%= fmtNum(st.low_stock_items) %></div>
+    <div class="mt-1 text-xs text-slate-400"><%= fmtNum(st.out_of_stock_items) %> out of stock</div>
+  </div>
+
+</div>
+
+<div class="mt-6 rounded-xl border border-slate-200 bg-white shadow-sm">
+  <div class="border-b border-slate-100 p-5">
+    <h2 class="font-semibold">Items in this location/Inventory</h2>
+  </div>
+
+  <div class="overflow-x-auto">
+    <table class="w-full text-left text-sm">
+      <thead class="bg-slate-50 text-xs uppercase tracking-wider text-slate-500">
+        <tr>
+          <th class="px-5 py-3">Listing</th>
+          <th class="px-5 py-3 text-right">Track. Mode</th>
+          <th class="px-5 py-3 text-right">Quantity</th>
+          <th class="px-5 py-3 text-right">Reserved</th>
+          <th class="px-5 py-3 text-right">Available</th>
+          <th class="px-5 py-3">Status</th>
+          <th class="px-5 py-3"></th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-slate-100">
+        <% if (!itms.length) { %>
+          <tr>
+            <td colspan="5" class="px-5 py-16 text-center">
+              <div class="inline-flex flex-col items-center gap-2">
+                <i data-lucide="package" class="h-8 w-8 text-slate-300"></i>
+                <p class="text-sm font-medium text-slate-700">No items in this inventory</p>
+                <p class="text-xs text-slate-500">Add items to start tracking stock here.</p>
+              </div>
+            </td>
+          </tr>
+        <% } else { %>
+          <% itms.forEach(item => { %>
+            <tr class="hover:bg-slate-50">
+              <td class="px-5 py-3">
+                <div class="flex items-center gap-3">
+                  <% if (item.listing?.image) { %>
+                    <img src="https://cdn.cococe.rw/<%= item.listing.image %>" alt="" class="h-10 w-10 rounded-lg object-cover ring-1 ring-slate-200" />
+                  <% } else { %>
+                    <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-slate-100">
+                      <i data-lucide="package" class="h-4 w-4 text-slate-400"></i>
+                    </div>
+                  <% } %>
+                  <div class="min-w-0">
+                    <div class="truncate font-medium"><%= item.listing?.title || '—' %></div>
+                    <div class="font-mono text-[10px] text-slate-400"><%= item.listing?.sku || '—' %></div>
+                  </div>
+                </div>
+              </td>
+              <td class="px-5 py-3 text-right font-medium"><%= item.tracking_mode %></td>
+              <td class="px-5 py-3 text-right font-medium"><%= fmtNum(item.quantity) %></td>
+              <td class="px-5 py-3 text-right text-amber-600"><%= fmtNum(item.reserved) %></td>
+              <td class="px-5 py-3 text-right font-semibold text-emerald-600"><%= fmtNum(item.available) %></td>
+              <td class="px-5 py-3">
+                <span class="rounded-full px-2.5 py-1 text-xs font-semibold
+                  <%= item.status === 'in_stock'     ? 'bg-emerald-50 text-emerald-700' : '' %>
+                  <%= item.status === 'low_stock'    ? 'bg-amber-50 text-amber-700' : '' %>
+                  <%= item.status === 'out_of_stock' ? 'bg-rose-50 text-rose-700' : '' %>">
+                  <%= (item.status || '').replace('_', ' ') %>
+                </span>
+              </td>
+              <td>
+                <button data-item-id="<%=item.id%>" data-open-unit-modal
+                  class="inline-flex 
+                  items-center gap-1 rounded-lg border border-slate-500 
+                  px-3 py-1 text-sm font-semibold text-slate-500 hover:text-brand hover:border-brand add-unit-btn">
+                   <i data-lucide="plus"></i>Add Unit
+                </button>
+              </td>
+            </tr>
+          <% }) %>
+        <% } %>
+      </tbody>
+    </table>
+  </div>
+
+  <% if (pag.total > 0) { %>
+    <div class="border-t border-slate-100 p-4 text-sm text-slate-500">
+      Showing <%= (pag.page - 1) * pag.limit + 1 %>–<%= Math.min(pag.page * pag.limit, pag.total) %> of <%= pag.total %>
+    </div>
+  <% } %>
+</div>
+
+<%- include('./_add-item-modal', { store, inventory }) %>
+<%- include('./_unit-add-modal', { store, inventory }) %>
+
+<script type="module">
+  window.__ADD_ITEM__ = {
+    storeId:     "<%= store.id %>",
+    inventoryId: "<%= inventory.id %>",
+  };
+</script>

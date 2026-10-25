@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>COCOCE — Inventory Center</title>
+
+  <meta name="description" content="COCOCE Inventory Center — <%= store.name %>">
+  <link rel="icon" href="/favicon.ico" type="image/x-icon">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <meta property="og:image" content="https://cdn.cococe.rw/branding/brand/logos/cococe.png">
+  <meta property="og:url" content="https://www.cococe.rw">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Laptops, Printers, Accessories, Game consoles, Electronics, and much more, cococe, your wish our priority">
+  <meta property="og:description" content="COCOCE Kigali Rwanda, Laptops, Desktops, Computer accessories, Smart tv, projectors, discover what you want about digital assets near you at Kigali">
+  <meta property="og:logo" content="https://cdn.cococe.rw/branding/brand/logos/cococe.png" />
+  <meta name="twitter:card" content="https://cdn.cococe.rw/branding/brand/logos/cococe.png">
+  <meta property="twitter:domain" content="https://cococe.rw">
+  <meta property="twitter:url" content="https://cococe.rw">
+  <meta name="twitter:title" content="Laptops, Printers, Accessories, Game consoles, Electronics, and much more, cococe, your wish our priority">
+  <meta name="twitter:description" content="COCOCE Kigali Rwanda, Laptops, Desktops, Computer accessories, Smart tv, projectors, discover what you want about digital assets near you at Kigali">
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.11.0/axios.min.js" integrity="sha512-h9644v03pHqrIHThkvXhB2PJ8zf5E9IyVnrSfZg8Yj8k4RsO4zldcQc4Bi9iVLUCCsqNY0b4WXVV4UB+wbWENA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+  <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <link rel="stylesheet" href="/styles/components/notification.css">
+  <link rel="stylesheet" href="/styles/components/main-snackbar.css">
+  <link rel="stylesheet" href="/styles/components/loaders.css">
+  <link rel="stylesheet" href="/styles/components/animations.css">
+
+  <link rel="stylesheet" href="/styles/main.css">
+  <link rel="stylesheet" href="/styles/_welcome.css">
+  <link rel="stylesheet" href="/styles/inventory-center.css">
+  
+  <script>
+    const welcomeAlert = <%- JSON.stringify(locals.welcomeAlert || null) %>;
+  </script>
+  
+</head>
+
+<body class="bg-slate-50 text-slate-900">
+
+  <header class="sticky top-0 z-30 border-b border-slate-200 bg-white/95 backdrop-blur">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center gap-4">
+
+      <a href="/inventories/<%=locals.inventory.id%>/<%= store.id %>/" class="flex items-center gap-2 shrink-0">
+        <img src="/images/logos/fav.png" alt="COCOCE" class="h-7">
+        <div class="hidden sm:block">
+          <div class="text-[10px] font-bold uppercase tracking-wider text-brand">Inventory</div>
+          <div class="text-xs font-bold truncate max-w-[160px]">Center</div>
+        </div>
+      </a>
+
+      <nav class="hidden md:flex items-center gap-2 text-sm text-slate-500 min-w-0">
+        <span class="text-slate-300">/</span>
+        <div class="flex items-center gap-2 text-slate-900 font-bold text-lg">
+          <span class="text-brand"><%= store.name %></span>
+          <span class="text-gray-500">></span>
+          <span><%= inventory.title %></span>
+        </div>
+      </nav>
+
+      <div class="ml-auto flex items-center gap-2 md:gap-5">
+
+        <button id="quickActionsButton" type="button" class="inline-flex items-center gap-1.5 rounded-lg bg-[var(--color-brand)] px-3 py-2 text-xs font-semibold text-white hover:bg-[var(--color-brand-dark)]" aria-haspopup="menu" aria-expanded="false" aria-controls="quickActionsMenu">
+          <i data-lucide="menu" class="h-3.5 w-3.5"></i>
+          <span class="hidden sm:inline">Quick actions</span>
+          <i data-lucide="chevron-down" class="h-3.5 w-3.5"></i>
+        </button>
+
+        <form action="<%=locals.protocal%>auth.<%=locals.domainName%>/signout" method="POST">
+          <input type="hidden" value="<%=locals.protocal%>business.<%=locals.domainName%>" name="host">
+          <input type="hidden" name="userAccount" value="<=locals.user.userAccount%>">
+          <button type="submit" data-profile-action="sign-out" class="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50">
+            <span class="hidden md:block">Sign out</span> <i data-lucide="log-out" class="h-4 w-4"></i>
+          </button>
+        </form>
+
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
+    <%- body %>
+  </main>
+
+  <div id="quickActionsMenu" class="hidden fixed inset-0 z-50">
+    <div id="quickActionsBackdrop" class="modal-backdrop absolute inset-0 bg-slate-950/40"></div>
+
+    <div class="modal-panel absolute right-4 top-20 w-full max-w-sm rounded-2xl border border-slate-200 bg-white shadow-2xl overflow-hidden">
+
+      <div class="flex items-center justify-between border-b border-slate-100 px-4 py-3">
+        <div>
+          <div class="text-sm font-semibold text-slate-900">Quick actions</div>
+          <div class="text-xs text-slate-500"><%= store.name %></div>
+        </div>
+        <button id="quickActionsClose" type="button" class="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-700">
+          <i data-lucide="x" class="h-4 w-4"></i>
+        </button>
+      </div>
+
+      <div class="p-2">
+        <div class="px-2 py-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-400">Inventory</div>
+
+        <a href="/inventories/<%= inventory.id %>/<%= store.id %>/overview" class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-slate-700 hover:bg-[var(--color-brand-ultralight)] hover:text-[var(--color-brand-dark)] transition">
+          <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-100 text-slate-600">
+            <i data-lucide="layout-dashboard" class="h-4 w-4"></i>
+          </span>
+          <div class="min-w-0">
+            <div class="font-medium">Overview</div>
+            <div class="text-xs text-slate-500">Inventory</div>
+          </div>
+        </a>
+
+        <a href="/inventories/<%= inventory.id %>/<%= store.id %>/units" class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-slate-700 hover:bg-[var(--color-brand-ultralight)] hover:text-[var(--color-brand-dark)] transition">
+          <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-100 text-slate-600">
+            <i data-lucide="scan-line" class="h-4 w-4"></i>
+          </span>
+          <div class="min-w-0">
+            <div class="font-medium">Search units</div>
+            <div class="text-xs text-slate-500">By serial, IMEI, barcode</div>
+          </div>
+        </a>
+
+        <a href="/inventories/<%= inventory.id %>/<%= store.id %>/add-item" class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-slate-700 hover:bg-[var(--color-brand-ultralight)] hover:text-[var(--color-brand-dark)] transition">
+          <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-100 text-slate-600">
+            <i data-lucide="list-plus" class="h-4 w-4"></i>
+          </span>
+          <div class="min-w-0">
+            <div class="font-medium">Add item</div>
+            <div class="text-xs text-slate-500">Add inventory item</div>
+          </div>
+        </a>
+
+        <a href="/inventories/<%= inventory.id %>/<%= store.id %>/add-unit" class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-slate-700 hover:bg-[var(--color-brand-ultralight)] hover:text-[var(--color-brand-dark)] transition">
+          <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-100 text-slate-600">
+            <i data-lucide="plus" class="h-4 w-4"></i>
+          </span>
+          <div class="min-w-0">
+            <div class="font-medium">Add item unit</div>
+            <div class="text-xs text-slate-500">Add inventory item unit</div>
+          </div>
+        </a>
+
+        <a href="/inventories/<%= inventory.id %>/<%= store.id %>/transactions" class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-slate-700 hover:bg-[var(--color-brand-ultralight)] hover:text-[var(--color-brand-dark)] transition">
+          <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-100 text-slate-600">
+            <i data-lucide="history" class="h-4 w-4"></i>
+          </span>
+          <div class="min-w-0">
+            <div class="font-medium">Transactions</div>
+            <div class="text-xs text-slate-500">Audit log</div>
+          </div>
+        </a>
+      </div>
+
+      <div class="border-t border-slate-100"></div>
+
+      <div class="p-2">
+        <div class="px-2 py-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-400">Related</div>
+
+        <a href="/stores/<%= store.id %>/dashboard" class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition">
+          <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-100 text-slate-600">
+            <i data-lucide="arrow-left" class="h-4 w-4"></i>
+          </span>
+          <div class="min-w-0">
+            <div class="font-medium">Store</div>
+            <div class="text-xs text-slate-500">Dashboard</div>
+          </div>
+        </a>
+
+      </div>
+
+    </div>
+  </div>
+
+  <script src="/scripts/components/notification.js"></script>
+  <script src="/scripts/components/main-snackbar.js"></script>
+
+  <script type="module" src="/scripts/inventory-shell.js"></script>
+  <% if (typeof pageScript !== 'undefined' && pageScript) { %>
+  <script type="module" src="<%= pageScript %>"></script>
+  <% } %>
+
+</body>
+
+</html>

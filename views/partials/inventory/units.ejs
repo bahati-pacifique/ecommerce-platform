@@ -1,0 +1,276 @@
+<%
+  // Defensive defaults
+  const unitItems   = data.units?.items ?? [];
+  const unitTotal   = data.units?.total ?? 0;
+  const pagination  = data.pagination ?? {
+    page: 1, limit: 20, total: 0, totalPages: 1,
+    hasNextPage: false, hasPreviousPage: false,
+  };
+
+  const fmtNum  = (n) => (n == null || n === '') ? '0' : Number(n).toLocaleString('en-US');
+  const fmtDate = (iso) => iso
+  ? new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+    : '—';
+
+  const statusTone = (status) => ({
+    available: 'bg-emerald-50 text-emerald-700',
+    reserved:  'bg-amber-50 text-amber-700',
+    sold: 'bg-slate-100 text-slate-600',
+    damaged: 'bg-rose-50 text-rose-700',
+    returned:  'bg-orange-50 text-orange-700',
+  }[status] || 'bg-slate-100 text-slate-600');
+%>
+
+<div class="mb-6 flex flex-col justify-between gap-4 md:flex-row md:items-end">
+  <div>
+    <div class="mb-1 flex items-center gap-2 text-[var(--color-brand)]">
+      <i data-lucide="scan-line" class="h-4 w-4"></i>
+      <span class="text-sm font-semibold"><%= store.name %></span>
+    </div>
+    <h1 class="text-2xl font-bold tracking-tight">Units</h1>
+    <p class="mt-1 text-sm text-slate-500">
+      Individual serialized items across all locations.
+    </p>
+  </div>
+  <div class="flex gap-4">
+    <button type="button" id="openSearchButton" class="inline-flex items-center gap-2 rounded-lg bg-[var(--color-brand)] px-3 py-2 text-sm font-semibold text-white hover:bg-[var(--color-brand-dark)]">
+      <i data-lucide="search" class="h-4 w-4"></i>
+      Search units
+    </button>
+  </div>
+</div>
+
+<form method="get" class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+  <div class="flex flex-col gap-3 md:flex-row">
+    <select name="status" class="rounded-lg border border-slate-200 px-3 py-2 text-sm">
+      <option value="">All statuses</option>
+      <option value="available" <%= locals.status === 'available' ? 'selected' : '' %>>Available</option>
+      <option value="reserved" <%= locals.status === 'reserved'  ? 'selected' : '' %>>Reserved</option>
+      <option value="sold" <%= locals.status === 'sold'    ? 'selected' : '' %>>Sold</option>
+      <option value="damaged" <%= locals.status === 'damaged' ? 'selected' : '' %>>Damaged</option>
+      <option value="returned" <%= locals.status === 'returned'  ? 'selected' : '' %>>Returned</option>
+    </select>
+    <select name="sort" class="rounded-lg border border-slate-200 px-3 py-2 text-sm">
+      <option value="recent" <%= locals.sort === 'recent'   ? 'selected' : '' %>>Recently added</option>
+      <option value="serial_asc" <%= locals.sort === 'serial_asc' ? 'selected' : '' %>>Serial A → Z</option>
+      <option value="warranty" <%= locals.sort === 'warranty' ? 'selected' : '' %>>Warranty ending soon</option>
+    </select>
+    <select name="limit" class="rounded-lg border border-slate-200 px-3 py-2 text-sm">
+      <option value="20" <%= locals.limit === 20 ? 'selected' : '' %>>20 / page</option>
+      <option value="50" <%= locals.limit === 50 ? 'selected' : '' %>>50 / page</option>
+      <option value="100" <%= locals.limit === 100 ? 'selected' : '' %>>100 / page</option>
+    </select>
+    <button type="submit" class="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium hover:bg-slate-50">
+      Apply
+    </button>
+  </div>
+</form>
+
+
+<div class="mt-4 flex items-center justify-between text-sm">
+  <span class="text-slate-500">
+    <%= fmtNum(unitTotal) %> unit<%= unitTotal === 1 ? '' : 's' %>
+  </span>
+  <% if (unitTotal > 0) { %>
+  <span class="text-xs text-slate-400">
+    Page <%= pagination.page %> of <%= pagination.totalPages %>
+  </span>
+  <% } %>
+</div>
+
+<div class="mt-3 rounded-xl border border-slate-200 bg-white shadow-sm">
+
+  <% if (!unitItems.length) { %>
+
+  <div class="py-16 text-center">
+    <div class="inline-flex flex-col items-center gap-2">
+      <div class="flex h-12 w-12 items-center justify-center rounded-full bg-slate-100">
+        <i data-lucide="package" class="h-6 w-6 text-slate-400"></i>
+      </div>
+      <p class="text-sm font-medium text-slate-700">No units recorded yet</p>
+      <p class="text-xs text-slate-500">
+        Serialized items will appear here once they're received into inventory.
+      </p>
+    </div>
+  </div>
+
+  <% } else { %>
+
+  <div class="overflow-x-auto">
+    <table class="w-full text-left text-sm">
+      <thead class="bg-slate-50 text-xs uppercase tracking-wider text-slate-500">
+        <tr>
+          <th class="px-5 py-3">Serial</th>
+          <th class="px-5 py-3">Listing</th>
+          <th class="px-5 py-3">Location</th>
+          <th class="px-5 py-3">Status</th>
+          <th class="px-5 py-3">Warranty</th>
+          <th class="px-5 py-3"></th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-slate-100">
+        <% unitItems.forEach(u => { %>
+        <tr class="hover:bg-slate-50">
+
+          <!-- Identifiers -->
+          <td class="px-5 py-3 align-top">
+            <div class="font-mono text-xs text-slate-900">
+              <%= u.serial_number || '—' %>
+            </div>
+            <% if (u.imei) { %>
+            <div class="mt-0.5 text-[10px] text-slate-400">
+              IMEI <%= u.imei %>
+            </div>
+            <% } %>
+            <% if (u.barcode && !u.imei) { %>
+            <div class="mt-0.5 text-[10px] text-slate-400">
+              BC <%= u.barcode %>
+            </div>
+            <% } %>
+          </td>
+
+          <td class="px-5 py-3">
+            <div class="flex items-center gap-2.5">
+              <% if (u.listing?.image) { %>
+              <img src="<%= u.listing.image %>" alt="" class="h-8 w-8 shrink-0 rounded object-cover ring-1 ring-slate-200" data-fallback-hide="true" />
+              <% } else { %>
+              <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded bg-slate-100">
+                <i data-lucide="package" class="h-3.5 w-3.5 text-slate-400"></i>
+              </div>
+              <% } %>
+              <span class="max-w-[220px] truncate font-medium text-slate-800" title="<%= u.listing?.title || '' %>">
+                <%= u.listing?.title || '—' %>
+              </span>
+            </div>
+          </td>
+
+          <td class="px-5 py-3 text-xs text-slate-600">
+            <span class="inline-flex items-center gap-1">
+              <i data-lucide="warehouse" class="h-3 w-3 text-slate-400"></i>
+              <%= u.location?.title || '—' %>
+            </span>
+          </td>
+
+          <td class="px-5 py-3">
+            <span class="rounded-full px-2 py-0.5 text-[10px] font-semibold <%= statusTone(u.status) %>">
+              <%= u.status || '—' %>
+            </span>
+          </td>
+
+          <td class="px-5 py-3 text-xs text-slate-500">
+            <%= fmtDate(u.warranty_end_date) %>
+          </td>
+
+          <td class="px-5 py-3 text-right">
+            <% if (u.inventory_item_id) { %>
+            <a href="/stores/<%= store.id %>/inventory/<%= u.location?.id %>/items/<%= u.inventory_item_id %>" class="inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-white px-2.5 py-1 text-xs font-medium text-slate-700 hover:bg-slate-50">
+              <i data-lucide="eye" class="h-3 w-3"></i>
+              View
+            </a>
+            <% } %>
+          </td>
+        </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+
+  <% if (pagination.totalPages > 1) { %>
+  <div class="border-t border-slate-100 px-5 py-3">
+    <div class="flex flex-col items-center justify-between gap-3 sm:flex-row text-xs text-slate-500">
+      <span>
+        Showing <%= (pagination.page - 1) * pagination.limit + 1 %>–<%= Math.min(pagination.page * pagination.limit, pagination.total) %>
+        of <%= fmtNum(pagination.total) %>
+      </span>
+      <div class="flex items-center gap-1">
+        <%
+              const baseQuery = new URLSearchParams({
+                status: locals.status || '',
+                sort:   locals.sort   || 'recent',
+                limit:  locals.limit  || 20,
+              }).toString();
+            %>
+        <a href="?<%= baseQuery %>&page=<%= pagination.page - 1 %>" class="rounded border px-2.5 py-1 <%= !pagination.hasPreviousPage ? 'opacity-40 pointer-events-none' : 'hover:bg-slate-50' %>">
+          ← Prev
+        </a>
+        <span class="rounded border bg-slate-50 px-2.5 py-1 font-medium">
+          <%= pagination.page %> / <%= pagination.totalPages %>
+        </span>
+        <a href="?<%= baseQuery %>&page=<%= pagination.page + 1 %>" class="rounded border px-2.5 py-1 <%= !pagination.hasNextPage ? 'opacity-40 pointer-events-none' : 'hover:bg-slate-50' %>">
+          Next →
+        </a>
+      </div>
+    </div>
+  </div>
+  <% } %>
+
+  <% } %>
+
+</div>
+
+<div id="searchModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+
+  <div id="searchModalBackdrop" class="absolute inset-0 bg-slate-950/40 backdrop-blur-sm"></div>
+
+  <div class="relative w-full max-w-3xl max-h-[90vh] flex flex-col">
+    <div class="rounded-2xl border border-slate-200 bg-white shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+
+      <div class="flex items-center justify-between border-b border-slate-100 px-5 py-4">
+        <div>
+          <div class="text-sm font-semibold text-slate-900">Search units</div>
+          <div class="text-xs text-slate-500">Serial, IMEI, barcode, or MAC</div>
+        </div>
+        <button type="button" id="closeSearchButton" class="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100">
+          <i data-lucide="x" class="h-4 w-4"></i>
+        </button>
+      </div>
+
+      <form id="unitSearchForm" class="border-b border-slate-100 p-4">
+        <div class="flex flex-col gap-3 sm:flex-row">
+          <div class="relative flex-1">
+            <i data-lucide="scan-line" class="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"></i>
+            <input type="search" name="q" id="unitQuery" placeholder="Scan or type a serial / IMEI / barcode / MAC..." class="w-full rounded-lg border border-slate-200 bg-slate-50 py-2.5 pl-10 pr-3 text-sm outline-none focus:border-[var(--color-brand)] focus:bg-white" autocomplete="off" />
+          </div>
+          <select name="status" class="rounded-lg border border-slate-200 px-3 py-2.5 text-sm">
+            <option value="">Any status</option>
+            <option value="available">Available</option>
+            <option value="reserved">Reserved</option>
+            <option value="sold">Sold</option>
+            <option value="damaged">Damaged</option>
+            <option value="returned">Returned</option>
+          </select>
+          <button type="submit" class="inline-flex items-center gap-2 rounded-lg bg-[var(--color-brand)] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[var(--color-brand-dark)]">
+            <i data-lucide="search" class="h-4 w-4"></i>
+            Search
+          </button>
+        </div>
+        <p class="mt-2 text-xs text-slate-400">
+          Tip: Barcode scanners append Enter — the form submits automatically.
+        </p>
+      </form>
+
+      <div id="unitResults" class="max-h-[60vh] overflow-y-auto p-4">
+
+        <div class="py-10 text-center">
+          <div class="inline-flex flex-col items-center gap-2">
+            <div class="flex h-12 w-12 items-center justify-center rounded-full bg-slate-100">
+              <i data-lucide="scan-line" class="h-6 w-6 text-slate-400"></i>
+            </div>
+            <p class="text-sm font-medium text-slate-700">Ready to search</p>
+            <p class="text-xs text-slate-500">Scan a barcode or type an identifier to begin.</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  window.__UNITS__ = {
+    storeId: "<%= store.id %>",
+    inventoryId: "<%= inventory.id %>"
+  };
+</script>
+
+<% pageScript = '/scripts/pages/units-search.js'; %>

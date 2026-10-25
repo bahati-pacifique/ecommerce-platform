@@ -1,4 +1,5 @@
 const StoreModel = require('../models/store.model');
+const StoreDashboardModel = require('../models/store.dashboard.model');
 
 class StoreService {
 
@@ -485,9 +486,249 @@ class StoreService {
         return StoreModel.setLastActive(id);
     }
 
-    static async getStoreDashboardAnalytics(storeId, period){
+    static async getStoreDashboardAnalytics(storeId, period) {
         return await StoreModel.getStoreDashboardAnalytics(storeId, period);
     }
+
+    //======================= Dashboard Data ==============================
+    static ALLOWED_PERIODS = [
+        "today",
+        "7d",
+        "30d",
+        "90d",
+        "year",
+        "custom",
+    ];
+
+    static resolvePeriod({ period = "7d", from, to }) {
+        if (!this.ALLOWED_PERIODS.includes(period)) {
+            throw new Error(
+                "Invalid period. Use today, 7d, 30d, 90d, year, or custom."
+            );
+        }
+
+        const now = new Date();
+        let start;
+        let end = now;
+        let days;
+
+        if (period === "custom") {
+            if (!from || !to) {
+                throw new Error(
+                    "Both from and to are required for a custom period."
+                );
+            }
+
+            start = new Date(`${from}T00:00:00.000Z`);
+            end = new Date(`${to}T23:59:59.999Z`);
+
+            if (
+                Number.isNaN(start.getTime()) ||
+                Number.isNaN(end.getTime())
+            ) {
+                throw new Error("Invalid from or to date.");
+            }
+
+            if (start > end) {
+                throw new Error("from must be before or equal to to.");
+            }
+
+            if (end > now) {
+                throw new Error("to cannot be in the future.");
+            }
+
+            // Inclusive calendar-day range.
+            days = Math.round(
+                (Date.UTC(
+                    end.getUTCFullYear(),
+                    end.getUTCMonth(),
+                    end.getUTCDate()
+                ) - Date.UTC(
+                    start.getUTCFullYear(),
+                    start.getUTCMonth(),
+                    start.getUTCDate()
+                )) / 86400000
+            ) + 1;
+        } else if (period === "today") {
+            start = new Date(Date.UTC(
+                now.getUTCFullYear(),
+                now.getUTCMonth(),
+                now.getUTCDate()
+            ));
+            days = 1;
+        } else {
+            days = {
+                "7d": 7,
+                "30d": 30,
+                "90d": 90,
+                year: 365,
+            }[period];
+
+            start = new Date(now.getTime() - days * 86400000);
+        }
+
+        const duration = end.getTime() - start.getTime();
+
+        const previousTo = start;
+        const previousFrom = new Date(
+            previousTo.getTime() - duration
+        );
+
+        return {
+            key: period,
+            label: period === "custom"
+                ? `${from} to ${to}`
+                : {
+                    today: "Today",
+                    "7d": "Last 7 days",
+                    "30d": "Last 30 days",
+                    "90d": "Last 90 days",
+                    year: "Last 365 days",
+                }[period],
+            from: start,
+            to: end,
+            previousFrom,
+            previousTo,
+            days,
+        };
+    }
+
+    static calculateChange(current, previous) {
+        if (previous === 0 || previous == null) {
+            return null;
+        }
+
+        return Number(
+            (((current - previous) / previous) * 100).toFixed(1)
+        );
+    }
+
+
+    static async getDashboard({
+        storeId,
+        period = "7d",
+        from,
+        to,
+    }) {
+        const range = this.resolvePeriod({ period, from, to });
+
+        const [
+            core,
+            salesSeries,
+            previousSalesSeries,
+            inventoryItems,
+            additions,
+        ] = await Promise.all([
+            StoreDashboardModel.getCoreData({
+                storeId,
+                from: range.from,
+                to: range.to,
+                previousFrom: range.previousFrom,
+                previousTo: range.previousTo,
+                lowStockThreshold: 5,
+            }),
+
+            StoreDashboardModel.getDailySalesSeries(
+                storeId,
+                range.from,
+                range.to
+            ),
+
+            StoreDashboardModel.getDailySalesSeries(
+                storeId,
+                range.previousFrom,
+                range.previousTo
+            ),
+
+            StoreDashboardModel.getInventoryAlertItems(
+                storeId,
+                5,
+                10
+            ),
+
+            StoreDashboardModel.getDashboardAdditions({
+                storeId,
+                from: range.from,
+                to: range.to,
+            }),
+        ]);
+
+        // Merge the additional fields into the existing core response.
+        core.sales.currency = additions.sales.currency;
+
+        core.visits.weekly = additions.visits.weekly;
+        core.visits.best_hour_range =
+            additions.visits.best_hour_range;
+
+        core.response = additions.response;
+        core.pending_orders = additions.pending_orders;
+
+        return {
+            period: {
+                key: range.key,
+                label: range.label,
+                from: range.from.toISOString(),
+                to: range.to.toISOString(),
+            },
+
+            generated_at: new Date().toISOString(),
+
+            core,
+
+            sales_overview: {
+                series: salesSeries,
+                previous_series: previousSalesSeries,
+            },
+
+            inventory_alerts: {
+                items: inventoryItems,
+            },
+
+            orders_attention: additions.orders_attention,
+            most_visited_listing: additions.most_visited_listing,
+            top_listings: additions.top_listings,
+            inventory: additions.inventory
+        };
+    }
+
+    /**
+     * Retrieves paginated product listing analytics based on filters.
+     * 
+     * @param {Object} filters - The filter configuration.
+     * @param {*} filters.storeId - The unique identifier for the store.
+     * @param {number} [filters.page=1] - The page number for pagination.
+     * @param {number} [filters.limit=20] - Number of items per page.
+     * @param {string} [filters.search=""] - Search query string.
+     * @param {*} [filters.status] - Filter by product status.
+     * @param {string} [filters.sortBy="created_at"] - Field to sort the results by.
+     * @param {"ASC" | "DESC"} [filters.sortOrder="DESC"] - Sort direction.
+     */
+    static async getProductListingAnalytics(filters) {
+        const result = await StoreDashboardModel.getPaginatedListingAnalytics(filters);
+        return result;
+    }
+
+    /**
+     * Retrieves store inventory data
+     * 
+     * @param {*} payload - The Filter configuration.
+     * @param {UUID} payload.storeId - The unique store identifier.
+     * @param {number} payload.page - The page number for pagination.
+     * @param {number} payload.limit - Number of items per page.
+     * @param {string} search - Search query string.
+     * @param {*} status - Filter by product status.
+     * @param {*} stock - Stock Filter.
+     * @param {*} sortBy - Field to sort the results by.
+     * @param {*} sortOrder - Sort direction.,
+     * @param {*} lowStockThreshold = 5 Low stock preset,
+     */
+    static async getInventoriesByStoreId(payload) {
+        const result = await StoreDashboardModel.getInventoriesByStoreId(payload);
+        return result;
+    }
+
+    
+
 }
 
 module.exports = StoreService;

@@ -5,6 +5,7 @@ const router = express.Router();
 const businessController = require('../controller/business.controller');
 
 const { dashboard, session, business, vendorBusinessRegister } = require('../../../middlewares/authGuards');
+const { getProductWithVariants } = require('../../../src/models/product.model');
 
 router.get('/stores/docs/terms', session, businessController.renderTerms);
 router.get('/docs/attributes-registry-terms', session, businessController.renderAttributeRegistryTerms);
@@ -27,7 +28,19 @@ router.get('/stores/:storeId/dashboard/listings', business, businessController.r
 router.get('/stores/:storeId/dashboard/products', business, businessController.renderStoreProducts);
 router.get('/stores/:storeId/dashboard/followers', business, businessController.renderStoreFollowers);
 
+router.get('/stores/:storeId/listings/search', business, businessController.searchListingByStore);
+
+router.get('/inventories/:inventoryId/:storeId/', business, businessController.renderInventoryHome);
+router.get('/inventories/:inventoryId/:storeId/overview', business, businessController.renderInventoryOverview);
+router.get('/inventories/:inventoryId/:storeId/units', business, businessController.renderInventoryUnit);
+router.get('/inventories/:inventoryId/:storeId/units/search', business, businessController.searchUnit);
+
+router.post('/inventories/:inventoryId/:storeId/items', business, businessController.createInventoryItem)
+
 router.get('/stores/:storeId/data/analytics', businessController.getStoreDashboardAnalytics);
+router.get('/stores/:storeId/data/product-listing/analytics', business, businessController.getStoreListingProductAnalytics);
+router.get('/stores/:storeId/data/product-listing/inventories', business, businessController.getInventoriesByStoreId);
+router.get('/stores/:storeId/data/dashboard', business, businessController.getStoreDashboard);
 
 // router.get('/stores/:vendorId/:storeId', business, businessController.renderVendorStorePage);
 router.get('/register', vendorBusinessRegister, businessController.renderVendorCreation);
@@ -44,6 +57,11 @@ router.get('/products/catalog/list', businessController.getPaginatedProductsCata
 router.get('/products/catalog/s', businessController.deepSearchProductsCatalog);
 router.post('/products/catalog/s', businessController.searchProductByImage);
 router.get('/products/catalog/:id', businessController.getProductById);
+
+router.get('/products/:productId/variants', business, businessController.getProductVariants);
+
+router.get('/cataloging/listing/:storeId/new', business, businessController.renderListingcataloging);
+router.post('/cataloging/listing/:storeId/', business, businessController.insertNewList);
 
 router.get('/messages', business, businessController.renderMessages);
 router.get('/notifications', business, businessController.renderNotifications);

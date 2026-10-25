@@ -1,0 +1,278 @@
+<%
+  // Required locals:
+  //   inventoryItem  — the parent item (id, name)
+  //   unitStatuses   — array of allowed status values
+  //   unitConditions — array of allowed condition values
+  //   locations      — array of { id, name } for the location dropdown
+  //
+  // Optional:
+  //   csrfToken      — if you're using CSRF protection (you should be)
+  //   preselectedStatus — defaults to 'available'
+%>
+
+<%
+  const statuses = [
+    'in_stock',
+    'low_stock',
+    'out_of_stock',
+    'reserved',
+    'damaged',
+    'returned',
+    'discontinued'
+  ]
+  const conditions  = [
+    'new',
+    'open_box',
+    'used',
+    'used_like_new',
+    'used_good',
+    'used_fair',
+    'refurbished',
+    'for_parts'
+  ]
+  const locs        = typeof locations      !== 'undefined' && Array.isArray(locations)      ? locations      : [];
+  const csrf        = typeof csrfToken      !== 'undefined' ? csrfToken : '';
+  const initialStat = typeof preselectedStatus !== 'undefined' ? preselectedStatus : 'available';
+%>
+
+<div id="unit-add-modal" class="fixed inset-0 z-[100] hidden items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="unit-add-title">
+
+  <!-- Backdrop -->
+  <div id="unit-add-backdrop" class="absolute inset-0 bg-gray-950/60 backdrop-blur-sm" aria-hidden="true"></div>
+
+  <!-- Panel -->
+  <div class="relative w-full max-w-2xl overflow-hidden rounded-2xl bg-white shadow-2xl ring-1 ring-gray-200" role="document">
+
+    <!-- Brand accent stripe -->
+    <div class="h-1.5 w-full bg-gradient-to-r from-brand via-brand-dark to-brand"></div>
+
+    <div class="relative max-h-[85vh] overflow-y-auto p-6 sm:p-8">
+
+      <!-- Header -->
+      <div class="flex items-start justify-between gap-4">
+        <div>
+          <h2 id="unit-add-title" class="text-lg font-bold tracking-tight text-gray-950">
+            Add unit
+          </h2>
+          <p class="mt-1 text-sm text-gray-500">
+            Add a tracked unit to inventory
+          </p>
+        </div>
+
+        <button type="button" id="unit-add-close" aria-label="Close" class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-gray-500 transition hover:bg-gray-100 hover:text-gray-800">
+          <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18 18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      <form id="unit-add-form" class="mt-6 space-y-5" method="POST" novalidate>
+
+        <% if (csrf) { %>
+        <input type="hidden" name="_csrf" value="<%= csrf %>">
+        <% } %>
+        <input type="hidden" name="inventory_item_id" id="selectedItemId">
+
+        <fieldset>
+          <legend class="text-xs font-bold uppercase tracking-wider text-gray-500">
+            Identifiers <span class="font-normal normal-case text-gray-400">(at least one recommended)</span>
+          </legend>
+
+          <div class="mt-3 grid gap-3 sm:grid-cols-2">
+            <!-- Serial -->
+            <div>
+              <label for="unit-serial" class="mb-1 block text-xs font-medium text-gray-700">
+                Serial number
+              </label>
+              <input id="unit-serial" name="serial_number" type="text" maxlength="255" autocomplete="off" class="h-10 w-full rounded-lg border border-gray-200 bg-white px-3 text-sm text-gray-900 outline-none placeholder:text-gray-400 focus:border-brand focus:ring-2 focus:ring-brand/20" placeholder="e.g. SN-2024-0001">
+            </div>
+
+            <!-- Barcode -->
+            <div>
+              <label for="unit-barcode" class="mb-1 block text-xs font-medium text-gray-700">
+                Barcode
+              </label>
+              <input id="unit-barcode" name="barcode" type="text" maxlength="255" autocomplete="off" class="h-10 w-full rounded-lg border border-gray-200 bg-white px-3 text-sm text-gray-900 outline-none placeholder:text-gray-400 focus:border-brand focus:ring-2 focus:ring-brand/20" placeholder="e.g. 5901234123457">
+            </div>
+
+            <!-- IMEI -->
+            <div>
+              <label for="unit-imei" class="mb-1 block text-xs font-medium text-gray-700">
+                IMEI <span class="text-gray-400 font-normal">(phones / tablets)</span>
+              </label>
+              <input id="unit-imei" name="imei" type="text" inputmode="numeric" pattern="[0-9]{15}" maxlength="15" autocomplete="off" class="h-10 w-full rounded-lg border border-gray-200 bg-white px-3 text-sm text-gray-900 outline-none placeholder:text-gray-400 focus:border-brand focus:ring-2 focus:ring-brand/20" placeholder="15 digits">
+              <p class="mt-1 hidden text-xs text-brand" data-error-for="imei">
+                IMEI must be exactly 15 digits.
+              </p>
+            </div>
+
+            <!-- MAC -->
+            <div>
+              <label for="unit-mac" class="mb-1 block text-xs font-medium text-gray-700">
+                MAC address <span class="text-gray-400 font-normal">(network devices)</span>
+              </label>
+              <input id="unit-mac" name="mac_address" type="text" maxlength="17" autocomplete="off" class="h-10 w-full rounded-lg border border-gray-200 bg-white px-3 font-mono text-sm uppercase text-gray-900 outline-none placeholder:text-gray-400 focus:border-brand focus:ring-2 focus:ring-brand/20" placeholder="AA:BB:CC:DD:EE:FF">
+              <p class="mt-1 hidden text-xs text-brand" data-error-for="mac_address">
+                Invalid MAC address format.
+              </p>
+            </div>
+          </div>
+        </fieldset>
+
+        <!-- ── Status & condition ───────────────────────────── -->
+        <fieldset class="grid gap-3 sm:grid-cols-2">
+          <div>
+            <label for="unit-status" class="mb-1 block text-xs font-medium text-gray-700">
+              Status
+            </label>
+            <select id="unit-status" name="status" required class="h-10 w-full rounded-lg border border-gray-200 bg-white px-3 text-sm text-gray-900 outline-none focus:border-brand focus:ring-2 focus:ring-brand/20">
+              <% statuses.forEach(s => { %>
+              <option value="<%= s %>" <%= s === initialStat ? 'selected' : '' %>>
+                <%= s.charAt(0).toUpperCase() + s.slice(1) %>
+              </option>
+              <% }) %>
+            </select>
+          </div>
+
+          <div>
+            <label for="unit-condition" class="mb-1 block text-xs font-medium text-gray-700">
+              Condition
+            </label>
+            <select id="unit-condition" name="condition" required class="h-10 w-full rounded-lg border border-gray-200 bg-white px-3 text-sm text-gray-900 outline-none focus:border-brand focus:ring-2 focus:ring-brand/20">
+              <% conditions.forEach(c => { %>
+              <option value="<%= c %>">
+                <%= c.charAt(0).toUpperCase() + c.slice(1) %>
+              </option>
+              <% }) %>
+            </select>
+          </div>
+        </fieldset>
+
+        <!-- <div>
+          <label for="unit-location" class="mb-1 block text-xs font-medium text-gray-700">
+            Location <span class="text-gray-400 font-normal">(optional)</span>
+          </label>
+          <select id="unit-location"
+                  name="location_id"
+                  class="h-10 w-full rounded-lg border border-gray-200 bg-white px-3 text-sm text-gray-900 outline-none focus:border-brand focus:ring-2 focus:ring-brand/20">
+            <option value="">— No location —</option>
+            <% locs.forEach(loc => { %>
+              <option value="<%= loc.id %>"><%= loc.name %></option>
+            <% }) %>
+          </select>
+        </div> -->
+
+        <!-- ── Warranty ─────────────────────────────────────── -->
+        <fieldset>
+          <legend class="text-xs font-bold uppercase tracking-wider text-gray-500">
+            Warranty <span class="font-normal normal-case text-gray-400">(optional)</span>
+          </legend>
+
+          <div class="mt-3 grid gap-3 sm:grid-cols-2">
+            <div>
+              <label for="unit-warranty-start" class="mb-1 block text-xs font-medium text-gray-700">
+                Start date
+              </label>
+              <input id="unit-warranty-start" name="warranty_start_date" type="date" class="h-10 w-full rounded-lg border border-gray-200 bg-white px-3 text-sm text-gray-900 outline-none focus:border-brand focus:ring-2 focus:ring-brand/20">
+            </div>
+
+            <div>
+              <label for="unit-warranty-end" class="mb-1 block text-xs font-medium text-gray-700">
+                End date
+              </label>
+              <input id="unit-warranty-end" name="warranty_end_date" type="date" class="h-10 w-full rounded-lg border border-gray-200 bg-white px-3 text-sm text-gray-900 outline-none focus:border-brand focus:ring-2 focus:ring-brand/20">
+              <p class="mt-1 hidden text-xs text-brand" data-error-for="warranty_end_date">
+                End date must be on or after start date.
+              </p>
+            </div>
+          </div>
+        </fieldset>
+
+        <fieldset class="grid gap-3 sm:grid-cols-2">
+          <div>
+            <label for="unit-received-at" class="mb-1 block text-xs font-medium text-gray-700">
+              Received at <span class="text-gray-400 font-normal">(optional)</span>
+            </label>
+            <input id="unit-received-at" name="received_at" type="datetime-local" class="h-10 w-full rounded-lg border border-gray-200 bg-white px-3 text-sm text-gray-900 outline-none focus:border-brand focus:ring-2 focus:ring-brand/20">
+          </div>
+
+          <div>
+            <label for="unit-sold-at" class="mb-1 block text-xs font-medium text-gray-700">
+              Sold at <span class="text-gray-400 font-normal">(optional)</span>
+            </label>
+            <input id="unit-sold-at" name="sold_at" type="datetime-local" class="h-10 w-full rounded-lg border border-gray-200 bg-white px-3 text-sm text-gray-900 outline-none focus:border-brand focus:ring-2 focus:ring-brand/20">
+          </div>
+        </fieldset>
+
+        <!-- <details class="rounded-lg border border-gray-200 bg-gray-50 px-4 py-3">
+          <summary class="cursor-pointer text-sm font-medium text-gray-700 hover:text-brand">
+            Additional metadata (JSONB)
+          </summary>
+          <div class="mt-3">
+            <label for="unit-meta" class="mb-1 block text-xs font-medium text-gray-700">
+              JSON object — leave as <code class="rounded bg-gray-200 px-1 py-0.5 text-[11px]">{}</code> if not needed
+            </label>
+            <textarea id="unit-meta"
+                      name="meta"
+                      rows="4"
+                      spellcheck="false"
+                      class="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 font-mono text-xs text-gray-900 outline-none placeholder:text-gray-400 focus:border-brand focus:ring-2 focus:ring-brand/20"
+                      placeholder='{ "supplier": "Acme Ltd", "notes": "Opened box" }'>{}</textarea>
+            <p class="mt-1 hidden text-xs text-brand" data-error-for="meta">
+              Must be a valid JSON object.
+            </p>
+          </div>
+        </details> -->
+
+        <fieldset>
+          <legend class="text-xs font-bold uppercase tracking-wider text-gray-500">
+            Additional metadata <span class="font-normal normal-case text-gray-400">(optional)</span>
+          </legend>
+
+          <div class="mt-3 rounded-lg border border-gray-200 bg-gray-50 p-3">
+
+            <!-- Rows container — JS appends here -->
+            <div id="unit-meta-rows" class="space-y-2"></div>
+
+            <!-- Empty state (hidden once at least one row exists) -->
+            <p id="unit-meta-empty" class="py-2 text-center text-xs text-gray-400">
+              No custom fields yet. Click <span class="font-medium text-gray-600">Add field</span> below.
+            </p>
+
+            <!-- Add row button -->
+            <button type="button" id="unit-meta-add" class="mt-2 inline-flex items-center gap-1.5 rounded-lg border border-dashed border-gray-300 bg-white px-3 py-1.5 text-xs font-semibold text-gray-700 transition hover:border-brand hover:bg-brand-light hover:text-brand">
+              <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+              </svg>
+              Add field
+            </button>
+
+            <!-- Hidden input carrying serialized JSON to the server -->
+            <input type="hidden" name="meta" id="unit-meta-json" value="{}">
+
+            <p class="mt-2 hidden text-xs text-brand" data-error-for="meta">
+              Must be valid key/value pairs.
+            </p>
+          </div>
+        </fieldset>
+
+
+        <div id="unit-add-error" class="hidden rounded-lg border border-brand/30 bg-brand-light px-4 py-3 text-sm text-brand-dark" role="alert"></div>
+
+        <!-- ── Actions ──────────────────────────────────────── -->
+        <div class="flex flex-col-reverse gap-2 pt-2 sm:flex-row sm:justify-end">
+          <button type="button" id="unit-add-cancel" class="inline-flex min-h-10 items-center justify-center rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-semibold text-gray-800 transition hover:border-gray-300 hover:bg-gray-50">
+            Cancel
+          </button>
+
+          <button type="submit" id="unit-add-submit" class="inline-flex min-h-10 items-center justify-center rounded-lg bg-brand px-5 py-2 text-sm font-bold text-white transition hover:bg-brand-dark disabled:cursor-not-allowed disabled:opacity-60">
+            <span id="unit-add-submit-text">Add unit</span>
+          </button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+</div>
+
+<script type="module" src="/scripts/pages/unit.js"></script>

@@ -151,6 +151,7 @@ function authPass({ acceptedTypes }) {
 
                 if (acceptsHtml(req)) {
                     return res.render('no-access', {
+                        layout: false,
                         user,
                         accepted: acceptedTypes,
                         account: accessToken.ac_type,
@@ -258,6 +259,7 @@ function authPass({ acceptedTypes }) {
 
             if (acceptsHtml(req)) {
                 return res.render('no-access', {
+                    layout: false,
                     user,
                     accepted: acceptedTypes,
                     account: user.account_category,

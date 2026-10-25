@@ -56,22 +56,28 @@
         </div>
       </div>
       <div class="flex items-center gap-3 ml-auto">
-        <% if (!locals.user) {%>
-        <a href="<%=locals.authDomain%>" class="btn-outline-premium flex items-center gap-2" target="_blank">
+        <% if (!locals.user) { %>
+        <a href="<%= locals.authDomain %>" class="btn-outline-premium flex items-center gap-2" target="_blank">
           Sign in <i class="bi bi-arrow-right"></i>
         </a>
-        <%} else {%>
+        <% } else { %>
         <div class="flex items-center gap-3">
+          
           <span class="text-sm font-bold hidden md:block text-slate-600 transition">
-            Hi, <%-locals.user.vendor?.business_name || locals.user.username%>
+            Hi, <%= locals.user?.vendor?.business_name || locals.user?.username %>
           </span>
-          <a href="/<%=locals.user?.vendor?.id?.replaceAll('-','')%>/dashboard" class="btn-premium text-white rounded-lg text-sm py-2 px-5">
+
+          <a href="<%= locals.user?.vendor ? '/' + locals.user.vendor.id.replaceAll('-', '') + '/dashboard' : '/' %>" class="btn-premium text-white rounded-lg text-sm py-2 px-5 <%= !locals.user?.vendor ? 'hidden' : '' %>">
             Go to Dashboard <i class="bi bi-arrow-right"></i>
           </a>
+
+          <div class="inline-flex items-center gap-2 px-4 py-1.5 bg-red-600 rounded-full border border-slate-200/60 shadow-sm text-sm font-medium text-white max-md:m-3">
+            <i class="bi bi-exclamation-triangle"></i><span>Please signin with Business account</span>
+          </div>
         </div>
-        <%}%>
-          
-        </div>
+        <% } %>
+      </div>
+
     </div>
   </nav>
 
@@ -96,18 +102,18 @@
           </p>
 
           <div class="flex flex-wrap gap-4">
-          <%if (!locals.user) {%>
-        <a href="/register" class="btn-primary-premium">
-          Register
-          <i class="fas fa-arrow-right text-xs"></i>
-        </a>
+            <%if (!locals.user) {%>
+            <a href="/register" class="btn-primary-premium">
+              Register
+              <i class="fas fa-arrow-right text-xs"></i>
+            </a>
 
-        <%} else {%>
-        <a href="<%=locals.user?.vendor?.id?.replaceAll('-','')%>/dashboard" class="btn-primary-premium">
-          <span>Dashboard</span>
-          <i class="bi bi-arrow-right"></i>
-        </a>
-        <%}%>
+            <%} else {%>
+            <a href="<%=locals.user?.vendor?.id?.replaceAll('-','')%>/dashboard" class="btn-primary-premium">
+              <span>Dashboard</span>
+              <i class="bi bi-arrow-right"></i>
+            </a>
+            <%}%>
             <a href="/pricing" class="btn-outline-premium" target="_blank">
               See Pricing
               <i class="bi bi-tags"></i>
@@ -345,11 +351,11 @@
           </div>
 
         <% if (!locals.user) {%>
-        <a href="/register" class="btn-primary-premium mt-8">
-          Get Started
-          <i class="fas fa-arrow-right text-xs"></i>
-        </a>
-        <%}%>
+            <a href="/register" class="btn-primary-premium mt-8">
+              Get Started
+              <i class="fas fa-arrow-right text-xs"></i>
+            </a>
+            <%}%>
         </div>
 
         <div class="relative">
@@ -488,17 +494,17 @@
       <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mt-8">
 
         <% if (!locals.user) {%>
-        <a href="/register" class="btn-premium text-sm rounded py-3 px-5">
-          Get Started
-          <i class="fas fa-arrow-right text-xs"></i>
-        </a>
-        <%} else {%>
-        <div class="flex items-center gap-3">
-          <a href="<%=locals.user?.vendor?.id?.replaceAll('-','')%>/dashboard" class="bg-white text-brand rounded-lg text-sm px-8 py-3.5 shadow-sm font-semibold hover:bg-white/50 transition flex items-center gap-2">
-            Go to Dashboard
-          </a>
-        </div>
-        <%}%>
+            <a href="/register" class="btn-premium text-sm rounded py-3 px-5">
+              Get Started
+              <i class="fas fa-arrow-right text-xs"></i>
+            </a>
+            <%} else {%>
+            <div class="flex items-center gap-3">
+              <a href="<%=locals.user?.vendor?.id?.replaceAll('-','')%>/dashboard" class="bg-white text-brand rounded-lg text-sm px-8 py-3.5 shadow-sm font-semibold hover:bg-white/50 transition flex items-center gap-2">
+                Go to Dashboard
+              </a>
+            </div>
+            <%}%>
         <a href="mailto:sales@cococe.rw" class="border border-white/20 text-white px-8 py-3.5 rounded-xl font-semibold hover:bg-white/10 transition flex items-center gap-2">
           <i class="fas fa-headset"></i>
           Contact Sales
@@ -552,20 +558,20 @@
         <p>© 2026 COCOCE Business. All rights reserved.</p>
         <div class="flex gap-6">
           <a href="<%=locals.protocal%>auth.<%=locals.domainName%>/privacy" target="_blank" class="hover:text-white transition">Privacy</a>
-        <a href="/docs/marketplace-terms" class="hover:text-white transition">Terms</a>
-        <a href="<%=locals.protocal%><%=locals.domainName%>/docs/cookie-terms" class="hover:text-white transition">Cookies</a>
-        <%if (locals.user){%>
+            <a href="/docs/marketplace-terms" class="hover:text-white transition">Terms</a>
+            <a href="<%=locals.protocal%><%=locals.domainName%>/docs/cookie-terms" class="hover:text-white transition">Cookies</a>
+            <%if (locals.user){%>
 
-        <form action="<%=locals.protocal%>auth.<%=locals.domainName%>/signout" method="post">
-          <input type="hidden" value="<%=locals.protocal%>business.<%=locals.domainName%>" name="host">
-          <input type="hidden" name="userAccount" value="<=locals.user.userAccount%>">
-          <button class="flex items-center gap-2 hover:text-brand" type="submit">
-            <span class="hidden md:block">Signout</span>
-            <i class="bi bi-arrow-right"></i>
-          </button>
-        </form>
+            <form action="<%=locals.protocal%>auth.<%=locals.domainName%>/signout" method="post">
+              <input type="hidden" value="<%=locals.protocal%>business.<%=locals.domainName%>" name="host">
+              <input type="hidden" name="userAccount" value="<=locals.user.userAccount%>">
+              <button class="flex items-center gap-2 hover:text-brand" type="submit">
+                <span class="hidden md:block">Signout</span>
+                <i class="bi bi-arrow-right"></i>
+              </button>
+            </form>
 
-        <%}%>
+            <%}%>
       </div>
     </div>
     </div>

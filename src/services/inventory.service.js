@@ -242,6 +242,209 @@ class InventoryService {
     static async getInventoryVendorDashboardData(vendorId, lowStockThreshold) {
         return await InventoryModel.getInventoryVendorDashboardData(vendorId, lowStockThreshold)
     }
+
+
+    /**
+     * Get everything the inventory overview page needs.
+     */
+    static async getInventoryOverview(storeId) {
+        const [locations, rawTotals] = await Promise.all([
+            InventoryModel.listByStore(storeId),
+            InventoryModel.getStoreTotals(storeId),
+        ]);
+
+        return {
+            locations: locations.data.map(loc => this.#shapeLocation(loc)),
+            totals: this.#shapeTotals(rawTotals),
+        };
+    }
+
+    /**
+     * Empty overview — for error fallback.
+     */
+    static emptyInventoryOverview() {
+        return {
+            locations: [],
+            totals: {
+                units: 0,
+                available: 0,
+                reserved: 0,
+                low_stock: 0,
+                out_of_stock: 0,
+            },
+        };
+    }
+
+    static async getInventoryDetail(storeId, inventoryId, opts = {}) {
+
+        const location = await InventoryModel.findInventoryByStoreId(storeId, inventoryId);
+        if (!location) return null;
+
+        const [items, rawStats] = await Promise.all([
+            InventoryModel.listByInventory(inventoryId, opts),
+            InventoryModel.getStats(inventoryId),
+        ]);
+
+        const detailPayload = {
+            location: {
+                id: location.id,
+                title: location.title,
+                description: location.description,
+                address: location.address,
+                is_default: location.is_default,
+                status: location.status,
+                meta: location.meta,
+            },
+            items: items.data.map(this.#shapeItem),
+            stats: {
+                item_records: rawStats.item_records,
+                total_units: rawStats.total_units,
+                available_units: rawStats.available_units,
+                reserved_units: rawStats.reserved_units,
+                low_stock_items: rawStats.low_stock_items,
+                out_of_stock_items: rawStats.out_of_stock_items,
+            },
+            pagination: {
+                page: items.page,
+                limit: items.limit,
+                total: items.total,
+                totalPages: items.totalPages,
+                hasNextPage: items.hasNextPage,
+                hasPreviousPage: items.hasPreviousPage,
+            },
+        };
+
+        return detailPayload;
+    }
+
+    static async listUnitsByInventory(inventoryId, opts) {
+        return await InventoryModel.listUnitsByInventory(inventoryId, opts);
+    }
+
+    static async searchUnit(storeId, query, opts){
+        return await InventoryModel.searchUnit(storeId, query, opts);
+    }
+
+    /**
+     * 
+     * @param {*} payload 
+     * {
+            inventory_id, listing_id, quantity = 0, reserved = 0,
+            batch_number = null, mfg_at = null, expires_at = null,
+            status = 'in_stock',
+        }
+     *
+     */
+    static async insertItem(storeId, payload){
+        const inventory = await InventoryModel.findInventoryByStoreId(storeId, payload.inventoryId);
+        if (!inventory) throw new Error('Store inventory verification failed');
+        return await InventoryModel.insertInventoryItem(payload);
+    }
+
+    shapeLocation(loc) {
+        return {
+            id: loc.id,
+            title: loc.title,
+            description: loc.description,
+            address: loc.address,
+            is_default: loc.is_default,
+            status: loc.status,
+            meta: loc.meta,
+        };
+    }
+
+    static #shapeItem(i) {
+        return {
+            id: i.id,
+            listing: {
+                title: i.listing_title,
+                image: i.listing_image,
+                sku: i.listing_sku,
+            },
+            quantity: i.quantity,
+            reserved: i.reserved,
+            available: i.available,
+            batch_number: i.batch_number,
+            status: i.status,
+            updated_at: i.updated_at,
+        };
+    }
+    static #shapeStats(s) {
+        return {
+            item_records: s.item_records,
+            total_units: s.total_units,
+            available_units: s.available_units,
+            reserved_units: s.reserved_units,
+            low_stock_items: s.low_stock_items,
+            out_of_stock_items: s.out_of_stock_items,
+        };
+    }
+
+    static #shapeUnit(u) {
+        return {
+            id: u.id,
+            serial_number: u.serial_number,
+            imei: u.imei,
+            barcode: u.barcode,
+            mac_address: u.mac_address,
+            status: u.status,
+            condition: u.condition,
+            warranty_start_date: u.warranty_start_date,
+            warranty_end_date: u.warranty_end_date,
+            received_at: u.received_at,
+            sold_at: u.sold_at,
+        };
+    }
+
+    static #shapeTransaction(t) {
+        return {
+            id: t.id,
+            quantity_change: t.quantity_change,
+            type: t.type,
+            reference_type: t.reference_type,
+            reference_id: t.reference_id,
+            notes: t.notes,
+            created_by: t.created_by_name ? { name: t.created_by_name } : null,
+            created_at: t.created_at,
+            listing_title: t.listing_title,
+            inventory_title: t.inventory_title,
+        };
+    }
+
+    static #shapeLocation(loc) {
+        return {
+            id: loc.id,
+            title: loc.title,
+            description: loc.description,
+            address: loc.address,
+            is_default: loc.is_default,
+            status: loc.status,
+            meta: loc.meta,
+            created_at: loc.created_at,
+            updated_at: loc.updated_at,
+            stats: {
+                item_records: loc.item_records,
+                total_units: loc.total_units,
+                available_units: loc.available_units,
+                reserved_units: loc.reserved_units,
+                low_stock_items: loc.low_stock_items,
+                out_of_stock_items: loc.out_of_stock_items,
+                damaged_units: loc.damaged_units,
+                returned_units: loc.returned_units,
+            },
+        };
+    }
+
+    // FIX 4: Made private as well since it's an internal shaper
+    static #shapeTotals(t) {
+        return {
+            units: t.total_units || 0,
+            available: t.available_units || 0,
+            reserved: t.reserved_units || 0,
+            low_stock: t.low_stock_items || 0,
+            out_of_stock: t.out_of_stock_items || 0,
+        };
+    }
 }
 
 module.exports = InventoryService;

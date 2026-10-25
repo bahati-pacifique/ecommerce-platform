@@ -1,3 +1,73 @@
+<% /* ...helpers stay exactly as you have them... */ %>
+
+<%
+
+  const root = (typeof dashboard !== 'undefined' && dashboard) ? dashboard : {};
+  const d = root.data ?? root;
+  const c = d.core ?? {};
+
+  const num = (v) => {
+    if (v == null || v === '') return 0;
+    const n = Number(v);
+    return Number.isFinite(n) ? n : 0;
+  };
+
+  const pct = (curr, prev) => {
+    const cv = num(curr), pv = num(prev);
+    if (pv === 0) return null;
+    return Number((((cv - pv) / pv) * 100).toFixed(1));
+  };
+
+  const fmtNum = (n) => num(n).toLocaleString();
+
+  const fmtCurrency = (n, currency = 'RWF') =>
+    new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency,
+      maximumFractionDigits: 0,
+    }).format(num(n));
+
+  const fmtChange = (pctValue) => {
+    if (pctValue == null) return null;
+    return `${pctValue >= 0 ? '+' : ''}${pctValue.toFixed(1)}%`;
+  };
+
+  const changeTone = (pctValue) => {
+    if (pctValue == null) return 'text-slate-400';
+    return pctValue >= 0 ? 'text-emerald-600' : 'text-rose-600';
+  };
+
+  const peakDay = (weekly) => {
+    if (!Array.isArray(weekly) || !weekly.length) return null;
+    const peak = weekly.reduce((m, w) => (w.visits > m.visits ? w : m), weekly[0]);
+    return peak.visits > 0 ? peak.day : null;
+  };
+
+  const sales     = c.sales     ?? {};
+  const orders    = c.orders    ?? {};
+  const products  = c.products  ?? {};
+  const inventory = c.inventory ?? {};
+  const reviews   = c.reviews   ?? {};
+  const visits    = c.visits    ?? {};
+  const search    = c.search    ?? {};
+  const followers = c.followers ?? {};
+  const response  = c.response  ?? {};
+  const pending   = c.pending_orders ?? {};
+
+  const currency  = sales.currency ?? 'RWF';
+  const periodKey = d.period?.key ?? '7d';
+
+  const invRec    = c.inventory ?? {};
+  const records   = num(invRec.inventory_records);
+  const units     = num(invRec.total_units);
+  const reserved  = num(invRec.reserved_units);
+  const available = num(invRec.available_units);
+  const lowCount  = num(invRec.low_stock_records ?? c.inventory?.low_stock);
+  const outCount  = num(invRec.out_of_stock_records ?? c.inventory?.out_of_stock);
+  const damaged   = num(invRec.damaged_units);
+  const returned  = num(invRec.returned_units);
+%>
+
 <div class="mb-6 flex flex-col justify-between gap-4 md:flex-row md:items-end">
   <div>
     <div class="mb-1 text-sm font-medium text-[var(--color-brand)]"><%= store.name %></div>
@@ -12,62 +82,146 @@
       <i data-lucide="plus" class="h-4 w-4"></i>Add Product
     </button>
     <select id="dateRange" class="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium shadow-sm outline-none">
-      <option>Today</option><option>Last 7 Days</option><option>Last 30 Days</option>
-      <option>This Year</option><option>Custom Range</option>
+      <option <%= d.period?.key === 'today' ? 'selected' : '' %>>Today</option>
+      <option <%= d.period?.key === '7d'    ? 'selected' : '' %>>Last 7 Days</option>
+      <option <%= d.period?.key === '30d'   ? 'selected' : '' %>>Last 30 Days</option>
+      <option <%= d.period?.key === 'year'  ? 'selected' : '' %>>This Year</option>
+      <option <%= d.period?.key === 'custom'? 'selected' : '' %>>Custom Range</option>
     </select>
   </div>
 </div>
 
 <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-  <%- include('../store-partials/metric-card', { label: 'Sales', value: '$24,580', change: '+12.5%', icon: 'banknote', tone: 'brand' }) %>
-  <%- include('../store-partials/metric-card', { label: 'Orders', value: '1,284', change: '+8.2%', icon: 'shopping-cart', tone: 'violet' }) %>
-  <%- include('../store-partials/metric-card', { label: 'Customers', value: '892', change: '+14.4%', icon: 'users', tone: 'emerald' }) %>
-  <%- include('../store-partials/metric-card', { label: 'Products', value: '246', icon: 'package', tone: 'amber' }) %>
-  <%- include('../store-partials/metric-card', { label: 'Pending Orders', value: '38', icon: 'clock-3', tone: 'orange' }) %>
-  <%- include('../store-partials/metric-card', { label: 'Store Rating', value: '4.8 / 5', icon: 'star', tone: 'amber' }) %>
+
+  <%- include('../store-partials/metric-card', {
+    label:  'Sales',
+    value:  fmtCurrency(sales.current_sales, currency),
+    change: fmtChange(pct(sales.current_sales, sales.previous_sales)),
+    icon:   'banknote',
+    tone:   'brand',
+  }) %>
+
+  <%- include('../store-partials/metric-card', {
+    label:  'Orders',
+    value:  fmtNum(sales.current_orders),
+    change: fmtChange(pct(sales.current_orders, sales.previous_orders)),
+    icon:   'shopping-cart',
+    tone:   'violet',
+  }) %>
+
+  <%- include('../store-partials/metric-card', {
+    label:  'Customers',
+    value:  fmtNum(orders.current_customers),
+    change: fmtChange(pct(orders.current_customers, orders.previous_customers)),
+    icon:   'users',
+    tone:   'emerald',
+  }) %>
+
+  <%- include('../store-partials/metric-card', {
+    label:  'Products',
+    value:  fmtNum(products.active_listings || products.total_listings),
+    hint:   `${num(inventory.low_stock)} low in stock`,
+    icon:   'package',
+    tone:   'amber',
+  }) %>
+
+  <%- include('../store-partials/metric-card', {
+    label:  'Pending Orders',
+    value:  fmtNum(pending.value),
+    icon:   'clock-3',
+    tone:   'orange',
+  }) %>
+
+  <%- include('../store-partials/metric-card', {
+    label:  'Store Rating',
+    value:  num(reviews.average_rating).toFixed(1) + ' / 5',
+    hint:   `${num(reviews.total_reviews)} reviews`,
+    icon:   'star',
+    tone:   'amber',
+  }) %>
+
 </div>
 
-<!-- Store Review section -->
-<div class="mt-6">
-  <%- include('../store-partials/store-reviews', { store, review: {
+<%
+  const reviewForPartial = {
     rating: {
-      average: 4.8,
-      total: 342,
-      breakdown: { 5: 240, 4: 70, 3: 20, 2: 8, 1: 4 }
+      average:   num(reviews.average_rating),
+      total:     num(reviews.total_reviews),
+      breakdown: {
+        '1': num(reviews.rating_1),
+        '2': num(reviews.rating_2),
+        '3': num(reviews.rating_3),
+        '4': num(reviews.rating_4),
+        '5': num(reviews.rating_5),
+      },
+      this_month:    num(reviews.reviews_this_month),
+      response_rate: num(reviews.reviews_in_period) > 0
+        ? Math.round((num(reviews.responded_in_period) / num(reviews.reviews_in_period)) * 100)
+        : (response.rate ?? 0),
     },
     visits: {
-      total: 12480,
-      change_pct: 12.4,
-      weekly: [
-        { day: 'Sun', visits: 1200 },
-        { day: 'Mon', visits: 1580 },
-        { day: 'Tue', visits: 1720 },
-        { day: 'Wed', visits: 1420 },
-        { day: 'Thu', visits: 1980 },
-        { day: 'Fri', visits: 2360 },
-        { day: 'Sat', visits: 2220 },
-      ]
+      total:           num(visits.current_visits),
+      change_pct:      pct(visits.current_visits, visits.previous_visits),
+      weekly:          Array.isArray(visits.weekly) ? visits.weekly : [],
+      peak_day:        peakDay(visits.weekly),
+      daily_average:   Math.round(num(visits.current_visits) / 7),
+      best_hour_range: visits.best_hour_range ?? null,
     },
-    search_appearances: { total: 8620, change_pct: 8.1 },
-    most_visited_listing: {
-      id: 'l-001',
-      title: 'iPhone 15 Pro Case — Black',
-      image: 'https://images.unsplash.com/photo-1601784551446-20c9e07cdbdb?w=200',
-      visits: 1840,
-      ctr: 4.2,
-      change_pct: 18.3
+    search_appearances: {
+      total:      num(search.current_appearances),
+      change_pct: pct(search.current_appearances, search.previous_appearances),
     },
-    followers: { total: 128, change_pct: 6.7, new_this_week: 9 },
-    response: { rate: 96, avg_minutes: 18 },
-    conversion: { rate: 3.4, change_pct: 0.6 },
-    top_listings: [
-      { id: 'l-001', title: 'iPhone 15 Pro Case — Black', image: 'https://images.unsplash.com/photo-1601784551446-20c9e07cdbdb?w=80', visits: 1840, ctr: 4.2, orders: 26 },
-      { id: 'l-002', title: 'USB-C Fast Charger 45W', image: 'https://images.unsplash.com/photo-1583863788434-e58a36330cf0?w=80', visits: 1420, ctr: 3.8, orders: 18 },
-      { id: 'l-004', title: 'Wireless Headphones — Midnight Blue', image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=80', visits: 1180, ctr: 3.1, orders: 11 },
-      { id: 'l-005', title: 'Aluminium Laptop Stand', image: 'https://images.unsplash.com/photo-1618384887929-16ec33fab9ef?w=80', visits: 940, ctr: 2.9, orders: 8 },
-    ]
-  } }) %>
+    most_visited_listing: d.most_visited_listing ?? null,
+    followers: {
+      total:         num(followers.total_followers),
+      change_pct:    null,
+      new_this_week: num(followers.new_followers_this_week),
+    },
+    response: {
+      rate:        response.rate ?? null,
+      avg_minutes: response.avg_minutes ?? null,
+    },
+    conversion: {
+      rate: num(visits.current_visits) > 0
+        ? Number(((num(sales.current_orders) / num(visits.current_visits)) * 100).toFixed(1))
+        : 0,
+      change_pct: null,
+    },
+    top_listings: Array.isArray(d.top_listings) ? d.top_listings : [],
+  };
+%>
+
+<div class="mt-6">
+  <%- include('../store-partials/store-reviews', { store, review: reviewForPartial }) %>
 </div>
+
+<%
+  const salesSeries = (d.sales_overview?.series ?? []).map(s => ({
+    date:    s.date,
+    revenue: num(s.revenue),
+    orders:  num(s.orders),
+  }));
+  const prevSeries = (d.sales_overview?.previous_series ?? []).map(s => ({
+    date:    s.date,
+    revenue: num(s.revenue),
+    orders:  num(s.orders),
+  }));
+
+  const allRevenues = [...salesSeries, ...prevSeries].map(s => s.revenue);
+  const maxRevenue  = Math.max(...allRevenues, 1);
+
+  const chartW = 700, chartH = 250;
+  const padL = 40, padR = 16, padT = 16, padB = 32;
+  const innerW = chartW - padL - padR;
+  const innerH = chartH - padT - padB;
+
+  const xAt = (i, len) => padL + (len > 1 ? (innerW / (len - 1)) * i : innerW / 2);
+  const yAt = (v) => padT + innerH - (v / maxRevenue) * innerH;
+
+  const toPolyline = (series) => series
+    .map((s, i) => `${xAt(i, series.length).toFixed(1)},${yAt(s.revenue).toFixed(1)}`)
+    .join(' ');
+%>
 
 <div class="mt-6 rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
   <div class="mb-5 flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
@@ -82,47 +236,71 @@
       <button class="chart-btn hidden rounded-md px-3 py-1.5 text-xs text-slate-500 sm:block" data-range="365">1 Year</button>
     </div>
   </div>
+
   <div class="grid gap-6 lg:grid-cols-[1fr_220px]">
     <div class="min-w-0">
       <div class="relative h-64 rounded-lg border border-slate-100 chart-grid">
-        <svg viewBox="0 0 700 250" preserveAspectRatio="none" class="absolute inset-0 h-full w-full">
-          <polyline class="line" points="0,190 100,155 200,168 300,105 400,125 500,70 600,92 700,42" stroke="var(--color-brand)" />
-          <polyline class="line" points="0,215 100,202 200,185 300,190 400,162 500,180 600,140 700,132" stroke="#94a3b8" stroke-dasharray="5 5" />
+        <svg viewBox="0 0 <%= chartW %> <%= chartH %>" preserveAspectRatio="none" class="absolute inset-0 h-full w-full">
+          <% if (salesSeries.length) { %>
+            <polyline class="line" points="<%= toPolyline(salesSeries) %>" stroke="var(--color-brand)" />
+          <% } %>
+          <% if (prevSeries.length) { %>
+            <polyline class="line" points="<%= toPolyline(prevSeries) %>" stroke="#94a3b8" stroke-dasharray="5 5" />
+          <% } %>
         </svg>
         <div class="absolute bottom-2 left-3 right-3 flex justify-between text-[10px] text-slate-400">
-          <span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span>
+          <% salesSeries.forEach(s => { %>
+            <span><%= new Date(s.date).toLocaleDateString('en-US', { weekday: 'short' }) %></span>
+          <% }) %>
         </div>
       </div>
     </div>
+
     <div class="grid grid-cols-1 gap-3 sm:grid-cols-3 lg:grid-cols-1">
       <div class="rounded-lg bg-slate-50 p-4">
         <div class="text-xs text-slate-500">Revenue</div>
-        <div class="mt-1 text-lg font-bold">$24,580</div>
-        <div class="mt-1 text-xs font-semibold text-emerald-600">+12.5%</div>
+        <div class="mt-1 text-lg font-bold"><%= fmtCurrency(sales.current_sales, currency) %></div>
+        <div class="mt-1 text-xs font-semibold <%= changeTone(pct(sales.current_sales, sales.previous_sales)) %>">
+          <%= fmtChange(pct(sales.current_sales, sales.previous_sales)) ?? '—' %>
+        </div>
       </div>
       <div class="rounded-lg bg-slate-50 p-4">
         <div class="text-xs text-slate-500">Orders</div>
-        <div class="mt-1 text-lg font-bold">1,284</div>
-        <div class="mt-1 text-xs font-semibold text-emerald-600">+8.2%</div>
+        <div class="mt-1 text-lg font-bold"><%= fmtNum(sales.current_orders) %></div>
+        <div class="mt-1 text-xs font-semibold <%= changeTone(pct(sales.current_orders, sales.previous_orders)) %>">
+          <%= fmtChange(pct(sales.current_orders, sales.previous_orders)) ?? '—' %>
+        </div>
       </div>
       <div class="rounded-lg bg-slate-50 p-4">
         <div class="text-xs text-slate-500">Avg. Order Value</div>
-        <div class="mt-1 text-lg font-bold">$19.14</div>
-        <div class="mt-1 text-xs font-semibold text-emerald-600">+3.8%</div>
+        <div class="mt-1 text-lg font-bold">
+          <%= num(sales.current_orders) > 0
+                ? fmtCurrency(num(sales.current_sales) / num(sales.current_orders), currency)
+                : fmtCurrency(0, currency) %>
+        </div>
+        <div class="mt-1 text-xs font-semibold text-slate-400">—</div>
       </div>
     </div>
   </div>
 </div>
 
 <div class="mt-6 grid gap-6 xl:grid-cols-3">
+
+  <!-- Orders Requiring Attention -->
   <div class="xl:col-span-2 rounded-xl border border-slate-200 bg-white shadow-sm">
     <div class="flex items-center justify-between border-b border-slate-100 p-5">
       <div>
         <h2 class="font-semibold">Orders Requiring Attention</h2>
-        <p class="text-xs text-slate-500">Items that need action today</p>
+        <p class="text-xs text-slate-500">
+          <%= num(d.orders_attention?.total) %> items need action
+        </p>
       </div>
-      <button class="text-sm font-semibold text-[var(--color-brand)] hover:text-[var(--color-brand-dark)]">View all</button>
+      <a href="/stores/<%= store.id %>/orders?status=to_ship,processing,return"
+         class="text-sm font-semibold text-[var(--color-brand)] hover:text-[var(--color-brand-dark)]">
+        View all
+      </a>
     </div>
+
     <div class="overflow-x-auto">
       <table class="w-full text-left text-sm">
         <thead class="bg-slate-50 text-xs uppercase tracking-wider text-slate-500">
@@ -136,60 +314,162 @@
           </tr>
         </thead>
         <tbody class="divide-y divide-slate-100">
-          <tr class="hover:bg-slate-50 cursor-pointer" data-action="open-order" data-order-id="ORD-10245">
-            <td class="px-5 py-4 font-semibold">#ORD-10245</td>
-            <td class="px-5 py-4">Jean M.</td>
-            <td class="px-5 py-4">2</td>
-            <td class="px-5 py-4 font-medium">$120</td>
-            <td class="px-5 py-4"><span class="rounded-full bg-amber-50 px-2.5 py-1 text-xs font-semibold text-amber-700">To Ship</span></td>
-            <td class="px-5 py-4"><button class="font-semibold text-[var(--color-brand)]">View</button></td>
-          </tr>
-          <tr class="hover:bg-slate-50 cursor-pointer" data-action="open-order" data-order-id="ORD-10244">
-            <td class="px-5 py-4 font-semibold">#ORD-10244</td>
-            <td class="px-5 py-4">Alice K.</td>
-            <td class="px-5 py-4">1</td>
-            <td class="px-5 py-4 font-medium">$85</td>
-            <td class="px-5 py-4"><span class="rounded-full bg-[var(--color-brand-ultralight)] px-2.5 py-1 text-xs font-semibold text-[var(--color-brand-dark)]">Processing</span></td>
-            <td class="px-5 py-4"><button class="font-semibold text-[var(--color-brand)]">View</button></td>
-          </tr>
-          <tr class="hover:bg-slate-50 cursor-pointer" data-action="open-order" data-order-id="ORD-10241">
-            <td class="px-5 py-4 font-semibold">#ORD-10241</td>
-            <td class="px-5 py-4">Eric N.</td>
-            <td class="px-5 py-4">3</td>
-            <td class="px-5 py-4 font-medium">$240</td>
-            <td class="px-5 py-4"><span class="rounded-full bg-rose-50 px-2.5 py-1 text-xs font-semibold text-rose-700">Return</span></td>
-            <td class="px-5 py-4"><button class="font-semibold text-[var(--color-brand)]">View</button></td>
-          </tr>
+          <% const attentionItems = d.orders_attention?.items ?? []; %>
+          <% if (!attentionItems.length) { %>
+            <tr>
+              <td colspan="6" class="px-5 py-12 text-center text-sm text-slate-400">
+                <i data-lucide="check-circle-2" class="mx-auto h-6 w-6 text-emerald-500"></i>
+                <p class="mt-2">No orders need attention right now.</p>
+              </td>
+            </tr>
+          <% } else { %>
+            <% attentionItems.forEach(o => { %>
+              <tr class="hover:bg-slate-50 cursor-pointer"
+                  data-action="open-order"
+                  data-order-id="<%= o.id %>">
+                <td class="px-5 py-4 font-semibold">#<%= o.id %></td>
+                <td class="px-5 py-4"><%= o.customer?.name ?? '—' %></td>
+                <td class="px-5 py-4"><%= num(o.items_count) %></td>
+                <td class="px-5 py-4 font-medium">
+                  <%= fmtCurrency(o.total, o.currency ?? currency) %>
+                </td>
+                <td class="px-5 py-4">
+                  <span class="rounded-full bg-amber-50 px-2.5 py-1 text-xs font-semibold text-amber-700">
+                    <%= o.status_label ?? o.status %>
+                  </span>
+                </td>
+                <td class="px-5 py-4">
+                  <button class="font-semibold text-[var(--color-brand)]">View</button>
+                </td>
+              </tr>
+            <% }) %>
+          <% } %>
         </tbody>
       </table>
     </div>
   </div>
 
+  <!-- Inventory Alerts -->
   <div class="rounded-xl border border-slate-200 bg-white shadow-sm">
     <div class="flex items-center justify-between border-b border-slate-100 p-5">
       <div>
         <h2 class="font-semibold">Inventory Alerts</h2>
-        <p class="text-xs text-slate-500">12 low · 3 out of stock</p>
+        <p class="text-xs text-slate-500">
+          <%= num(inventory.low_stock) %> low · <%= num(inventory.out_of_stock) %> out of stock
+        </p>
       </div>
       <i data-lucide="triangle-alert" class="h-5 w-5 text-amber-500"></i>
     </div>
+
     <div class="divide-y divide-slate-100">
-      <div class="flex items-center justify-between p-4">
-        <div><div class="text-sm font-medium">iPhone 15 Case</div><div class="text-xs text-slate-500">SKU IP15P-BLK</div></div>
-        <span class="text-sm font-bold text-amber-600">4 left</span>
-      </div>
-      <div class="flex items-center justify-between p-4">
-        <div><div class="text-sm font-medium">USB-C Charger</div><div class="text-xs text-slate-500">SKU USBC-45W</div></div>
-        <span class="text-sm font-bold text-amber-600">2 left</span>
-      </div>
-      <div class="flex items-center justify-between p-4">
-        <div><div class="text-sm font-medium">Wireless Mouse</div><div class="text-xs text-slate-500">SKU WM-204</div></div>
-        <span class="text-sm font-bold text-rose-600">Out of stock</span>
-      </div>
+      <% const invItems = d.inventory_alerts?.items ?? []; %>
+      <% if (!invItems.length) { %>
+        <div class="px-4 py-12 text-center text-sm text-slate-400">
+          <i data-lucide="check-circle-2" class="mx-auto h-6 w-6 text-emerald-500"></i>
+          <p class="mt-2">All items are in stock.</p>
+        </div>
+      <% } else { %>
+        <% invItems.forEach(i => { %>
+          <div class="flex items-center justify-between p-4">
+            <div class="min-w-0">
+              <div class="truncate text-sm font-medium"><%= i.title %></div>
+              <div class="text-xs text-slate-500">SKU <%= i.sku ?? '—' %></div>
+            </div>
+            <span class="ml-3 shrink-0 text-sm font-bold <%= i.status === 'out_of_stock' ? 'text-rose-600' : 'text-amber-600' %>">
+              <%= i.status === 'out_of_stock' ? 'Out of stock' : `${num(i.stock)} left` %>
+            </span>
+          </div>
+        <% }) %>
+      <% } %>
     </div>
+
     <div class="p-4">
-      <button class="w-full rounded-lg border border-slate-200 py-2 text-sm font-semibold hover:bg-slate-50">Manage Inventory</button>
+      <a href="/stores/<%= store.id %>/inventory"
+         class="block w-full rounded-lg border border-slate-200 py-2 text-center text-sm font-semibold hover:bg-slate-50">
+        Manage Inventory
+      </a>
     </div>
+  </div>
+</div>
+
+<div class="mt-6 rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+  <div class="mb-5 flex items-center justify-between">
+    <div>
+      <h2 class="font-semibold">Inventory Overview</h2>
+      <p class="text-xs text-slate-500">Stock health across all listings</p>
+    </div>
+    <a href="/stores/<%= store.id %>/inventory"
+       class="text-sm font-semibold text-[var(--color-brand)] hover:text-[var(--color-brand-dark)]">
+      Manage →
+    </a>
+  </div>
+
+  <div class="grid grid-cols-2 gap-4 sm:grid-cols-4">
+
+    <div class="rounded-lg bg-slate-50 p-4">
+      <div class="flex items-center gap-2 text-xs text-slate-500">
+        <i data-lucide="clipboard-list" class="h-3.5 w-3.5"></i>
+        Records
+      </div>
+      <div class="mt-2 text-2xl font-bold text-slate-900"><%= fmtNum(records) %></div>
+    </div>
+
+    <div class="rounded-lg bg-slate-50 p-4">
+      <div class="flex items-center gap-2 text-xs text-slate-500">
+        <i data-lucide="package" class="h-3.5 w-3.5"></i>
+        Total units
+      </div>
+      <div class="mt-2 text-2xl font-bold text-slate-900"><%= fmtNum(units) %></div>
+    </div>
+
+    <div class="rounded-lg bg-slate-50 p-4">
+      <div class="flex items-center gap-2 text-xs text-slate-500">
+        <i data-lucide="lock" class="h-3.5 w-3.5"></i>
+        Reserved
+      </div>
+      <div class="mt-2 text-2xl font-bold text-slate-900"><%= fmtNum(reserved) %></div>
+    </div>
+
+    <div class="rounded-lg bg-emerald-50 p-4">
+      <div class="flex items-center gap-2 text-xs text-emerald-700">
+        <i data-lucide="check-circle" class="h-3.5 w-3.5"></i>
+        Available
+      </div>
+      <div class="mt-2 text-2xl font-bold text-emerald-700"><%= fmtNum(available) %></div>
+    </div>
+
+    <div class="rounded-lg bg-amber-50 p-4">
+      <div class="flex items-center gap-2 text-xs text-amber-700">
+        <i data-lucide="alert-triangle" class="h-3.5 w-3.5"></i>
+        Low stock
+      </div>
+      <div class="mt-2 text-2xl font-bold text-amber-700"><%= fmtNum(lowCount) %></div>
+    </div>
+
+    <div class="rounded-lg bg-rose-50 p-4">
+      <div class="flex items-center gap-2 text-xs text-rose-700">
+        <i data-lucide="x-circle" class="h-3.5 w-3.5"></i>
+        Out of stock
+      </div>
+      <div class="mt-2 text-2xl font-bold text-rose-700"><%= fmtNum(outCount) %></div>
+    </div>
+
+    <div class="rounded-lg bg-rose-50 p-4">
+      <div class="flex items-center gap-2 text-xs text-rose-700">
+        <i data-lucide="shield-x" class="h-3.5 w-3.5"></i>
+        Damaged
+      </div>
+      <div class="mt-2 text-2xl font-bold text-rose-700"><%= fmtNum(damaged) %></div>
+    </div>
+
+    <div class="rounded-lg bg-slate-100 p-4">
+      <div class="flex items-center gap-2 text-xs text-slate-700">
+        <i data-lucide="rotate-ccw" class="h-3.5 w-3.5"></i>
+        Returned
+      </div>
+      <div class="mt-2 text-2xl font-bold text-slate-700"><%= fmtNum(returned) %></div>
+    </div>
+
   </div>
 </div>
 

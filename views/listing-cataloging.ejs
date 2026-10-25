@@ -1,0 +1,351 @@
+<%
+  const _fmtNum   = (n) => n == null ? '0' : Number(n).toLocaleString('en-US');
+  const _fmtMoney = (v, c = 'RWF') => v == null ? '—'
+    : new Intl.NumberFormat('en-US', { style: 'currency', currency: c, maximumFractionDigits: 0 }).format(Number(v));
+%>
+
+
+<div class="mb-6">
+  <nav class="mb-3 flex items-center gap-1.5 text-xs text-slate-500">
+    <a href="/stores/<%= store.id %>/listings" class="hover:text-[var(--color-brand)]">Listings</a>
+    <span class="text-slate-300">/</span>
+    <span class="text-slate-900 font-medium">New listing</span>
+  </nav>
+
+  <h1 class="text-2xl font-bold tracking-tight">Create a listing</h1>
+  <p class="mt-1 text-sm text-slate-500">
+    Turn a product from the catalog into something you can sell.
+  </p>
+</div>
+
+<form id="createListingForm" class="max-w-3xl space-y-6">
+
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <!-- Fragment 1 — Welcome + terms acceptance                    -->
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <section id="fragmentWelcome" class="rounded-xl border border-slate-200 bg-gradient-to-br from-white to-slate-50 p-6 shadow-sm">
+
+    <div class="flex items-start gap-4">
+      <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[var(--color-brand-ultralight)] text-[var(--color-brand)]">
+        <i data-lucide="sparkles" class="h-6 w-6"></i>
+      </div>
+      <div>
+        <h2 class="text-lg font-bold text-slate-900">Before you start</h2>
+        <p class="mt-1 text-sm text-slate-600">
+          A listing is what customers see and buy. Here's what you'll do:
+        </p>
+      </div>
+    </div>
+
+    <!-- Steps preview -->
+    <ul class="mt-5 space-y-3">
+      <li class="flex items-start gap-3">
+        <span class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-emerald-700">
+          <i data-lucide="check" class="h-3.5 w-3.5"></i>
+        </span>
+        <div>
+          <div class="text-sm font-medium text-slate-900">Choose a product from the catalog</div>
+          <div class="text-xs text-slate-500">Products are shared across all vendors.</div>
+        </div>
+      </li>
+      <li class="flex items-start gap-3">
+        <span class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-emerald-700">
+          <i data-lucide="check" class="h-3.5 w-3.5"></i>
+        </span>
+        <div>
+          <div class="text-sm font-medium text-slate-900">Add your listing details</div>
+          <div class="text-xs text-slate-500">Title, description, condition, price.</div>
+        </div>
+      </li>
+      <li class="flex items-start gap-3">
+        <span class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-emerald-700">
+          <i data-lucide="check" class="h-3.5 w-3.5"></i>
+        </span>
+        <div>
+          <div class="text-sm font-medium text-slate-900">Add stock to your inventory</div>
+          <div class="text-xs text-slate-500">You can add stock after the listing is created.</div>
+        </div>
+      </li>
+    </ul>
+
+    <!-- Terms acceptance -->
+    <div class="mt-6 rounded-lg border border-slate-200 bg-white p-4">
+      <label class="flex items-start gap-3 cursor-pointer">
+        <input type="checkbox" name="accept_terms" id="acceptTerms" required class="mt-0.5 h-4 w-4 rounded border-slate-300 text-[var(--color-brand)] focus:ring-[var(--color-brand)]" />
+        <div class="text-xs text-slate-600 leading-relaxed">
+          By creating a listing, I confirm I have read and agree to the
+          <a href="/terms" target="_blank" class="font-medium text-[var(--color-brand)] hover:underline">Marketplace Terms &amp; Conditions</a>,
+          <a href="/privacy" target="_blank" class="font-medium text-[var(--color-brand)] hover:underline">Privacy Policy</a>,
+          and
+          <a href="/listing-terms" target="_blank" class="font-medium text-[var(--color-brand)] hover:underline">Listing Terms</a>.
+          I confirm I have the legal right to sell the products I list.
+        </div>
+      </label>
+    </div>
+
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <!-- Fragment 2 — Product selection                             -->
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <section id="fragmentProduct" class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+
+    <div class="mb-4 flex items-center gap-3">
+      <span class="flex h-7 w-7 items-center justify-center rounded-full bg-[var(--color-brand)] text-xs font-bold text-white">1</span>
+      <div>
+        <h2 class="text-base font-semibold">Pick a product</h2>
+        <p class="text-xs text-slate-500">Search the shared catalog. Can't find it? Add it first.</p>
+      </div>
+    </div>
+
+    <!-- Selected product display -->
+    <div id="selectedProduct" class="hidden rounded-lg border border-emerald-200 bg-emerald-50 p-4">
+      <div class="flex items-start gap-3">
+        <img id="selectedProductImage" src="" alt="" class="h-14 w-14 shrink-0 rounded-lg object-cover ring-1 ring-slate-200 hidden" data-fallback-hide="true" />
+        <div class="flex h-14 w-14 shrink-0 items-center justify-center rounded-lg bg-white ring-1 ring-slate-200 hidden" id="selectedProductImagePlaceholder">
+          <i data-lucide="package" class="h-5 w-5 text-slate-400"></i>
+        </div>
+        <div class="min-w-0 flex-1">
+          <div id="selectedProductName" class="text-sm font-semibold text-slate-900"></div>
+          <div id="selectedProductMeta" class="mt-0.5 text-xs text-slate-500"></div>
+        </div>
+        <button type="button" id="clearProductBtn" class="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-700">
+          <i data-lucide="x" class="h-4 w-4"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Search + results -->
+    <div id="productSearchPanel">
+      <div class="relative">
+        <i data-lucide="search" class="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"></i>
+        <input type="search" id="productSearchInput" placeholder="Search by product name, brand, or category..." class="w-full rounded-lg border border-slate-200 bg-slate-50 py-2.5 pl-9 pr-3 text-sm outline-none focus:border-[var(--color-brand)] focus:bg-white" autocomplete="off" />
+      </div>
+
+      <div id="productResults" class="mt-2 max-h-72 overflow-y-auto rounded-lg border border-slate-200 bg-white hidden">
+        <!-- Filled by JS -->
+      </div>
+    </div>
+
+    <input type="hidden" name="product_id" id="productIdInput" required />
+
+    <!-- CTA to create a product -->
+    <div class="mt-4 flex items-center justify-between border-t border-slate-100 pt-4">
+      <div class="text-xs text-slate-500">
+        Can't find your product in the catalog?
+      </div>
+      <a href="/stores/<%= store.id %>/products/new" target="_blank" class="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50">
+        <i data-lucide="plus" class="h-3.5 w-3.5"></i>
+        Add product to catalog
+      </a>
+    </div>
+
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <!-- Fragment 3 — Listing details                               -->
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <section id="fragmentDetails" class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm opacity-50 pointer-events-none">
+
+    <div class="mb-4 flex items-center gap-3">
+      <span class="flex h-7 w-7 items-center justify-center rounded-full bg-slate-200 text-xs font-bold text-slate-500">2</span>
+      <div>
+        <h2 class="text-base font-semibold text-slate-700">Listing details</h2>
+        <p class="text-xs text-slate-500">What customers will see in search and the storefront.</p>
+      </div>
+    </div>
+
+    <div class="space-y-4">
+
+      <!-- Title -->
+      <div>
+        <label for="titleInput" class="mb-1.5 block text-xs font-semibold text-slate-600">
+          Title <span class="text-rose-500">*</span>
+        </label>
+        <input type="text" id="titleInput" name="title" required maxlength="255" placeholder="e.g. iPhone 15 Pro Case — Blue" class="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-[var(--color-brand)]" />
+        <p class="mt-1 text-xs text-slate-400">Short and descriptive — shown in search results.</p>
+      </div>
+
+      <!-- Description -->
+      <div>
+        <label for="descriptionInput" class="mb-1.5 block text-xs font-semibold text-slate-600">
+          Description <span class="text-slate-400 font-normal">(optional)</span>
+        </label>
+        <textarea id="descriptionInput" name="description" rows="4" placeholder="Describe the product's features, materials, or anything else customers should know." class="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-[var(--color-brand)]"></textarea>
+      </div>
+
+      <!-- Condition + Status -->
+      <div class="grid gap-4 sm:grid-cols-2">
+        <div>
+          <label for="conditionInput" class="mb-1.5 block text-xs font-semibold text-slate-600">Condition</label>
+          <select id="conditionInput" name="condition" class="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-[var(--color-brand)]">
+            <option value="new">New</option>
+            <option value="used">Used</option>
+            <option value="refurbished">Refurbished</option>
+          </select>
+        </div>
+
+        <div>
+          <label for="statusInput" class="mb-1.5 block text-xs font-semibold text-slate-600">Status</label>
+          <select id="statusInput" name="status" class="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-[var(--color-brand)]">
+            <option value="active">Active — visible to customers</option>
+            <option value="draft">Draft — hidden for now</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Price + SKU -->
+      <div class="grid gap-4 sm:grid-cols-2">
+        <div>
+          <label for="priceInput" class="mb-1.5 block text-xs font-semibold text-slate-600">
+            Price <span class="text-rose-500">*</span>
+          </label>
+          <div class="relative">
+            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-medium text-slate-400">RWF</span>
+            <input type="number" id="priceInput" name="price" required min="1" step="1" placeholder="35000" class="w-full rounded-lg border border-slate-200 py-2 pl-12 pr-3 text-sm outline-none focus:border-[var(--color-brand)]" />
+          </div>
+          <p class="mt-1 text-xs text-slate-400">Selling price for this listing.</p>
+        </div>
+
+        <div>
+          <label for="skuInput" class="mb-1.5 block text-xs font-semibold text-slate-600">
+            SKU <span class="text-slate-400 font-normal">(optional)</span>
+          </label>
+          <input type="text" id="skuInput" name="sku" maxlength="100" placeholder="e.g. IP15P-BLU" class="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-[var(--color-brand)]" />
+          <p class="mt-1 text-xs text-slate-400">Leave blank to auto-generate.</p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <!-- Fragment 4 — Media uploads                                  -->
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <section id="fragmentMedia" class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm opacity-50 pointer-events-none">
+
+    <div class="mb-4 flex items-center gap-3">
+      <span class="flex h-7 w-7 items-center justify-center rounded-full bg-slate-200 text-xs font-bold text-slate-500">3</span>
+      <div>
+        <h2 class="text-base font-semibold text-slate-700">
+          Media <span class="font-normal text-slate-400">(optional)</span>
+        </h2>
+        <p class="text-xs text-slate-500">
+          A short video and a few images help customers buy.
+        </p>
+      </div>
+    </div>
+
+    <div class="space-y-6">
+
+      <!-- ───────────────────────────────────────────────────── -->
+      <!-- VIDEO (hero)                                          -->
+      <!-- ───────────────────────────────────────────────────── -->
+      <div>
+        <div class="mb-2 flex items-center gap-2">
+          <i data-lucide="video" class="h-4 w-4 text-[var(--color-brand)]"></i>
+          <span class="text-sm font-semibold text-slate-800">Video</span>
+          <span class="rounded-full bg-[var(--color-brand-ultralight)] px-2 py-0.5 text-[10px] font-semibold text-[var(--color-brand-dark)]">
+            Hero
+          </span>
+        </div>
+
+        <!-- Empty drop zone -->
+        <div id="videoDropZone" class="relative cursor-pointer rounded-xl border-2 border-dashed border-slate-300 bg-slate-50 p-8 text-center transition hover:border-[var(--color-brand)] hover:bg-[var(--color-brand-ultralight)]">
+          <input type="file" id="videoInput" accept="video/mp4,video/webm,video/quicktime" class="hidden" />
+
+          <div class="flex flex-col items-center gap-2">
+            <div class="flex h-12 w-12 items-center justify-center rounded-full bg-white shadow-sm">
+              <i data-lucide="video" class="h-6 w-6 text-[var(--color-brand)]"></i>
+            </div>
+            <div class="text-sm font-medium text-slate-700">
+              Drop your video here, or <span class="text-[var(--color-brand)]">browse files</span>
+            </div>
+            <div class="text-xs text-slate-400">
+              MP4, MOV, or WebM · Up to 1 minute · Max 50 MB
+            </div>
+          </div>
+        </div>
+
+        <!-- Video preview (hidden until uploaded) -->
+        <div id="videoPreview" class="hidden rounded-xl border border-slate-200 bg-slate-900 overflow-hidden">
+          <div class="relative">
+            <video id="videoElement" controls playsinline class="w-full aspect-video bg-black"></video>
+            <button type="button" id="removeVideoBtn" class="absolute right-3 top-3 rounded-lg bg-black/60 p-1.5 text-white backdrop-blur hover:bg-black/80">
+              <i data-lucide="x" class="h-4 w-4"></i>
+            </button>
+          </div>
+          <div class="flex items-center justify-between bg-slate-800 px-4 py-2 text-xs text-slate-300">
+            <span id="videoFileName" class="truncate"></span>
+            <span id="videoFileMeta" class="shrink-0 text-slate-400"></span>
+          </div>
+        </div>
+
+        <p class="mt-2 text-xs text-slate-400">
+          Shown first when customers view your listing.
+        </p>
+      </div>
+
+      <!-- ───────────────────────────────────────────────────── -->
+      <!-- IMAGES                                                -->
+      <!-- ───────────────────────────────────────────────────── -->
+      <div>
+        <div class="mb-2 flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <i data-lucide="image" class="h-4 w-4 text-[var(--color-brand)]"></i>
+            <span class="text-sm font-semibold text-slate-800">Images</span>
+            <span class="text-xs text-slate-400">(up to 8)</span>
+          </div>
+          <span id="imageCountLabel" class="text-xs text-slate-400">0 of 8</span>
+        </div>
+
+        <!-- Image grid -->
+        <div id="imageGrid" class="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
+
+          <!-- Upload tile (always visible) -->
+          <button type="button" id="imageUploadTile" class="flex aspect-square flex-col items-center justify-center gap-1 rounded-xl border-2 border-dashed border-slate-300 bg-slate-50 transition hover:border-[var(--color-brand)] hover:bg-[var(--color-brand-ultralight)]">
+            <i data-lucide="plus" class="h-6 w-6 text-slate-400"></i>
+            <span class="text-[10px] font-medium text-slate-500">Add image</span>
+            <input type="file" id="imageInput" accept="image/jpeg,image/png,image/webp" multiple class="hidden" />
+          </button>
+
+          <!-- Existing image tiles appended here by JS -->
+
+        </div>
+
+        <p class="mt-2 text-xs text-slate-400">
+          First image is the <strong>primary</strong> — shown in search results. Drag to reorder.
+        </p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <!-- Form-level errors                                           -->
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <div id="formError" class="hidden rounded-lg border border-rose-200 bg-rose-50 p-3 text-sm text-rose-700"></div>
+
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <!-- Actions                                                     -->
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <div class="sticky bottom-4 flex items-center justify-between rounded-xl border border-slate-200 bg-white/95 p-4 shadow-lg backdrop-blur">
+    <a href="/stores/<%= store.id %>/listings" class="rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">
+      Cancel
+    </a>
+    <button type="submit" id="submitBtn" disabled class="inline-flex items-center gap-2 rounded-lg bg-[var(--color-brand)] px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-[var(--color-brand-dark)] disabled:cursor-not-allowed disabled:opacity-40">
+      <i data-lucide="plus" class="h-4 w-4"></i>
+      Create listing
+    </button>
+  </div>
+
+</form>
+
+<script>
+  window.__CREATE_LISTING__ = {
+    storeId: "<%= store.id %>",
+    currency: "<%= store.currency || 'RWF' %>",
+  };
+</script>
+
+<script src="/scripts/listing-cataloging.js"></script>
