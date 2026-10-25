@@ -492,12 +492,12 @@
       <%if (!locals.user?.vendor){%>
       <section id="register" class="mt-10">
         <div class=" flex flex-row items-center gap-3 w-full p-2">
-          <a href="<%= locals.protocal %>business.<%= locals.domainName %>/register" class="ml-auto inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-brand hover:bg-brand-dark transition">
-            <span class="text-white text-sm font-semibold">Register Now</span>
+          <a href="<%= locals.protocal %>business.<%= locals.domainName %>/register" class="ml-auto inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-brand hover:bg-brand-dark max-md:text-xs md:text-sm transition">
+            <span class="text-white text-sm font-semibold">Register</span>
           </a>
           OR
-          <a href="<%= locals.protocal %>auth.<%= locals.domainName %>?r=<%= locals.protocal %>business.<%= locals.domainName %>/dashboard" class="inline-flex items-center gap-1.5 px-3 py-2 m-2 rounded-xl transition btn-link">
-            Sign in to Dashboard
+          <a href="<%= locals.protocal %>auth.<%= locals.domainName %>?r=<%= locals.protocal %>business.<%= locals.domainName %>/dashboard" class="inline-flex max-md:text-xs md:text-sm items-center gap-1.5 px-3 py-2 m-2 rounded-xl transition btn-link">
+            Sign in
           </a>
         </div>
       </section>

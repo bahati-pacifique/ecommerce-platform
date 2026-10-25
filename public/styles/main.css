@@ -4739,6 +4739,18 @@
       padding: calc(var(--spacing) * 3);
     }
   }
+  .max-md\:text-base {
+    @media (width < 48rem) {
+      font-size: var(--text-base);
+      line-height: var(--tw-leading, var(--text-base--line-height));
+    }
+  }
+  .max-md\:text-xs {
+    @media (width < 48rem) {
+      font-size: var(--text-xs);
+      line-height: var(--tw-leading, var(--text-xs--line-height));
+    }
+  }
   .max-sm\:grid {
     @media (width < 40rem) {
       display: grid;
