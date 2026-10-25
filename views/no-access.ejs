@@ -47,7 +47,9 @@
       <a href="/" class="relative inline-block group">
         <img src="/images/logos/cococe.png" alt="Logo-brand" class="max-w-[120px] md:max-w-[100px]">
       </a>
-      <span class="status-badge text-xs">Hey <%=locals.user?.username%>, <small>You do not have access to this page!</small></span>
+      <span class="status-badge text-base">
+        <i class="bi bi-shield-slash"></i> Access denied!
+      </span>
     </div>
   </nav>
 
@@ -145,38 +147,39 @@
         </div>
       </div>
 
-      <div class="flex flex-col sm:flex-row items-center justify-center gap-3 md:gap-8 animate-slide-up" style="animation-delay: 0.2s">
-        <a href="/" class="btn-primary">
+      <div class="flex flex-col sm:flex-row items-center justify-center gap-3 md:gap-8 mt-3 animate-slide-up max-md:w-full" style="animation-delay: 0.2s">
+        <a href="/" class="btn-primary max-md:w-full">
           <span class="hidden md:block">Go to the Home Page</span>
           <span class="md:hidden">Home Page</span>
         </a>
-        <a href="mailto:sales@cococe.rw" class="btn-outline cursor-pointer">
+        <a href="mailto:sales@cococe.rw" class="btn-outline cursor-pointer max-md:w-full text-center" >
           <i class="bi bi-person-plus mr-2"></i>
           Request Access
         </a>
-        <form action="<%=locals.protocal%>auth.<%=locals.domain%>/signout" method="post" class="btn-outline cursor-pointer">
+        <form action="<%=locals.protocal%>auth.<%=locals.domain%>/signout" method="post" class="cursor-pointer max-md:w-full">
           <input type="hidden" value="<%=locals.user.userAccount%>" name="userAccount">
           <input type="hidden" name="host" value="<%=locals.protocal%>business.<%=locals.domainName%>/">
-          <button type="submit">
+          <button type="submit" class="max-md:w-full btn-outline">
             Signout <i class="bi bi-arrow-right"></i>
           </button>
         </form>
 
       </div>
 
-      <div class="bg-brand-light/30 min-h-h-12 md:min-w-2xl px-4 py-3 mt-[2.5rem] rounded-xl flex items-center gap-4">
+      <div class="max-md:w-full bg-brand-light/30 min-h-h-12 md:min-w-2xl px-4 py-3 mt-[2.5rem] rounded-xl flex flex-col md:flex-row md:items-center gap-4">
 
-        <div>
+        <div class="text-[32px] text-red-700">
           <i class="bi bi-question-circle"></i>
         </div>
         <div class="flex flex-col text-left gap-1">
           <strong class="text-sm">Need additional permission?</strong>
           <span class="text-xs text-gray-400">
-            <a href="mailto:sales@cococe.rw">Contact our sales team </a> or <a href="<%=locals.protocal%>auth.<%=locals.domainName%>/support?q=privileges" class="text-brand hover:underline transition font-medium" target="_blank"> mention the issue</a>
+            Contact our
+            <a href="mailto:sales@cococe.rw" class="text-brand hover:underline"> our team </a>
           </span>
         </div>
-        <a href="<%=locals.protocal%>auth.<%=locals.domainName%>/docs/privileges" target="_blank" class="ml-auto text-sm md:text-base text-brand border border-brand rounded-full px-3 py-2 hover:text-brand-dark hover:border-brand-dark hover:underline" target="_blank">
-          Learn More
+        <a href="<%=locals.protocal%>auth.<%=locals.domainName%>/docs/privileges" target="_blank" class="ml-auto text-sm md:text-base text-brand border border-brand rounded-full px-3 py-2 hover:text-brand-dark hover:border-brand-dark" target="_blank">
+          Learn More <i class="bi bi-arrow-right"></i>
         </a>
 
       </div>
