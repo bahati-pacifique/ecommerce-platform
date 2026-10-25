@@ -803,7 +803,7 @@
         const delta = editor.clipboard.convert({ html: desc });
         if (desc) {
             editor.setContents(delta, 'api');
-            console.log(desc)
+            
             //els.detailDescription.classList.remove('text-ink-400');
             // requestAnimationFrame(() => {
             //     const overflowing = els.detailDescription.scrollHeight > els.detailDescription.clientHeight + 4;
