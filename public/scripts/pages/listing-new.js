@@ -1216,6 +1216,8 @@ document.addEventListener('DOMContentLoaded', () => {
       });
 
       const listing = res.data?.data;
+      
+      //Handle response....
       if (!listing?.id) throw new Error('No listing ID returned');
 
       setSubmitState('done');

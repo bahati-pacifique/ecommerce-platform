@@ -1700,20 +1700,21 @@ class InventoryModel {
     * Create a new inventory item.
     */
     static async insertInventoryItem(data) {
+        
         const {
-            inventoryId, listing_variant_id, quantity = 0, reserved = 0,
+            inventoryId, listing_variant_id, tracking_mode, quantity = 0, reserved = 0,
             batchNumber = null, mfg_at = null, expires_at = null,
             status = 'in_stock',
         } = data;
 
         const { rows: [row] } = await db.query(`
             INSERT INTO inventory_items (
-            inventory_id, listing_variant_id, quantity, reserved,
+            inventory_id, listing_variant_id, tracking_mode, quantity, reserved,
             batch_number, mfg_at, expires_at, status
             )
-            VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
             RETURNING *
-        `, [inventoryId, listing_variant_id, quantity, reserved,
+        `, [inventoryId, listing_variant_id, tracking_mode, quantity, reserved,
             batchNumber, mfg_at, expires_at, status
         ]);
 
@@ -1969,9 +1970,9 @@ class InventoryModel {
             WHERE listing_variant_id = lv.id AND is_primary = TRUE) AS listing_image
             FROM inventory_units u
             JOIN inventory_items ii ON ii.id = u.inventory_item_id
-            JOIN inventories inv ON inv.id = ii.inventory_id
-            JOIN listings l ON l.id = ii.listing_id
-            JOIN listing_variants lv ON lv.listing_id = l.id
+            JOIN inventories inv ON inv.id = ii.inventory_id 
+            JOIN listing_variants lv ON lv.id = ii.listing_variant_id 
+            JOIN listings l ON l.id = lv.listing_id
             WHERE ${where.join(' AND ')}
             ORDER BY u.updated_at DESC NULLS LAST
             LIMIT $${params.length}
@@ -2119,8 +2120,8 @@ class InventoryModel {
             WHERE listing_variant_id = lv.id) AS listing_image
             FROM inventory_units u
             JOIN inventory_items ii ON ii.id = u.inventory_item_id
-            JOIN listings l ON l.id = ii.listing_id 
-            JOIN listing_variants lv ON lv.listing_id = l.id
+            JOIN listing_variants lv ON lv.id = ii.listing_variant_id
+            JOIN listings l ON l.id = lv.listing_id 
             WHERE ${where.join(' AND ')}
             ORDER BY ${orderBy}
             LIMIT $${params.length + 1} OFFSET $${params.length + 2}

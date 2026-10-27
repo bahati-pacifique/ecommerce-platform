@@ -46,6 +46,7 @@
           <th class="px-5 py-3">Inv. Rerv</th>
           <th class="px-5 py-3">Anv. Avai</th>
           <th class="px-5 py-3">Str. Units</th>
+
         </tr>
       </thead>
       <tbody id="ordersTbody" class="divide-y divide-slate-100">
@@ -100,7 +101,9 @@
           withCredentials: true
         });
 
-        renderRows(res.data);
+        console.log(res.data)
+
+        renderRows(res.data.data);
         renderPagination(res.data.pagination);
 
         window.lucide?.createIcons();
@@ -132,22 +135,26 @@
 
       tbody.innerHTML = rows.map(r => `
         <tr class="hover:bg-slate-50 cursor-pointer" data-order-id="${r.id}">
-        <td class="px-5 py-4 font-semibold">#${r.id}</td>
-        <td class="px-5 py-4">${r.date}</td>
-        <td class="px-5 py-4">${r.customer}</td>
-        <td class="px-5 py-4">${r.items}</td>
-        <td class="px-5 py-4">${r.total}</td>
-        <td class="px-5 py-4">
-            <span class="rounded-full px-2.5 py-1 text-xs font-semibold ${r.status === 'Delivered' ? 'bg-emerald-50 text-emerald-700' :
-                r.status === 'Shipped' ? 'bg-brand-ultralight text-brand-dark' :
-                    'bg-amber-50 text-amber-700'
-            }">${r.status}</span>
-        </td>
-        <td class="px-5 py-4">
-            <button class="font-semibold text-brand">View</button>
-        </td>
+          <td class="px-5 py-4">${truncateText(r.product_name, 25)}</td>
+          <td class="px-5 py-4">${truncateText(r.listing_name, 25)}</td>
+          <td class="px-5 py-4">${r.total_variants}</td>
+          <td class="px-5 py-4">${r.inventory_records}</td>
+          <td class="px-5 py-4">
+            ${r.reserved_units}
+          </td>
+          <td class="px-5 py-4">
+              ${r.available_units}
+          </td>
+          <td class="px-5 py-4">
+              ${r.stored_units}
+          </td>
+          <td class="px-5 py-4 font-semibold">
+            <a href="/listings/${r.listing_id}" target="blank" class="inline-flex items-center gap-1 rounded-lg border border-slate-200 px-3 py-2 text-xs font-semibold hover:bg-slate-50">
+              <i data-lucide="arrow-right"></i>
+            </a>
+          </td>
         </tr>
-  `).join('');
+      `).join('');
 
       tbody.querySelectorAll('tr[data-order-id]').forEach(tr => {
         tr.addEventListener('click', () => {
@@ -194,7 +201,7 @@
       });
     }
 
-    
+
     let debounce;
 
     searchInput.addEventListener('input', (e) => {

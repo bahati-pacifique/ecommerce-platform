@@ -180,12 +180,13 @@ class StoreDashboardModel {
                             SUM(ii.reserved), 0
                         )::int AS reserved_quantity
                     FROM listings l
+                    LEFT JOIN listing_variants lv ON lv.listing_id = l.id
                     LEFT JOIN inventories i
                       ON i.store_id = l.store_id
                      AND i.status = 'active'
                     LEFT JOIN inventory_items ii
                       ON ii.inventory_id = i.id
-                     AND ii.listing_id = l.id
+                     AND ii.listing_variant_id = lv.id
                     WHERE l.store_id = $1
                       AND l.status = 'active'
                     GROUP BY l.id, l.title
@@ -340,20 +341,21 @@ class StoreDashboardModel {
         const { rows } = await db.query(
             `
             WITH stock AS (
-                SELECT
-                    l.id AS listing_id,
-                    COALESCE(l.title, p.title) AS title,
-                    COALESCE(SUM(ii.quantity - ii.reserved), 0)::int
-                        AS available_stock
+            SELECT
+                l.id AS listing_id,
+                COALESCE(l.title, p.title) AS title,
+                COALESCE(SUM(ii.quantity - ii.reserved), 0)::int
+                    AS available_stock
                 FROM listings l
                 JOIN products p
                   ON p.id = l.product_id
                 LEFT JOIN inventories i
                   ON i.store_id = l.store_id
                  AND i.status = 'active'
+                LEFT JOIN listing_variants lv ON lv.listing_id = l.id
                 LEFT JOIN inventory_items ii
                   ON ii.inventory_id = i.id
-                 AND ii.listing_id = l.id
+                 AND ii.listing_variant_id = lv.id
                 WHERE l.store_id = $1
                   AND l.status = 'active'
                 GROUP BY l.id, l.title, p.title
@@ -1017,7 +1019,7 @@ class StoreDashboardModel {
             ),
             inventory_metrics AS (
                 SELECT
-                    ii.listing_id,
+                    lv.listing_id,
 
                     COUNT(*)::INTEGER AS inventory_records,
 
@@ -1048,8 +1050,9 @@ class StoreDashboardModel {
                 FROM inventory_items ii
                 JOIN inventories i
                     ON i.id = ii.inventory_id
+                LEFT JOIN listing_variants lv ON lv.id = ii.listing_variant_id
                 WHERE i.store_id = $1
-                GROUP BY ii.listing_id
+                GROUP BY lv.listing_id
             )
             SELECT
                 l.id AS listing_id,
@@ -1395,6 +1398,263 @@ class StoreDashboardModel {
     // }
 
 
+    // static async getInventoriesByStoreId({
+    //     storeId,
+    //     page = 1,
+    //     limit = 20,
+    //     search = "",
+    //     status,
+    //     stock,
+    //     sortBy = "created_at",
+    //     sortOrder = "DESC",
+    //     lowStockThreshold = 5,
+    // }) {
+    //     const validPage = Math.max(1, Number.parseInt(page, 10) || 1);
+    //     const validLimit = Math.min(
+    //         100,
+    //         Math.max(1, Number.parseInt(limit, 10) || 20)
+    //     );
+
+    //     const offset = (validPage - 1) * validLimit;
+    //     const threshold = Number(lowStockThreshold);
+
+    //     if (!Number.isFinite(threshold) || threshold < 0) {
+    //         throw new Error("lowStockThreshold must be a non-negative number");
+    //     }
+
+    //     const allowedSortColumns = {
+    //         title: "title",
+    //         status: "status",
+    //         created_at: "created_at",
+    //         updated_at: "updated_at",
+    //         low_stock: "low_stock",
+    //         out_of_stock: "out_of_stock",
+    //         reserved: "reserved",
+    //         items: "items",
+    //         quantity: "quantity",
+    //     };
+
+    //     const orderColumn = allowedSortColumns[sortBy] ?? "created_at";
+    //     const orderDirection =
+    //         String(sortOrder).toUpperCase() === "ASC" ? "ASC" : "DESC";
+
+    //     const validStockFilters = ["low", "out_of_stock", "available"];
+
+    //     if (stock && !validStockFilters.includes(stock)) {
+    //         throw new Error(
+    //             `Invalid stock filter. Allowed values: ${validStockFilters.join(", ")}`
+    //         );
+    //     }
+
+    //     const values = [storeId, threshold];
+    //     const filters = ["i.store_id = $1"];
+    //     let paramIndex = 3;
+
+    //     if (search?.trim()) {
+    //         filters.push(`i.title ILIKE $${paramIndex}`);
+    //         values.push(`%${search.trim()}%`);
+    //         paramIndex++;
+    //     }
+
+    //     if (status) {
+    //         filters.push(`i.status::TEXT = $${paramIndex}`);
+    //         values.push(status);
+    //         paramIndex++;
+    //     }
+
+    //     const whereClause = filters.join(" AND ");
+    //     const stockParam = stock ? `$${paramIndex++}` : null;
+    //     const limitParam = `$${paramIndex++}`;
+    //     const offsetParam = `$${paramIndex++}`;
+
+    //     if (stock) {
+    //         values.push(stock);
+    //     }
+
+    //     const dataValues = [...values, validLimit, offset];
+    //     const countValues = [...values];
+
+    //     const baseCtes = `
+    //     WITH inventory_metrics AS (
+    //         SELECT
+    //             i.id,
+    //             i.title,
+    //             i.status::TEXT AS status,
+    //             i.is_default,
+    //             i.created_at,
+    //             i.updated_at,
+
+    //             COUNT(ii.id) FILTER (
+    //                 WHERE ii.status::TEXT NOT IN (
+    //                     'damaged', 'returned', 'discontinued'
+    //                 )
+    //                 AND GREATEST(ii.quantity - ii.reserved, 0) > 0
+    //                 AND GREATEST(ii.quantity - ii.reserved, 0) <= $2
+    //             )::INTEGER AS low_stock,
+
+    //             COUNT(ii.id) FILTER (
+    //                 WHERE ii.status::TEXT NOT IN (
+    //                     'damaged', 'returned', 'discontinued'
+    //                 )
+    //                 AND GREATEST(ii.quantity - ii.reserved, 0) = 0
+    //             )::INTEGER AS out_of_stock,
+
+    //             COALESCE(SUM(ii.reserved), 0)::BIGINT AS reserved,
+    //             COUNT(DISTINCT ii.listing_id)::INTEGER AS items,
+    //             COALESCE(SUM(ii.quantity), 0)::BIGINT AS quantity,
+
+    //             COUNT(ii.id) FILTER (
+    //                 WHERE ii.status::TEXT NOT IN (
+    //                     'damaged', 'returned', 'discontinued'
+    //                 )
+    //                 AND GREATEST(ii.quantity - ii.reserved, 0) > 0
+    //             )::INTEGER AS available_records
+
+    //         FROM inventories i
+    //         LEFT JOIN inventory_items ii
+    //             ON ii.inventory_id = i.id
+
+    //         WHERE ${whereClause}
+
+    //         GROUP BY
+    //             i.id, i.title, i.status, i.is_default,
+    //             i.created_at, i.updated_at
+    //     ),
+
+    //     filtered_inventories AS (
+    //         SELECT *,
+    //             CASE
+    //                 WHEN low_stock > 0 THEN 'low'
+    //                 WHEN out_of_stock > 0 THEN 'out_of_stock'
+    //                 WHEN available_records > 0 THEN 'available'
+    //                 ELSE 'out_of_stock'
+    //             END AS stock_filter
+    //         FROM inventory_metrics
+    //     )
+    // `;
+
+    //     const stockCondition = stock
+    //         ? `WHERE stock_filter = ${stockParam}`
+    //         : "";
+
+    //     const query = `
+    //     ${baseCtes},
+
+    //     listing_details AS (
+    //         SELECT
+    //             ii.inventory_id,
+    //             l.id AS listing_id,
+    //             l.title AS listing_title,
+    //             l.status::TEXT AS listing_status,
+    //             p.id AS product_id,
+    //             p.title AS product_title,
+
+    //             COUNT(ii.id)::INTEGER AS inventory_records,
+    //             COALESCE(SUM(ii.quantity), 0)::BIGINT AS quantity,
+    //             COALESCE(SUM(ii.reserved), 0)::BIGINT AS reserved,
+
+    //             COALESCE(
+    //                 SUM(GREATEST(ii.quantity - ii.reserved, 0)),
+    //                 0
+    //             )::BIGINT AS available_quantity
+
+    //         FROM inventory_items ii
+    //         JOIN listings l
+    //             ON l.id = ii.listing_id
+    //         JOIN products p
+    //             ON p.id = l.product_id
+
+    //         WHERE ii.inventory_id IN (
+    //             SELECT id FROM filtered_inventories ${stockCondition}
+    //         )
+
+    //         GROUP BY
+    //             ii.inventory_id,
+    //             l.id,
+    //             l.title,
+    //             l.status,
+    //             p.id,
+    //             p.title
+    //     ),
+
+    //     listing_aggregates AS (
+    //         SELECT
+    //             inventory_id,
+    //             jsonb_agg(
+    //                 jsonb_build_object(
+    //                     'listing_id', listing_id,
+    //                     'listing_title', listing_title,
+    //                     'listing_status', listing_status,
+    //                     'product_id', product_id,
+    //                     'product_title', product_title,
+    //                     'inventory_records', inventory_records,
+    //                     'quantity', quantity,
+    //                     'reserved', reserved,
+    //                     'available_quantity', available_quantity
+    //                 )
+    //                 ORDER BY listing_title
+    //             ) AS listings
+    //         FROM listing_details
+    //         GROUP BY inventory_id
+    //     )
+
+    //     SELECT
+    //         fi.*,
+    //         COALESCE(la.listings, '[]'::JSONB) AS listings
+
+    //     FROM filtered_inventories fi
+    //     LEFT JOIN listing_aggregates la
+    //         ON la.inventory_id = fi.id
+
+    //     ${stockCondition}
+
+    //     ORDER BY ${orderColumn} ${orderDirection}, fi.id DESC
+    //     LIMIT ${limitParam}
+    //     OFFSET ${offsetParam};
+    // `;
+
+    //     const countQuery = `
+    //     ${baseCtes}
+    //     SELECT COUNT(*)::INTEGER AS total
+    //     FROM filtered_inventories
+    //     ${stockCondition};
+    // `;
+
+    //     const [dataResult, countResult] = await Promise.all([
+    //         db.query(query, dataValues),
+    //         db.query(countQuery, countValues),
+    //     ]);
+
+    //     const data = dataResult.rows.map((row) => ({
+    //         ...row,
+    //         low_stock: Number(row.low_stock),
+    //         out_of_stock: Number(row.out_of_stock),
+    //         reserved: Number(row.reserved),
+    //         items: Number(row.items),
+    //         quantity: Number(row.quantity),
+    //         available_records: Number(row.available_records),
+    //         listings: (row.listings ?? []).map((listing) => ({
+    //             ...listing,
+    //             inventory_records: Number(listing.inventory_records),
+    //             quantity: Number(listing.quantity),
+    //             reserved: Number(listing.reserved),
+    //             available_quantity: Number(listing.available_quantity),
+    //         })),
+    //     }));
+
+    //     const total = Number(countResult.rows[0].total);
+
+    //     return {
+    //         data,
+    //         pagination: {
+    //             page: validPage,
+    //             limit: validLimit,
+    //             total,
+    //             totalPages: Math.ceil(total / validLimit),
+    //         },
+    //     };
+    // }
+
     static async getInventoriesByStoreId({
         storeId,
         page = 1,
@@ -1406,7 +1666,11 @@ class StoreDashboardModel {
         sortOrder = "DESC",
         lowStockThreshold = 5,
     }) {
-        const validPage = Math.max(1, Number.parseInt(page, 10) || 1);
+        const validPage = Math.max(
+            1,
+            Number.parseInt(page, 10) || 1
+        );
+
         const validLimit = Math.min(
             100,
             Math.max(1, Number.parseInt(limit, 10) || 20)
@@ -1416,26 +1680,36 @@ class StoreDashboardModel {
         const threshold = Number(lowStockThreshold);
 
         if (!Number.isFinite(threshold) || threshold < 0) {
-            throw new Error("lowStockThreshold must be a non-negative number");
+            throw new Error(
+                "lowStockThreshold must be a non-negative number"
+            );
         }
 
         const allowedSortColumns = {
-            title: "title",
-            status: "status",
-            created_at: "created_at",
-            updated_at: "updated_at",
-            low_stock: "low_stock",
-            out_of_stock: "out_of_stock",
-            reserved: "reserved",
-            items: "items",
-            quantity: "quantity",
+            title: "fi.title",
+            status: "fi.status",
+            created_at: "fi.created_at",
+            updated_at: "fi.updated_at",
+            low_stock: "fi.low_stock",
+            out_of_stock: "fi.out_of_stock",
+            reserved: "fi.reserved",
+            items: "fi.items",
+            quantity: "fi.quantity",
         };
 
-        const orderColumn = allowedSortColumns[sortBy] ?? "created_at";
-        const orderDirection =
-            String(sortOrder).toUpperCase() === "ASC" ? "ASC" : "DESC";
+        const orderColumn =
+            allowedSortColumns[sortBy] ?? "fi.created_at";
 
-        const validStockFilters = ["low", "out_of_stock", "available"];
+        const orderDirection =
+            String(sortOrder).toUpperCase() === "ASC"
+                ? "ASC"
+                : "DESC";
+
+        const validStockFilters = [
+            "low",
+            "out_of_stock",
+            "available",
+        ];
 
         if (stock && !validStockFilters.includes(stock)) {
             throw new Error(
@@ -1445,6 +1719,7 @@ class StoreDashboardModel {
 
         const values = [storeId, threshold];
         const filters = ["i.store_id = $1"];
+
         let paramIndex = 3;
 
         if (search?.trim()) {
@@ -1460,19 +1735,82 @@ class StoreDashboardModel {
         }
 
         const whereClause = filters.join(" AND ");
-        const stockParam = stock ? `$${paramIndex++}` : null;
-        const limitParam = `$${paramIndex++}`;
-        const offsetParam = `$${paramIndex++}`;
+
+        let stockParam = null;
 
         if (stock) {
+            stockParam = `$${paramIndex++}`;
             values.push(stock);
         }
 
-        const dataValues = [...values, validLimit, offset];
+        const limitParam = `$${paramIndex++}`;
+        const offsetParam = `$${paramIndex++}`;
+
+        const dataValues = [
+            ...values,
+            validLimit,
+            offset,
+        ];
+
         const countValues = [...values];
 
         const baseCtes = `
-        WITH inventory_metrics AS (
+        WITH unit_metrics AS (
+            SELECT
+                iu.inventory_item_id,
+
+                COUNT(*) FILTER (
+                    WHERE iu.status IN ('available', 'reserved')
+                )::BIGINT AS total_units,
+
+                COUNT(*) FILTER (
+                    WHERE iu.status = 'reserved'
+                )::BIGINT AS reserved_units,
+
+                COUNT(*) FILTER (
+                    WHERE iu.status = 'available'
+                )::BIGINT AS available_units
+
+            FROM inventory_units iu
+
+            GROUP BY iu.inventory_item_id
+        ),
+
+        item_stock AS (
+            SELECT
+                ii.id AS inventory_item_id,
+                ii.inventory_id,
+                ii.listing_variant_id,
+                ii.tracking_mode,
+                ii.status::TEXT AS item_status,
+
+                CASE
+                    WHEN ii.tracking_mode = 'bulk'
+                    THEN ii.quantity::BIGINT
+                    ELSE COALESCE(um.total_units, 0)
+                END AS quantity,
+
+                CASE
+                    WHEN ii.tracking_mode = 'bulk'
+                    THEN ii.reserved::BIGINT
+                    ELSE COALESCE(um.reserved_units, 0)
+                END AS reserved,
+
+                CASE
+                    WHEN ii.tracking_mode = 'bulk'
+                    THEN GREATEST(
+                        ii.quantity - ii.reserved, 0
+                    )::BIGINT
+                    ELSE COALESCE(um.available_units, 0)
+                END AS available_quantity
+
+            FROM inventory_items ii
+
+            LEFT JOIN unit_metrics um
+                ON um.inventory_item_id = ii.id
+        ),
+
+        inventory_metrics AS (
             SELECT
                 i.id,
                 i.title,
@@ -1481,51 +1819,83 @@ class StoreDashboardModel {
                 i.created_at,
                 i.updated_at,
 
-                COUNT(ii.id) FILTER (
-                    WHERE ii.status::TEXT NOT IN (
-                        'damaged', 'returned', 'discontinued'
+                COUNT(s.inventory_item_id) FILTER (
+                    WHERE s.item_status NOT IN (
+                        'damaged',
+                        'returned',
+                        'discontinued'
                     )
-                    AND GREATEST(ii.quantity - ii.reserved, 0) > 0
-                    AND GREATEST(ii.quantity - ii.reserved, 0) <= $2
+                    AND s.available_quantity > 0
+                    AND s.available_quantity <= $2
                 )::INTEGER AS low_stock,
 
-                COUNT(ii.id) FILTER (
-                    WHERE ii.status::TEXT NOT IN (
-                        'damaged', 'returned', 'discontinued'
+                COUNT(s.inventory_item_id) FILTER (
+                    WHERE s.item_status NOT IN (
+                        'damaged',
+                        'returned',
+                        'discontinued'
                     )
-                    AND GREATEST(ii.quantity - ii.reserved, 0) = 0
+                    AND s.available_quantity = 0
                 )::INTEGER AS out_of_stock,
 
-                COALESCE(SUM(ii.reserved), 0)::BIGINT AS reserved,
-                COUNT(DISTINCT ii.listing_id)::INTEGER AS items,
-                COALESCE(SUM(ii.quantity), 0)::BIGINT AS quantity,
+                COALESCE(
+                    SUM(s.reserved),
+                    0
+                )::BIGINT AS reserved,
 
-                COUNT(ii.id) FILTER (
-                    WHERE ii.status::TEXT NOT IN (
-                        'damaged', 'returned', 'discontinued'
+                COUNT(
+                    DISTINCT s.listing_variant_id
+                ) FILTER (
+                    WHERE s.inventory_item_id IS NOT NULL
+                )::INTEGER AS items,
+
+                COALESCE(
+                    SUM(s.quantity),
+                    0
+                )::BIGINT AS quantity,
+
+                COUNT(s.inventory_item_id) FILTER (
+                    WHERE s.item_status NOT IN (
+                        'damaged',
+                        'returned',
+                        'discontinued'
                     )
-                    AND GREATEST(ii.quantity - ii.reserved, 0) > 0
+                    AND s.available_quantity > 0
                 )::INTEGER AS available_records
 
             FROM inventories i
-            LEFT JOIN inventory_items ii
-                ON ii.inventory_id = i.id
+
+            LEFT JOIN item_stock s
+                ON s.inventory_id = i.id
 
             WHERE ${whereClause}
 
             GROUP BY
-                i.id, i.title, i.status, i.is_default,
-                i.created_at, i.updated_at
+                i.id,
+                i.title,
+                i.status,
+                i.is_default,
+                i.created_at,
+                i.updated_at
         ),
 
         filtered_inventories AS (
-            SELECT *,
+            SELECT
+                *,
+
                 CASE
-                    WHEN low_stock > 0 THEN 'low'
-                    WHEN out_of_stock > 0 THEN 'out_of_stock'
-                    WHEN available_records > 0 THEN 'available'
+                    WHEN low_stock > 0
+                        THEN 'low'
+
+                    WHEN out_of_stock > 0
+                        THEN 'out_of_stock'
+
+                    WHEN available_records > 0
+                        THEN 'available'
+
                     ELSE 'out_of_stock'
                 END AS stock_filter
+
             FROM inventory_metrics
         )
     `;
@@ -1539,34 +1909,53 @@ class StoreDashboardModel {
 
         listing_details AS (
             SELECT
-                ii.inventory_id,
+                s.inventory_id,
+
                 l.id AS listing_id,
                 l.title AS listing_title,
                 l.status::TEXT AS listing_status,
+
                 p.id AS product_id,
                 p.title AS product_title,
 
-                COUNT(ii.id)::INTEGER AS inventory_records,
-                COALESCE(SUM(ii.quantity), 0)::BIGINT AS quantity,
-                COALESCE(SUM(ii.reserved), 0)::BIGINT AS reserved,
+                COUNT(
+                    DISTINCT s.inventory_item_id
+                )::INTEGER AS inventory_records,
 
                 COALESCE(
-                    SUM(GREATEST(ii.quantity - ii.reserved, 0)),
+                    SUM(s.quantity),
+                    0
+                )::BIGINT AS quantity,
+
+                COALESCE(
+                    SUM(s.reserved),
+                    0
+                )::BIGINT AS reserved,
+
+                COALESCE(
+                    SUM(s.available_quantity),
                     0
                 )::BIGINT AS available_quantity
 
-            FROM inventory_items ii
+            FROM item_stock s
+
+            JOIN listing_variants lv
+                ON lv.id = s.listing_variant_id
+
             JOIN listings l
-                ON l.id = ii.listing_id
+                ON l.id = lv.listing_id
+
             JOIN products p
                 ON p.id = l.product_id
 
-            WHERE ii.inventory_id IN (
-                SELECT id FROM filtered_inventories ${stockCondition}
+            WHERE s.inventory_id IN (
+                SELECT id
+                FROM filtered_inventories
+                ${stockCondition}
             )
 
             GROUP BY
-                ii.inventory_id,
+                s.inventory_id,
                 l.id,
                 l.title,
                 l.status,
@@ -1577,6 +1966,7 @@ class StoreDashboardModel {
         listing_aggregates AS (
             SELECT
                 inventory_id,
+
                 jsonb_agg(
                     jsonb_build_object(
                         'listing_id', listing_id,
@@ -1591,29 +1981,42 @@ class StoreDashboardModel {
                     )
                     ORDER BY listing_title
                 ) AS listings
+
             FROM listing_details
+
             GROUP BY inventory_id
         )
 
         SELECT
             fi.*,
-            COALESCE(la.listings, '[]'::JSONB) AS listings
+
+            COALESCE(
+                la.listings,
+                '[]'::JSONB
+            ) AS listings
 
         FROM filtered_inventories fi
+
         LEFT JOIN listing_aggregates la
             ON la.inventory_id = fi.id
 
         ${stockCondition}
 
-        ORDER BY ${orderColumn} ${orderDirection}, fi.id DESC
+        ORDER BY
+            ${orderColumn} ${orderDirection},
+            fi.id DESC
+
         LIMIT ${limitParam}
         OFFSET ${offsetParam};
     `;
 
         const countQuery = `
         ${baseCtes}
+
         SELECT COUNT(*)::INTEGER AS total
+
         FROM filtered_inventories
+
         ${stockCondition};
     `;
 
@@ -1624,18 +2027,24 @@ class StoreDashboardModel {
 
         const data = dataResult.rows.map((row) => ({
             ...row,
+
             low_stock: Number(row.low_stock),
             out_of_stock: Number(row.out_of_stock),
             reserved: Number(row.reserved),
             items: Number(row.items),
             quantity: Number(row.quantity),
             available_records: Number(row.available_records),
+
             listings: (row.listings ?? []).map((listing) => ({
                 ...listing,
-                inventory_records: Number(listing.inventory_records),
+                inventory_records: Number(
+                    listing.inventory_records
+                ),
                 quantity: Number(listing.quantity),
                 reserved: Number(listing.reserved),
-                available_quantity: Number(listing.available_quantity),
+                available_quantity: Number(
+                    listing.available_quantity
+                ),
             })),
         }));
 
@@ -1643,6 +2052,7 @@ class StoreDashboardModel {
 
         return {
             data,
+
             pagination: {
                 page: validPage,
                 limit: validLimit,

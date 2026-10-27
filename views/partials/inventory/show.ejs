@@ -111,6 +111,8 @@
           </tr>
         <% } else { %>
           <% itms.forEach(item => { %>
+            <% const addUnitBtn = item.tracking_mode === 'bulk' ? 'hidden' : '' %>
+            
             <tr class="hover:bg-slate-50">
               <td class="px-5 py-3">
                 <div class="flex items-center gap-3">
@@ -127,7 +129,7 @@
                   </div>
                 </div>
               </td>
-              <td class="px-5 py-3 text-right font-medium"><%= item.tracking_mode %></td>
+              <td class="px-5 py-3 text-right font-medium capitalize"><%= item.tracking_mode %></td>
               <td class="px-5 py-3 text-right font-medium"><%= fmtNum(item.quantity) %></td>
               <td class="px-5 py-3 text-right text-amber-600"><%= fmtNum(item.reserved) %></td>
               <td class="px-5 py-3 text-right font-semibold text-emerald-600"><%= fmtNum(item.available) %></td>
@@ -141,10 +143,32 @@
               </td>
               <td>
                 <button data-item-id="<%=item.id%>" data-open-unit-modal
-                  class="inline-flex 
-                  items-center gap-1 rounded-lg border border-slate-500 
-                  px-3 py-1 text-sm font-semibold text-slate-500 hover:text-brand hover:border-brand add-unit-btn">
-                   <i data-lucide="plus"></i>Add Unit
+                  class = "<%=
+                  item.tracking_mode === 'bulk' ? 'hidden' : 'inline-flex'%> 
+                  items-center gap-1 
+                  rounded-lg border 
+                  border-slate-500 
+                  px-3 py-1 text-sm 
+                  font-semibold text-slate-500 
+                  hover:text-brand 
+                  hover:border-brand 
+                  add-unit-btn"
+                  title="Add Unit">
+                   <i data-lucide="plus"></i>
+                </button>
+                <button data-item-id="<%=item.id%>" data-adjust-item-modal
+                  class = "<%=
+                  item.tracking_mode === 'bulk' ? 'inline-flex' : 'hidden'%> 
+                  items-center gap-1 
+                  rounded-lg border 
+                  border-slate-500 
+                  px-3 py-1 text-sm 
+                  font-semibold text-slate-500 
+                  hover:text-brand 
+                  hover:border-brand
+                  add-unit-btn"
+                  title="Adjust Quantity">
+                  <i data-lucide="rotate-cw"></i>
                 </button>
               </td>
             </tr>

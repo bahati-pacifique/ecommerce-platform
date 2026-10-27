@@ -49,11 +49,27 @@
           </div>
 
           <div class="grid grid-cols-2 gap-4">
+
+            <div class="relative">
+              <label class="mb-1.5 block text-xs font-semibold text-slate-600">
+                Tracking mode <span class="text-rose-500">*</span>
+              </label>
+              <select name="inventory-item-trackicking-mode" id="inventoryItemTrackickingMode" class="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-[var(--color-brand)]">
+                <option value="">Select mode</option>
+                <option value="serialized">Serialized</option>
+                <option value="bulk">Bulk</option>
+              </select>
+              <div class="absolute top-[100%] z-[1000] flex flex-col min-h-12 w-full p-2 rounded bg-white shadow-sm border border-slate-300 transition hidden" id="trackingModeInfoBar">
+                <button type="button" class="ml-auto" id="trackingModeClose"><i data-lucide="x"></i></button>
+                <p id="trackingModeMsg" class="flex gap-1 text-sm"></p>
+              </div>
+            </div>
+
             <div>
               <label class="mb-1.5 block text-xs font-semibold text-slate-600">
                 Quantity <span class="text-rose-500">*</span>
               </label>
-              <input type="number" name="quantity" id="quantityInput" min="1" step="1" value="1" required class="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-[var(--color-brand)]" />
+              <input type="number" name="quantity" id="quantityInput" min="1" step="1" value="1" required class="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-[var(--color-brand)]" disabled />
             </div>
 
             <div>
@@ -64,7 +80,6 @@
             </div>
           </div>
 
-          <!-- Dates -->
           <div class="grid grid-cols-2 gap-4">
             <div>
               <label class="mb-1.5 block text-xs font-semibold text-slate-600">
@@ -104,6 +119,28 @@
 <script type="module">
   document.addEventListener('DOMContentLoaded', () => {
     initAddItemModal();
+    $('#trackingModeClose').click(() => {
+      $('#trackingModeInfoBar').addClass('hidden');
+    })
+
+    $('#inventoryItemTrackickingMode').on('change', (e) => {
+
+      const selected = e.target.value;
+      if (selected === 'bulk') {
+        $('#trackingModeMsg').html(`Bulk mode — Adding non-trackable items to inventory without entering each unit individually.`);
+        $('#trackingModeInfoBar').removeClass('hidden');
+        $('#quantityInput').prop('disabled', false);
+      } else if (selected === 'serialized') {
+        $('#trackingModeMsg').html(`Serialized mode — Entering a unique serial number/identifier for each individual unit being added to inventory.`);
+        $('#trackingModeInfoBar').removeClass('hidden');
+        $('#quantityInput').prop('disabled', true).val(1);
+      } else {
+        $('#trackingModeInfoBar').addClass('hidden');
+        $('#quantityInput').prop('disabled', true);
+      }
+
+      lucide?.createIcons();
+    });
   });
 
   function initAddItemModal() {
@@ -121,6 +158,7 @@
     const form = document.getElementById('addItemForm');
     const submitBtn = document.getElementById('addItemSubmit');
     const errorBox = document.getElementById('addItemError');
+    const infoBar = document.getElementById('trackingModeInfoBar');
 
     // Listing search
     const searchInput = document.getElementById('listingSearchInput');
@@ -151,6 +189,9 @@
       resultsBox.innerHTML = '';
       selectedPanel.classList.add('hidden');
       errorBox.classList.add('hidden');
+      infoBar?.classList.add('hidden');
+      const qty = document.getElementById('quantityInput');
+      if (qty) { qty.disabled = true; qty.value = 1; }
     }
 
     openBtn?.addEventListener('click', openModal);
@@ -183,8 +224,8 @@
       searchAbort = new AbortController();
 
       resultsBox.innerHTML = `<div class="p-3 text-xs text-slate-400 flex items-center gap-2">
-      <i data-lucide="loader-circle" class="animate-lucide-spin w-4 h-4"></i> Searching…
-    </div>`;
+        <i data-lucide="loader-circle" class="animate-lucide-spin w-4 h-4"></i> Searching…
+      </div>`;
       window.lucide?.createIcons?.();
       resultsBox.classList.remove('hidden');
 
@@ -211,22 +252,42 @@
         return;
       }
 
-      resultsBox.innerHTML = items.map(l => `
-      <button type="button"
-              class="listing-option w-full flex items-center gap-3 px-3 py-2 hover:bg-slate-50 text-left"
-              data-id="${escapeHtml(l.id)}"
-              data-title="${escapeHtml(l.title)}"
-              data-sku="${escapeHtml(l.sku || '')}"
-              data-image="${escapeHtml(l.image || '')}">
-        ${l.image_url
-          ? `<img src="http://localhost:9000/${escapeHtml(l.image_url)}" class="h-8 w-8 rounded object-cover ring-1 ring-slate-200" />`
-          : `<div class="flex h-8 w-8 items-center justify-center rounded bg-slate-100"><i data-lucide="package" class="h-3.5 w-3.5 text-slate-400"></i></div>`}
-        <div class="min-w-0 flex-1">
-          <div class="text-sm font-medium text-slate-900 truncate">${escapeHtml(l.title)}</div>
-          ${l.sku ? `<div class="text-xs text-slate-500 font-mono">${escapeHtml(l.sku)}</div>` : ''}
-        </div>
-      </button>
-    `).join('');
+      resultsBox.innerHTML = items.map((listing) => {
+        const listingVariants = listing.variants || [];
+
+        return `
+            <div class="listing-card p-3 border border-slate-200 rounded-lg bg-white mb-3 shadow-sm">
+              <!-- Listing Header (Rendered Only Once) -->
+              <div class="flex items-center gap-3 pb-2 mb-2 border-b border-slate-100">
+                ${ listing.image_url
+                  ? `<img src="https://cdn.cococe.rw/${escapeHtml(listing.image_url)}" class="h-10 w-10 rounded object-cover ring-1 ring-slate-200" />`
+                  : `<div class="flex h-10 w-10 items-center justify-center rounded bg-slate-100"><i data-lucide="package" class="h-4 w-4 text-slate-400"></i></div>`
+                }
+                <div class="min-w-0 flex-1">
+                  <div class="text-sm font-semibold text-slate-900 truncate">${escapeHtml(listing.title)}</div>
+                  <div class="text-xs text-slate-500">${listingVariants.length} variant${listingVariants.length === 1 ? '' : 's'} available</div>
+                </div>
+              </div>
+
+              <div class="flex flex-col gap-1.5">
+                ${listingVariants.map(v => `
+                  <button type="button"
+                          class="listing-option w-full flex items-center justify-between px-3 py-2 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded text-left transition-colors"
+                          data-id="${escapeHtml(v.id)}"
+                          data-title="${escapeHtml(listing.title)}"
+                          data-sku="${escapeHtml(v.sku || '')}"
+                          data-image="${escapeHtml(listing.image_url || '')}">
+                    <span class="text-xs font-medium text-slate-700 truncate">
+                      ${escapeHtml(v.title || 'SKU')}
+                    </span>
+                    ${v.sku ? `<span class="text-xs text-slate-500 font-mono bg-white px-1.5 py-0.5 rounded border border-slate-100">${escapeHtml(v.sku)}</span>` : ''}
+                  </button>
+                `).join('')}
+              </div>
+            </div>
+          `;
+      }).join('');
+
 
       window.lucide?.createIcons();
 
@@ -242,14 +303,14 @@
       });
     }
 
-    function selectListing(listing) {
-      hiddenInput.value = listing.id;
+    function selectListing(listingVariant) {
+      hiddenInput.value = listingVariant.id;
 
-      selectedTitle.textContent = listing.title;
-      selectedSku.textContent = listing.sku ? `SKU: ${listing.sku}` : '';
+      selectedTitle.textContent = listingVariant.title;
+      selectedSku.textContent = listingVariant.sku ? `SKU: ${listingVariant.sku}` : '';
 
-      if (listing.image) {
-        selectedImage.src = listing.image;
+      if (listingVariant.image) {
+        selectedImage.src = listingVariant.image.startsWith('http') ? listingVariant.image : `https://cdn.cococe.rw/${listingVariant.image}`;
         selectedImage.classList.remove('hidden');
       } else {
         selectedImage.classList.add('hidden');
@@ -266,36 +327,43 @@
       searchInput.focus();
     });
 
-    // Close results dropdown on outside click
     document.addEventListener('click', (e) => {
       if (!e.target.closest('#listingSearchInput') && !e.target.closest('#listingResults')) {
         resultsBox.classList.add('hidden');
       }
     });
 
-    // ─── Submit ───────────────────────────────────────────────
     form?.addEventListener('submit', async (e) => {
       e.preventDefault();
       errorBox.classList.add('hidden');
 
-      const listingId = hiddenInput.value;
-      if (!listingId) {
-        showError('Please select a listing.');
+      const listingVariantId = hiddenInput.value;
+
+      if (!listingVariantId) {
+        showError('Please select a listing variant.');
         return;
       }
 
       const formData = new FormData(form);
+      const trackingMode = formData.get('inventory-item-trackicking-mode');
+      
+      if (!trackingMode) {
+        showError('Please select item tracking mode');
+        return;
+      }
+
+      const rawQty = parseInt(formData.get('quantity'), 10);
+
       const payload = {
-        listing_id: listingId,
-        quantity: parseInt(formData.get('quantity'), 10),
+        listing_variant_id: listingVariantId,
+        quantity: trackingMode === 'bulk' ? (Number.isFinite(rawQty) && rawQty > 0 ? rawQty : 1) : 0,
+        tracking_mode: trackingMode,
         batch_number: formData.get('batch_number')?.toString().trim() || null,
         mfg_at: formData.get('mfg_at')?.toString() || null,
         expires_at: formData.get('expires_at')?.toString() || null,
       };
 
-      console.log("Item payload: ", payload);
-
-      if (!payload.quantity || payload.quantity < 1) {
+      if (payload.tracking_mode === 'bulk' && (!payload.quantity || payload.quantity < 1)) {
         showError('Quantity must be at least 1.');
         return;
       }

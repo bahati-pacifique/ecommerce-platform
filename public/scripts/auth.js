@@ -56,7 +56,6 @@ form.addEventListener('submit', async function (e) {
     const password = passwordInput.value.trim();
     const referer = refererHolder.value.trim();
 
-    // Validation
     if (!email) {
         setError(emailInput);
         showMessage('Please enter your email or username.', 'error');
@@ -86,7 +85,7 @@ form.addEventListener('submit', async function (e) {
             Notification.showNotification({
                 type: 'warning',
                 message: 'Something went wrong. Please try to log in again'
-            })
+            });
         }
     } catch (error) {
         console.log(error);
@@ -98,35 +97,13 @@ form.addEventListener('submit', async function (e) {
     }
 
     return;
-
-    // Simulate API call
-    setTimeout(() => {
-        // Demo successful login
-        if (email.toLowerCase().includes('demo') || email.toLowerCase().includes('admin')) {
-            showMessage('✅ Welcome back! Redirecting to dashboard...', 'success');
-            setTimeout(() => {
-                alert('🚀 You\'ve successfully signed in to the COCOCE Admin Dashboard.\n\n(Full dashboard coming soon!)');
-                form.reset();
-                signinBtn.disabled = false;
-                signinBtn.textContent = 'Sign in';
-            }, 1500);
-        } else {
-            showMessage('❌ Invalid credentials. Please try again.', 'error');
-            signinBtn.disabled = false;
-            signinBtn.textContent = 'Sign in';
-            passwordInput.value = '';
-            setError(passwordInput);
-        }
-    }, 1500);
 });
 
-// Forgot password handler
 document.getElementById('forgotLink').addEventListener('click', function (e) {
     e.preventDefault();
     showMessage('<strong>Forgot password?</strong> Please contact our support team', 'warning');
 });
 
-// SSO button handler
 document.getElementById('ssoBtn').addEventListener('click', function () {
     Notification.showNotification({
         type: 'warning',
@@ -134,7 +111,6 @@ document.getElementById('ssoBtn').addEventListener('click', function () {
     });
 });
 
-// Clear error on focus
 emailInput.addEventListener('focus', function () {
     this.classList.remove('error');
 });

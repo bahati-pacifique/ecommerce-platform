@@ -418,7 +418,7 @@ async function createInventoryItem(req, res) {
         }
 
         const {
-            listing_variant_id, quantity = 0, reserved = 0,
+            listing_variant_id, tracking_mode, quantity = 0, reserved = 0,
             batch_number = null, mfg_at = null, expires_at = null,
             status = 'in_stock'
         } = req.body;
@@ -426,7 +426,7 @@ async function createInventoryItem(req, res) {
         
 
         const result = await InventoryService.insertItem(storeId,{
-            inventoryId, listing_variant_id, quantity, reserved,
+            inventoryId, listing_variant_id, tracking_mode, quantity, reserved,
             batch_number, mfg_at, expires_at,
             status,
         });

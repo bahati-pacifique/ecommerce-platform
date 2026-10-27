@@ -76,9 +76,9 @@
             <form action="<%=locals.protocal%>auth.<%=locals.domainName%>/signout" method="post">
               <input type="hidden" value="<%=locals.protocal%>business.<%=locals.domainName%>" name="host">
               <input type="hidden" name="userAccount" value="<=locals.user.userAccount%>">
-              <button class="flex items-center gap-2" type="submit">
+              <button class="flex items-center gap-2 text-brand" type="submit">
                 <span class="hidden md:block">Signout</span>
-                <i class="bi bi-arrow-right"></i>
+                <i class="bi bi-box-arrow-right"></i>
               </button>
             </form>
           </div>
@@ -575,7 +575,7 @@
               <input type="hidden" name="userAccount" value="<=locals.user.userAccount%>">
               <button class="flex items-center gap-2 hover:text-brand" type="submit">
                 <span class="hidden md:block">Signout</span>
-                <i class="bi bi-arrow-right"></i>
+                <i class="bi bi-box-arrow-right"></i>
               </button>
             </form>
 

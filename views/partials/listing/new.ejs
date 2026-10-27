@@ -6,9 +6,6 @@
 
 <div class="flex flex-col h-full">
 
-  <!-- ═══════════════════════════════════════════════════════════ -->
-  <!-- HEADER                                                      -->
-  <!-- ═══════════════════════════════════════════════════════════ -->
   <div class="shrink-0 border-b border-slate-200 bg-white px-4 sm:px-6 py-4">
     <nav class="mb-2 flex items-center gap-1.5 text-xs text-slate-500">
       <a href="/stores/<%= store.id %>/dashboard/listings" class="hover:text-brand">Listings</a>
@@ -24,9 +21,6 @@
     </p>
   </div>
 
-  <!-- ═══════════════════════════════════════════════════════════ -->
-  <!-- TABS                                                        -->
-  <!-- ═══════════════════════════════════════════════════════════ -->
   <div class="shrink-0 border-b border-slate-200 bg-white px-4 sm:px-6">
     <nav id="tabs" class="flex gap-1 overflow-x-auto" role="tablist">
       <button type="button" data-tab="welcome" class="tab-button whitespace-nowrap border-b-2 border-brand px-4 py-3 text-sm font-medium text-brand">
@@ -52,14 +46,11 @@
     </nav>
   </div>
 
-  <!-- ═══════════════════════════════════════════════════════════ -->
-  <!-- FORM                                                        -->
-  <!-- ═══════════════════════════════════════════════════════════ -->
+
   <form id="createListingForm" class="flex-1 min-h-0 flex flex-col">
     <div class="flex-1 min-h-0 overflow-y-auto px-4 sm:px-6 py-6">
       <div class="max-w-3xl mx-auto space-y-6">
 
-        <!-- ─── TAB: WELCOME ──────────────────────────────── -->
         <section data-panel="welcome">
           <div class="rounded-xl border border-slate-200 bg-gradient-to-br from-white to-slate-50 p-6 shadow-sm">
             <div class="flex items-start gap-4">
@@ -117,7 +108,6 @@
           </div>
         </section>
 
-        <!-- ─── TAB: PRODUCT ──────────────────────────────── -->
         <section data-panel="product" hidden>
           <div class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
             <div class="mb-4 flex items-center gap-3">
@@ -128,7 +118,6 @@
               </div>
             </div>
 
-            <!-- Selected product -->
             <div id="selectedProduct" class="hidden rounded-lg border border-emerald-200 bg-emerald-50 p-4">
               <div class="flex items-start gap-3">
                 <img id="selectedProductImg" src="" alt="" class="h-14 w-14 shrink-0 rounded-lg object-cover ring-1 ring-slate-200" />
@@ -143,7 +132,6 @@
               </div>
             </div>
 
-            <!-- Search -->
             <div id="productSearchPanel">
               <div class="flex items-center gap-2">
                 <div class="relative flex-1">
@@ -187,7 +175,6 @@
           </div>
         </section>
 
-        <!-- ─── TAB: DETAILS ──────────────────────────────── -->
         <section data-panel="details" hidden>
           <div class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
             <div class="mb-4 flex items-center gap-3">
@@ -377,7 +364,7 @@
     storeId: "<%= store.id %>",
     currency: "<%= store.currency || 'RWF' %>",
     currencyId: "<%= store.currency_id || '' %>",
-    cdnBase: "<%= process.env.CDN_BASE || 'http://localhost:9000' %>",
+    cdnBase: "<%= process.env.CDN_BASE || 'https://cdn.cococe.rw' %>",
   };
 </script>
 

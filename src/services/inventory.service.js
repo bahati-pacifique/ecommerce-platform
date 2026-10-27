@@ -361,6 +361,7 @@ class InventoryService {
                 image: i.listing_image,
                 sku: i.listing_sku,
             },
+            tracking_mode: i.tracking_mode,
             quantity: i.quantity,
             reserved: i.reserved,
             available: i.available,
