@@ -35,6 +35,7 @@ router.get('/inventories/:inventoryId/:storeId/overview', business, businessCont
 router.get('/inventories/:inventoryId/:storeId/units', business, businessController.renderInventoryUnit);
 router.get('/inventories/:inventoryId/:storeId/units/search', business, businessController.searchUnit);
 
+router.post('/inventories/:inventoryId/:storeId/add-item', business, businessController.insertInventoryUnit);
 router.post('/inventories/:inventoryId/:storeId/items', business, businessController.createInventoryItem)
 
 router.get('/stores/:storeId/data/analytics', businessController.getStoreDashboardAnalytics);

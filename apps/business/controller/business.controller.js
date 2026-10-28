@@ -316,7 +316,7 @@ async function renderInventoryOverview(req, res) {
         res.locals.layout = 'inventory-center';
 
         const inventory = await InventoryService.getInventoryById(inventoryId, vendorStore.id);
-        
+
         updateStoreLastActive(vendorStore.id);
 
         const data = await InventoryService.getInventoryDetail(vendorStore.id, inventoryId);
@@ -423,9 +423,9 @@ async function createInventoryItem(req, res) {
             status = 'in_stock'
         } = req.body;
 
-        
 
-        const result = await InventoryService.insertItem(storeId,{
+
+        const result = await InventoryService.insertItem(storeId, {
             inventoryId, listing_variant_id, tracking_mode, quantity, reserved,
             batch_number, mfg_at, expires_at,
             status,
@@ -437,10 +437,51 @@ async function createInventoryItem(req, res) {
 
         return res.status(500).json({
             success: false,
-            message: 'Unable to insert items — Internal Error'
-        })
+            message: 'Unable to insert item — Internal Error'
+        });
     }
 
+}
+
+async function insertInventoryUnit(req, res) {
+    const { storeId, inventoryId } = req.params;
+    const user = req.user;
+    try {
+        const vendorStore = await StoreService.getVendorStore(storeId, user.vendor?.id || null);
+
+        if (!vendorStore) {
+            return res.status(401).json({
+                message: 'Failed — Vendor/Store verification failed'
+            });
+        }
+
+        const result = await InventoryService.insertItemUnity(vendorStore.id, inventoryId, {
+            inventoryItemId: req.body.inventory_item_id,
+            serialNumber: req.body.serial_number,
+            barcode: req.body.barcode,
+            imei: req.body.imei,
+            macAddress: req.body.mac_address,
+            status: req.body.status,
+            condition: req.body.condition,
+            receivedAt: req.body.received_at,
+            soldAt: req.body.sold_at,
+            meta: req.body.meta,
+        }, user)
+
+        
+        return res.status(201).json(result);
+
+    } catch (error) {
+        console.log('[insertInventoryItemUnit]', error);
+
+        let message = 'Unable to insert unit — Internal Error';
+
+        if (error.code === '23505') message = `Failed — Item unit with provided serial number/imei/mac address/barcode already exists` 
+        return res.status(500).json({
+            success: false,
+            message, 
+        });
+    }
 }
 
 async function searchUnit(req, res) {
@@ -455,6 +496,7 @@ async function searchUnit(req, res) {
                 message: 'Failed — Unable to retieve store'
             })
         }
+
         const result = await InventoryService.searchUnit(storeId, q, {
             inventoryId,
             status,
@@ -957,10 +999,6 @@ async function insertProductCatalog(req, res) {
 
     try {
 
-        // --------------------------------------------------
-        // PARSE REQUEST
-        // --------------------------------------------------
-
         const body = qs.parse(
             Object.assign({}, req.body)
         );
@@ -974,11 +1012,6 @@ async function insertProductCatalog(req, res) {
         const mediaMeta = Array.isArray(body.media)
             ? body.media
             : [];
-
-
-        // --------------------------------------------------
-        // MAP UPLOADED FILES BY MEDIA INDEX
-        // --------------------------------------------------
 
         const filesByIndex = {};
 
@@ -1776,8 +1809,10 @@ module.exports = {
 
     renderInventoryHome,
     renderInventoryOverview,
+
     renderInventoryUnit,
     searchUnit,
+    insertInventoryUnit,
 
     searchListingByStore,
 

@@ -62,9 +62,9 @@ document.addEventListener('DOMContentLoaded', () => {
         withCredentials: true,
       });
 
-      const data = res.data;
+      const data = res.data.result;
 
-      renderResults(data?.items || []);
+      renderResults(data || []);
     } catch (err) {
       console.error('[units-search] failed:', err);
       results.innerHTML = errorState(err.response?.data?.message || 'Internal Server Error');
@@ -97,15 +97,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const tone = {
       available: 'bg-emerald-50 text-emerald-700',
       reserved:  'bg-amber-50 text-amber-700',
-      sold:      'bg-slate-100 text-slate-600',
-      damaged:   'bg-rose-50 text-rose-700',
-      returned:  'bg-orange-50 text-orange-700',
+      sold: 'bg-slate-100 text-slate-600',
+      damaged: 'bg-rose-50 text-rose-700',
+      returned: 'bg-orange-50 text-orange-700',
     }[u.status] || 'bg-slate-100 text-slate-600';
 
     const ids = [
       u.serial_number && `<span>SN: <span class="font-mono">${escapeHtml(u.serial_number)}</span></span>`,
-      u.imei          && `<span>IMEI: <span class="font-mono">${escapeHtml(u.imei)}</span></span>`,
-      u.barcode       && `<span>BC: <span class="font-mono">${escapeHtml(u.barcode)}</span></span>`,
+      u.imei && `<span>IMEI: <span class="font-mono">${escapeHtml(u.imei)}</span></span>`,
+      u.barcode && `<span>BC: <span class="font-mono">${escapeHtml(u.barcode)}</span></span>`,
     ].filter(Boolean).join('');
 
     return `
@@ -113,24 +113,27 @@ document.addEventListener('DOMContentLoaded', () => {
         <div class="flex items-start justify-between gap-3">
           <div class="flex items-start gap-3 min-w-0">
             ${u.listing_image
-              ? `<img src="${escapeHtml(u.listing_image)}" class="h-10 w-10 rounded object-cover ring-1 ring-slate-200" data-fallback-hide="true" />`
+              ? `<img src="https:cdn.cococe.rw/${escapeHtml(u.listing_image)}" class="h-10 w-10 rounded object-cover ring-1 ring-slate-200" data-fallback-hide="true" />`
               : `<div class="flex h-10 w-10 items-center justify-center rounded bg-slate-100"><i data-lucide="package" class="h-4 w-4 text-slate-400"></i></div>`}
             <div class="min-w-0">
               <div class="text-sm font-semibold text-slate-900 truncate">${escapeHtml(u.listing_title || '—')}</div>
               <div class="mt-0.5 flex flex-wrap gap-x-3 gap-y-0.5 text-xs text-slate-500">${ids || '<em>No identifiers</em>'}</div>
             </div>
           </div>
-          <span class="rounded-full px-2 py-0.5 text-[10px] font-semibold shrink-0 ${tone}">${escapeHtml(u.status)}</span>
+          <span class="rounded-full px-2 py-0.5 capitalize text-[10px] font-semibold shrink-0 ${tone}">${escapeHtml(u.status)}</span>
         </div>
         <div class="mt-2 flex items-center gap-3 border-t border-slate-100 pt-2 text-[11px] text-slate-500">
           <span class="inline-flex items-center gap-1">
             <i data-lucide="warehouse" class="h-3 w-3"></i>
-            ${escapeHtml(u.location_title || '—')}
+            ${escapeHtml(u.inventory_title || u.location_title || '—')}
           </span>
           <span class="inline-flex items-center gap-1">
             <i data-lucide="calendar" class="h-3 w-3"></i>
             ${u.received_at ? new Date(u.received_at).toLocaleDateString() : '—'}
           </span>
+          <a href="#" class="ml-auto text-white bg-brand rounded px-2 py-2 flex items-center justify-center gap-1">
+            <i data-lucide="settings-2"></i>
+          </a>
         </div>
       </div>`;
   }

@@ -12,13 +12,14 @@
 
 <%
   const statuses = [
-    'in_stock',
-    'low_stock',
-    'out_of_stock',
+    'available',
     'reserved',
-    'damaged',
+    'sold',
     'returned',
-    'discontinued'
+    'damaged',
+    'repair',
+    'lost',
+    'disposed'
   ]
   const conditions  = [
     'new',
@@ -128,7 +129,7 @@
             <select id="unit-status" name="status" required class="h-10 w-full rounded-lg border border-gray-200 bg-white px-3 text-sm text-gray-900 outline-none focus:border-brand focus:ring-2 focus:ring-brand/20">
               <% statuses.forEach(s => { %>
               <option value="<%= s %>" <%= s === initialStat ? 'selected' : '' %>>
-                <%= s.charAt(0).toUpperCase() + s.slice(1) %>
+                <%= (s.charAt(0).toUpperCase() + s.slice(1)).replaceAll('_', ' ') %>
               </option>
               <% }) %>
             </select>
@@ -141,7 +142,7 @@
             <select id="unit-condition" name="condition" required class="h-10 w-full rounded-lg border border-gray-200 bg-white px-3 text-sm text-gray-900 outline-none focus:border-brand focus:ring-2 focus:ring-brand/20">
               <% conditions.forEach(c => { %>
               <option value="<%= c %>">
-                <%= c.charAt(0).toUpperCase() + c.slice(1) %>
+                <%= (c.charAt(0).toUpperCase() + c.slice(1)).replaceAll('_', ' ') %>
               </option>
               <% }) %>
             </select>
@@ -162,8 +163,7 @@
           </select>
         </div> -->
 
-        <!-- ── Warranty ─────────────────────────────────────── -->
-        <fieldset>
+        <fieldset class="hidden">
           <legend class="text-xs font-bold uppercase tracking-wider text-gray-500">
             Warranty <span class="font-normal normal-case text-gray-400">(optional)</span>
           </legend>

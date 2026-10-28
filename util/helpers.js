@@ -1,5 +1,7 @@
 const UAParser = require('ua-parser-js');
 
+const crypto = require('crypto');
+
 /**
  * 
  * @param {*} req Client request
@@ -136,6 +138,24 @@ function formatError(name, status = 500, error, message, res) {
   })
 }
 
+/**
+ * 
+ * @returns identical random string
+ */
+function randomUId() {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_';
+    
+    const bytes = crypto.randomBytes(11);
+    let result = '';
+    
+    for (let i = 0; i < 11; i++) {
+        // Map each byte to one of the 64 characters
+        result += chars[bytes[i] % 64];
+    }
+    
+    return result;
+}
+
 
 module.exports = {
   acceptsHtml,
@@ -149,5 +169,6 @@ module.exports = {
   deny403,
   deny500,
   isSameOrigin,
-  formatError
+  formatError,
+  randomUId,
 }

@@ -1,7 +1,6 @@
 <%
-  // Defensive defaults
-  const unitItems   = data.units?.items ?? [];
-  const unitTotal   = data.units?.total ?? 0;
+  const unitItems   = data.units ?? [];
+  const unitTotal   = data.pagination?.total ?? 0;
   const pagination  = data.pagination ?? {
     page: 1, limit: 20, total: 0, totalPages: 1,
     hasNextPage: false, hasPreviousPage: false,
@@ -100,9 +99,9 @@
     <table class="w-full text-left text-sm">
       <thead class="bg-slate-50 text-xs uppercase tracking-wider text-slate-500">
         <tr>
-          <th class="px-5 py-3">Serial</th>
           <th class="px-5 py-3">Listing</th>
-          <th class="px-5 py-3">Location</th>
+          <th class="px-5 py-3">Serial</th>
+          <th class="px-5 py-3">Inventory</th>
           <th class="px-5 py-3">Status</th>
           <th class="px-5 py-3">Warranty</th>
           <th class="px-5 py-3"></th>
@@ -112,6 +111,20 @@
         <% unitItems.forEach(u => { %>
         <tr class="hover:bg-slate-50">
 
+          <td class="px-5 py-3">
+            <div class="flex items-center gap-2.5">
+              <% if (u.listing_image) { %>
+              <img src="https://cdn.cococe.rw/<%= u.listing_image %>" alt="" class="h-8 w-8 shrink-0 rounded object-cover ring-1 ring-slate-200" data-fallback-hide="true" />
+              <% } else { %>
+              <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded bg-slate-100">
+                <i data-lucide="package" class="h-3.5 w-3.5 text-slate-400"></i>
+              </div>
+              <% } %>
+              <span class="max-w-[220px] truncate font-medium text-slate-800" title="<%= u.listing?.title || '' %>">
+                <%= u.listing_title || '—' %>
+              </span>
+            </div>
+          </td>
           <!-- Identifiers -->
           <td class="px-5 py-3 align-top">
             <div class="font-mono text-xs text-slate-900">
@@ -129,43 +142,27 @@
             <% } %>
           </td>
 
-          <td class="px-5 py-3">
-            <div class="flex items-center gap-2.5">
-              <% if (u.listing?.image) { %>
-              <img src="<%= u.listing.image %>" alt="" class="h-8 w-8 shrink-0 rounded object-cover ring-1 ring-slate-200" data-fallback-hide="true" />
-              <% } else { %>
-              <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded bg-slate-100">
-                <i data-lucide="package" class="h-3.5 w-3.5 text-slate-400"></i>
-              </div>
-              <% } %>
-              <span class="max-w-[220px] truncate font-medium text-slate-800" title="<%= u.listing?.title || '' %>">
-                <%= u.listing?.title || '—' %>
-              </span>
-            </div>
-          </td>
-
           <td class="px-5 py-3 text-xs text-slate-600">
             <span class="inline-flex items-center gap-1">
               <i data-lucide="warehouse" class="h-3 w-3 text-slate-400"></i>
-              <%= u.location?.title || '—' %>
+              <%= u.inventory_title || '—' %>
             </span>
           </td>
 
           <td class="px-5 py-3">
-            <span class="rounded-full px-2 py-0.5 text-[10px] font-semibold <%= statusTone(u.status) %>">
+            <span class="rounded-full px-2 py-0.5 capitalize text-[10px] font-semibold <%= statusTone(u.status) %>">
               <%= u.status || '—' %>
             </span>
           </td>
 
           <td class="px-5 py-3 text-xs text-slate-500">
-            <%= fmtDate(u.warranty_end_date) %>
+            <%= u.warranty_title || 'No warranty registered' %>
           </td>
 
           <td class="px-5 py-3 text-right">
             <% if (u.inventory_item_id) { %>
-            <a href="/stores/<%= store.id %>/inventory/<%= u.location?.id %>/items/<%= u.inventory_item_id %>" class="inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-white px-2.5 py-1 text-xs font-medium text-slate-700 hover:bg-slate-50">
-              <i data-lucide="eye" class="h-3 w-3"></i>
-              View
+            <a  href="/stores/<%= store.id %>/inventory/<%= u.location?.id %>/items/<%= u.inventory_item_id %>" class="ml-auto text-white bg-brand rounded px-2 py-2 flex items-center justify-center gap-1">
+              <i data-lucide="settings-2"></i>
             </a>
             <% } %>
           </td>

@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>COCOCE — Inventory Center</title>
 
-  <meta name="description" content="COCOCE Inventory Center — <%= store.name %>">
+  <meta name="description" content="COCOCE Inventory Center — <%= locals.store?.name %>">
   <link rel="icon" href="/favicon.ico" type="image/x-icon">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -53,7 +53,7 @@
   <header class="sticky top-0 z-30 border-b border-slate-200 bg-white/95 backdrop-blur">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center gap-4">
 
-      <a href="/inventories/<%=locals.inventory.id%>/<%= store.id %>/" class="flex items-center gap-2 shrink-0">
+      <a href="/inventories/<%=locals.inventory?.id%>/<%= locals.store?.id %>/" class="flex items-center gap-2 shrink-0">
         <img src="/images/logos/fav.png" alt="COCOCE" class="h-7">
         <div class="hidden sm:block">
           <div class="text-[10px] font-bold uppercase tracking-wider text-brand">Inventory</div>
@@ -64,9 +64,9 @@
       <nav class="hidden md:flex items-center gap-2 text-sm text-slate-500 min-w-0">
         <span class="text-slate-300">/</span>
         <div class="flex items-center gap-2 text-slate-900 font-bold text-lg">
-          <span class="text-brand"><%= store.name %></span>
+          <span class="text-brand"><%= locals.store?.name %></span>
           <span class="text-gray-500">></span>
-          <span><%= inventory.title %></span>
+          <span><%= locals.inventory?.title %></span>
         </div>
       </nav>
 
@@ -102,7 +102,7 @@
       <div class="flex items-center justify-between border-b border-slate-100 px-4 py-3">
         <div>
           <div class="text-sm font-semibold text-slate-900">Quick actions</div>
-          <div class="text-xs text-slate-500"><%= store.name %></div>
+          <div class="text-xs text-slate-500"><%= locals.store?.name %></div>
         </div>
         <button id="quickActionsClose" type="button" class="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-700">
           <i data-lucide="x" class="h-4 w-4"></i>
@@ -112,7 +112,7 @@
       <div class="p-2">
         <div class="px-2 py-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-400">Inventory</div>
 
-        <a href="/inventories/<%= inventory.id %>/<%= store.id %>/overview" class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-slate-700 hover:bg-[var(--color-brand-ultralight)] hover:text-[var(--color-brand-dark)] transition">
+        <a href="/inventories/<%= locals.inventory?.id %>/<%= locals.store?.id %>/overview" class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-slate-700 hover:bg-[var(--color-brand-ultralight)] hover:text-[var(--color-brand-dark)] transition">
           <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-100 text-slate-600">
             <i data-lucide="layout-dashboard" class="h-4 w-4"></i>
           </span>
@@ -122,7 +122,7 @@
           </div>
         </a>
 
-        <a href="/inventories/<%= inventory.id %>/<%= store.id %>/units" class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-slate-700 hover:bg-[var(--color-brand-ultralight)] hover:text-[var(--color-brand-dark)] transition">
+        <a href="/inventories/<%= locals.inventory?.id %>/<%= locals.store?.id %>/units" class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-slate-700 hover:bg-[var(--color-brand-ultralight)] hover:text-[var(--color-brand-dark)] transition">
           <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-100 text-slate-600">
             <i data-lucide="scan-line" class="h-4 w-4"></i>
           </span>
@@ -132,7 +132,7 @@
           </div>
         </a>
 
-        <a href="/inventories/<%= inventory.id %>/<%= store.id %>/add-item" class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-slate-700 hover:bg-[var(--color-brand-ultralight)] hover:text-[var(--color-brand-dark)] transition">
+        <a href="/inventories/<%= locals.inventory?.id %>/<%= locals.store?.id %>/add-item" class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-slate-700 hover:bg-[var(--color-brand-ultralight)] hover:text-[var(--color-brand-dark)] transition">
           <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-100 text-slate-600">
             <i data-lucide="list-plus" class="h-4 w-4"></i>
           </span>
@@ -142,7 +142,7 @@
           </div>
         </a>
 
-        <a href="/inventories/<%= inventory.id %>/<%= store.id %>/add-unit" class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-slate-700 hover:bg-[var(--color-brand-ultralight)] hover:text-[var(--color-brand-dark)] transition">
+        <a href="/inventories/<%= locals.inventory?.id %>/<%= locals.store?.id %>/add-unit" class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-slate-700 hover:bg-[var(--color-brand-ultralight)] hover:text-[var(--color-brand-dark)] transition">
           <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-100 text-slate-600">
             <i data-lucide="plus" class="h-4 w-4"></i>
           </span>
@@ -152,7 +152,7 @@
           </div>
         </a>
 
-        <a href="/inventories/<%= inventory.id %>/<%= store.id %>/transactions" class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-slate-700 hover:bg-[var(--color-brand-ultralight)] hover:text-[var(--color-brand-dark)] transition">
+        <a href="/inventories/<%= locals.inventory?.id %>/<%= locals.store?.id %>/transactions" class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-slate-700 hover:bg-[var(--color-brand-ultralight)] hover:text-[var(--color-brand-dark)] transition">
           <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-100 text-slate-600">
             <i data-lucide="history" class="h-4 w-4"></i>
           </span>
@@ -168,7 +168,7 @@
       <div class="p-2">
         <div class="px-2 py-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-400">Related</div>
 
-        <a href="/stores/<%= store.id %>/dashboard" class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition">
+        <a href="/stores/<%= locals.store?.id %>/dashboard" class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition">
           <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-100 text-slate-600">
             <i data-lucide="arrow-left" class="h-4 w-4"></i>
           </span>

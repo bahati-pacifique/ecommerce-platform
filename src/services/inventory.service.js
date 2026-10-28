@@ -1,4 +1,5 @@
 const InventoryModel = require("../models/inventory.model");
+const { randomUId } = require("../../util/helpers");
 
 class InventoryService {
 
@@ -321,7 +322,7 @@ class InventoryService {
         return await InventoryModel.listUnitsByInventory(inventoryId, opts);
     }
 
-    static async searchUnit(storeId, query, opts){
+    static async searchUnit(storeId, query, opts) {
         return await InventoryModel.searchUnit(storeId, query, opts);
     }
 
@@ -335,10 +336,36 @@ class InventoryService {
         }
      *
      */
-    static async insertItem(storeId, payload){
+    static async insertItem(storeId, payload) {
         const inventory = await InventoryModel.findInventoryByStoreId(storeId, payload.inventoryId);
-        if (!inventory) throw new Error('Store inventory verification failed');
+        if (!inventory) throw new Error('Store/Inventory verification failed');
         return await InventoryModel.insertInventoryItem(payload);
+    }
+
+    static async insertItemUnity(storeId, inventoryId, payload, user) {
+        const inventory = await InventoryModel.findInventoryByStoreId(storeId, inventoryId);
+        if (!inventory) throw new Error('Store/Inventory verification failed');
+
+        const result = await InventoryModel.insertInventoryUnit(payload);
+
+        if (result) {
+            try {
+                const transactionPayload = {
+                    inventoryItemId: payload.inventoryItemId,
+                    type: 'initial_stock',
+                    quantityChange: 1,
+                    reference_type: randomUId(),
+                    notes: `Unit registration. Unit id: ${result.id}`,
+                    createdBy: user?.id || null
+                }
+
+                await InventoryModel.createInventoryTransaction(transactionPayload);
+            } catch (error) {
+                console.log('Insert unit transaction failed', error);
+            }
+        }
+
+        return result;
     }
 
     shapeLocation(loc) {

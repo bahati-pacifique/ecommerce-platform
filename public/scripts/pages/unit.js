@@ -11,7 +11,7 @@ $(function () {
   const submitTxt = document.getElementById('unit-add-submit-text');
   const errorBox = document.getElementById('unit-add-error');
 
-  // ── Open / close ─────────────────────────────────────────
+  // ── Open / close 
   function openUnitModal() {
     modal.classList.remove('hidden');
     modal.classList.add('flex');
@@ -33,7 +33,7 @@ $(function () {
     if (e.key === 'Escape') closeUnitModal();
   }
 
-  // ── Focus trap ───────────────────────────────────────────
+  // ── Focus trap 
   modal.addEventListener('keydown', (e) => {
     if (e.key !== 'Tab') return;
     const f = modal.querySelectorAll(
@@ -49,12 +49,11 @@ $(function () {
     }
   });
 
-  // ── Wire triggers ────────────────────────────────────────
-  // Any element with [data-open-unit-modal] opens it
+  // ── Wire triggers 
   $(document).on('click', '[data-open-unit-modal]', function (e) {
     const itemId = e.currentTarget.dataset.itemId;
     if (!itemId) return;
-    console.log(itemId);
+    $('#selectedItemId').val(itemId);
     e.preventDefault();
     openUnitModal();
   });
@@ -68,7 +67,7 @@ $(function () {
     openUnitModal();
   }
 
-  // ── Client-side validation ───────────────────────────────
+  // ── Client-side validation 
   function setError(field, message) {
     const el = modal.querySelector(`[data-error-for="${field}"]`);
     if (el) {
@@ -233,32 +232,20 @@ $(function () {
     submitTxt.textContent = 'Adding…';
 
     try {
-      const res = await fetch(form.action, {
-        method: 'POST',
-        headers: { 'Accept': 'application/json' },
-        body: new FormData(form),
-        credentials: 'same-origin',
-      });
+      const response = await axios.post(`/inventories/${__ADD_ITEM__.inventoryId}/${__ADD_ITEM__.storeId}/add-item`, new FormData(form), { withCredentials: true });
 
-      if (res.redirected) {
-        window.location.href = res.url;
-        return;
+
+      if (response.data) {
+        Notification.showNotification({
+          type: 'success',
+          message: 'Inventory unit inserted successfully'
+        })
+        window.location.reload();
       }
 
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({}));
-        if (data.errors) {
-          Object.entries(data.errors).forEach(([field, msg]) => setError(field, msg));
-        }
-        errorBox.textContent = data.message || 'Could not add unit. Please try again.';
-        errorBox.classList.remove('hidden');
-        return;
-      }
-
-      // Success without redirect → reload
-      window.location.reload();
-    } catch {
-      errorBox.textContent = 'Network error. Please check your connection.';
+    } catch (error) {
+      console.log(error);
+      errorBox.textContent = error.response?.data?.message || 'Internal Server Error — You may try again';
       errorBox.classList.remove('hidden');
     } finally {
       submitBtn.disabled = false;

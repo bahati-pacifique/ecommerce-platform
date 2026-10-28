@@ -5,15 +5,15 @@
   };
 
   const safe = {
-    locations:   Array.isArray(locations) ? locations : [],
-    totals:      totals || {},
+    locations: Array.isArray(locations) ? locations : [],
+    totals: totals || {},
   };
 
   const t = {
     units: safe.totals.units ?? 0,
-    available:    safe.totals.available    ?? 0,
-    reserved:     safe.totals.reserved     ?? 0,
-    low_stock:    safe.totals.low_stock    ?? 0,
+    available: safe.totals.available ?? 0,
+    reserved: safe.totals.reserved ?? 0,
+    low_stock: safe.totals.low_stock ?? 0,
     out_of_stock: safe.totals.out_of_stock ?? 0,
   };
 %>
@@ -21,17 +21,17 @@
   <div>
     <div class="mb-1 flex items-center gap-2 text-[var(--color-brand)]">
       <i data-lucide="boxes" class="h-4 w-4"></i>
-      <span class="text-sm font-semibold"><%= store.name %></span>
+      <span class="text-sm font-semibold"><%= locals.store?.name %></span>
     </div>
     <h1 class="text-2xl font-bold tracking-tight">Inventory</h1>
     <p class="mt-1 text-sm text-slate-500">Manage stock across all your locations.</p>
   </div>
   <div class="flex flex-wrap gap-2">
-    <a href="/stores/<%= store.id %>/inventory/units"
+    <a href="/stores/<%= locals.store?.id %>/inventory/units"
        class="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium hover:bg-slate-50">
       <i data-lucide="scan-line" class="h-4 w-4"></i>Search units
     </a>
-    <a href="/stores/<%= store.id %>/inventory/transactions"
+    <a href="/stores/<%= locals.store?.id %>/inventory/transactions"
        class="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium hover:bg-slate-50">
       <i data-lucide="history" class="h-4 w-4"></i>Transactions
     </a>
@@ -43,9 +43,6 @@
   </div>
 </div>
 
-<!-- ═══════════════════════════════════════════════════════════ -->
-<!-- Store-wide aggregate stats                                  -->
-<!-- ═══════════════════════════════════════════════════════════ -->
 <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
 
   <div class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
@@ -136,7 +133,7 @@
            const lowStockItems  = stats.low_stock_items   ?? 0;
            const outOfStockItems = stats.out_of_stock_items ?? 0;
       %>
-        <a href="/stores/<%= store.id %>/inventory/<%= loc.id %>"
+        <a href="/stores/<%= locals.store?.id %>/inventory/<%= loc.id %>"
            class="group rounded-xl border border-slate-200 bg-white p-5 shadow-sm transition hover:border-slate-300 hover:shadow-md">
 
           <div class="flex items-start justify-between">
