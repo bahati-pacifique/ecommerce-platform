@@ -142,13 +142,13 @@
               <td class="px-5 py-3 text-right font-semibold text-emerald-600"><%= fmtNum(item.available) %></td>
               <td class="px-5 py-3">
                 <span class="rounded-full px-2.5 py-1 text-xs font-semibold
-                  <%= item.status === 'in_stock'     ? 'bg-emerald-50 text-emerald-700' : '' %>
-                  <%= item.status === 'low_stock'    ? 'bg-amber-50 text-amber-700' : '' %>
+                  <%= item.status === 'in_stock' ? 'bg-emerald-50 text-emerald-700' : '' %>
+                  <%= item.status === 'low_stock' ? 'bg-amber-50 text-amber-700' : '' %>
                   <%= item.status === 'out_of_stock' ? 'bg-rose-50 text-rose-700' : '' %>">
                   <%= (item.status || '').replace('_', ' ') %>
                 </span>
               </td>
-              <td>
+              <td class="flex items-center gap-3 py-3">
                 <button data-item-id="<%=item.id%>" data-open-unit-modal
                   class = "<%=
                   item.tracking_mode === 'bulk' ? 'hidden' : 'inline-flex'%> 
@@ -177,6 +177,19 @@
                   title="Adjust Quantity">
                   <i data-lucide="rotate-cw"></i>
                 </button>
+                <button data-item-id="<%=item.id%>" data-unit-pricing
+                  class = "<%=
+                  item.tracking_mode === 'bulk' ? 'hidden' : 'inline-flex'%> 
+                  items-center gap-1 
+                  rounded-lg border 
+                  border-slate-500 
+                  px-3 py-1 text-sm 
+                  font-semibold text-slate-500 
+                  hover:text-brand 
+                  hover:border-brand 
+                  add-unit-btn"
+                  title="Listing pricing">
+                   <i data-lucide="dollar-sign"></i>
               </td>
             </tr>
           <% }) %>

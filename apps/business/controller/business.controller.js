@@ -379,6 +379,8 @@ async function renderInventoryUnit(req, res) {
             sort,
         });
 
+        const storeInventories = await InventoryService.getInventoriesByStoreId(vendorStore.id, { limit: 10 });
+
         return res.render('partials/inventory/units', {
             layout: 'inventory-center',
             store: vendorStore,
@@ -386,6 +388,7 @@ async function renderInventoryUnit(req, res) {
             user,
             protocal,
             domainName,
+            store_inventories: storeInventories.rows,
             title: 'Inventory Unit',
             data: result
         });
@@ -399,6 +402,34 @@ async function renderInventoryUnit(req, res) {
             title: 'Inventory Overview',
             ...InventoryService.emptyInventoryOverview(),
         });
+    }
+}
+
+async function getItemUnit(req, res) {
+    const user = req.user;
+    const storeId = req.params.storeId;
+    const unitId = req.params.unitId;
+
+    try {
+        const vendorStore = await StoreService.getVendorStore(storeId, user.vendor?.id || null);
+
+        if (!vendorStore) {
+            return res.status(401).json({
+                message: `Vendor/Store verification failed`
+            });
+        }
+
+        const result = await InventoryService.getUnitById(unitId);
+
+        return res.status(result ? 200 : 404).json({
+            ...result,
+            ...(!result && { message: 'Unit not found, please check unit id/serial number/barcode' }),
+        });
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            message: 'Unable to get unit — Internal error'
+        })
     }
 }
 
@@ -468,7 +499,7 @@ async function insertInventoryUnit(req, res) {
             meta: req.body.meta,
         }, user)
 
-        
+
         return res.status(201).json(result);
 
     } catch (error) {
@@ -476,10 +507,10 @@ async function insertInventoryUnit(req, res) {
 
         let message = 'Unable to insert unit — Internal Error';
 
-        if (error.code === '23505') message = `Failed — Item unit with provided serial number/imei/mac address/barcode already exists` 
+        if (error.code === '23505') message = `Failed — Item unit with provided serial number/imei/mac address/barcode already exists`
         return res.status(500).json({
             success: false,
-            message, 
+            message,
         });
     }
 }
@@ -777,6 +808,19 @@ async function getInventoriesByStoreId(req, res) {
     try {
         const storeId = req.params.storeId;
         const { lowStockThreshold, search, status, stock, page, limit } = req.params;
+        const user = req.user;
+
+        const vendorStore = await StoreService.getVendorStore(
+            storeId,
+            user.vendor?.id || null
+        );
+
+        if (!vendorStore) {
+            return res.status(401).json({
+                message: 'Store verification failed'
+            })
+        }
+
         const result = await StoreService.getInventoriesByStoreId({
             storeId,
             search, status, stock, page, limit, lowStockThreshold
@@ -869,11 +913,38 @@ async function renderMessages(req, res) {
 
 async function renderNotifications(req, res) {
     //const vendorId = req.params.vendor;
-
     const user = req.user;
 
     const conversations = [];
     return res.render('notification-center', { layout: false, user, conversations });
+}
+
+async function transferUnit(req, res) {
+    const { storeId, unitId, inventoryId } = req.params;
+    const user = req.user;
+    try {
+        const vendorStore = await StoreService.getVendorStore(
+            storeId,
+            user.vendor?.id || null
+        );
+
+        if (!vendorStore) {
+            return res.status(401).json({
+                message: 'Vendor/Store verification failed'
+            });
+        }
+
+        const result = await StoreService.transferUnit(unitId, inventoryId);
+
+        return res.status(201).json(result);
+    } catch (error) {
+        console.log(error);
+        let message = 'Failed — Internal Error';
+        if (!error.code) message = error.message;
+        return res.status(500).json({
+            message 
+        });
+    }
 }
 
 async function getVendorOrderDashboard(req, res) {
@@ -1812,11 +1883,13 @@ module.exports = {
 
     renderInventoryUnit,
     searchUnit,
+    getItemUnit,
     insertInventoryUnit,
 
     searchListingByStore,
 
     createInventoryItem,
+    transferUnit,
 
     getStoreDashboardAnalytics,
     getStoreDashboard,

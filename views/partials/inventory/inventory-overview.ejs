@@ -126,11 +126,11 @@
     <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
       <% safe.locations.forEach(loc => {
            const stats = loc.stats || {};
-           const itemRecords   = stats.item_records       ?? 0;
-           const totalUnits    = stats.total_units        ?? 0;
-           const availableUnits = stats.available_units   ?? 0;
-           const reservedUnits  = stats.reserved_units    ?? 0;
-           const lowStockItems  = stats.low_stock_items   ?? 0;
+           const itemRecords = stats.item_records ?? 0;
+           const totalUnits = stats.total_units ?? 0;
+           const availableUnits = stats.available_units ?? 0;
+           const reservedUnits = stats.reserved_units ?? 0;
+           const lowStockItems  = stats.low_stock_items ?? 0;
            const outOfStockItems = stats.out_of_stock_items ?? 0;
       %>
         <a href="/stores/<%= locals.store?.id %>/inventory/<%= loc.id %>"

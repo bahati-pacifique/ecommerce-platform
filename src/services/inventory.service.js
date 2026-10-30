@@ -322,6 +322,10 @@ class InventoryService {
         return await InventoryModel.listUnitsByInventory(inventoryId, opts);
     }
 
+    static async getUnitById(unitId) {
+        return await InventoryModel.getUnitById(unitId);
+    }
+
     static async searchUnit(storeId, query, opts) {
         return await InventoryModel.searchUnit(storeId, query, opts);
     }

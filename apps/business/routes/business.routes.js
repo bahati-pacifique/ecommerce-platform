@@ -36,7 +36,10 @@ router.get('/inventories/:inventoryId/:storeId/units', business, businessControl
 router.get('/inventories/:inventoryId/:storeId/units/search', business, businessController.searchUnit);
 
 router.post('/inventories/:inventoryId/:storeId/add-item', business, businessController.insertInventoryUnit);
-router.post('/inventories/:inventoryId/:storeId/items', business, businessController.createInventoryItem)
+router.post('/inventories/:inventoryId/:storeId/items', business, businessController.createInventoryItem);
+
+router.get('/inventories/units/:storeId/:unitId', business, businessController.getItemUnit);
+router.patch('/inventories/units/:unitId/:inventoryId/:storeId/transfer', business, businessController.transferUnit);
 
 router.get('/stores/:storeId/data/analytics', businessController.getStoreDashboardAnalytics);
 router.get('/stores/:storeId/data/product-listing/analytics', business, businessController.getStoreListingProductAnalytics);

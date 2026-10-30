@@ -13,10 +13,10 @@
 
   const statusTone = (status) => ({
     available: 'bg-emerald-50 text-emerald-700',
-    reserved:  'bg-amber-50 text-amber-700',
+    reserved: 'bg-amber-50 text-amber-700',
     sold: 'bg-slate-100 text-slate-600',
     damaged: 'bg-rose-50 text-rose-700',
-    returned:  'bg-orange-50 text-orange-700',
+    returned: 'bg-orange-50 text-orange-700',
   }[status] || 'bg-slate-100 text-slate-600');
 %>
 
@@ -161,9 +161,9 @@
 
           <td class="px-5 py-3 text-right">
             <% if (u.inventory_item_id) { %>
-            <a  href="/stores/<%= store.id %>/inventory/<%= u.location?.id %>/items/<%= u.inventory_item_id %>" class="ml-auto text-white bg-brand rounded px-2 py-2 flex items-center justify-center gap-1">
+            <button data-unit-id="<%= u.id %>" href="/stores/<%= store.id %>/inventory/<%= u.location?.id %>/items/<%= u.inventory_item_id %>" class="ml-auto text-white bg-brand rounded px-2 py-2 flex items-center justify-center gap-1">
               <i data-lucide="settings-2"></i>
-            </a>
+            </button>
             <% } %>
           </td>
         </tr>
@@ -263,11 +263,15 @@
   </div>
 </div>
 
+<%- include('./unit-bottom-sheet') %>
+
 <script>
   window.__UNITS__ = {
     storeId: "<%= store.id %>",
     inventoryId: "<%= inventory.id %>"
   };
 </script>
-
-<% pageScript = '/scripts/pages/units-search.js'; %>
+<% pageScripts = [
+  '/scripts/pages/units-search.js',
+  '/scripts/pages/unit-sheet.js',
+]; %>

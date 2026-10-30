@@ -2268,6 +2268,49 @@ class InventoryModel {
         };
     }
 
+    static async getUnitById(unitId) {
+
+        const { rows } = await db.query(`
+            SELECT
+            u.id,
+            u.serial_number,
+            u.imei,
+            u.barcode,
+            u.mac_address,
+            u.status,
+            u.condition,
+            u.received_at,
+            u.sold_at,
+            i.title AS inventory_title,
+            i.description AS inventory_description,
+            u.inventory_item_id,
+            ii.inventory_id,
+            l.id AS listing_id,
+            l.title AS listing_title,
+            (SELECT storage_key FROM listing_variants_media
+            WHERE listing_variant_id = lv.id) AS listing_image,
+            w.title AS warranty_title,
+            w.provider AS warranty_provider,
+            w.description AS warranty_description,
+            w.duration_months AS warranty_months_duration,
+            w.terms_url AS warranty_terms_url,
+            w.status AS warranty_status,
+            w.updated_at AS warranty_updated_at,
+            wr.starts_at AS unit_warrant_start,
+            wr.expires_at AS unit_warrant_end
+            FROM inventory_units u
+            JOIN inventory_items ii ON ii.id = u.inventory_item_id
+            JOIN inventories i ON i.id = ii.inventory_id
+            JOIN listing_variants lv ON lv.id = ii.listing_variant_id
+            JOIN listings l ON l.id = lv.listing_id 
+            LEFT JOIN warranty_registrations wr ON wr.inventory_unit_id = u.id
+            LEFT JOIN warranties w ON w.id = wr.warranty_id
+            WHERE u.id = $1
+        `, [unitId]);
+
+        return rows[0] ?? null;
+    }
+
     /**
      * Update a unit's status / metadata.
      */

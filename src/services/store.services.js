@@ -727,7 +727,13 @@ class StoreService {
         return result;
     }
 
-    
+    static async transferUnit(unitId, destinationInventoryId, userId) {
+        const result = await StoreModel.transferUnit(unitId, destinationInventoryId, userId);
+
+        return result;
+    }
+
+
 
 }
 

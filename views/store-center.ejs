@@ -44,7 +44,7 @@
   %>
 
   <script>
-    const username = '<%=locals.user.username%>';
+    const username = '<%=locals.user?.username || ""%>';
   </script>
 
 </head>

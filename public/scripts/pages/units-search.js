@@ -1,15 +1,26 @@
 document.addEventListener('DOMContentLoaded', () => {
   const { storeId } = window.__UNITS__ || {};
 
-  const modal          = document.getElementById('searchModal');
-  const backdrop       = document.getElementById('searchModalBackdrop');
-  const openBtn        = document.getElementById('openSearchButton');
-  const closeBtn       = document.getElementById('closeSearchButton');
-  const form           = document.getElementById('unitSearchForm');
-  const input          = document.getElementById('unitQuery');
-  const results        = document.getElementById('unitResults');
+  const modal = document.getElementById('searchModal');
+  const backdrop = document.getElementById('searchModalBackdrop');
+  const openBtn = document.getElementById('openSearchButton');
+  const closeBtn = document.getElementById('closeSearchButton');
+  const form = document.getElementById('unitSearchForm');
+  const input = document.getElementById('unitQuery');
+  const results = document.getElementById('unitResults');
 
-  // ─── Modal open/close ─────────────────────────────────────
+  document.addEventListener('click', (e) => {
+    
+    const card = e.target.closest('[data-unit-id]');
+    if (!card) return;
+
+    if (e.target.closest('a')) return;
+
+    const id = card.dataset.unitId;
+
+    window.UnitSheet?.open(id);
+  });
+
   function openModal() {
     modal.classList.remove('hidden');
     document.body.style.overflow = 'hidden';
@@ -58,7 +69,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (status) params.append('status', status);
 
       const res = await axios.get(`/inventories/${__UNITS__.inventoryId}/${__UNITS__.storeId}/units/search`, {
-        params: {q, ...(!!status && {status})},
+        params: { q, ...(!!status && { status }) },
         withCredentials: true,
       });
 
@@ -74,12 +85,14 @@ document.addEventListener('DOMContentLoaded', () => {
     window.lucide?.createIcons();
   });
 
-  
+
   function renderResults(items) {
     if (!items.length) {
       results.innerHTML = emptyState('No units found', 'Try a different serial, IMEI, or barcode.');
       return;
     }
+
+    window.__lastUnitResults__ = items;
 
     results.innerHTML = `
       <div class="mb-2 text-xs text-slate-500">
@@ -96,7 +109,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function renderUnitCard(u) {
     const tone = {
       available: 'bg-emerald-50 text-emerald-700',
-      reserved:  'bg-amber-50 text-amber-700',
+      reserved: 'bg-amber-50 text-amber-700',
       sold: 'bg-slate-100 text-slate-600',
       damaged: 'bg-rose-50 text-rose-700',
       returned: 'bg-orange-50 text-orange-700',
@@ -113,8 +126,8 @@ document.addEventListener('DOMContentLoaded', () => {
         <div class="flex items-start justify-between gap-3">
           <div class="flex items-start gap-3 min-w-0">
             ${u.listing_image
-              ? `<img src="https:cdn.cococe.rw/${escapeHtml(u.listing_image)}" class="h-10 w-10 rounded object-cover ring-1 ring-slate-200" data-fallback-hide="true" />`
-              : `<div class="flex h-10 w-10 items-center justify-center rounded bg-slate-100"><i data-lucide="package" class="h-4 w-4 text-slate-400"></i></div>`}
+        ? `<img src="https:cdn.cococe.rw/${escapeHtml(u.listing_image)}" class="h-10 w-10 rounded object-cover ring-1 ring-slate-200" data-fallback-hide="true" />`
+        : `<div class="flex h-10 w-10 items-center justify-center rounded bg-slate-100"><i data-lucide="package" class="h-4 w-4 text-slate-400"></i></div>`}
             <div class="min-w-0">
               <div class="text-sm font-semibold text-slate-900 truncate">${escapeHtml(u.listing_title || '—')}</div>
               <div class="mt-0.5 flex flex-wrap gap-x-3 gap-y-0.5 text-xs text-slate-500">${ids || '<em>No identifiers</em>'}</div>
@@ -131,9 +144,9 @@ document.addEventListener('DOMContentLoaded', () => {
             <i data-lucide="calendar" class="h-3 w-3"></i>
             ${u.received_at ? new Date(u.received_at).toLocaleDateString() : '—'}
           </span>
-          <a href="#" class="ml-auto text-white bg-brand rounded px-2 py-2 flex items-center justify-center gap-1">
+          <button data-unit-id="${u.id}" class="ml-auto text-white bg-brand rounded px-2 py-2 flex items-center justify-center gap-1">
             <i data-lucide="settings-2"></i>
-          </a>
+          </button>
         </div>
       </div>`;
   }
@@ -183,6 +196,5 @@ document.addEventListener('DOMContentLoaded', () => {
     return div.innerHTML;
   }
 
-  // Ensure icons are rendered on first paint
   window.lucide?.createIcons();
 });

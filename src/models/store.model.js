@@ -905,6 +905,362 @@ class StoreModel {
     }
 
 
+    /**
+     * Transfer inventory unit from one inventory to another inventory
+     * @param {*} UUID unityId
+     * @param {*} UUID inventoryId 
+     */
+    // static async transferUnit(unitId, destinationInventoryId, userId) {
+    //     const client = await db.connect();
+
+    //     try {
+    //         await client.query('BEGIN');
+
+    //         // 1. Get and lock the unit and its source inventory item.
+    //         const unitResult = await client.query(
+    //             `SELECT
+    //             iu.id AS unit_id,
+    //             iu.inventory_item_id,
+    //             iu.status AS unit_status,
+    //             ii.inventory_id AS source_inventory_id,
+    //             ii.listing_variant_id,
+    //             ii.tracking_mode
+    //          FROM inventory_units iu
+    //          JOIN inventory_items ii
+    //             ON ii.id = iu.inventory_item_id
+    //          WHERE iu.id = $1
+    //          FOR UPDATE OF iu, ii`,
+    //             [unitId]
+    //         );
+
+    //         if (!unitResult.rowCount) {
+    //             throw new Error('Inventory unit not found.');
+    //         }
+
+    //         const unit = unitResult.rows[0];
+
+    //         // 2. Validate source and destination.
+    //         if (unit.source_inventory_id === destinationInventoryId) {
+    //             throw new Error(
+    //                 'Unit already belongs to the destination inventory.'
+    //             );
+    //         }
+
+    //         if (unit.unit_status !== 'available') {
+    //             throw new Error(
+    //                 'Only available units can be transferred.'
+    //             );
+    //         }
+
+    //         // This service transfers individually tracked units.
+    //         if (unit.tracking_mode !== 'serialized') {
+    //             throw new Error(
+    //                 'Only serialized inventory units can be transferred.'
+    //             );
+    //         }
+
+    //         // 3. Validate destination inventory.
+    //         const inventoryResult = await client.query(
+    //             `SELECT id
+    //          FROM inventories
+    //          WHERE id = $1
+    //            AND status = 'active'
+    //          FOR UPDATE`,
+    //             [destinationInventoryId]
+    //         );
+
+    //         if (!inventoryResult.rowCount) {
+    //             throw new Error(
+    //                 'Destination inventory not found or inactive.'
+    //             );
+    //         }
+
+    //         // 4. Find the destination item for the SAME listing variant.
+    //         const itemResult = await client.query(
+    //             `SELECT id
+    //          FROM inventory_items
+    //          WHERE inventory_id = $1
+    //            AND listing_variant_id = $2
+    //          FOR UPDATE`,
+    //             [
+    //                 destinationInventoryId,
+    //                 unit.listing_variant_id
+    //             ]
+    //         );
+
+    //         let destinationItemId;
+
+    //         if (itemResult.rowCount) {
+    //             destinationItemId = itemResult.rows[0].id;
+    //         } else {
+    //             // 5. Create the destination item using the source item's
+    //             // applicable properties.
+    //             const newItemResult = await client.query(
+    //                 `INSERT INTO inventory_items (
+    //                 inventory_id,
+    //                 listing_variant_id,
+    //                 quantity,
+    //                 tracking_mode,
+    //                 reserved,
+    //                 batch_number,
+    //                 mfg_at,
+    //                 expires_at,
+    //                 status
+    //             )
+    //             SELECT
+    //                 $1,
+    //                 listing_variant_id,
+    //                 0,
+    //                 tracking_mode,
+    //                 0,
+    //                 batch_number,
+    //                 mfg_at,
+    //                 expires_at,
+    //                 status
+    //             FROM inventory_items
+    //             WHERE id = $2
+    //             RETURNING id`,
+    //                 [
+    //                     destinationInventoryId,
+    //                     unit.inventory_item_id
+    //                 ]
+    //             );
+
+    //             if (!newItemResult.rowCount) {
+    //                 throw new Error(
+    //                     'Failed to create destination inventory item.'
+    //                 );
+    //             }
+
+    //             destinationItemId = newItemResult.rows[0].id;
+    //         }
+
+    //         // 6. Move the unit to the destination item.
+    //         await client.query(
+    //             `UPDATE inventory_units
+    //          SET inventory_item_id = $1
+    //          WHERE id = $2`,
+    //             [destinationItemId, unitId]
+    //         );
+
+    //         // 7. Record the outgoing and incoming transfers.
+    //         // Serialized inventory quantity remains unchanged (0).
+    //         await client.query(
+    //             `INSERT INTO inventory_transactions (
+    //             inventory_item_id,
+    //             type,
+    //             quantity_change,
+    //             created_by,
+    //             notes
+    //         )
+    //         VALUES
+    //             ($1, 'transfer_out', 0, $3, $4),
+    //             ($2, 'transfer_in', 0, $3, $5)`,
+    //             [
+    //                 unit.inventory_item_id,
+    //                 destinationItemId,
+    //                 userId,
+    //                 `Unit transferred to inventory ${destinationInventoryId}`,
+    //                 `Unit received from inventory ${unit.source_inventory_id}`
+    //             ]
+    //         );
+
+    //         await client.query('COMMIT');
+
+    //         return {
+    //             unitId,
+    //             sourceInventoryId: unit.source_inventory_id,
+    //             destinationInventoryId,
+    //             destinationItemId
+    //         };
+
+    //     } catch (error) {
+    //         await client.query('ROLLBACK');
+    //         throw error;
+    //     } finally {
+    //         client.release();
+    //     }
+    // }
+
+    static async transferUnit(unitId, destinationInventoryId, userId) {
+        const client = await db.connect();
+
+        try {
+            await client.query('BEGIN');
+
+            // 1. Get and lock the unit, its inventory item, and source inventory.
+            const unitResult = await client.query(
+                `SELECT
+                iu.id AS unit_id,
+                iu.inventory_item_id,
+                iu.status AS unit_status,
+                ii.inventory_id AS source_inventory_id,
+                ii.listing_variant_id,
+                ii.tracking_mode,
+                source_inventory.title AS source_inventory_title
+             FROM inventory_units iu
+             JOIN inventory_items ii
+                ON ii.id = iu.inventory_item_id
+             JOIN inventories source_inventory
+                ON source_inventory.id = ii.inventory_id
+             WHERE iu.id = $1
+             FOR UPDATE OF iu, ii`,
+                [unitId]
+            );
+
+            if (!unitResult.rowCount) {
+                throw new Error('Inventory unit not found.');
+            }
+
+            const unit = unitResult.rows[0];
+
+            // 2. Prevent transferring to the same inventory.
+            if (unit.source_inventory_id === destinationInventoryId) {
+                throw new Error(
+                    'Unit already belongs to the destination inventory.'
+                );
+            }
+
+            // 3. Validate the unit status.
+            if (unit.unit_status !== 'available') {
+                throw new Error(
+                    'Only available units can be transferred.'
+                );
+            }
+
+            // 4. Validate the tracking mode.
+            if (unit.tracking_mode !== 'serialized') {
+                throw new Error(
+                    'Only serialized inventory units can be transferred.'
+                );
+            }
+
+            // 5. Validate destination inventory and retrieve its title.
+            const inventoryResult = await client.query(
+                `SELECT id, title
+             FROM inventories
+             WHERE id = $1
+               AND status = 'active'
+             FOR UPDATE`,
+                [destinationInventoryId]
+            );
+
+            if (!inventoryResult.rowCount) {
+                throw new Error(
+                    'Destination inventory not found or inactive.'
+                );
+            }
+
+            const destinationInventory = inventoryResult.rows[0];
+
+            // 6. Find an existing destination item for the same listing variant.
+            const itemResult = await client.query(
+                `SELECT id
+             FROM inventory_items
+             WHERE inventory_id = $1
+               AND listing_variant_id = $2
+             FOR UPDATE`,
+                [
+                    destinationInventoryId,
+                    unit.listing_variant_id
+                ]
+            );
+
+            let destinationItemId;
+
+            if (itemResult.rowCount) {
+                destinationItemId = itemResult.rows[0].id;
+            } else {
+                // 7. Create the destination inventory item if missing.
+                const newItemResult = await client.query(
+                    `INSERT INTO inventory_items (
+                    inventory_id,
+                    listing_variant_id,
+                    quantity,
+                    tracking_mode,
+                    reserved,
+                    batch_number,
+                    mfg_at,
+                    expires_at,
+                    status
+                )
+                SELECT
+                    $1,
+                    listing_variant_id,
+                    0,
+                    tracking_mode,
+                    0,
+                    batch_number,
+                    mfg_at,
+                    expires_at,
+                    status
+                FROM inventory_items
+                WHERE id = $2
+                RETURNING id`,
+                    [
+                        destinationInventoryId,
+                        unit.inventory_item_id
+                    ]
+                );
+
+                if (!newItemResult.rowCount) {
+                    throw new Error(
+                        'Failed to create destination inventory item.'
+                    );
+                }
+
+                destinationItemId = newItemResult.rows[0].id;
+            }
+
+            // 8. Move the unit to the destination inventory item.
+            await client.query(
+                `UPDATE inventory_units
+             SET inventory_item_id = $1
+             WHERE id = $2`,
+                [destinationItemId, unitId]
+            );
+
+            // 9. Record both sides of the transfer using inventory titles.
+            await client.query(
+                `INSERT INTO inventory_transactions (
+                inventory_item_id,
+                type,
+                quantity_change,
+                created_by,
+                notes
+            )
+            VALUES
+                ($1, 'transfer_out', 0, $3, $4),
+                ($2, 'transfer_in', 0, $3, $5)`,
+                [
+                    unit.inventory_item_id,
+                    destinationItemId,
+                    userId,
+                    `Unit transferred to ${destinationInventory.title}`,
+                    `Unit received from ${unit.source_inventory_title}`
+                ]
+            );
+
+            await client.query('COMMIT');
+
+            return {
+                unitId,
+                sourceInventoryId: unit.source_inventory_id,
+                sourceInventoryTitle: unit.source_inventory_title,
+                destinationInventoryId,
+                destinationInventoryTitle: destinationInventory.title,
+                destinationItemId
+            };
+
+        } catch (error) {
+            await client.query('ROLLBACK');
+            throw error;
+        } finally {
+            client.release();
+        }
+    }
+
+
 }
 
 module.exports = StoreModel;
