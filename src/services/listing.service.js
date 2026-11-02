@@ -11,6 +11,10 @@ class ListingServices {
         return await ListingModel.searchListingByStore(storeId, query, opts);
     }
 
+    static async getStoreListings(storeId, opts){
+        return await ListingModel.getListingsByStore(storeId, opts);
+    }
+
     static async createListing({
         listing,
         variants = [],

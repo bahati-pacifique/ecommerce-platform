@@ -42,6 +42,7 @@
   <%
   const store = locals.store || {}
   %>
+  <% if (!locals.pageScripts) { pageScripts = [] }%>
 
   <script>
     const username = '<%=locals.user?.username || ""%>';
@@ -79,9 +80,15 @@
   <script type="module" src="/scripts/shell.js"></script>
   
   <% if (typeof pageScript !== 'undefined' && pageScript) { %>
-  <script type="module" src="<%= pageScript %>"></script>
+  <script type="module" src="<%= pageScript %>" defer></script>
   <% } %>
 
+  
+  <% if (typeof pageScripts !== 'undefined' && Array.isArray(pageScripts)) { %>
+  <% pageScripts.forEach(src => { %>
+  <script src="<%= src %>" type="module" defer></script>
+  <% }) %>
+  <% } %>
   
   
 </body>

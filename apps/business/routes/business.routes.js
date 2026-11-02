@@ -41,9 +41,12 @@ router.post('/inventories/:inventoryId/:storeId/items', business, businessContro
 router.get('/inventories/units/:storeId/:unitId', business, businessController.getItemUnit);
 router.patch('/inventories/units/:unitId/:inventoryId/:storeId/transfer', business, businessController.transferUnit);
 
-router.get('/stores/:storeId/data/analytics', businessController.getStoreDashboardAnalytics);
+router.get('/stores/:storeId/data/analytics', business, businessController.getStoreDashboardAnalytics);
 router.get('/stores/:storeId/data/product-listing/analytics', business, businessController.getStoreListingProductAnalytics);
 router.get('/stores/:storeId/data/product-listing/inventories', business, businessController.getInventoriesByStoreId);
+router.get('/stores/:storeId/listings', business, businessController.getStoreListings);
+router.get('/stores/:storeId/listings/review/:listingId', business, businessController.renderListingPage);
+//router.get('/stores/:storeId/listings/:listingId', business, businessController.renderListingPage);
 router.get('/stores/:storeId/data/dashboard', business, businessController.getStoreDashboard);
 
 // router.get('/stores/:vendorId/:storeId', business, businessController.renderVendorStorePage);

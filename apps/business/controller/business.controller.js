@@ -433,7 +433,6 @@ async function getItemUnit(req, res) {
     }
 }
 
-
 async function createInventoryItem(req, res) {
 
     const { storeId, inventoryId } = req.params;
@@ -659,6 +658,45 @@ async function renderStoreListing(req, res) {
         res.locals.layout = 'store-center';
         updateStoreLastActive(vendorStore.id);
         return res.render('store-partials/listings', { layout: 'store-center', store: vendorStore, user, protocal, domainName, title: 'listings' });
+    } catch (error) {
+        console.log(error);
+        return res.render('store-no-access', {
+            layout: false,
+            message: `<span class="text-black/70">Oops!</span> <span class="text-brand">${user.username}</span>, we're unable to get you authenticated to this Store.`,
+            details: `<h1 class="text-left text-ink-700 text-lg">It's seems like:</h1><p class="text-sm sm:text-base text-left text-ink-500 leading-relaxed"><br>● This store does not belongs to you, <br>● This store have been disabled or does not exist. <br><br><i>Please contact our support team for clarification</i></p>`,
+            code: error.message.toUpperCase(),
+            protocal,
+            domainName
+        });
+
+    }
+}
+
+async function renderListingPage(req, res) {
+    const user = req.user;
+    const {storeId, listingId} = req.params;
+
+    
+    try {
+
+        const vendorStore = await StoreService.getVendorStore(storeId, user.vendor?.id || null);
+
+        if (!vendorStore) {
+            return res.render('store-no-access', {
+                layout: false,
+                message: `<span class="text-black/70">Oops!</span> <span class="text-brand">${user.username}</span>, we're unable to get you authenticated to this Store.`,
+                details: `<h1 class="text-left text-ink-700 text-lg">It's seems like:</h1><p class="text-sm sm:text-base text-left text-ink-500 leading-relaxed"><br>● This store does not belongs to you, <br>● This store have been disabled or does not exist. <br><br><i>Please contact our support team for clarification</i></p>`,
+                code: 'STORE_NOT_FOUND',
+                protocal,
+                domainName
+            });
+        }
+
+        //Update store last active
+        //res.locals.layout = 'store-center';
+        updateStoreLastActive(vendorStore.id);
+        
+        return res.render('store-partials/listing', { listingId, layout: 'store-center', store: vendorStore, user, protocal, domainName, title: 'listings' });
     } catch (error) {
         console.log(error);
         return res.render('store-no-access', {
@@ -942,7 +980,7 @@ async function transferUnit(req, res) {
         let message = 'Failed — Internal Error';
         if (!error.code) message = error.message;
         return res.status(500).json({
-            message 
+            message
         });
     }
 }
@@ -1806,6 +1844,42 @@ async function getStoreDashboardAnalytics(req, res) {
     }
 }
 
+async function getStoreListings(req, res) {
+
+    const storeId = req.params.storeId;
+    const user = req.user;
+
+    try {
+
+        const {
+            search,
+            page = 1,
+            limit = 20,
+            status = 'active',
+            sort = 'recent' } = req.query;
+            console.log(req.query);
+        const vendorStore = await StoreService.getVendorStore(
+            storeId,
+            user.vendor?.id || null
+        );
+
+        if (!vendorStore) {
+            return res.status(401).json({
+                message: 'Vendor/Store verification failed'
+            });
+        }
+
+        const result = await ListingService.getStoreListings(vendorStore.id, {search, page, limit, status, sort});
+
+        return res.json(result);
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            message: `Unable to get listings — Internal Error`
+        })
+    }
+}
+
 async function getStoreDashboard(req, res) {
     try {
         const { storeId } = req.params;
@@ -1872,7 +1946,10 @@ module.exports = {
     renderStoreOrders,
     renderStoreDashboardWelcome,
     renderStoreInventory,
+
     renderStoreListing,
+    renderListingPage,
+
     renderStoreProducts,
     renderStoreFollowers,
     renderMessages,
@@ -1890,6 +1967,7 @@ module.exports = {
 
     createInventoryItem,
     transferUnit,
+    getStoreListings,
 
     getStoreDashboardAnalytics,
     getStoreDashboard,
