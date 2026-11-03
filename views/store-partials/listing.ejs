@@ -1,78 +1,49 @@
 <%
-  // IDs are all we have at render time
-  // (the JS will fetch the rest)
+  // IDs only — JS fetches the rest
 %>
 
 <script>
   window.__LISTING__ = {
-    storeId: "<%= locals.store?.id %>",
+    storeId:   "<%= locals.store?.id %>",
     listingId: "<%= locals.listingId %>",
-    baseUrl: "<%= locals.baseUrl %>",
+    baseUrl:   "<%= locals.baseUrl %>",
   };
 </script>
 
 <main class="bg-bg-soft">
-  <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8 lg:py-10">
+  <div class="mx-auto max-w-7xl px-4 py-3 sm:px-6 sm:py-6 lg:px-8 lg:py-10">
 
-    <!-- ═══════════════════════════════════════════════════
-         STATE 1 — LOADING (skeleton)
-    ════════════════════════════════════════════════════ -->
+    <!-- LOADING -->
     <div id="listingLoading" class="animate-pulse">
-      <div class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_420px]">
-
-        <!-- Gallery skeleton -->
-        <div class="rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-200">
+      <div class="grid grid-cols-1 gap-3 sm:gap-6 lg:grid-cols-[minmax(0,1fr)_420px]">
+        <div class="rounded-2xl bg-white p-3 shadow-sm ring-1 ring-slate-200 sm:p-4">
           <div class="aspect-square w-full rounded-xl bg-slate-200"></div>
-          <div class="mt-3 flex gap-2">
-            <div class="h-16 w-16 rounded-lg bg-slate-200 sm:h-20 sm:w-20"></div>
-            <div class="h-16 w-16 rounded-lg bg-slate-200 sm:h-20 sm:w-20"></div>
-            <div class="h-16 w-16 rounded-lg bg-slate-200 sm:h-20 sm:w-20"></div>
-            <div class="h-16 w-16 rounded-lg bg-slate-200 sm:h-20 sm:w-20"></div>
+          <div class="mt-3 flex gap-2 overflow-hidden">
+            <div class="h-16 w-16 shrink-0 rounded-lg bg-slate-200 sm:h-20 sm:w-20"></div>
+            <div class="h-16 w-16 shrink-0 rounded-lg bg-slate-200 sm:h-20 sm:w-20"></div>
+            <div class="h-16 w-16 shrink-0 rounded-lg bg-slate-200 sm:h-20 sm:w-20"></div>
           </div>
         </div>
-
-        <!-- Buy panel skeleton -->
-        <div class="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200">
+        <div class="rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-200 sm:p-5">
           <div class="h-4 w-24 rounded bg-slate-200"></div>
           <div class="mt-3 h-7 w-full rounded bg-slate-200"></div>
           <div class="mt-2 h-7 w-3/4 rounded bg-slate-200"></div>
           <div class="mt-4 h-10 w-40 rounded bg-slate-200"></div>
           <div class="mt-3 h-6 w-32 rounded-full bg-slate-200"></div>
-          <div class="mt-5 space-y-2">
-            <div class="h-14 rounded-lg bg-slate-200"></div>
-            <div class="h-14 rounded-lg bg-slate-200"></div>
-          </div>
-          <div class="mt-5 h-11 rounded-lg bg-slate-200"></div>
-          <div class="mt-2 h-11 rounded-lg bg-slate-200"></div>
-        </div>
-      </div>
-
-      <!-- Description skeleton -->
-      <div class="mt-6 rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
-        <div class="h-5 w-40 rounded bg-slate-200"></div>
-        <div class="mt-4 space-y-2">
-          <div class="h-3 w-full rounded bg-slate-200"></div>
-          <div class="h-3 w-full rounded bg-slate-200"></div>
-          <div class="h-3 w-5/6 rounded bg-slate-200"></div>
-          <div class="h-3 w-4/6 rounded bg-slate-200"></div>
         </div>
       </div>
     </div>
 
-    <!-- ═══════════════════════════════════════════════════
-         STATE 2 — ERROR (hidden until fetch fails)
-    ════════════════════════════════════════════════════ -->
-    <div id="listingError" class="hidden rounded-2xl border border-rose-200 bg-white p-8 text-center shadow-sm">
+    <!-- ERROR -->
+    <div id="listingError" class="hidden rounded-2xl border border-rose-200 bg-white p-6 text-center shadow-sm sm:p-8">
       <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-rose-50">
         <svg class="h-7 w-7 text-rose-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v4m0 4h.01M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z" />
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v4m0 4h.01M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/>
         </svg>
       </div>
       <h2 class="mt-4 text-lg font-bold text-slate-900">Couldn't load this listing</h2>
-      <p id="listingErrorMsg" class="mt-2 text-sm text-slate-500">
-        Something went wrong while loading the product.
-      </p>
-      <div class="mt-6 flex justify-center gap-2">
+      <p id="listingErrorMsg" class="mt-2 text-sm text-slate-500">Something went wrong.</p>
+      <div class="mt-6 flex flex-col justify-center gap-2 sm:flex-row">
         <button type="button" id="listingRetry" class="rounded-lg bg-brand px-5 py-2.5 text-sm font-bold text-white transition hover:bg-brand-dark">
           Try again
         </button>
@@ -82,15 +53,11 @@
       </div>
     </div>
 
-    <!-- ═══════════════════════════════════════════════════
-         STATE 3 — CONTENT (hidden until fetch succeeds)
-         The skeleton above is identical in shape.
-         This is where all the real markup lives.
-    ════════════════════════════════════════════════════ -->
+    <!-- CONTENT -->
     <div id="listingContent" class="hidden">
 
       <!-- Breadcrumb -->
-      <nav aria-label="Breadcrumb" class="mb-4 flex flex-wrap items-center gap-1.5 text-xs text-slate-500">
+      <nav aria-label="Breadcrumb" class="mb-3 flex flex-wrap items-center gap-1.5 text-xs text-slate-500 sm:mb-4">
         <a href="/" class="hover:text-brand">Home</a>
         <span class="text-slate-300">/</span>
         <a id="breadcrumbCategory" href="#" class="hover:text-brand">Category</a>
@@ -100,56 +67,72 @@
         <span id="breadcrumbTitle" class="truncate font-medium text-slate-900">—</span>
       </nav>
 
-      <!-- ═══ Top: gallery + buy panel ═══════════════════════ -->
-      <div class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_420px]">
+      <!-- Top grid: gallery + buy -->
+      <div class="grid grid-cols-1 gap-3 sm:gap-6 lg:grid-cols-[minmax(0,1fr)_420px]">
 
-        <!-- LEFT: gallery -->
-        <section aria-label="Product images" class="rounded-2xl bg-white p-3 shadow-sm ring-1 ring-slate-200 sm:p-4" data-component="listing-gallery">
+        <!-- Gallery -->
+        <section aria-label="Product images"
+                 class="min-w-0 rounded-2xl bg-white p-3 shadow-sm ring-1 ring-slate-200 sm:p-4"
+                 data-component="listing-gallery">
 
-          <!-- Main image -->
-          <div id="galleryMain" class="group relative aspect-square w-full overflow-hidden rounded-xl bg-slate-100">
-            <img id="galleryMainImg" src="" alt="" class="h-full w-full object-contain transition-transform duration-200 ease-out will-change-transform">
+          <div id="galleryMain"
+               class="group relative aspect-square w-full cursor-zoom-in overflow-hidden rounded-xl bg-slate-100"
+               role="button"
+               tabindex="0"
+               aria-label="Open full-size image">
+
+            <img id="galleryMainImg" src="" alt=""
+                 class="h-full w-full object-contain transition-transform duration-200 ease-out will-change-transform">
+
+            <!-- Desktop hover hint -->
             <span class="pointer-events-none absolute bottom-3 right-3 hidden rounded-full bg-slate-900/70 px-3 py-1 text-[10px] font-semibold text-white backdrop-blur group-hover:block">
-              Hover to zoom
+              Click to zoom
             </span>
-            <button type="button" data-open-video id="videoOpenBadge" class="hidden absolute left-3 top-3 flex items-center gap-1.5 rounded-full bg-slate-900/70 px-3 py-1.5 text-[11px] font-semibold text-white backdrop-blur transition hover:bg-slate-900">
+
+            <!-- Mobile expand hint -->
+            <span class="pointer-events-none absolute bottom-3 right-3 flex items-center gap-1 rounded-full bg-slate-900/70 px-2.5 py-1 text-[10px] font-semibold text-white backdrop-blur sm:hidden">
+              <svg class="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/>
+              </svg>
+              Tap to expand
+            </span>
+
+            <button type="button" data-open-video id="videoOpenBadge"
+                    class="hidden absolute left-3 top-3 flex items-center gap-1.5 rounded-full bg-slate-900/70 px-3 py-1.5 text-[11px] font-semibold text-white backdrop-blur transition hover:bg-slate-900">
               <svg class="h-3.5 w-3.5" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M6.3 4.2A1 1 0 0 0 5 5.1v9.8a1 1 0 0 0 1.3.9l9.4-4.9a1 1 0 0 0 0-1.8L6.3 4.2Z" />
+                <path d="M6.3 4.2A1 1 0 0 0 5 5.1v9.8a1 1 0 0 0 1.3.9l9.4-4.9a1 1 0 0 0 0-1.8L6.3 4.2Z"/>
               </svg>
               Video
             </button>
           </div>
 
-          <!-- Thumbnails (populated by JS) -->
-          <div id="galleryThumbs" class="mt-3 flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
+          <div id="galleryThumbs"
+               class="mt-3 flex w-full snap-x snap-mandatory gap-2 overflow-x-auto pb-2 scrollbar-hide">
             <!-- filled by JS -->
           </div>
         </section>
 
-        <!-- RIGHT: buy panel -->
-        <aside class="lg:sticky lg:top-4 lg:h-fit">
+        <!-- Buy panel -->
+        <aside class="min-w-0 lg:sticky lg:top-4 lg:h-fit">
 
-          <!-- Brand strip -->
-          <div class="mb-3 flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs">
-            <img id="brandLogo" src="" alt="" class="hidden h-6 w-auto object-contain">
-            <span id="brandName" class="font-semibold text-slate-700">—</span>
+          <div class="mb-3 flex flex-wrap items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs">
+            <img id="brandLogo" src="" alt="" class="hidden h-6 w-auto max-w-[80px] object-contain">
+            <span id="brandName" class="truncate font-semibold text-slate-700">—</span>
             <span id="brandSep" class="hidden text-slate-300">•</span>
-            <span id="familyName" class="hidden text-slate-500">—</span>
+            <span id="familyName" class="hidden truncate text-slate-500">—</span>
           </div>
 
-          <!-- Title + price -->
-          <div class="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200">
-            <h1 id="listingTitle" class="text-xl font-bold leading-tight text-slate-950 sm:text-2xl">
+          <div class="rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-200 sm:p-5">
+            <h1 id="listingTitle" class="text-lg font-bold leading-tight text-slate-950 sm:text-2xl">
               —
             </h1>
             <p id="listingProductTitle" class="mt-1 hidden text-sm text-slate-500"></p>
 
-            <div class="mt-4 flex items-baseline gap-2">
-              <span id="priceMain" class="text-3xl font-extrabold tracking-tight text-slate-950">—</span>
+            <div class="mt-3 flex flex-wrap items-baseline gap-2 sm:mt-4">
+              <span id="priceMain" class="text-2xl font-extrabold tracking-tight text-slate-950 sm:text-3xl">—</span>
               <span id="priceOriginal" class="hidden text-sm text-slate-400 line-through"></span>
-              <span id="saleBadge" class="hidden rounded-full bg-brand px-2 py-0.5 text-[10px] font-bold text-white">
-                SALE
-              </span>
+              <span id="saleBadge" class="hidden rounded-full bg-brand px-2 py-0.5 text-[10px] font-bold text-white">SALE</span>
             </div>
 
             <div id="stockBadge" class="mt-3 inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold bg-slate-100 text-slate-600">
@@ -157,102 +140,99 @@
               <span id="stockText">Checking availability…</span>
             </div>
 
-            <!-- Variant selector (populated) -->
-            <div id="variantSection" class="mt-5 hidden">
+            <!-- Variants -->
+            <div id="variantSection" class="mt-5 hidden w-full min-w-0">
               <div class="mb-2 flex items-center justify-between">
-                <label class="text-xs font-bold uppercase tracking-wider text-slate-500">
-                  Choose variant
-                </label>
+                <label class="text-xs font-bold uppercase tracking-wider text-slate-500">Choose variant</label>
                 <span id="variantCount" class="text-xs text-slate-400"></span>
               </div>
-              <div id="variantList" class="grid grid-cols-1 gap-2 sm:grid-cols-2">
+              <div id="variantList"
+                   class="flex w-full snap-x snap-mandatory gap-2 overflow-x-auto pb-2 scrollbar-hide
+                          sm:grid sm:grid-cols-2 sm:overflow-visible sm:pb-0">
                 <!-- filled by JS -->
               </div>
             </div>
 
-            <!-- Quantity + CTAs -->
+            <!-- Desktop CTA (hidden on mobile) -->
             <div class="mt-5">
-              <label for="qty" class="mb-1 block text-xs font-bold uppercase tracking-wider text-slate-500">
-                Quantity
-              </label>
+              <label for="qty" class="mb-1 block text-xs font-bold uppercase tracking-wider text-slate-500">Quantity</label>
               <div class="flex items-stretch gap-2">
                 <div class="flex h-11 items-center rounded-lg border border-slate-200 bg-white">
-                  <button type="button" data-qty="-" class="flex h-full w-9 items-center justify-center text-slate-600 hover:text-brand">
+                  <button type="button" data-qty="-"
+                          class="flex h-full w-10 items-center justify-center text-slate-600 hover:text-brand">
                     <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14" />
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14"/>
                     </svg>
                   </button>
-                  <input id="qty" name="qty" type="number" value="1" min="1" max="99" class="h-full w-12 border-x border-slate-200 text-center text-sm font-semibold outline-none">
-                  <button type="button" data-qty="+" class="flex h-full w-9 items-center justify-center text-slate-600 hover:text-brand">
+                  <input id="qty" name="qty" type="number" value="1" min="1" max="99"
+                         class="h-full w-12 border-x border-slate-200 text-center text-sm font-semibold outline-none">
+                  <button type="button" data-qty="+"
+                          class="flex h-full w-10 items-center justify-center text-slate-600 hover:text-brand">
                     <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v14M5 12h14" />
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v14M5 12h14"/>
                     </svg>
                   </button>
                 </div>
-
-                <button type="button" id="addToCartBtn" class="h-11 flex-1 rounded-lg bg-brand px-4 text-sm font-bold text-white transition hover:bg-brand-dark disabled:cursor-not-allowed disabled:opacity-50">
+                <button type="button" id="addToCartBtn"
+                        class="h-11 flex-1 rounded-lg bg-brand px-4 text-sm font-bold text-white transition hover:bg-brand-dark disabled:cursor-not-allowed disabled:opacity-50">
                   Add to cart
                 </button>
               </div>
-
-              <button type="button" id="buyNowBtn" class="mt-2 h-11 w-full rounded-lg border-2 border-slate-900 bg-white text-sm font-bold text-slate-900 transition hover:bg-slate-900 hover:text-white disabled:cursor-not-allowed disabled:opacity-50">
+              <button type="button" id="buyNowBtn"
+                      class="mt-2 h-11 w-full rounded-lg border-2 border-slate-900 bg-white text-sm font-bold text-slate-900 transition hover:bg-slate-900 hover:text-white disabled:cursor-not-allowed disabled:opacity-50">
                 Buy now
               </button>
             </div>
 
             <!-- Trust badges -->
-            <div class="mt-5 grid grid-cols-3 gap-2 border-t border-slate-100 pt-4 text-center text-[10px] font-medium text-slate-600">
+            <div class="mt-4 grid grid-cols-3 gap-2 border-t border-slate-100 pt-4 text-center text-[10px] font-medium text-slate-600 sm:mt-5">
               <div class="flex flex-col items-center gap-1">
                 <svg class="h-5 w-5 text-brand" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0 1 12 2.944a11.955 11.955 0 0 1-8.618 3.04A12.02 12.02 0 0 0 3 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016Z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0 1 12 2.944a11.955 11.955 0 0 1-8.618 3.04A12.02 12.02 0 0 0 3 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016Z"/>
                 </svg>
                 Genuine
               </div>
               <div class="flex flex-col items-center gap-1">
                 <svg class="h-5 w-5 text-brand" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 17a2 2 0 1 1-4 0 2 2 0 0 1 4 0Zm10 0a2 2 0 1 1-4 0 2 2 0 0 1 4 0ZM13 16V6a1 1 0 0 0-1-1H3m10 11h7l-2-6h-5" />
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 17a2 2 0 1 1-4 0 2 2 0 0 1 4 0Zm10 0a2 2 0 1 1-4 0 2 2 0 0 1 4 0ZM13 16V6a1 1 0 0 0-1-1H3m10 11h7l-2-6h-5"/>
                 </svg>
                 Fast delivery
               </div>
               <div class="flex flex-col items-center gap-1">
                 <svg class="h-5 w-5 text-brand" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 12l2 2 4-4M12 3l9 4v6c0 5-3.5 8.5-9 10-5.5-1.5-9-5-9-10V7l9-4Z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 12l2 2 4-4M12 3l9 4v6c0 5-3.5 8.5-9 10-5.5-1.5-9-5-9-10V7l9-4Z"/>
                 </svg>
                 Secure
               </div>
             </div>
           </div>
 
-          <!-- Vendor card -->
-          <div class="mt-3 rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-200">
+          <!-- Vendor -->
+          <div class="mt-3 rounded-2xl bg-white p-3 shadow-sm ring-1 ring-slate-200 sm:p-4">
             <div class="flex items-center gap-2">
-              <div id="vendorInitial" class="flex h-9 w-9 items-center justify-center rounded-full bg-brand-light text-sm font-bold text-brand">
-                —
-              </div>
+              <div id="vendorInitial" class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-brand-light text-sm font-bold text-brand">—</div>
               <div class="min-w-0 flex-1">
                 <p id="vendorName" class="truncate text-sm font-semibold text-slate-900">—</p>
                 <p class="text-[11px] text-slate-500">Verified seller</p>
               </div>
-              <a href="#" class="text-xs font-semibold text-brand hover:text-brand-dark">Visit</a>
+              <a href="#" class="shrink-0 text-xs font-semibold text-brand hover:text-brand-dark">Visit</a>
             </div>
           </div>
         </aside>
       </div>
 
-      <!-- ═══ Description + specs ═════════════════════════════ -->
-      <section class="mt-6 grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
+      <!-- Description + specs -->
+      <section class="mt-3 grid grid-cols-1 gap-3 sm:mt-6 sm:gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
 
-        <article class="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200 sm:p-6">
-          <h2 class="text-lg font-bold text-slate-950">Product details</h2>
+        <article class="min-w-0 rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-200 sm:p-6">
+          <h2 class="text-base font-bold text-slate-950 sm:text-lg">Product details</h2>
           <div id="listingDescription" class="prose prose-sm mt-3 max-w-none text-slate-700
                       prose-headings:font-bold prose-headings:text-slate-900
                       prose-a:text-brand prose-a:no-underline hover:prose-a:underline
                       prose-strong:text-slate-900"></div>
 
           <div id="productDescriptionWrap" class="mt-6 hidden border-t border-slate-100 pt-6">
-            <h3 class="text-sm font-bold uppercase tracking-wider text-slate-500">
-              About this product
-            </h3>
+            <h3 class="text-sm font-bold uppercase tracking-wider text-slate-500">About this product</h3>
             <div id="productDescription" class="prose prose-sm mt-3 max-w-none text-slate-700
                         prose-headings:font-bold prose-headings:text-slate-900
                         prose-a:text-brand prose-a:no-underline hover:prose-a:underline
@@ -260,17 +240,13 @@
           </div>
 
           <div id="productGallerySection" class="mt-6 hidden border-t border-slate-100 pt-6">
-            <h3 class="text-sm font-bold uppercase tracking-wider text-slate-500">
-              Product gallery
-            </h3>
-            <div id="productGalleryGrid" class="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4"></div>
+            <h3 class="text-sm font-bold uppercase tracking-wider text-slate-500">Product gallery</h3>
+            <div id="productGalleryGrid" class="mt-3 grid grid-cols-3 gap-2 sm:grid-cols-4"></div>
           </div>
         </article>
 
-        <aside class="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200">
-          <h2 class="text-sm font-bold uppercase tracking-wider text-slate-500">
-            Specifications
-          </h2>
+        <aside class="min-w-0 rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-200 sm:p-5">
+          <h2 class="text-sm font-bold uppercase tracking-wider text-slate-500">Specifications</h2>
           <dl id="specsList" class="mt-3 divide-y divide-slate-100 text-sm"></dl>
         </aside>
       </section>
@@ -278,16 +254,16 @@
   </div>
 </main>
 
-<!-- Video modal (hidden by default) -->
+<!-- Video modal -->
 <div id="videoModal" class="fixed inset-0 z-[70] hidden items-center justify-center bg-slate-950/80 p-4 backdrop-blur-sm">
   <div class="relative w-full max-w-3xl overflow-hidden rounded-2xl bg-black shadow-2xl">
     <button type="button" data-close-video class="absolute right-3 top-3 z-10 flex h-9 w-9 items-center justify-center rounded-full bg-white/90 text-slate-900 hover:bg-white">
       <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18 18 6M6 6l12 12" />
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18 18 6M6 6l12 12"/>
       </svg>
     </button>
     <div class="aspect-video w-full">
-      <video controls preload="metadata" class="h-full w-full" id="listingVideo">
+      <video controls preload="metadata" playsinline class="h-full w-full" id="listingVideo">
         <source id="listingVideoSource" src="" type="video/mp4">
         Your browser does not support video.
       </video>
@@ -295,7 +271,67 @@
   </div>
 </div>
 
-<!-- JSON-LD (populated by JS after fetch) -->
+<!-- Image lightbox -->
+<div id="imageLightbox" class="fixed inset-0 z-[80] hidden bg-black/95 backdrop-blur-sm" role="dialog" aria-modal="true" aria-label="Product image viewer">
+  <button type="button" id="lightboxClose" aria-label="Close image viewer"
+          class="absolute right-3 top-3 z-20 flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white backdrop-blur transition hover:bg-white/20">
+    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18 18 6M6 6l12 12"/>
+    </svg>
+  </button>
+  <div id="lightboxCounter" class="absolute left-1/2 top-3 z-20 -translate-x-1/2 rounded-full bg-white/10 px-3 py-1 text-xs font-semibold text-white backdrop-blur">
+    1 / 1
+  </div>
+  <div id="lightboxStrip" class="flex h-full w-full snap-x snap-mandatory overflow-x-auto overflow-y-hidden [-webkit-overflow-scrolling:touch] scrollbar-hide">
+    <!-- filled by JS -->
+  </div>
+  <button type="button" id="lightboxPrev" aria-label="Previous image"
+          class="absolute left-3 top-1/2 z-20 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/10 text-white backdrop-blur transition hover:bg-white/20 sm:flex">
+    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m15 18-6-6 6-6"/>
+    </svg>
+  </button>
+  <button type="button" id="lightboxNext" aria-label="Next image"
+          class="absolute right-3 top-1/2 z-20 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/10 text-white backdrop-blur transition hover:bg-white/20 sm:flex">
+    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m9 18 6-6-6-6"/>
+    </svg>
+  </button>
+  <div class="pointer-events-none absolute bottom-6 left-1/2 z-20 -translate-x-1/2 rounded-full bg-white/10 px-3 py-1.5 text-[11px] font-medium text-white/90 backdrop-blur sm:hidden">
+    Swipe to navigate
+  </div>
+</div>
+
+<!-- Mobile sticky CTA -->
+<!-- <div id="mobileCtaBar"
+     class="fixed inset-x-0 bottom-0 z-[60] hidden border-t border-slate-200 bg-white/95 px-3 py-3 shadow-[0_-4px_12px_rgba(0,0,0,0.06)] backdrop-blur sm:hidden">
+  <div class="mx-auto flex w-full max-w-7xl items-center gap-2">
+    <div class="min-w-0 shrink">
+      <p id="mobilePrice" class="truncate text-sm font-extrabold text-slate-950">—</p>
+      <p id="mobileStock" class="truncate text-[10px] font-medium text-slate-500">—</p>
+    </div>
+    <div class="flex h-11 shrink-0 items-center rounded-lg border border-slate-200 bg-white">
+      <button type="button" data-mobile-qty="-" class="flex h-full w-9 items-center justify-center text-slate-600 hover:text-brand">
+        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14"/>
+        </svg>
+      </button>
+      <input id="qtyMobile" type="number" value="1" min="1" max="99"
+             class="h-full w-10 border-x border-slate-200 text-center text-sm font-semibold outline-none">
+      <button type="button" data-mobile-qty="+" class="flex h-full w-9 items-center justify-center text-slate-600 hover:text-brand">
+        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v14M5 12h14"/>
+        </svg>
+      </button>
+    </div>
+    <button type="button" id="addToCartBtnMobile"
+            class="h-11 flex-1 rounded-lg bg-brand px-4 text-sm font-bold text-white transition hover:bg-brand-dark disabled:cursor-not-allowed disabled:opacity-50">
+      Add to cart
+    </button>
+  </div>
+</div> -->
+
+<!-- JSON-LD -->
 <script type="application/ld+json" id="listingJsonLd">
   {
     "@context": "https://schema.org",
@@ -305,8 +341,8 @@
 </script>
 
 <script>
-  const _LISTING_ID = "<%=locals.listingId%>"
-  const _STORE_ID = "<%=locals.store?.id%>"
+  const _LISTING_ID = "<%= locals.listingId %>";
+  const _STORE_ID   = "<%= locals.store?.id %>";
 </script>
 
 <script src="/scripts/pages/listing.js" type="module"></script>

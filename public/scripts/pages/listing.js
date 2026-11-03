@@ -2,7 +2,10 @@
  * Listing show page — client-side hydration.
  *
  * Loads the listing with axios, then populates the pre-rendered DOM.
- * Works via the states: loading → content | error.
+ * States: loading → content | error.
+ *
+ * Mobile: single-column flow, CTA inside the buy panel (no sticky bar).
+ * Lightbox: tap image to view full-size.
  */
 (function () {
     'use strict';
@@ -14,11 +17,11 @@
     }
 
     // ─── DOM refs ────────────────────────────────────────
-    const elLoading   = document.getElementById('listingLoading');
-    const elContent   = document.getElementById('listingContent');
-    const elError     = document.getElementById('listingError');
-    const elErrorMsg  = document.getElementById('listingErrorMsg');
-    const retryBtn    = document.getElementById('listingRetry');
+    const elLoading  = document.getElementById('listingLoading');
+    const elContent  = document.getElementById('listingContent');
+    const elError    = document.getElementById('listingError');
+    const elErrorMsg = document.getElementById('listingErrorMsg');
+    const retryBtn   = document.getElementById('listingRetry');
 
     // ─── State toggling ──────────────────────────────────
     function showLoading() {
@@ -71,16 +74,21 @@
         const el = document.getElementById(id);
         if (el) el.textContent = text ?? '';
     }
-
     function setHTML(id, html) {
         const el = document.getElementById(id);
         if (el) el.innerHTML = html ?? '';
     }
-
     function toggle(id, show) {
         const el = document.getElementById(id);
         if (!el) return;
         el.classList.toggle('hidden', !show);
+    }
+    function escapeAttr(s) {
+        return String(s ?? '')
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;');
     }
 
     // ─── Fetch + hydrate ─────────────────────────────────
@@ -93,7 +101,6 @@
                 { withCredentials: true, headers: { Accept: 'application/json' } }
             );
 
-            // Handle {data}, {result}, or flat responses
             const data = res.data?.data ?? res.data?.result ?? res.data;
             if (!data || !data.id) throw new Error('Empty or malformed response');
 
@@ -110,12 +117,10 @@
         }
     }
 
-    // ─── Hydrate the DOM from the fetched data ───────────
+    // ─── Hydrate ─────────────────────────────────────────
     function hydrate(data) {
 
-        // ══════════════════════════════════════════════════
-        // 1. Build normalized variants
-        // ══════════════════════════════════════════════════
+        // 1. Variants
         const variants = (data.variants || []).map(v => ({
             id: v.id,
             sku: v.sku,
@@ -132,9 +137,7 @@
             stock: stockLabel(v.inventory),
         }));
 
-        // ══════════════════════════════════════════════════
-        // 2. Build the gallery (variant images first, then product media)
-        // ══════════════════════════════════════════════════
+        // 2. Gallery
         const variantImages = variants
             .filter(v => v.imageUrl)
             .map(v => ({ url: v.imageUrl, source: 'variant', variantId: v.id }));
@@ -150,15 +153,11 @@
             return true;
         });
 
-        // ══════════════════════════════════════════════════
-        // 3. Build the video URL (or null)
-        // ══════════════════════════════════════════════════
+        // 3. Video
         const videoKey = data.listing_video_storage_key || null;
         const videoUrl = videoKey ? imageUrl(videoKey) : null;
 
-        // ══════════════════════════════════════════════════
         // 4. Header / breadcrumb
-        // ══════════════════════════════════════════════════
         setText('listingTitle', data.title);
         if (data.product_title && data.product_title !== data.title) {
             toggle('listingProductTitle', true);
@@ -177,7 +176,6 @@
         }
         setText('breadcrumbTitle', data.title);
 
-        // Brand strip
         const brandLogo = document.getElementById('brandLogo');
         if (brandLogo && data.brand_logo_url) {
             brandLogo.src = imageUrl(data.brand_logo_url);
@@ -191,30 +189,24 @@
             setText('familyName', data.family);
         }
 
-        // ══════════════════════════════════════════════════
         // 5. Gallery + thumbs
-        //    IMPORTANT: reset thumbs first, THEN build them.
-        //    Video thumb is conditional and goes first if present.
-        // ══════════════════════════════════════════════════
         const mainImg = document.getElementById('galleryMainImg');
         const thumbsEl = document.getElementById('galleryThumbs');
 
-        // Reset
         thumbsEl.innerHTML = '';
 
-        // Set main image
         if (gallery.length) {
             mainImg.src = gallery[0].url;
             mainImg.alt = data.title;
         }
 
-        // ── Video thumb FIRST (conditional) ──────────────
+        // Video thumb first
         if (videoUrl) {
             const videoThumb = document.createElement('button');
             videoThumb.type = 'button';
             videoThumb.dataset.thumb = 'video';
             videoThumb.className =
-                'relative flex h-16 w-16 shrink-0 items-center justify-center rounded-lg border-2 border-slate-200 bg-slate-900 text-white transition hover:border-brand sm:h-20 sm:w-20';
+                'relative flex h-16 w-16 shrink-0 snap-start items-center justify-center rounded-lg border-2 border-slate-200 bg-slate-900 text-white transition hover:border-brand sm:h-20 sm:w-20';
             videoThumb.innerHTML = `
                 <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 20 20">
                     <path d="M6.3 4.2A1 1 0 0 0 5 5.1v9.8a1 1 0 0 0 1.3.9l9.4-4.9a1 1 0 0 0 0-1.8L6.3 4.2Z"/>
@@ -224,46 +216,41 @@
             thumbsEl.appendChild(videoThumb);
         }
 
-        // ── Image thumbs ─────────────────────────────────
+        // Image thumbs
         gallery.forEach((img, i) => {
             const btn = document.createElement('button');
             btn.type = 'button';
             btn.dataset.thumb = String(i);
             btn.dataset.variantId = img.variantId || '';
             btn.className =
-                `relative h-16 w-16 shrink-0 overflow-hidden rounded-lg border-2 bg-slate-100 transition sm:h-20 sm:w-20 ` +
+                `relative h-16 w-16 shrink-0 snap-start overflow-hidden rounded-lg border-2 bg-slate-100 transition sm:h-20 sm:w-20 ` +
                 (i === 0 ? 'border-brand' : 'border-transparent hover:border-slate-300');
             btn.innerHTML = `<img src="${img.url}" alt="" class="h-full w-full object-cover" loading="lazy">`;
             thumbsEl.appendChild(btn);
         });
 
-        // ── Video element + badge ────────────────────────
-        const videoEl   = document.getElementById('listingVideo');
-        const videoSrc  = document.getElementById('listingVideoSource');
+        // Video element + badge
+        const videoEl    = document.getElementById('listingVideo');
+        const videoSrc   = document.getElementById('listingVideoSource');
         const videoBadge = document.getElementById('videoOpenBadge');
 
         if (videoUrl && videoEl && videoSrc) {
             videoSrc.src = videoUrl;
             if (gallery[0]?.url) videoEl.poster = gallery[0].url;
             videoEl.load();
-
             videoBadge?.classList.remove('hidden');
 
-            // If the CDN 404s, hide the badge + thumb gracefully
             videoEl.addEventListener('error', () => {
                 console.warn('[listing] video failed to load:', videoUrl);
                 videoBadge?.classList.add('hidden');
                 thumbsEl.querySelector('[data-thumb="video"]')?.remove();
             }, { once: true });
         } else {
-            // No video → ensure badge and thumb are hidden
             videoBadge?.classList.add('hidden');
             thumbsEl.querySelector('[data-thumb="video"]')?.remove();
         }
 
-        // ══════════════════════════════════════════════════
         // 6. Price / stock
-        // ══════════════════════════════════════════════════
         const defaultVariant = variants[0];
         if (defaultVariant) {
             setText('priceMain', defaultVariant.currentPriceLabel);
@@ -282,9 +269,7 @@
             setText('stockText', 'Not available');
         }
 
-        // ══════════════════════════════════════════════════
         // 7. Variant radios
-        // ══════════════════════════════════════════════════
         if (variants.length) {
             toggle('variantSection', true);
             setText('variantCount', `${variants.length} option${variants.length === 1 ? '' : 's'}`);
@@ -294,7 +279,7 @@
 
             variants.forEach((v, idx) => {
                 const label = document.createElement('label');
-                label.className = 'group relative cursor-pointer';
+                label.className = 'group relative w-[170px] shrink-0 snap-start cursor-pointer sm:w-auto';
                 label.innerHTML = `
                     <input type="radio" name="variant" value="${v.id}"
                            data-variant-radio data-variant-index="${idx}"
@@ -302,16 +287,16 @@
                     <span class="flex items-center gap-2 rounded-lg border-2 border-slate-200 bg-white p-2 transition
                                  peer-checked:border-brand peer-checked:bg-brand-ultralight hover:border-slate-300">
                         ${v.imageUrl
-                            ? `<img src="${v.imageUrl}" alt="" class="h-10 w-10 rounded object-cover" loading="lazy">`
-                            : `<div class="h-10 w-10 rounded bg-slate-100"></div>`}
+                            ? `<img src="${v.imageUrl}" alt="" class="h-10 w-10 shrink-0 rounded object-cover" loading="lazy">`
+                            : `<div class="h-10 w-10 shrink-0 rounded bg-slate-100"></div>`}
                         <span class="min-w-0 flex-1">
                             <span class="block truncate text-xs font-semibold text-slate-900">
                                 ${escapeAttr(v.attributes.map(a => a.value).join(' / ') || v.sku)}
                             </span>
-                            <span class="block text-[11px] text-slate-500">${escapeAttr(v.currentPriceLabel)}</span>
+                            <span class="block truncate text-[11px] text-slate-500">${escapeAttr(v.currentPriceLabel)}</span>
                         </span>
                         ${v.stock.tone === 'rose'
-                            ? `<span class="rounded-full bg-rose-50 px-1.5 py-0.5 text-[9px] font-bold text-rose-700">OOS</span>`
+                            ? `<span class="shrink-0 rounded-full bg-rose-50 px-1.5 py-0.5 text-[9px] font-bold text-rose-700">OOS</span>`
                             : ''}
                     </span>`;
                 list.appendChild(label);
@@ -323,9 +308,7 @@
             });
         }
 
-        // ══════════════════════════════════════════════════
         // 8. Description + product gallery
-        // ══════════════════════════════════════════════════
         setHTML('listingDescription', data.description || '');
         if (data.product_description) {
             toggle('productDescriptionWrap', true);
@@ -358,9 +341,7 @@
             });
         }
 
-        // ══════════════════════════════════════════════════
-        // 9. Specs sidebar
-        // ══════════════════════════════════════════════════
+        // 9. Specs
         const specs = document.getElementById('specsList');
         const attrMap = new Map();
         for (const v of variants) {
@@ -380,25 +361,20 @@
         if (variants[0]?.sku) specsHtml += specRow('SKU', variants[0].sku);
         specs.innerHTML = specsHtml;
 
-        // ══════════════════════════════════════════════════
-        // 10. Vendor card
-        // ══════════════════════════════════════════════════
+        // 10. Vendor
         const vendorName = data.brand || 'COCOCE Vendor';
         setText('vendorName', vendorName);
         setText('vendorInitial', vendorName.charAt(0).toUpperCase());
 
-        // ══════════════════════════════════════════════════
         // 11. JSON-LD
-        // ══════════════════════════════════════════════════
         updateJsonLd(data, variants, gallery);
 
-        // ══════════════════════════════════════════════════
-        // 12. Gallery interactions (bind once)
-        // ══════════════════════════════════════════════════
+        // 12. Interactions
         initGalleryInteractions(gallery, mainImg, thumbsEl);
+        initLightbox(gallery, mainImg);
     }
 
-    // ─── Spec row helper ─────────────────────────────────
+    // ─── Helpers ─────────────────────────────────────────
     function specRow(label, value) {
         return `
             <div class="flex justify-between gap-3 py-2">
@@ -407,15 +383,6 @@
             </div>`;
     }
 
-    function escapeAttr(s) {
-        return String(s ?? '')
-            .replace(/&/g, '&amp;')
-            .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;')
-            .replace(/"/g, '&quot;');
-    }
-
-    // ─── Stock tone ──────────────────────────────────────
     function applyStockTone(stock) {
         const badge = document.getElementById('stockBadge');
         const dot   = document.getElementById('stockDot');
@@ -437,7 +404,6 @@
         dot.classList.add(t.dot);
     }
 
-    // ─── Variant change ──────────────────────────────────
     function onVariantChange(variant, gallery, mainImg, thumbsEl) {
         setText('priceMain', variant.currentPriceLabel);
         if (variant.isOnSale && variant.salePriceLabel) {
@@ -461,10 +427,10 @@
         }
 
         const oos = variant.stock.tone === 'rose';
-        const addBtn = document.getElementById('addToCartBtn');
-        const buyBtn = document.getElementById('buyNowBtn');
-        if (addBtn) addBtn.disabled = oos;
-        if (buyBtn) buyBtn.disabled = oos;
+        ['addToCartBtn', 'buyNowBtn'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.disabled = oos;
+        });
     }
 
     function highlightThumb(thumbsEl, activeIdx) {
@@ -484,24 +450,28 @@
 
         const mainWrap   = document.getElementById('galleryMain');
         const videoModal = document.getElementById('videoModal');
+        const qty        = document.getElementById('qty');
 
-        // Zoom on hover
-        mainWrap.addEventListener('mouseenter', () => {
-            mainImg.style.transformOrigin = 'center center';
-            mainImg.style.transform = 'scale(2)';
-        });
-        mainWrap.addEventListener('mousemove', (e) => {
-            const rect = mainWrap.getBoundingClientRect();
-            const x = ((e.clientX - rect.left) / rect.width) * 100;
-            const y = ((e.clientY - rect.top) / rect.height) * 100;
-            mainImg.style.transformOrigin = `${x}% ${y}%`;
-        });
-        mainWrap.addEventListener('mouseleave', () => {
-            mainImg.style.transform = '';
-            mainImg.style.transformOrigin = 'center center';
-        });
+        // Hover zoom (desktop only)
+        const isTouch = window.matchMedia('(hover: none)').matches;
+        if (!isTouch) {
+            mainWrap.addEventListener('mouseenter', () => {
+                mainImg.style.transformOrigin = 'center center';
+                mainImg.style.transform = 'scale(2)';
+            });
+            mainWrap.addEventListener('mousemove', (e) => {
+                const rect = mainWrap.getBoundingClientRect();
+                const x = ((e.clientX - rect.left) / rect.width) * 100;
+                const y = ((e.clientY - rect.top) / rect.height) * 100;
+                mainImg.style.transformOrigin = `${x}% ${y}%`;
+            });
+            mainWrap.addEventListener('mouseleave', () => {
+                mainImg.style.transform = '';
+                mainImg.style.transformOrigin = 'center center';
+            });
+        }
 
-        // Thumbnail clicks (delegated — works for video thumb + image thumbs)
+        // Thumbnail clicks
         thumbsEl.addEventListener('click', (e) => {
             const btn = e.target.closest('[data-thumb]');
             if (!btn) return;
@@ -517,7 +487,7 @@
             highlightThumb(thumbsEl, idx);
         });
 
-        // Video open/close
+        // Video modal
         function openVideo() {
             videoModal?.classList.remove('hidden');
             videoModal?.classList.add('flex');
@@ -527,11 +497,10 @@
             videoModal?.classList.add('hidden');
             videoModal?.classList.remove('flex');
             document.body.style.overflow = '';
-
-            const videoEl = document.getElementById('listingVideo');
-            if (videoEl) {
-                videoEl.pause();
-                videoEl.currentTime = 0;
+            const v = document.getElementById('listingVideo');
+            if (v) {
+                v.pause();
+                v.currentTime = 0;
             }
         }
 
@@ -543,13 +512,113 @@
         });
 
         // Quantity stepper
-        const qty = document.getElementById('qty');
         document.querySelectorAll('[data-qty]').forEach(b => {
             b.addEventListener('click', () => {
-                const cur  = Number(qty.value) || 1;
+                if (!qty) return;
+                const cur = Number(qty.value) || 1;
                 const next = b.dataset.qty === '+' ? cur + 1 : cur - 1;
                 qty.value = Math.min(99, Math.max(1, next));
             });
+        });
+    }
+
+    // ─── Lightbox ────────────────────────────────────────
+    let lightboxBound = false;
+    function initLightbox(gallery, mainImg) {
+        if (lightboxBound) return;
+        lightboxBound = true;
+
+        const lightbox = document.getElementById('imageLightbox');
+        const strip    = document.getElementById('lightboxStrip');
+        const counter  = document.getElementById('lightboxCounter');
+        const closeBtn = document.getElementById('lightboxClose');
+        const prevBtn  = document.getElementById('lightboxPrev');
+        const nextBtn  = document.getElementById('lightboxNext');
+        const mainWrap = document.getElementById('galleryMain');
+
+        if (!lightbox || !strip || !mainWrap) return;
+
+        let currentIndex = 0;
+
+        function buildSlides() {
+            strip.innerHTML = gallery.map(img => `
+                <div class="flex h-full w-full shrink-0 snap-center items-center justify-center p-4">
+                    <img src="${img.url}" alt=""
+                         class="max-h-full max-w-full object-contain"
+                         loading="lazy">
+                </div>
+            `).join('');
+        }
+
+        function updateCounter() {
+            if (counter) counter.textContent = `${currentIndex + 1} / ${gallery.length}`;
+        }
+
+        function open(index) {
+            if (!gallery.length) return;
+
+            currentIndex = Math.max(0, Math.min(gallery.length - 1, index));
+            buildSlides();
+
+            requestAnimationFrame(() => {
+                strip.scrollLeft = currentIndex * strip.clientWidth;
+                updateCounter();
+            });
+
+            lightbox.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+
+            setTimeout(() => closeBtn?.focus(), 50);
+        }
+
+        function close() {
+            lightbox.classList.add('hidden');
+            document.body.style.overflow = '';
+        }
+
+        function goTo(idx) {
+            currentIndex = Math.max(0, Math.min(gallery.length - 1, idx));
+            strip.scrollTo({ left: currentIndex * strip.clientWidth, behavior: 'smooth' });
+            updateCounter();
+        }
+
+        // Open from main image
+        mainWrap.addEventListener('click', (e) => {
+            if (e.target.closest('[data-open-video]')) return;
+            const idx = gallery.findIndex(g => g.url === mainImg.src);
+            open(idx >= 0 ? idx : 0);
+        });
+
+        mainWrap.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                const idx = gallery.findIndex(g => g.url === mainImg.src);
+                open(idx >= 0 ? idx : 0);
+            }
+        });
+
+        closeBtn?.addEventListener('click', close);
+        lightbox.addEventListener('click', (e) => {
+            if (e.target === lightbox) close();
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (lightbox.classList.contains('hidden')) return;
+            if (e.key === 'Escape')     close();
+            if (e.key === 'ArrowRight') goTo(currentIndex + 1);
+            if (e.key === 'ArrowLeft')  goTo(currentIndex - 1);
+        });
+
+        prevBtn?.addEventListener('click', () => goTo(currentIndex - 1));
+        nextBtn?.addEventListener('click', () => goTo(currentIndex + 1));
+
+        strip.addEventListener('scroll', () => {
+            if (!strip.clientWidth) return;
+            const i = Math.round(strip.scrollLeft / strip.clientWidth);
+            if (i !== currentIndex && i >= 0 && i < gallery.length) {
+                currentIndex = i;
+                updateCounter();
+            }
         });
     }
 

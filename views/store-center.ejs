@@ -78,19 +78,19 @@
   <div id="toast" class="fixed bottom-5 right-5 z-[80] hidden rounded-lg bg-slate-900 px-4 py-3 text-sm font-medium text-white shadow-xl"></div>
 
   <script type="module" src="/scripts/shell.js"></script>
-  
+
   <% if (typeof pageScript !== 'undefined' && pageScript) { %>
   <script type="module" src="<%= pageScript %>" defer></script>
   <% } %>
 
-  
+
   <% if (typeof pageScripts !== 'undefined' && Array.isArray(pageScripts)) { %>
   <% pageScripts.forEach(src => { %>
   <script src="<%= src %>" type="module" defer></script>
   <% }) %>
   <% } %>
-  
-  
+
+
 </body>
 
 </html>
