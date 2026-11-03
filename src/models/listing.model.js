@@ -785,171 +785,199 @@ class ListingModel {
     static async getListingById(storeId, listingId) {
         const { rows } = await db.query(`
         SELECT
-            -- Listing
-            l.id,
-            l.title,
-            l.description,
-            l.status,
-            l.created_at,
-            l.updated_at,
+        -- Listing
+        l.id,
+        l.title,
+        l.description,
+        l.status,
+        l.created_at,
+        l.updated_at,
 
-            -- Product
-            p.id AS product_id,
-            p.title AS product_title,
-            p.description AS product_description,
+        -- Product
+        p.id AS product_id,
+        p.title AS product_title,
+        p.description AS product_description,
 
-            -- Family
-            fm.id AS family_id,
-            fm.title AS family_title,
+        -- Brand
+        br.title AS brand,
+        br.logo_url AS brand_logo_url,
 
-            -- Category
-            ct.id AS category_id,
-            ct.title AS category_title,
+        -- Family
+        fm.title AS family,
 
-            -- Variants
-            COALESCE((
-                SELECT jsonb_agg(
-                    jsonb_build_object(
-                        'id', lv.id,
-                        'product_variant_id', pv.id,
-                        'sku', pv.sku,
+        -- Category
+        ct.title AS category,
 
-                        -- Pricing
-                        'price', lcp.price,
-                        'sale_price', lcp.sale_price,
-                        'current_price', lcp.current_price,
-                        'currency_id', lcp.currency_id,
-                        'is_on_sale', COALESCE(lcp.is_on_sale, FALSE),
+        (CONCAT('listings/videos/', l.id, '/', l.id, '.mp4')) AS listing_video_storage_key,
 
-                        -- Inventory availability
-                        'inventory', jsonb_build_object(
-                            'available_quantity',
-                                COALESCE(inventory_data.available_quantity, 0),
+        -- Variants
+        COALESCE((
+            SELECT jsonb_agg(
+                jsonb_build_object(
+                    'id', lv.id,
+                    'product_variant_id', pv.id,
+                    'sku', pv.sku,
 
-                            'reserved_quantity',
-                                COALESCE(inventory_data.reserved_quantity, 0),
+                    -- Pricing
+                    'price', lcp.price,
+                    'sale_price', lcp.sale_price,
+                    'current_price', lcp.current_price,
+                    'currency_id', lcp.currency_id,
+                    'is_on_sale', COALESCE(lcp.is_on_sale, FALSE),
 
-                            'inventory_records',
-                                COALESCE(inventory_data.inventory_records, 0),
+                    -- Inventory availability
+                    'inventory', jsonb_build_object(
+                        'available_quantity',
+                            COALESCE(inventory_data.available_quantity, 0),
 
-                            'availability_status',
-                                CASE
-                                    WHEN COALESCE(inventory_data.inventory_records, 0) = 0
-                                        THEN 'untracked'
-                                    WHEN COALESCE(inventory_data.available_quantity, 0) = 0
-                                        THEN 'out_of_stock'
-                                    WHEN inventory_data.available_quantity <= 5
-                                        THEN 'low_stock'
-                                    ELSE 'in_stock'
-                                END
-                        ),
+                        'reserved_quantity',
+                            COALESCE(inventory_data.reserved_quantity, 0),
 
-                        -- Attributes
-                        'attributes', COALESCE(
-                            (
-                                SELECT jsonb_agg(
-                                    jsonb_build_object(
-                                        'id', a.id,
-                                        'name', a.title,
-                                        'value_id', av.id,
-                                        'value', av.value
-                                    )
-                                    ORDER BY a.title
+                        'inventory_records',
+                            COALESCE(inventory_data.inventory_records, 0),
+
+                        'availability_status',
+                            CASE
+                                WHEN COALESCE(inventory_data.inventory_records, 0) = 0
+                                    THEN 'untracked'
+                                WHEN COALESCE(inventory_data.available_quantity, 0) = 0
+                                    THEN 'out_of_stock'
+                                WHEN inventory_data.available_quantity <= 5
+                                    THEN 'low_stock'
+                                ELSE 'in_stock'
+                            END
+                    ),
+
+                    -- Attributes
+                    'attributes', COALESCE(
+                        (
+                            SELECT jsonb_agg(
+                                jsonb_build_object(
+                                    'id', a.id,
+                                    'name', a.title,
+                                    'value_id', av.id,
+                                    'value', av.value
                                 )
-                                FROM variant_attribute_values vav
-                                JOIN attribute_values av
-                                    ON av.id = vav.attribute_value_id
-                                JOIN attributes a
-                                    ON a.id = av.attribute_id
-                                WHERE vav.variant_id = pv.id
-                            ),
-                            '[]'::jsonb
+                                ORDER BY a.title
+                            )
+                            FROM variant_attribute_values vav
+                            JOIN attribute_values av
+                                ON av.id = vav.attribute_value_id
+                            JOIN attributes a
+                                ON a.id = av.attribute_id
+                            WHERE vav.variant_id = pv.id
                         ),
+                        '[]'::jsonb
+                    ),
 
-                        -- Primary image
-                        'image_url', (
-                            SELECT lvm.storage_key
-                            FROM listing_variants_media lvm
-                            WHERE lvm.listing_variant_id = lv.id
-                                AND lvm.is_primary = TRUE
-                            ORDER BY lvm.id
-                            LIMIT 1
-                        )
+                    -- Primary image
+                    'image_url', (
+                        SELECT lvm.storage_key
+                        FROM listing_variants_media lvm
+                        WHERE lvm.listing_variant_id = lv.id
+                            AND lvm.is_primary = TRUE
+                        ORDER BY lvm.id
+                        LIMIT 1
                     )
-                    ORDER BY lv.id
                 )
-                FROM listing_variants lv
-                JOIN product_variants pv
-                    ON pv.id = lv.product_variant_id
+                ORDER BY lv.id
+            )
+            FROM listing_variants lv
 
-                LEFT JOIN listing_variant_current_prices lcp
-                    ON lcp.listing_variant_id = lv.id
+            JOIN product_variants pv
+                ON pv.id = lv.product_variant_id
 
-                -- Inventory aggregation for this listing variant
+            LEFT JOIN listing_variant_current_prices lcp
+                ON lcp.listing_variant_id = lv.id
+
+            -- Inventory aggregation for this listing variant
+            LEFT JOIN LATERAL (
+                SELECT
+                    COUNT(ii.id)::int AS inventory_records,
+
+                    COALESCE(
+                        SUM(
+                            CASE
+                                WHEN ii.tracking_mode = 'bulk'
+                                    THEN GREATEST(ii.quantity - ii.reserved, 0)
+
+                                WHEN ii.tracking_mode = 'serialized'
+                                    THEN COALESCE(unit_stock.available_units, 0)
+
+                                ELSE 0
+                            END
+                        ),
+                        0
+                    )::int AS available_quantity,
+
+                    COALESCE(
+                        SUM(
+                            CASE
+                                WHEN ii.tracking_mode = 'bulk'
+                                    THEN ii.reserved
+
+                                WHEN ii.tracking_mode = 'serialized'
+                                    THEN COALESCE(unit_stock.reserved_units, 0)
+
+                                ELSE 0
+                            END
+                        ),
+                        0
+                    )::int AS reserved_quantity
+
+                FROM inventory_items ii
+
+                JOIN inventories inv
+                    ON inv.id = ii.inventory_id
+                    AND inv.store_id = l.store_id
+
                 LEFT JOIN LATERAL (
                     SELECT
-                        COUNT(ii.id)::int AS inventory_records,
+                        COUNT(*) FILTER (
+                            WHERE iu.status = 'available'
+                        )::int AS available_units,
 
-                        COALESCE(
-                            SUM(
-                                CASE
-                                    WHEN ii.tracking_mode = 'bulk'
-                                        THEN GREATEST(ii.quantity - ii.reserved, 0)
+                        COUNT(*) FILTER (
+                            WHERE iu.status = 'reserved'
+                        )::int AS reserved_units
 
-                                    WHEN ii.tracking_mode = 'serialized'
-                                        THEN COALESCE(unit_stock.available_units, 0)
+                    FROM inventory_units iu
+                    WHERE iu.inventory_item_id = ii.id
+                ) unit_stock ON TRUE
 
-                                    ELSE 0
-                                END
-                            ),
-                            0
-                        )::int AS available_quantity,
+                WHERE ii.listing_variant_id = lv.id
+            ) inventory_data ON TRUE
 
-                        COALESCE(
-                            SUM(
-                                CASE
-                                    WHEN ii.tracking_mode = 'bulk'
-                                        THEN ii.reserved
+            WHERE lv.listing_id = l.id
+        ), '[]'::jsonb) AS variants,
 
-                                    WHEN ii.tracking_mode = 'serialized'
-                                        THEN COALESCE(unit_stock.reserved_units, 0)
-
-                                    ELSE 0
-                                END
-                            ),
-                            0
-                        )::int AS reserved_quantity
-
-                    FROM inventory_items ii
-
-                    JOIN inventories inv
-                        ON inv.id = ii.inventory_id
-                       AND inv.store_id = l.store_id
-
-                    LEFT JOIN LATERAL (
-                        SELECT
-                            COUNT(*) FILTER (
-                                WHERE iu.status = 'available'
-                            )::int AS available_units,
-
-                            COUNT(*) FILTER (
-                                WHERE iu.status = 'reserved'
-                            )::int AS reserved_units
-
-                        FROM inventory_units iu
-                        WHERE iu.inventory_item_id = ii.id
-                    ) unit_stock ON TRUE
-
-                    WHERE ii.listing_variant_id = lv.id
-                ) inventory_data ON TRUE
-
-                WHERE lv.listing_id = l.id
-            ), '[]'::jsonb) AS variants
+        -- Product media
+        COALESCE(
+            (
+                SELECT jsonb_agg(
+                    jsonb_build_object(
+                        'id', pm.id,
+                        'media_type', pm.media_type,
+                        'width', pm.width,
+                        'height', pm.height,
+                        'storage_key', pm.storage_key,
+                        'url', pm.url
+                    )
+                    ORDER BY pm.id
+                )
+                FROM product_media pm
+                WHERE pm.product_id = p.id
+            ),
+            '[]'::jsonb
+        ) AS product_media
 
         FROM listings l
 
         LEFT JOIN products p
             ON p.id = l.product_id
+
+        LEFT JOIN brands br
+            ON br.id = p.brand_id
 
         LEFT JOIN families fm
             ON fm.id = p.family_id
@@ -966,7 +994,49 @@ class ListingModel {
         return rows[0] || null;
     }
 
+    static async getListingVariantPrices(storeId, listingId, variantId) {
+        const { rows } = await db.query(`
+        SELECT
+        lp.id,
+        lp.listing_variant_id,
+        lp.currency_id,
+        c.code AS currency_code,
+        c.name AS currency_name,
+        lp.price,
+        lp.sale_price,
+        CASE
+            WHEN lp.sale_price IS NOT NULL
+                THEN lp.sale_price
+            ELSE lp.price
+        END AS current_price,
+        (
+            lp.sale_price IS NOT NULL
+        ) AS is_on_sale,
+        lp.starts_at,
+        lp.ends_at,
+        lp.status,
+        lp.created_at,
+        lp.updated_at
+        FROM listing_prices lp
 
+        JOIN currencies c
+            ON c.id = lp.currency_id
+
+        JOIN listing_variants lv
+            ON lv.id = lp.listing_variant_id
+
+        JOIN listings l
+            ON l.id = lv.listing_id
+
+        WHERE l.id = $1
+          AND l.store_id = $2
+          AND lv.id = $3
+
+        ORDER BY lp.starts_at DESC
+    `, [listingId, storeId, variantId]);
+
+        return rows;
+    }
 
     static async insertListing(client, {
         store_id,

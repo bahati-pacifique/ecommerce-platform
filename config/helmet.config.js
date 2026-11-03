@@ -148,6 +148,7 @@ module.exports = {
             "media-src": [
                 "'self'",
                 "https://www.w3schools.com",
+                "https://cdn.cococe.rw/",
                 "blob:"
             ],
 

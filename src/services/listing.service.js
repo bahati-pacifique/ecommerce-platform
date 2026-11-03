@@ -15,6 +15,10 @@ class ListingServices {
         return await ListingModel.getListingsByStore(storeId, opts);
     }
 
+    static async getStoreListing(storeId, listingId) {
+        return await ListingModel.getListingById(storeId, listingId)
+    }
+
     static async createListing({
         listing,
         variants = [],

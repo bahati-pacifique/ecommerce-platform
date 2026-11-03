@@ -674,9 +674,8 @@ async function renderStoreListing(req, res) {
 
 async function renderListingPage(req, res) {
     const user = req.user;
-    const {storeId, listingId} = req.params;
+    const { storeId, listingId } = req.params;
 
-    
     try {
 
         const vendorStore = await StoreService.getVendorStore(storeId, user.vendor?.id || null);
@@ -695,8 +694,8 @@ async function renderListingPage(req, res) {
         //Update store last active
         //res.locals.layout = 'store-center';
         updateStoreLastActive(vendorStore.id);
-        
-        return res.render('store-partials/listing', { listingId, layout: 'store-center', store: vendorStore, user, protocal, domainName, title: 'listings' });
+
+        return res.render('store-partials/listing', { listingId, layout: 'focused', store: vendorStore, user, protocal, domainName, title: 'listings' });
     } catch (error) {
         console.log(error);
         return res.render('store-no-access', {
@@ -1857,7 +1856,7 @@ async function getStoreListings(req, res) {
             limit = 20,
             status = 'active',
             sort = 'recent' } = req.query;
-            console.log(req.query);
+        
         const vendorStore = await StoreService.getVendorStore(
             storeId,
             user.vendor?.id || null
@@ -1869,7 +1868,7 @@ async function getStoreListings(req, res) {
             });
         }
 
-        const result = await ListingService.getStoreListings(vendorStore.id, {search, page, limit, status, sort});
+        const result = await ListingService.getStoreListings(vendorStore.id, { search, page, limit, status, sort });
 
         return res.json(result);
     } catch (error) {
@@ -1877,6 +1876,40 @@ async function getStoreListings(req, res) {
         return res.status(500).json({
             message: `Unable to get listings — Internal Error`
         })
+    }
+}
+
+async function getListing(req, res) {
+    try {
+        const { storeId, listingId } = req.params;
+        const user = req.user;
+        // const vendorStore = await StoreService.getVendorStore(storeId, user?.vendor?.id || null);
+
+        // if (!vendorStore) {
+        //     return res.status(401).json({
+        //         message: `Can not get listing — Store Verfication failed`
+        //     });
+        // }
+
+        const result = await ListingService.getStoreListing(storeId, listingId);
+
+        console.log(result)
+        if (!result) {
+            return res.status(404).json({
+                message: 'Listing not found'
+            });
+        }
+
+        return res.status(200).json({
+            data: result
+        });
+
+        //Update store last active
+        //res.locals.layout = 'store-center';
+        // updateStoreLastActive(vendorStore.id);
+    } catch (error) {
+        console.log('[getListing]', error);
+        return res.status(500).json({ message: 'Unable to get listing — Internal Error' })
     }
 }
 
@@ -1968,6 +2001,7 @@ module.exports = {
     createInventoryItem,
     transferUnit,
     getStoreListings,
+    getListing,
 
     getStoreDashboardAnalytics,
     getStoreDashboard,
