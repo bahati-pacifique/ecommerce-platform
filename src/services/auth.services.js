@@ -68,7 +68,11 @@ class AuthService {
                         affected = await authModel.expirePreauthForUser(user.id);
                     } catch (error) {
                         console.error(error);
-                        throw new Error('Something went wrong, please try to log in again')
+                        //throw new Error('Something went wrong, please try to log in again');
+                        return {
+                            success: false,
+                            message: 'Something went wrong, please try to log in again'
+                        };
                     }
 
                     //Insteadof denying user login attempt let's do a recursive, after expiring last preauth.
@@ -253,10 +257,10 @@ class AuthService {
             await authModel.expirePreauthForUser(userId);
 
             if (userAccount.account_category === 'Business') {
-                
+
                 try {
                     const vendorResult = await Vendor.getVendorByUserId(userAccount.user_id);
-                    
+
                     if (vendorResult) {
                         userAccount.vendor = vendorResult;
                     }
@@ -307,6 +311,7 @@ class AuthService {
             };
         }
     }
+
     async signout(userAccount) {
         try {
             const session = await sessionModel.invalidateAllForUser(userAccount);

@@ -326,7 +326,7 @@
                 btn.className = 'group overflow-hidden rounded-lg bg-slate-100';
                 btn.innerHTML = `
                     <img src="${img.url}" alt=""
-                         class="aspect-square w-full object-cover transition duration-200 group-hover:scale-105"
+                         class="aspect-square w-full object-contain transition duration-200 group-hover:scale-105"
                          loading="lazy">`;
                 btn.addEventListener('click', () => {
                     const idx = gallery.findIndex(g => g.url === img.url);

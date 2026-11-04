@@ -217,7 +217,7 @@ async function login(req, res) {
 
     } catch (error) {
         console.log('auth.controller login()', error);
-        return deny401(req, res, { message: 'We\'re unable to get you logged in — Please try again' })
+        return deny401(req, res, { message: error.message || 'We\'re unable to get you logged in — Please try again' })
     }
 }
 
@@ -502,6 +502,7 @@ async function signout(req, res) {
         }
 
         await authServices.signout(userAccount);
+
         clearAuthentication(res);
 
         if (redirectTo) return res.redirect(redirectTo)
