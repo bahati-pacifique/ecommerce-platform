@@ -17,11 +17,11 @@
     }
 
     // ─── DOM refs ────────────────────────────────────────
-    const elLoading  = document.getElementById('listingLoading');
-    const elContent  = document.getElementById('listingContent');
-    const elError    = document.getElementById('listingError');
+    const elLoading = document.getElementById('listingLoading');
+    const elContent = document.getElementById('listingContent');
+    const elError = document.getElementById('listingError');
     const elErrorMsg = document.getElementById('listingErrorMsg');
-    const retryBtn   = document.getElementById('listingRetry');
+    const retryBtn = document.getElementById('listingRetry');
 
     // ─── State toggling ──────────────────────────────────
     function showLoading() {
@@ -31,8 +31,14 @@
     }
     function showContent() {
         elLoading.classList.add('hidden');
-        elContent.classList.remove('hidden');
         elError.classList.add('hidden');
+
+        // Reveal content with a fade-in
+        elContent.classList.remove('hidden');
+        elContent.classList.add('opacity-0');
+        void elContent.offsetWidth;      // force reflow
+        elContent.classList.remove('opacity-0');
+        elContent.classList.add('opacity-100');
     }
     function showError(msg) {
         elLoading.classList.add('hidden');
@@ -62,11 +68,11 @@
     function stockLabel(inv) {
         if (!inv) return { label: 'Unknown', tone: 'slate' };
         switch (inv.availability_status) {
-            case 'in_stock':     return { label: 'In stock', tone: 'emerald' };
-            case 'low_stock':    return { label: `Only ${inv.available_quantity} left`, tone: 'amber' };
+            case 'in_stock': return { label: 'In stock', tone: 'emerald' };
+            case 'low_stock': return { label: `Only ${inv.available_quantity} left`, tone: 'amber' };
             case 'out_of_stock': return { label: 'Out of stock', tone: 'rose' };
-            case 'untracked':    return { label: 'Untracked', tone: 'slate' };
-            default:             return { label: 'Unknown', tone: 'slate' };
+            case 'untracked': return { label: 'Untracked', tone: 'slate' };
+            default: return { label: 'Unknown', tone: 'slate' };
         }
     }
 
@@ -230,8 +236,8 @@
         });
 
         // Video element + badge
-        const videoEl    = document.getElementById('listingVideo');
-        const videoSrc   = document.getElementById('listingVideoSource');
+        const videoEl = document.getElementById('listingVideo');
+        const videoSrc = document.getElementById('listingVideoSource');
         const videoBadge = document.getElementById('videoOpenBadge');
 
         if (videoUrl && videoEl && videoSrc) {
@@ -287,8 +293,8 @@
                     <span class="flex items-center gap-2 rounded-lg border-2 border-slate-200 bg-white p-2 transition
                                  peer-checked:border-brand peer-checked:bg-brand-ultralight hover:border-slate-300">
                         ${v.imageUrl
-                            ? `<img src="${v.imageUrl}" alt="" class="h-10 w-10 shrink-0 rounded object-cover" loading="lazy">`
-                            : `<div class="h-10 w-10 shrink-0 rounded bg-slate-100"></div>`}
+                        ? `<img src="${v.imageUrl}" alt="" class="h-10 w-10 shrink-0 rounded object-cover" loading="lazy">`
+                        : `<div class="h-10 w-10 shrink-0 rounded bg-slate-100"></div>`}
                         <span class="min-w-0 flex-1">
                             <span class="block truncate text-xs font-semibold text-slate-900">
                                 ${escapeAttr(v.attributes.map(a => a.value).join(' / ') || v.sku)}
@@ -296,8 +302,8 @@
                             <span class="block truncate text-[11px] text-slate-500">${escapeAttr(v.currentPriceLabel)}</span>
                         </span>
                         ${v.stock.tone === 'rose'
-                            ? `<span class="shrink-0 rounded-full bg-rose-50 px-1.5 py-0.5 text-[9px] font-bold text-rose-700">OOS</span>`
-                            : ''}
+                        ? `<span class="shrink-0 rounded-full bg-rose-50 px-1.5 py-0.5 text-[9px] font-bold text-rose-700">OOS</span>`
+                        : ''}
                     </span>`;
                 list.appendChild(label);
 
@@ -352,8 +358,8 @@
         }
 
         let specsHtml = '';
-        if (data.brand)    specsHtml += specRow('Brand', data.brand);
-        if (data.family)   specsHtml += specRow('Family', data.family);
+        if (data.brand) specsHtml += specRow('Brand', data.brand);
+        if (data.family) specsHtml += specRow('Family', data.family);
         if (data.category) specsHtml += specRow('Category', data.category);
         attrMap.forEach((values, name) => {
             specsHtml += specRow(name, Array.from(values).join(' / '));
@@ -385,14 +391,14 @@
 
     function applyStockTone(stock) {
         const badge = document.getElementById('stockBadge');
-        const dot   = document.getElementById('stockDot');
+        const dot = document.getElementById('stockDot');
         if (!badge || !dot) return;
 
         const tones = {
             emerald: { bg: 'bg-emerald-50 text-emerald-700', dot: 'bg-emerald-600' },
-            amber:   { bg: 'bg-amber-50 text-amber-700',     dot: 'bg-amber-600' },
-            rose:    { bg: 'bg-rose-50 text-rose-700',       dot: 'bg-rose-600' },
-            slate:   { bg: 'bg-slate-100 text-slate-600',    dot: 'bg-slate-400' },
+            amber: { bg: 'bg-amber-50 text-amber-700', dot: 'bg-amber-600' },
+            rose: { bg: 'bg-rose-50 text-rose-700', dot: 'bg-rose-600' },
+            slate: { bg: 'bg-slate-100 text-slate-600', dot: 'bg-slate-400' },
         };
 
         badge.className = 'mt-3 inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold';
@@ -448,9 +454,9 @@
         if (galleryBound) return;
         galleryBound = true;
 
-        const mainWrap   = document.getElementById('galleryMain');
+        const mainWrap = document.getElementById('galleryMain');
         const videoModal = document.getElementById('videoModal');
-        const qty        = document.getElementById('qty');
+        const qty = document.getElementById('qty');
 
         // Hover zoom (desktop only)
         const isTouch = window.matchMedia('(hover: none)').matches;
@@ -529,11 +535,11 @@
         lightboxBound = true;
 
         const lightbox = document.getElementById('imageLightbox');
-        const strip    = document.getElementById('lightboxStrip');
-        const counter  = document.getElementById('lightboxCounter');
+        const strip = document.getElementById('lightboxStrip');
+        const counter = document.getElementById('lightboxCounter');
         const closeBtn = document.getElementById('lightboxClose');
-        const prevBtn  = document.getElementById('lightboxPrev');
-        const nextBtn  = document.getElementById('lightboxNext');
+        const prevBtn = document.getElementById('lightboxPrev');
+        const nextBtn = document.getElementById('lightboxNext');
         const mainWrap = document.getElementById('galleryMain');
 
         if (!lightbox || !strip || !mainWrap) return;
@@ -604,9 +610,9 @@
 
         document.addEventListener('keydown', (e) => {
             if (lightbox.classList.contains('hidden')) return;
-            if (e.key === 'Escape')     close();
+            if (e.key === 'Escape') close();
             if (e.key === 'ArrowRight') goTo(currentIndex + 1);
-            if (e.key === 'ArrowLeft')  goTo(currentIndex - 1);
+            if (e.key === 'ArrowLeft') goTo(currentIndex - 1);
         });
 
         prevBtn?.addEventListener('click', () => goTo(currentIndex - 1));
@@ -644,8 +650,8 @@
                 price: String(variants[0].currentPrice),
                 availability:
                     variants[0].stock.tone === 'rose' ? 'https://schema.org/OutOfStock' :
-                    variants[0].stock.tone === 'amber' ? 'https://schema.org/LimitedAvailability' :
-                    'https://schema.org/InStock',
+                        variants[0].stock.tone === 'amber' ? 'https://schema.org/LimitedAvailability' :
+                            'https://schema.org/InStock',
             };
         } else if (variants.length > 1) {
             const prices = variants.map(v => v.currentPrice);

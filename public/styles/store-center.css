@@ -77,3 +77,11 @@ body {
     stroke-linecap: round;
     stroke-linejoin: round;
 }
+
+#listingContent {
+    transition: opacity 300ms ease-out;
+}
+
+#listingLoading {
+    transition: opacity 150ms ease-out;
+}

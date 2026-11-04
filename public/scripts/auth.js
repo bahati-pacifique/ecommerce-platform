@@ -89,10 +89,10 @@ form.addEventListener('submit', async function (e) {
         }
     } catch (error) {
         console.log(error);
-        showMessage(error.response?.data?.message || 'Internal Server Error', 'error');
-    } finally {
         signinBtn.disabled = false;
         signinBtn.textContent = 'Sign in';
+        showMessage(error.response?.data?.message || 'Internal Server Error', 'error');
+    } finally {
         passwordInput.value = '';
     }
 
