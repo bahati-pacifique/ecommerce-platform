@@ -2,19 +2,22 @@
   <div class="mx-auto max-w-7xl px-4 py-3 md:flex md:items-center md:justify-between lg:px-8">
 
     <div class="flex justify-center">
-      <a href="<%=locals.baseUrl || '/'%>" class="flex items-center gap-2">
+      <a href="<%=locals.baseUrl || '/'%>" class="flex items-center gap-1">
         <img src="/images/logos/fav.png" alt="Logo" class="h-8">
-        <span class="text-xl font-bold tracking-tight text-brand">COCOCE</span>
+        <span class="text-xl font-bold tracking-tight text-brand mb-1">COCOCE <span class="md:hidden text-slate-500">&copy;</span></span>
+        <p class="text-center text-sm leading-5 text-gray-500 hidden md:block">
+          — &copy; 2026 COCOCE. All rights reserved.
+        </p>
       </a>
     </div>
 
     <div class="mt-4 md:order-2 md:mt-0 flex max-md:flex-col md:items-center gap-3">
-      <% navs?.forEach(nav=>{%>
-      <a href="<%=nav.link%>" class="text-gray-600 text-sm md:text-base hover:underline hover:text-brand"><%=nav.title%></a>
-      <%})%>
-      <p class="text-center text-sm leading-5 text-gray-500">
-        &copy; 2026 COCOCE. All rights reserved.
-      </p>
+
+      <div class="flex items-center gap-3 md:gap-4 max-md:w-full max-md:justify-center">
+        <% navs?.forEach(nav=>{%>
+        <a href="<%=nav.link%>" class="text-slate-400 text-sm md:text-base hover:underline hover:text-brand"><%=nav.title%></a>
+        <%})%>
+      </div>
     </div>
 
   </div>
