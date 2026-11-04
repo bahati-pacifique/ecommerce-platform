@@ -42,18 +42,24 @@
 <body>
 
   <nav class="fixed top-0 w-full z-50 bg-white/80 backdrop-blur-lg border-b border-gray-100/60">
-    <div class="max-w-7xl mx-auto px-6 md:px-10 flex items-center flex-wrap">
-      <div class="flex items-center h-16">
+    <div class="max-w-7xl mx-auto px-6 md:px-10 flex items-center justify-between">
+      <div class="flex items-center gap-2 h-16">
         <a href="/" class="flex items-center gap-2 group mr-auto pr-2">
           <img src="/images/logos/business.png" alt="Logo-brand" class="max-w-[120px]">
         </a>
-
+        <% if (locals.user?.vendor) {%>
+        <span class="flex items-center gap-2 text-sm font-bold hidden md:block text-slate-600 transition border border-brand p-2 rounded">
+          <i class="bi bi-house-gear font-extrabold"></i>
+          <span><%= locals.user?.vendor?.business_name || locals.user?.username %></span>
+        </span>
+        <%}%>
         <div class="hidden md:flex items-center gap-8 text-sm font-medium text-slate-600">
           <a href="#features" class="hover:text-brand hover:underline transition">Features</a>
           <a href="#solutions" class="hover:text-brand hover:underline transition">Solutions</a>
           <a href="#testimonials" class="hover:text-brand hover:underline transition">Testimonials</a>
           <a href="#pricing" class="hover:text-brand hover:underline transition">Pricing</a>
         </div>
+
       </div>
       <div class="flex items-center gap-3 ml-auto">
         <% if (!locals.user) { %>
@@ -62,17 +68,13 @@
         </a>
         <% } else { %>
         <div class="flex items-center gap-3">
-          
-          <span class="text-sm font-bold hidden md:block text-slate-600 transition">
-            👋 Hi, <%= locals.user?.vendor?.business_name || locals.user?.username %>
-          </span>
 
           <a href="<%= locals.user?.vendor ? '/' + locals.user.vendor.id.replaceAll('-', '') + '/dashboard' : '/' %>" class="btn-premium text-white rounded-lg text-sm py-2 px-5 <%= !locals.user?.vendor ? 'hidden' : '' %>">
-            Go to Dashboard <i class="bi bi-arrow-right"></i>
+            <span class="hidden md:block">Dashboard</span> <i class="bi bi-columns-gap"></i>
           </a>
 
-          <div class="inline-flex items-center gap-2 px-4 py-1.5 bg-white/60 hover:bg-white/70 rounded-full border border-slate-200/60 shadow-sm text-sm font-medium text-black max-md:m-3">
-            
+          <div class="inline-flex items-center gap-2 px-4 py-1.5 bg-white/60 hover:bg-white/70 rounded border border-slate-200/60 shadow-sm text-sm font-medium text-black max-md:m-3">
+
             <form action="<%=locals.protocal%>auth.<%=locals.domainName%>/signout" method="post">
               <input type="hidden" value="<%=locals.protocal%>business.<%=locals.domainName%>" name="host">
               <input type="hidden" name="userAccount" value="<=locals.user.userAccount%>">
