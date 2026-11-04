@@ -36,7 +36,7 @@ function renderCards() {
             <p class="text-sm text-gray-600 leading-relaxed flex-1">${account.description}</p>
             <div class="mt-4 pt-3 border-t border-gray-100 flex items-center justify-between">
               <span class="flex items-center gap-2 text-xs text-gray-400">
-                 Click to select <i class="bi bi-hand-index rotate-45 text-gray-700 font-semibold"></i> 
+                 Click this card to select this account 
               </span>
               ${selectedAccountId === account.id ? '<span class="text-brand text-sm font-semibold">✓ Selected</span>' : ''}
             </div>
@@ -206,17 +206,18 @@ async function handleContinue() {
             console.log(error.response?.data?.redirectTo)
             return window.location.href = error.response?.data?.redirectTo || '/';
         }
-        //window.location.href = '/';
+        continueBtn.disabled = !selectedAccountId;
         Notification.showNotification({
             type: 'error',
             title: '',
             message: error.response?.data?.message || 'Internal server error'
         });
     } finally {
-        continueBtn.innerHTML = `<span class="flex items-center gap-3">
-                                      Continue <i class="bi bi-arrow-right"></i>
-                                    </span>`;
-        continueBtn.disabled = !selectedAccountId;
+        continueBtn.innerHTML =
+            `<span class="flex items-center gap-3">
+                Continue <i class="bi bi-arrow-right"></i>
+            </span>
+            `;
     }
 }
 

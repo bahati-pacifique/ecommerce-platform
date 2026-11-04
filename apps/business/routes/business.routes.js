@@ -46,7 +46,7 @@ router.get('/stores/:storeId/data/product-listing/analytics', business, business
 router.get('/stores/:storeId/data/product-listing/inventories', business, businessController.getInventoriesByStoreId);
 router.get('/stores/:storeId/listings', business, businessController.getStoreListings);
 router.get('/stores/:storeId/listings/review/:listingId', business, businessController.renderListingPage);
-router.get('/stores/:storeId/listings/:listingId', businessController.getListing);
+router.get('/stores/:storeId/listings/:listingId', business, businessController.getListing);
 router.get('/stores/:storeId/data/dashboard', business, businessController.getStoreDashboard);
 
 // router.get('/stores/:vendorId/:storeId', business, businessController.renderVendorStorePage);

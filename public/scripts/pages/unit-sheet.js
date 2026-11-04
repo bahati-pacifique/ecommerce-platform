@@ -400,7 +400,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         window.location.reload()
                     }
                 } catch (error) {
-                    console.log("Error transfering unit",error);
+                    console.log("[Error transfering unit]",error);
                     showSnackbar({
                         type: 'error',
                         message: error.response?.data?.message || 'Internal Server Error'

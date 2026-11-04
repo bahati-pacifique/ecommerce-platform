@@ -1883,17 +1883,17 @@ async function getListing(req, res) {
     try {
         const { storeId, listingId } = req.params;
         const user = req.user;
-        // const vendorStore = await StoreService.getVendorStore(storeId, user?.vendor?.id || null);
+        
+        const vendorStore = await StoreService.getVendorStore(storeId, user?.vendor?.id || null);
 
-        // if (!vendorStore) {
-        //     return res.status(401).json({
-        //         message: `Can not get listing — Store Verfication failed`
-        //     });
-        // }
+        if (!vendorStore) {
+            return res.status(401).json({
+                message: `Can not get listing — Store Verfication failed`
+            });
+        }
 
         const result = await ListingService.getStoreListing(storeId, listingId);
 
-        console.log(result)
         if (!result) {
             return res.status(404).json({
                 message: 'Listing not found'
