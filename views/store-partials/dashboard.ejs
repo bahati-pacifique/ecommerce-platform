@@ -43,28 +43,28 @@
     return peak.visits > 0 ? peak.day : null;
   };
 
-  const sales     = c.sales     ?? {};
-  const orders    = c.orders    ?? {};
+  const sales = c.sales ?? {};
+  const orders = c.orders ?? {};
   const products  = c.products  ?? {};
   const inventory = c.inventory ?? {};
-  const reviews   = c.reviews   ?? {};
-  const visits    = c.visits    ?? {};
-  const search    = c.search    ?? {};
+  const reviews  = c.reviews ?? {};
+  const visits = c.visits ?? {};
+  const search = c.search ?? {};
   const followers = c.followers ?? {};
-  const response  = c.response  ?? {};
-  const pending   = c.pending_orders ?? {};
+  const response = c.response ?? {};
+  const pending = c.pending_orders ?? {};
 
-  const currency  = sales.currency ?? 'RWF';
+  const currency = sales.currency ?? 'RWF';
   const periodKey = d.period?.key ?? '7d';
 
-  const invRec    = c.inventory ?? {};
-  const records   = num(invRec.inventory_records);
-  const units     = num(invRec.total_units);
+  const invRec = c.inventory ?? {};
+  const records = num(invRec.inventory_records);
+  const units = num(invRec.total_units);
   const reserved  = num(invRec.reserved_units);
   const available = num(invRec.available_units);
   const lowCount  = num(invRec.low_stock_records ?? c.inventory?.low_stock);
   const outCount  = num(invRec.out_of_stock_records ?? c.inventory?.out_of_stock);
-  const damaged   = num(invRec.damaged_units);
+  const damaged = num(invRec.damaged_units);
   const returned  = num(invRec.returned_units);
 %>
 
@@ -223,7 +223,7 @@
     .join(' ');
 %>
 
-<div class="mt-6 rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+<div class="mt-6 rounded-xl border border-slate-200 bg-white p-5 shadow-sm overflow-x-hidden">
   <div class="mb-5 flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
     <div>
       <h2 class="font-semibold">Sales Overview</h2>
@@ -284,9 +284,8 @@
   </div>
 </div>
 
-<div class="mt-6 grid gap-6 xl:grid-cols-3">
+<div class="mt-6 grid gap-6 xl:grid-cols-3 overflow-x-auto max-w-full">
 
-  <!-- Orders Requiring Attention -->
   <div class="xl:col-span-2 rounded-xl border border-slate-200 bg-white shadow-sm">
     <div class="flex items-center justify-between border-b border-slate-100 p-5">
       <div>
@@ -349,7 +348,6 @@
     </div>
   </div>
 
-  <!-- Inventory Alerts -->
   <div class="rounded-xl border border-slate-200 bg-white shadow-sm">
     <div class="flex items-center justify-between border-b border-slate-100 p-5">
       <div>
@@ -384,7 +382,7 @@
     </div>
 
     <div class="p-4">
-      <a href="/stores/<%= store.id %>/inventory"
+      <a href="/stores/<%= store.id %>/dashboard/inventory"
          class="block w-full rounded-lg border border-slate-200 py-2 text-center text-sm font-semibold hover:bg-slate-50">
         Manage Inventory
       </a>
@@ -398,7 +396,7 @@
       <h2 class="font-semibold">Inventory Overview</h2>
       <p class="text-xs text-slate-500">Stock health across all listings</p>
     </div>
-    <a href="/stores/<%= store.id %>/inventory"
+    <a href="/stores/<%= store.id %>/dashboard/inventory"
        class="text-sm font-semibold text-[var(--color-brand)] hover:text-[var(--color-brand-dark)]">
       Manage →
     </a>
