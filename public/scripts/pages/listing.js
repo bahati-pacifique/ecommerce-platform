@@ -1,12 +1,3 @@
-/**
- * Listing show page — client-side hydration.
- *
- * Loads the listing with axios, then populates the pre-rendered DOM.
- * States: loading → content | error.
- *
- * Mobile: single-column flow, CTA inside the buy panel (no sticky bar).
- * Lightbox: tap image to view full-size.
- */
 (function () {
     'use strict';
 
@@ -16,14 +7,12 @@
         return;
     }
 
-    // ─── DOM refs ────────────────────────────────────────
     const elLoading = document.getElementById('listingLoading');
     const elContent = document.getElementById('listingContent');
     const elError = document.getElementById('listingError');
     const elErrorMsg = document.getElementById('listingErrorMsg');
     const retryBtn = document.getElementById('listingRetry');
 
-    // ─── State toggling ──────────────────────────────────
     function showLoading() {
         elLoading.classList.remove('hidden');
         elContent.classList.add('hidden');
@@ -47,7 +36,6 @@
         elErrorMsg.textContent = msg || 'Something went wrong.';
     }
 
-    // ─── Helpers ─────────────────────────────────────────
     const CDN = 'https://cdn.cococe.rw/';
 
     function imageUrl(storageKey) {
@@ -97,7 +85,6 @@
             .replace(/"/g, '&quot;');
     }
 
-    // ─── Fetch + hydrate ─────────────────────────────────
     async function loadListing() {
         showLoading();
 
@@ -123,10 +110,8 @@
         }
     }
 
-    // ─── Hydrate ─────────────────────────────────────────
     function hydrate(data) {
 
-        // 1. Variants
         const variants = (data.variants || []).map(v => ({
             id: v.id,
             sku: v.sku,
@@ -143,7 +128,6 @@
             stock: stockLabel(v.inventory),
         }));
 
-        // 2. Gallery
         const variantImages = variants
             .filter(v => v.imageUrl)
             .map(v => ({ url: v.imageUrl, source: 'variant', variantId: v.id }));
@@ -159,11 +143,9 @@
             return true;
         });
 
-        // 3. Video
         const videoKey = data.listing_video_storage_key || null;
         const videoUrl = videoKey ? imageUrl(videoKey) : null;
 
-        // 4. Header / breadcrumb
         setText('listingTitle', data.title);
         if (data.product_title && data.product_title !== data.title) {
             toggle('listingProductTitle', true);
@@ -195,7 +177,6 @@
             setText('familyName', data.family);
         }
 
-        // 5. Gallery + thumbs
         const mainImg = document.getElementById('galleryMainImg');
         const thumbsEl = document.getElementById('galleryThumbs');
 
@@ -206,7 +187,6 @@
             mainImg.alt = data.title;
         }
 
-        // Video thumb first
         if (videoUrl) {
             const videoThumb = document.createElement('button');
             videoThumb.type = 'button';
@@ -222,7 +202,6 @@
             thumbsEl.appendChild(videoThumb);
         }
 
-        // Image thumbs
         gallery.forEach((img, i) => {
             const btn = document.createElement('button');
             btn.type = 'button';
@@ -235,7 +214,6 @@
             thumbsEl.appendChild(btn);
         });
 
-        // Video element + badge
         const videoEl = document.getElementById('listingVideo');
         const videoSrc = document.getElementById('listingVideoSource');
         const videoBadge = document.getElementById('videoOpenBadge');
@@ -256,7 +234,6 @@
             thumbsEl.querySelector('[data-thumb="video"]')?.remove();
         }
 
-        // 6. Price / stock
         const defaultVariant = variants[0];
         if (defaultVariant) {
             setText('priceMain', defaultVariant.currentPriceLabel);
@@ -275,7 +252,6 @@
             setText('stockText', 'Not available');
         }
 
-        // 7. Variant radios
         if (variants.length) {
             toggle('variantSection', true);
             setText('variantCount', `${variants.length} option${variants.length === 1 ? '' : 's'}`);
@@ -314,7 +290,6 @@
             });
         }
 
-        // 8. Description + product gallery
         setHTML('listingDescription', data.description || '');
         if (data.product_description) {
             toggle('productDescriptionWrap', true);
@@ -347,7 +322,6 @@
             });
         }
 
-        // 9. Specs
         const specs = document.getElementById('specsList');
         const attrMap = new Map();
         for (const v of variants) {
@@ -367,20 +341,23 @@
         if (variants[0]?.sku) specsHtml += specRow('SKU', variants[0].sku);
         specs.innerHTML = specsHtml;
 
-        // 10. Vendor
-        const vendorName = data.brand || 'COCOCE Vendor';
+        const vendorName = data.vendor_name || 'COCOCE Vendor';
         setText('vendorName', vendorName);
+        document.getElementById('storeVisitLink').href = `${__APP__.protocal}${__APP__.domainName}/store/${data.store_id}`;
+        document.getElementById('storeSocialNetwork').href = data.store_meta.instagram || data.store_meta.tiktok || data.store_meta.facebook;
+        document.getElementById('storeSocialNetwork').innerText = 'Store social network'
+        
+        setText('vendorStatus', data.vendor_verification);
+        setText('storeRating', data.store_rating);
+        
         setText('vendorInitial', vendorName.charAt(0).toUpperCase());
 
-        // 11. JSON-LD
         updateJsonLd(data, variants, gallery);
 
-        // 12. Interactions
         initGalleryInteractions(gallery, mainImg, thumbsEl);
         initLightbox(gallery, mainImg);
     }
 
-    // ─── Helpers ─────────────────────────────────────────
     function specRow(label, value) {
         return `
             <div class="flex justify-between gap-3 py-2">
@@ -448,7 +425,6 @@
         });
     }
 
-    // ─── Gallery interactions ────────────────────────────
     let galleryBound = false;
     function initGalleryInteractions(gallery, mainImg, thumbsEl) {
         if (galleryBound) return;
@@ -528,7 +504,6 @@
         });
     }
 
-    // ─── Lightbox ────────────────────────────────────────
     let lightboxBound = false;
     function initLightbox(gallery, mainImg) {
         if (lightboxBound) return;
@@ -628,7 +603,6 @@
         });
     }
 
-    // ─── JSON-LD ─────────────────────────────────────────
     function updateJsonLd(data, variants, gallery) {
         const el = document.getElementById('listingJsonLd');
         if (!el) return;
@@ -667,10 +641,8 @@
         el.textContent = JSON.stringify(schema);
     }
 
-    // ─── Retry ───────────────────────────────────────────
     retryBtn?.addEventListener('click', loadListing);
 
-    // ─── Go ──────────────────────────────────────────────
     loadListing();
     lucide?.createIcons();
 })();

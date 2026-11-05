@@ -48,7 +48,7 @@
           <img src="/images/logos/business.png" alt="Logo-brand" class="max-w-[120px]">
         </a>
         <% if (locals.user?.vendor) {%>
-        <span class="flex items-center gap-2 text-sm font-bold hidden md:block text-slate-600 transition border border-brand p-2 rounded">
+        <span class="flex items-center gap-2 text-sm font-bold hidden md:block text-slate-600 transition border border-black/70 p-2 rounded">
           <i class="bi bi-house-gear font-extrabold"></i>
           <span><%= locals.user?.vendor?.business_name || locals.user?.username %></span>
         </span>

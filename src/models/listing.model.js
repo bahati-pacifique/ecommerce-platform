@@ -785,6 +785,18 @@ class ListingModel {
     static async getListingById(storeId, listingId) {
         const { rows } = await db.query(`
         SELECT
+
+        -- vendor
+        v.id AS vendor_id,
+        v.business_name AS vendor_name,
+        v.verification_status AS vendor_verification,
+        
+        -- store
+        s.id AS store_id,
+        s.name AS store_name,
+        s.rating as store_rating,
+        s.meta AS store_meta,
+
         -- Listing
         l.id,
         l.title,
@@ -984,6 +996,12 @@ class ListingModel {
 
         LEFT JOIN categories ct
             ON ct.id = fm.category_id
+
+        LEFT JOIN stores s
+            ON s.id = l.store_id
+
+        LEFT JOIN vendors v
+            ON v.id = s.vendor_id
 
         WHERE l.id = $1
           AND l.store_id = $2

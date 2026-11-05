@@ -1,14 +1,21 @@
-<footer class="w-full bg-white shadow-[0_-8px_30px_rgb(0,0,0,0.04)] border-t border-gray-100">
+<footer class="mt-auto w-full bg-white shadow-[0_-8px_30px_rgb(0,0,0,0.04)] border-t border-gray-100">
   <div class="mx-auto max-w-7xl px-4 py-3 md:flex md:items-center md:justify-between lg:px-8">
 
     <div class="flex justify-center">
-      <a href="<%=locals.baseUrl || '/'%>" class="flex items-center gap-1">
-        <img src="/images/logos/fav.png" alt="Logo" class="h-8">
-        <span class="text-xl font-bold tracking-tight text-brand mb-1">COCOCE <span class="md:hidden text-slate-500">&copy;</span></span>
+      <div class="flex items-center gap-1">
+        <a href="<%=locals.baseUrl || '/'%>" class="flex items-center gap-1">
+          <img src="/images/logos/fav.png" alt="Logo" class="h-8">
+          <span class="text-xl font-bold tracking-tight text-brand mb-1">
+            COCOCE
+            <span class="md:hidden text-slate-500">
+              &copy;
+            </span>
+          </span>
+        </a>
         <p class="text-center text-sm leading-5 text-gray-500 hidden md:block">
           — &copy; 2026 COCOCE. All rights reserved.
         </p>
-      </a>
+      </div>
     </div>
 
     <div class="mt-4 md:order-2 md:mt-0 flex max-md:flex-col md:items-center gap-3">

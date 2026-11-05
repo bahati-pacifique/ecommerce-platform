@@ -1893,7 +1893,9 @@ async function getListing(req, res) {
         }
 
         const result = await ListingService.getStoreListing(storeId, listingId);
-
+        
+        console.log(result);
+        
         if (!result) {
             return res.status(404).json({
                 message: 'Listing not found'

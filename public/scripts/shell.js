@@ -22,7 +22,7 @@ function toggleDesktopSidebar() {
     button?.setAttribute('aria-expanded', String(!collapsed));
     const icon = button?.querySelector('[data-lucide]');
     if (icon) {
-        icon.setAttribute('data-lucide', collapsed ? 'panel-left-open' : 'panel-left-close');
+        icon.setAttribute('data-lucide', collapsed ? 'chevron-right' : 'chevron-left');
         window.lucide?.createIcons();
     }
 }
