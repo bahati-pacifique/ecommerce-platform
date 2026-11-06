@@ -58,12 +58,12 @@
 <body class="bg-slate-50 text-slate-900">
   <div id="appShell" class="min-h-screen">
 
-    <%- include('store-partials/sidebar', { store, user, title }) %>
+    <%- include('store-partials/sidebar', { store: locals.store, user: locals.user, title: locals.title }) %>
 
     <div id="sidebarBackdrop" class="fixed inset-0 z-40 hidden bg-slate-950/30 lg:hidden"></div>
 
     <div id="main" class="min-h-screen min-w-0 transition-[margin] duration-300 ease-in-out lg:ml-[var(--sidebar-width)]">
-      <%- include('store-partials/header',  { store, user }) %>
+      <%- include('store-partials/header',  { store: locals.store, user:locals.user }) %>
       <main id="content" class="p-4 sm:p-6 lg:p-8">
         <%- body %>
       </main>
