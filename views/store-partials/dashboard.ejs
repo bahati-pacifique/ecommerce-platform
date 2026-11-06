@@ -157,11 +157,11 @@
         : (response.rate ?? 0),
     },
     visits: {
-      total:           num(visits.current_visits),
-      change_pct:      pct(visits.current_visits, visits.previous_visits),
-      weekly:          Array.isArray(visits.weekly) ? visits.weekly : [],
-      peak_day:        peakDay(visits.weekly),
-      daily_average:   Math.round(num(visits.current_visits) / 7),
+      total: num(visits.current_visits),
+      change_pct: pct(visits.current_visits, visits.previous_visits),
+      weekly: Array.isArray(visits.weekly) ? visits.weekly : [],
+      peak_day: peakDay(visits.weekly),
+      daily_average: Math.round(num(visits.current_visits) / 7),
       best_hour_range: visits.best_hour_range ?? null,
     },
     search_appearances: {

@@ -10,9 +10,9 @@
     </p>
   </div>
   <div class="flex gap-2">
-    <button class="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium hover:bg-slate-50">
+    <a href="/products/catalog" target="_blank" class="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium hover:bg-slate-50">
       <i data-lucide="list" class="h-4 w-4"></i> Visit Catalog
-    </button>
+    </a>
     <a href="/cataloging/listing/<%=locals.store.id%>/new" target="_blank" class="inline-flex items-center gap-2 rounded-lg bg-[var(--color-brand)] px-3 py-2 text-sm font-semibold text-white hover:bg-[var(--color-brand-dark)]">
       <i data-lucide="plus" class="h-4 w-4"></i>New Listing
     </a>
@@ -30,7 +30,6 @@
     <option value="">All statuses</option>
     <option value="active">Active</option>
     <option value="draft">Draft</option>
-    <option value="archived">Archived</option>
   </select>
 
   <select id="listingsSort" class="rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm outline-none transition focus:border-[var(--color-brand)]">
