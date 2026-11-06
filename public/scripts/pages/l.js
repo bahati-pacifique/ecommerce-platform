@@ -345,7 +345,7 @@
         setText('vendorName', vendorName);
         document.getElementById('storeVisitLink').href = `${__APP__.protocal}${__APP__.domainName}/store/${data.store_id}`;
         document.getElementById('storeSocialNetwork').href = data.store_meta.instagram || data.store_meta.tiktok || data.store_meta.facebook;
-        document.getElementById('storeSocialNetwork').innerText = 'Store social network'
+        document.getElementById('storeSocialNetwork').innerText = 'Store social network';
 
         setText('vendorStatus', data.vendor_verification);
         setText('storeRating', data.store_rating);
@@ -358,6 +358,27 @@
         initLightbox(gallery, mainImg);
 
         populateStatusSelect(data.status);
+        if (data.status !== 'active') {
+            $('#listingAlert').html(`<div class="mb-3 flex gap-2 rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800 shadow-sm text-center">
+            <svg class="h-6 w-6 shrink-0 text-amber-500" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+            <p class="flex flex-col items-start text-start gap-1">
+              <span class="font-bold">This listing is currently unavailable for sale</span>
+              <span class="font-medium text-xs">Change its status below to make it available for sale</span>
+            </p>
+          </div>`);
+        } else {
+            $('#listingAlert').html(`<div class="mb-3 flex gap-3 rounded-lg border border-emerald-200 bg-emerald-50 p-3 text-center text-emerald-800 shadow-sm">
+            <svg class="h-6 w-6 shrink-0 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <p class="flex flex-col items-start gap-0.5 text-sm">
+              <span class="font-bold">This listing is currently active.</span>
+              <span class="text-xs font-medium text-emerald-700">It is visible and available for sale on the marketplace.</span>
+            </p>
+          </div>`);
+        }
     }
 
     function specRow(label, value) {
@@ -670,7 +691,7 @@
                 try {
                     $('#statusConfirmBtn').prop('disabled', true);
                     $('#statusConfirmBtn').text('Saving...');
-                    await axios.patch(`/stores/${storeId}/listings/${listingId}/`, {status: $('#statusSelect').val()}, { withCredentials: true });
+                    await axios.patch(`/stores/${storeId}/listings/${listingId}/`, { status: $('#statusSelect').val() }, { withCredentials: true });
                     Notification.showNotification({
                         type: 'success',
                         message: 'Listing updates settled successfully'
@@ -706,20 +727,20 @@
     });
 
     function populateStatusSelect(status) {
-        $('#statusSelect option').each(function() {
-        const $option = $(this);
-        
-        if ($option.val() === status) {
-            $option.hide();
-            
-            if ($option.is(':selected')) {
-                $('#statusSelect').val(''); 
-                $('#statusConfirmBtn').addClass('hidden');
+        $('#statusSelect option').each(function () {
+            const $option = $(this);
+
+            if ($option.val() === status) {
+                $option.hide();
+
+                if ($option.is(':selected')) {
+                    $('#statusSelect').val('');
+                    $('#statusConfirmBtn').addClass('hidden');
+                }
+            } else {
+                $option.show();
             }
-        } else {
-            $option.show();
-        }
-    });
+        });
     }
 
 
