@@ -49,6 +49,8 @@ router.get('/stores/:storeId/listings/review/:listingId', business, businessCont
 router.get('/stores/:storeId/listings/:listingId', business, businessController.getListing);
 router.get('/stores/:storeId/data/dashboard', business, businessController.getStoreDashboard);
 
+router.patch('/stores/:storeId/listings/:listingId/', business, businessController.patchListing)
+
 // router.get('/stores/:vendorId/:storeId', business, businessController.renderVendorStorePage);
 router.get('/register', vendorBusinessRegister, businessController.renderVendorCreation);
 router.get('/pricing', businessController.businessVendorPricing);

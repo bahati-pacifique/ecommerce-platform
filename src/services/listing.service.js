@@ -2,8 +2,8 @@ const ListingModel = require('../models/listing.model');
 const { convertToWebp } = require('./media.service');
 const listingMediaModel = require('../models/listingMedia.model');
 const db = require('../configs/db');
-const { saveListingImage,saveListingVideo, removeFile } = require('./file.service');
-const {insertListingVariantMedia, deleteVariantListingMedia} = require('../models/listingMedia.model');
+const { saveListingImage, saveListingVideo, removeFile } = require('./file.service');
+const { insertListingVariantMedia, deleteVariantListingMedia } = require('../models/listingMedia.model');
 
 class ListingServices {
 
@@ -11,7 +11,7 @@ class ListingServices {
         return await ListingModel.searchListingByStore(storeId, query, opts);
     }
 
-    static async getStoreListings(storeId, opts){
+    static async getStoreListings(storeId, opts) {
         return await ListingModel.getListingsByStore(storeId, opts);
     }
 
@@ -200,7 +200,7 @@ class ListingServices {
 
                     savedFiles.push(listingMediaSaveResult.storageKey);
 
-                    
+
                     const media = await insertListingVariantMedia(
                         client,
                         {
@@ -296,6 +296,10 @@ class ListingServices {
         } finally {
             client.release();
         }
+    }
+
+    static async patchListingOnStoreLevel(listingId, storeId, newStatus) {
+        return await ListingModel.patchListingOnStoreLevel(listingId, storeId, newStatus);
     }
 
 }

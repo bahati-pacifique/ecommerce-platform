@@ -1156,6 +1156,22 @@ class ListingModel {
 
         return rows[0] ?? null;
     }
+
+    static async patchListingOnStoreLevel(listingId, storeId, newStatus) {
+        const allowedStatus = [
+            'draft',
+            'active',
+            'inactive',
+            'not_available'
+        ]
+
+        if (!allowedStatus.includes(newStatus)) {
+            throw new Error(`Not allowed`);
+        }
+
+        const { rows } = await db.query(`UPDATE listings SET status = $1 WHERE id = $2 AND store_id = $3 RETURNING id, status`, [newStatus, listingId, storeId]);
+        return rows[0] ?? null;
+    }
 }
 
 module.exports = ListingModel;

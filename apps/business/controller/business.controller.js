@@ -1856,7 +1856,7 @@ async function getStoreListings(req, res) {
             limit = 20,
             status = 'active',
             sort = 'recent' } = req.query;
-        
+
         const vendorStore = await StoreService.getVendorStore(
             storeId,
             user.vendor?.id || null
@@ -1883,7 +1883,7 @@ async function getListing(req, res) {
     try {
         const { storeId, listingId } = req.params;
         const user = req.user;
-        
+
         const vendorStore = await StoreService.getVendorStore(storeId, user?.vendor?.id || null);
 
         if (!vendorStore) {
@@ -1893,9 +1893,7 @@ async function getListing(req, res) {
         }
 
         const result = await ListingService.getStoreListing(storeId, listingId);
-        
-        console.log(result);
-        
+
         if (!result) {
             return res.status(404).json({
                 message: 'Listing not found'
@@ -1912,6 +1910,30 @@ async function getListing(req, res) {
     } catch (error) {
         console.log('[getListing]', error);
         return res.status(500).json({ message: 'Unable to get listing — Internal Error' })
+    }
+}
+
+async function patchListing(req, res) {
+    try {
+        const { listingId, storeId } = req.params;
+        const { status } = req.body;
+
+        const user = req.user;
+
+        const vendorStore = await StoreService.getVendorStore(storeId, user?.vendor?.id || null);
+
+        if (!vendorStore) {
+            return res.status(401).json({
+                message: `Unable to settle listing — Store Verfication failed`
+            });
+        }
+
+        const result = await ListingService.patchListingOnStoreLevel(listingId, vendorStore.id, status);
+
+        return result ? res.status(201).json(result) : res.status(404).json({message: 'Unable to settle listing — Please check listing id'});
+    } catch (error) {
+        console.log('patchListing', error);
+        return res.status(500).json({ message: error.message || `Unable to settle listing — Internal error` })
     }
 }
 
@@ -1999,11 +2021,12 @@ module.exports = {
     insertInventoryUnit,
 
     searchListingByStore,
+    getStoreListings,
+    getListing,
+    patchListing,
 
     createInventoryItem,
     transferUnit,
-    getStoreListings,
-    getListing,
 
     getStoreDashboardAnalytics,
     getStoreDashboard,

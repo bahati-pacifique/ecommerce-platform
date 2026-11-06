@@ -346,16 +346,18 @@
         document.getElementById('storeVisitLink').href = `${__APP__.protocal}${__APP__.domainName}/store/${data.store_id}`;
         document.getElementById('storeSocialNetwork').href = data.store_meta.instagram || data.store_meta.tiktok || data.store_meta.facebook;
         document.getElementById('storeSocialNetwork').innerText = 'Store social network'
-        
+
         setText('vendorStatus', data.vendor_verification);
         setText('storeRating', data.store_rating);
-        
+
         setText('vendorInitial', vendorName.charAt(0).toUpperCase());
 
         updateJsonLd(data, variants, gallery);
 
         initGalleryInteractions(gallery, mainImg, thumbsEl);
         initLightbox(gallery, mainImg);
+
+        populateStatusSelect(data.status);
     }
 
     function specRow(label, value) {
@@ -645,4 +647,80 @@
 
     loadListing();
     lucide?.createIcons();
+
+    $('#statusSelect').on('change', (e) => {
+        const newStatus = $(e.target).val();
+        if (newStatus) {
+            $('#statusConfirmBtn').removeClass('hidden');
+            $('#statusConfirmBtn').data("status", newStatus);
+        } else {
+            $('#statusConfirmBtn').addClass('hidden');
+        }
+    });
+
+    $('#statusConfirmBtn').click(function (e) {
+        const status = $(this).data("status");
+
+        showSnackbar({
+            type: 'warning',
+            autoClose: false,
+            message: `You are about to change this listing status to ${capitalize(status.replaceAll('_', ' '))} ?`,
+            actionText: 'Continue',
+            onAction: async () => {
+                try {
+                    $('#statusConfirmBtn').prop('disabled', true);
+                    $('#statusConfirmBtn').text('Saving...');
+                    await axios.patch(`/stores/${storeId}/listings/${listingId}/`, {status: $('#statusSelect').val()}, { withCredentials: true });
+                    Notification.showNotification({
+                        type: 'success',
+                        message: 'Listing updates settled successfully'
+                    })
+                    loadListing();
+                } catch (error) {
+                    console.log('[Error changing listing status]', error);
+                    Notification.showNotification({
+                        type: 'error',
+                        message: error.response?.data?.message || 'Internal Server Error'
+                    });
+                } finally {
+                    $('#statusConfirmBtn').addClass('hidden');
+                    $('#statusConfirmBtn').prop('disabled', false);
+                    $('#statusConfirmBtn').text('Save');
+                }
+            }
+        });
+    });
+
+    $(document).on('click', (e) => {
+        const $btn = $('#statusConfirmBtn');
+        const $select = $('#statusSelect');
+        const $snackbar = $('.snackbar');
+
+        if (!$btn.is(e.target) && $btn.has(e.target).length === 0 &&
+            !$select.is(e.target) && $select.has(e.target).length === 0 &&
+            !$snackbar.is(e.target) && $snackbar.has(e.target).length === 0) {
+
+            $btn.addClass('hidden');
+            $select.val('');
+        }
+    });
+
+    function populateStatusSelect(status) {
+        $('#statusSelect option').each(function() {
+        const $option = $(this);
+        
+        if ($option.val() === status) {
+            $option.hide();
+            
+            if ($option.is(':selected')) {
+                $('#statusSelect').val(''); 
+                $('#statusConfirmBtn').addClass('hidden');
+            }
+        } else {
+            $option.show();
+        }
+    });
+    }
+
+
 })();
