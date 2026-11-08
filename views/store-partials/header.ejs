@@ -10,8 +10,11 @@
   </button>
 
   <div class="flex items-center gap-1">
-    <img src="/images/logos/fav.png" alt="Logo" class="h-8 <%- locals.sidebarToggerVisibility === 'hidden' ? 'block' : 'hidden' %>">
-    <h1 class="text-brand font-bold text-sm md:text-lg transition"><%-locals.headerTitle || 'STORE CENTER'%></h1>
+    <img src="/images/logos/fav.png" alt="Logo" class="h-10 <%- locals.sidebarToggerVisibility === 'hidden' ? 'block' : 'hidden' %>">
+    <div class="text-brand font-bold text-sm md:text-lg transition flex flex-col">
+      <span class="text-brand font-bold text-sm md:text-lg"><%-locals.headerTitle || 'STORE CENTER'%></span>
+      <span class="text-black font-bold text-xs <%-!!locals.subTitle ? '': 'hidden'%>"><%=locals.subTitle%></span>
+    </div>
   </div>
 
   <div class="relative min-w-0 flex-1 hidden">
@@ -19,9 +22,9 @@
     <input id="globalSearch" class="w-full rounded-lg border border-slate-200 bg-slate-50 py-2 pl-10 pr-4 text-sm outline-none transition focus:border-[var(--color-brand)] focus:bg-white focus:ring-2 focus:ring-[var(--color-brand-light)]" placeholder="Search products, orders, customers..." />
   </div>
 
-  <div class="hidden items-center gap-2 text-xs font-semibold text-emerald-700 sm:flex">
+  <!-- <div class="hidden items-center gap-2 text-xs font-semibold text-emerald-700 sm:flex">
     <span class="h-2 w-2 rounded-full bg-emerald-500"></span>
-  </div>
+  </div> -->
 
   <a href="/notifications" target="_blank" class="ml-auto relative rounded-lg p-2 text-slate-500 hover:bg-[var(--color-brand-ultralight)]">
     <i data-lucide="bell" class="h-5 w-5"></i>

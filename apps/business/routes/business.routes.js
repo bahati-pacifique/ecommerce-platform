@@ -46,10 +46,14 @@ router.get('/stores/:storeId/data/product-listing/analytics', business, business
 router.get('/stores/:storeId/data/product-listing/inventories', business, businessController.getInventoriesByStoreId);
 router.get('/stores/:storeId/listings', business, businessController.getStoreListings);
 router.get('/stores/:storeId/listings/review/:listingId', business, businessController.renderListingPage);
+
+router.get('/stores/:storeId/listings/:listingId/:variantId/pricing', business, businessController.renderListingPricing);
+router.get('/stores/:storeId/listings/:listingId/variants/:variantId/prices', business, businessController.getListingVariantPrices);
+
 router.get('/stores/:storeId/listings/:listingId', business, businessController.getListing);
 router.get('/stores/:storeId/data/dashboard', business, businessController.getStoreDashboard);
 
-router.patch('/stores/:storeId/listings/:listingId/', business, businessController.patchListing)
+router.patch('/stores/:storeId/listings/:listingId/', business, businessController.patchListing);
 
 // router.get('/stores/:vendorId/:storeId', business, businessController.renderVendorStorePage);
 router.get('/register', vendorBusinessRegister, businessController.renderVendorCreation);

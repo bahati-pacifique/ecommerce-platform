@@ -1172,6 +1172,111 @@ class ListingModel {
         const { rows } = await db.query(`UPDATE listings SET status = $1 WHERE id = $2 AND store_id = $3 RETURNING id, status`, [newStatus, listingId, storeId]);
         return rows[0] ?? null;
     }
+
+    static async createVariantPrice({ listing_variant_id, currency_id, price, sale_price, starts_at, ends_at, status }) {
+        const { rows } = await db.query(
+            `INSERT INTO listing_prices
+                 (listing_variant_id, currency_id, price, sale_price, starts_at, ends_at, status)
+             VALUES ($1, $2, $3, $4, $5, $6, $7)
+             RETURNING id`,
+            [listing_variant_id, currency_id, price, sale_price, starts_at, ends_at, status || 'active']
+        );
+        return rows[0];
+    }
+
+    static async toggleVariantPriceStatus(priceId) {
+        const { rows } = await db.query(
+            `UPDATE listing_prices
+                SET status = CASE
+                    WHEN status = 'active' THEN 'inactive'
+                    WHEN status = 'inactive' THEN 'active'
+                    ELSE status
+                END,
+                updated_at = NOW()
+              WHERE id = $1
+              RETURNING id, status`,
+            [priceId]
+        );
+        return rows[0];
+    }
+
+    static async deleteVariantPrice(priceId) {
+        await db.query(`DELETE FROM listing_prices WHERE id = $1`, [priceId]);
+    }
+
+    static async findPricesByVariant(variantId) {
+        const { rows } = await db.query(
+            `SELECT
+            jsonb_build_object(
+                'listing_id', l.id,
+                'listing_title', l.title,
+                'variant_id', lv.id,
+                'variant_sku', lv.sku,
+                'variant_image', (
+                    SELECT lvm.storage_key
+                    FROM listing_variants_media lvm
+                    WHERE lvm.listing_variant_id = lv.id
+                      AND lvm.is_primary = TRUE
+                    ORDER BY lvm.id
+                    LIMIT 1
+                )
+            ) AS variant,
+            COALESCE(
+                jsonb_agg(
+                    jsonb_build_object(
+                        'id', lp.id,
+                        'currency_id', lp.currency_id,
+                        'currency_code', c.code,
+                        'currency_symbol', c.symbol,
+                        'price', lp.price,
+                        'sale_price', lp.sale_price,
+                        'starts_at', lp.starts_at,
+                        'ends_at', lp.ends_at,
+                        'status', lp.status,
+                        'created_at', lp.created_at,
+                        'updated_at', lp.updated_at,
+                        'is_current', (lp.id = vpc.listing_price_id)
+                    )
+                    ORDER BY lp.starts_at DESC, lp.created_at DESC
+                ) FILTER (WHERE lp.id IS NOT NULL),
+                '[]'::jsonb
+            ) AS prices
+         FROM listing_variants lv
+         JOIN listings l ON l.id = lv.listing_id
+         LEFT JOIN listing_prices lp ON lp.listing_variant_id = lv.id
+         LEFT JOIN currencies c ON c.id = lp.currency_id
+         LEFT JOIN listing_variant_current_prices vpc
+                ON vpc.listing_variant_id = lp.listing_variant_id
+               AND vpc.listing_price_id = lp.id
+         WHERE lv.id = $1
+         GROUP BY lv.id, l.id`,
+            [variantId]
+        );
+        return rows[0] || null;
+    }
+
+    static async findCurrentPriceForVariant(variantId) {
+        const { rows } = await db.query(
+            `SELECT
+                 vpc.listing_variant_id,
+                 vpc.listing_price_id,
+                 vpc.currency_id,
+                 c.code AS currency_code,
+                 c.symbol AS currency_symbol,
+                 vpc.price,
+                 vpc.sale_price,
+                 vpc.current_price,
+                 vpc.is_on_sale,
+                 vpc.starts_at,
+                 vpc.ends_at
+             FROM listing_variant_current_prices vpc
+             JOIN currencies c ON c.id = vpc.currency_id
+             WHERE vpc.listing_variant_id = $1`,
+            [variantId]
+        );
+        return rows[0] || null;
+    }
+
 }
 
 module.exports = ListingModel;

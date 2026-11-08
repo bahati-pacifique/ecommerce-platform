@@ -259,6 +259,8 @@
             const list = document.getElementById('variantList');
             list.innerHTML = '';
 
+            document.getElementById('pricingLink').href = `/stores/${storeId}/listings/${listingId}/${variants[0].id}/pricing`;
+
             variants.forEach((v, idx) => {
                 const label = document.createElement('label');
                 label.className = 'group relative w-[170px] shrink-0 snap-start cursor-pointer sm:w-auto';
@@ -437,6 +439,8 @@
             const el = document.getElementById(id);
             if (el) el.disabled = oos;
         });
+
+        document.getElementById('pricingLink').href = `/stores/${storeId}/listings/${listingId}/${variant.id}/pricing`;
     }
 
     function highlightThumb(thumbsEl, activeIdx) {

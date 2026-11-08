@@ -710,6 +710,73 @@ async function renderListingPage(req, res) {
     }
 }
 
+async function renderListingPricing(req, res) {
+    const user = req.user;
+    const { storeId, listingId, variantId } = req.params;
+
+    try {
+
+        const vendorStore = await StoreService.getVendorStore(storeId, user.vendor?.id || null);
+
+        if (!vendorStore) {
+            return res.render('store-no-access', {
+                layout: false,
+                message: `<span class="text-black/70">Oops!</span> <span class="text-brand">${user.username}</span>, we're unable to get you authenticated to this Store.`,
+                details: `<h1 class="text-left text-ink-700 text-lg">It's seems like:</h1><p class="text-sm sm:text-base text-left text-ink-500 leading-relaxed"><br>● This store does not belongs to you, <br>● This store have been disabled or does not exist. <br><br><i>Please contact our support team for clarification</i></p>`,
+                code: 'STORE_NOT_FOUND',
+                protocal,
+                domainName
+            });
+        }
+
+        updateStoreLastActive(vendorStore.id);
+
+        return res.render('store-partials/listing-prices', { 
+            layout: 'focused', 
+            variantId,
+            listingId, 
+            store: vendorStore, 
+            user, protocal, 
+            domainName, 
+            title: 'Listing Prices' 
+        });
+    } catch (error) {
+        console.log(error);
+        return res.render('store-no-access', {
+            layout: false,
+            message: `<span class="text-black/70">Oops!</span> <span class="text-brand">${user.username}</span>, we're unable to get you authenticated to this Store.`,
+            details: `<h1 class="text-left text-ink-700 text-lg">It's seems like:</h1><p class="text-sm sm:text-base text-left text-ink-500 leading-relaxed"><br>● This store does not belongs to you, <br>● This store have been disabled or does not exist. <br><br><i>Please contact our support team for clarification</i></p>`,
+            code: error.message.toUpperCase(),
+            protocal,
+            domainName
+        });
+
+    }
+}
+
+async function getListingVariantPrices(req, res) {
+    try {
+        const {storeId, variantId, listingId} = req.params;
+        const user = req.user;
+
+        const vendorStore = await StoreService.getVendorStore(storeId, user.vendor?.id || null);
+
+        if (!vendorStore) {
+            return res.status(401).json({
+                message: 'Store validation failed'
+            })
+        }
+
+        const result = await ListingService.getListingVariantPrices(variantId);
+
+        return res.json(result);
+
+    } catch (error) {
+        console.log('[getListingVariantPrices]', error);
+        return res.status(500).json({message: `Unable to get prices — Internal error`})
+    }
+}
+
 async function renderStoreOrders(req, res) {
     const user = req.user;
     const storeId = req.params.storeId;
@@ -725,11 +792,11 @@ async function renderStoreOrders(req, res) {
                 layout: false,
                 message: `<span class="text-black/70">Oops!</span> <span class="text-brand">${user.username}</span>, we're unable to get you authenticated to this Store.`,
                 details: `<h1 class="text-left text-ink-700 text-lg">It seems like:</h1>
-          <p class="text-sm sm:text-base text-left text-ink-500 leading-relaxed">
-            <br>● This store does not belong to you, <br>
-            ● This store has been disabled or does not exist. <br><br>
-            <i>Please contact our support team for clarification</i>
-          </p>`,
+                        <p class="text-sm sm:text-base text-left text-ink-500 leading-relaxed">
+                            <br>● This store does not belong to you, <br>
+                            ● This store has been disabled or does not exist. <br><br>
+                            <i>Please contact our support team for clarification</i>
+                        </p>`,
                 code: 'STORE_NOT_FOUND',
                 protocal,
                 domainName,
@@ -2006,6 +2073,7 @@ module.exports = {
 
     renderStoreListing,
     renderListingPage,
+    renderListingPricing,
 
     renderStoreProducts,
     renderStoreFollowers,
@@ -2024,6 +2092,8 @@ module.exports = {
     getStoreListings,
     getListing,
     patchListing,
+
+    getListingVariantPrices,
 
     createInventoryItem,
     transferUnit,

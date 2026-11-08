@@ -302,6 +302,33 @@ class ListingServices {
         return await ListingModel.patchListingOnStoreLevel(listingId, storeId, newStatus);
     }
 
+    
+    static async getListingVariantPrices(variantId){
+        return await ListingModel.findPricesByVariant(variantId);
+    }
+
+    static async getListingVariantCurrentPrice(variantId){
+        return await ListingModel.findCurrentPriceForVariant(variantId);
+    }
+
+    /**
+     * 
+     * @param {*} payload 
+     * payload: { listing_variant_id, currency_id, price, sale_price, starts_at, ends_at, status }
+     * @returns 
+     */
+    static async insertVariantPrice(payload) {
+        return await ListingModel.createVariantPrice(payload)
+    }
+
+    static async toggleVariantPriceStatus(priceId) {
+        return await ListingModel.toggleVariantPriceStatus(priceId)
+    }
+
+    static async deleteVariantPrice(priceId) {
+        return await ListingModel.deleteVariantPrice(priceId);
+    }
+
 }
 
 module.exports = ListingServices;
