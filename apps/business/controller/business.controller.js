@@ -485,6 +485,12 @@ async function insertInventoryUnit(req, res) {
             });
         }
 
+        if (!req.body.serial_number && !req.body.imei && !req.body.mac_address && !req.body.barcode) {
+            return res.status(400).json({
+                message: `Unit's Serial Number, IMEI, MAC Address, or Barcode is required`
+            })
+        }
+
         const result = await InventoryService.insertItemUnity(vendorStore.id, inventoryId, {
             inventoryItemId: req.body.inventory_item_id,
             serialNumber: req.body.serial_number,
@@ -768,6 +774,8 @@ async function getListingVariantPrices(req, res) {
         }
 
         const result = await ListingService.getListingVariantPrices(variantId);
+
+        console.log(result)
 
         return res.json(result);
 

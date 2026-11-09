@@ -194,7 +194,7 @@ $(document).ready(() => {
             `${l.brand_logo_url ? `<img src="${l.brand_logo_url}" class="absolute right-3 bottom-1 max-w-[80px] p-1 bg-white/60 rounded-full">` : ''}` : '';
 
         const storeId = l.store_id || getStoreId();
-        const listingUrl = `/stores/${storeId}/listings/review/${l.id}`;
+        const listingUrl = `/stores/${storeId}/listings/${l.id}/review`;
 
         return `
         <article class="group relative flex flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition hover:border-slate-300 hover:shadow-md"

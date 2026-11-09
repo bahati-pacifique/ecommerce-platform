@@ -216,12 +216,16 @@ $(function () {
   metaRowsEl?.addEventListener('input', serializeMeta);
 
   // Before submit, serialize once more (belt and suspenders)
-  form.addEventListener('submit', serializeMeta, true); // capture phase: runs before your validator
+  form.addEventListener('submit', serializeMeta, true);
 
-  // ── Submit ───────────────────────────────────────────────
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
 
+    if (!form.serial_number.value && !form.mac_address.value && !form.barcode.value && !form.imei.value) {
+      errorBox.textContent = 'No unit identifier provided.';
+      errorBox.classList.remove('hidden');
+      return;
+    }
     if (!validate()) {
       errorBox.textContent = 'Please fix the errors above and try again.';
       errorBox.classList.remove('hidden');

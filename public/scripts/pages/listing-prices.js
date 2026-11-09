@@ -130,11 +130,11 @@
                 throw new Error('Malformed response: no variant');
             }
 
+            
             data = {
                 variant: payload.variant,
                 prices: Array.isArray(payload.prices) ? payload.prices : [],
-                current: payload.current || null,
-                currencies: Array.isArray(payload.currencies) ? payload.currencies : [],
+                currency: payload.base_currency,
             };
 
             hydrate();
@@ -152,14 +152,12 @@
 
     // ─── Hydrate ─────────────────────────────────────────
     function hydrate() {
-        const { variant, prices, current, currencies } = data;
+        const { variant, prices, currency } = data;
 
-        // Header
         document.getElementById('variantSku').textContent = variant.variant_sku || '—';
         document.getElementById('variantTitle').textContent =
             variant.variant_title || variant.listing_title || 'Untitled variant';
 
-        // Thumbnail (if the element exists)
         const variantImage = document.getElementById('variantImage');
         if (variantImage) {
             if (variant.variant_image) {
@@ -172,15 +170,16 @@
         }
 
         modalSku.textContent = variant.variant_sku || 'variant';
+        $('#salePriceModalTag').text(`(${variant.currency_code})`)
 
         addBtn.disabled = false;
 
-        renderSummary(prices);
-        renderCurrencyOptions(currencies);
+        renderSummary(prices, currency);
+        renderCurrencyOptions([currency]);
         renderPrices(prices);
     }
 
-    function renderSummary(prices) {
+    function renderSummary(prices, baseCurrency) {
         const priceEl = document.getElementById('currentPriceValue');
         const saleEl = document.getElementById('currentSaleBadge');
         const currencyEl = document.getElementById('currentCurrency');
@@ -206,8 +205,9 @@
         const activeAmt = hasSale ? Number(active.sale_price) : Number(active.price);
 
         priceEl.textContent = formatMoney(activeAmt, symbol);
-        currencyEl.textContent = active.currency_code
-            ? `${active.currency_code}${active.currency_symbol ? ' · ' + active.currency_symbol : ''}`
+
+        currencyEl.textContent = baseCurrency
+            ? `${baseCurrency.currency_code} · ${baseCurrency.currency_name}`
             : '—';
 
         startsEl.textContent = formatDateTime(active.starts_at);
@@ -229,14 +229,16 @@
         if (!currencySel) return;
 
         if (!currencies || !currencies.length) {
+            console.log('DUMP')
             currencySel.innerHTML = '<option value="">No currencies available</option>';
             currencySel.disabled = true;
             return;
         }
 
         currencySel.disabled = false;
+        
         currencySel.innerHTML = currencies.map(c => `
-            <option value="${c.id}">${escapeHtml(c.code)} — ${escapeHtml(c.name)}</option>
+            <option value="${c.currency_id}">${escapeHtml(c.currency_code)} — ${escapeHtml(c.currency_name)}</option>
         `).join('');
     }
 
@@ -288,9 +290,7 @@
                 <td class="px-5 py-3">
                     ${p.is_current ? `<span class="block h-2 w-2 rounded-full bg-green-800" title="Currently active"></span>` : ''}
                 </td>
-                <td class="px-5 py-3">
-                    <span class="font-mono text-xs font-semibold text-slate-700">${escapeHtml(p.currency_code)}</span>
-                </td>
+                
                 <td class="px-5 py-3">
                     <p class="font-semibold text-slate-900">${formatMoney(p.price, symbol)}</p>
                 </td>

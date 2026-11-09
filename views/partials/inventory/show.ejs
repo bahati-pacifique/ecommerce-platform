@@ -1,16 +1,16 @@
 <%
   // Guard against missing data (should never happen, but safe)
-  const loc     = data.location || {};
-  const st      = data.stats    || {};
-  const itms    = Array.isArray(data.items) ? data.items : [];
-  const pag     = data.pagination || { page: 1, limit: 20, total: 0, totalPages: 1, hasNextPage: false, hasPreviousPage: false };
+  const loc = data.location || {};
+  const st = data.stats    || {};
+  const itms = Array.isArray(data.items) ? data.items : [];
+  const pag = data.pagination || { page: 1, limit: 20, total: 0, totalPages: 1, hasNextPage: false, hasPreviousPage: false };
 
   const fmtNum = (n) => n == null || n === '' ? '0' : Number(n).toLocaleString('en-US');
 %>
 
 <script type="module">
   window.__ADD_ITEM__ = {
-    storeId:     "<%= store.id %>",
+    storeId: "<%= store.id %>",
     inventoryId: "<%= inventory.id %>",
   };
 </script>
@@ -21,21 +21,19 @@
     <div class="mb-1 flex items-center gap-2">
       <a href="/stores/<%= store.id %>/inventory" class="flex items-center gap-1 text-xs text-slate-500 hover:text-[var(--color-brand)]">
         <i data-lucide="chevron-left" class="h-3 w-3"></i>
-        Back to locations
+        Back to inventories
       </a>
     </div>
     <div class="flex items-center gap-2">
       <h1 class="text-2xl font-bold tracking-tight"><%= loc.title %></h1>
       <% if (loc.is_default) { %>
-        <span class="rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-semibold text-emerald-700">Default</span>
+      <span class="rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-semibold text-emerald-700">Default</span>
       <% } %>
     </div>
     <p class="mt-1 text-sm text-slate-500"><%= loc.address || loc.description || '—' %></p>
   </div>
   <div class="flex gap-2">
-    <button data-action="add-item" type="button"
-            data-action="add-item"
-            class="inline-flex items-center gap-2 rounded-lg bg-[var(--color-brand)] px-3 py-2 text-sm font-semibold text-white hover:bg-[var(--color-brand-dark)]">
+    <button data-action="add-item" type="button" data-action="add-item" class="inline-flex items-center gap-2 rounded-lg bg-[var(--color-brand)] px-3 py-2 text-sm font-semibold text-white hover:bg-[var(--color-brand-dark)]">
       <i data-lucide="plus" class="h-4 w-4"></i>Add Item
     </button>
   </div>
@@ -107,103 +105,93 @@
       </thead>
       <tbody class="divide-y divide-slate-100">
         <% if (!itms.length) { %>
-          <tr>
-            <td colspan="5" class="px-5 py-16 text-center">
-              <div class="inline-flex flex-col items-center gap-2">
-                <i data-lucide="package" class="h-8 w-8 text-slate-300"></i>
-                <p class="text-sm font-medium text-slate-700">No items in this inventory</p>
-                <p class="text-xs text-slate-500">Add items to start tracking stock here.</p>
-              </div>
-            </td>
-          </tr>
+        <tr>
+          <td colspan="5" class="px-5 py-16 text-center">
+            <div class="inline-flex flex-col items-center gap-2">
+              <i data-lucide="package" class="h-8 w-8 text-slate-300"></i>
+              <p class="text-sm font-medium text-slate-700">No items in this inventory</p>
+              <p class="text-xs text-slate-500">Add items to start tracking stock here.</p>
+            </div>
+          </td>
+        </tr>
         <% } else { %>
-          <% itms.forEach(item => { %>
-            <% const addUnitBtn = item.tracking_mode === 'bulk' ? 'hidden' : '' %>
-            
-            <tr class="hover:bg-slate-50">
-              <td class="px-5 py-3">
-                <div class="flex items-center gap-3">
-                  <% if (item.listing?.image) { %>
-                    <img src="https://cdn.cococe.rw/<%= item.listing.image %>" alt="" class="h-10 w-10 rounded-lg object-cover ring-1 ring-slate-200" />
-                  <% } else { %>
-                    <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-slate-100">
-                      <i data-lucide="package" class="h-4 w-4 text-slate-400"></i>
-                    </div>
-                  <% } %>
-                  <div class="min-w-0">
-                    <div class="truncate font-medium"><%= item.listing?.title || '—' %></div>
-                    <div class="font-mono text-[10px] text-slate-400"><%= item.listing?.sku || '—' %></div>
-                  </div>
-                </div>
-              </td>
-              <td class="px-5 py-3 text-right font-medium capitalize"><%= item.tracking_mode %></td>
-              <td class="px-5 py-3 text-right font-medium"><%= fmtNum(item.quantity) %></td>
-              <td class="px-5 py-3 text-right text-amber-600"><%= fmtNum(item.reserved) %></td>
-              <td class="px-5 py-3 text-right font-semibold text-emerald-600"><%= fmtNum(item.available) %></td>
-              <td class="px-5 py-3">
-                <span class="rounded-full px-2.5 py-1 text-xs font-semibold
+        <% itms.forEach(item => { %>
+        <% const addUnitBtn = item.tracking_mode === 'bulk' ? 'hidden' : '' %>
+
+        <tr class="hover:bg-slate-50">
+          <td class="px-5 py-3">
+            <div class="flex items-center gap-3">
+              <% if (item.listing?.image) { %>
+              <img src="https://cdn.cococe.rw/<%= item.listing.image %>" alt="" class="h-10 w-10 rounded-lg object-cover ring-1 ring-slate-200" />
+              <% } else { %>
+              <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-slate-100">
+                <i data-lucide="package" class="h-4 w-4 text-slate-400"></i>
+              </div>
+              <% } %>
+              <div class="min-w-0">
+                <div class="truncate font-medium"><%= item.listing?.title || '—' %></div>
+                <div class="font-mono text-[10px] text-slate-400"><%= item.listing?.sku || '—' %></div>
+              </div>
+            </div>
+          </td>
+          <td class="px-5 py-3 text-right font-medium capitalize"><%= item.tracking_mode %></td>
+          <td class="px-5 py-3 text-right font-medium"><%= fmtNum(item.quantity) %></td>
+          <td class="px-5 py-3 text-right text-amber-600"><%= fmtNum(item.reserved) %></td>
+          <td class="px-5 py-3 text-right font-semibold text-emerald-600"><%= fmtNum(item.available) %></td>
+          <td class="px-5 py-3">
+            <span class="rounded-full px-2.5 py-1 text-xs font-semibold
                   <%= item.status === 'in_stock' ? 'bg-emerald-50 text-emerald-700' : '' %>
                   <%= item.status === 'low_stock' ? 'bg-amber-50 text-amber-700' : '' %>
                   <%= item.status === 'out_of_stock' ? 'bg-rose-50 text-rose-700' : '' %>">
-                  <%= (item.status || '').replace('_', ' ') %>
-                </span>
-              </td>
-              <td class="flex items-center gap-3 py-3">
-                <button data-item-id="<%=item.id%>" data-open-unit-modal
-                  class = "<%=
-                  item.tracking_mode === 'bulk' ? 'hidden' : 'inline-flex'%> 
-                  items-center gap-1 
-                  rounded-lg border 
-                  border-slate-500 
-                  px-3 py-1 text-sm 
-                  font-semibold text-slate-500 
-                  hover:text-brand 
-                  hover:border-brand 
-                  add-unit-btn"
-                  title="Add Unit">
-                   <i data-lucide="plus"></i>
+              <%= (item.status || '').replace('_', ' ') %>
+            </span>
+          </td>
+          <td class="relative px-3 py-3 text-right">
+            <button type="button" class="inline-flex items-center gap-1 rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-sm font-semibold text-slate-700 shadow-sm hover:bg-slate-50 toggle-actions-btn" title="More Actions">
+              <span>Manage</span>
+              <i data-lucide="chevron-down" class="h-4 w-4"></i>
+            </button>
+
+            <div class="absolute right-3 z-50 mt-2 w-48 origin-top-right scale-95 transform opacity-0 pointer-events-none rounded-lg border border-slate-200 bg-white p-1 shadow-lg transition-all duration-100 ease-out actions-dropdown">
+              <div class="flex flex-col gap-0.5">
+
+                <button data-item-id="<%=item.id%>" data-open-unit-modal class="<%=
+                  item.tracking_mode === 'bulk' ? 'hidden' : 'flex'%> 
+                  w-full items-center gap-2 rounded-md px-3 py-2 text-left text-sm text-slate-700 hover:bg-slate-100 hover:text-brand add-unit-btn">
+                  <span>Add Unit</span>
+                  <i data-lucide="plus" class="h-4 w-4"></i>
                 </button>
-                <button data-item-id="<%=item.id%>" data-adjust-item-modal
-                  class = "<%=
-                  item.tracking_mode === 'bulk' ? 'inline-flex' : 'hidden'%> 
-                  items-center gap-1 
-                  rounded-lg border 
-                  border-slate-500 
-                  px-3 py-1 text-sm 
-                  font-semibold text-slate-500 
-                  hover:text-brand 
-                  hover:border-brand
-                  add-quantity-btn"
-                  title="Adjust Quantity">
-                  <i data-lucide="rotate-cw"></i>
+
+                <button data-item-id="<%=item.id%>" data-adjust-item-modal class="<%=
+                  item.tracking_mode === 'bulk' ? 'flex' : 'hidden'%> 
+                  w-full items-center gap-2 rounded-md px-3 py-2 text-left text-sm text-slate-700 hover:bg-slate-100 hover:text-brand add-quantity-btn">
+                  <span>Adjust Quantity</span>
+                  <i data-lucide="settings-2" class="h-4 w-4"></i>
                 </button>
-                <button data-item-id="<%=item.id%>" data-unit-pricing
-                  class = "<%=
-                  item.tracking_mode === 'bulk' ? 'hidden' : 'inline-flex'%> 
-                  items-center gap-1 
-                  rounded-lg border 
-                  border-slate-500 
-                  px-3 py-1 text-sm 
-                  font-semibold text-slate-500 
-                  hover:text-brand 
-                  hover:border-brand 
-                  add-unit-btn"
-                  title="Listing pricing">
-                   <i data-lucide="dollar-sign"></i>
-              </td>
-            </tr>
-          <% }) %>
+
+                <a href="/stores/<%= store.id %>/listings/<%=item.listing?.id%>/review" target="_blank" data-item-id="<%=item.id%>" data-unit-pricing class="w-full flex items-center gap-2 rounded-md px-3 py-2 text-left text-sm text-slate-700 hover:bg-slate-100 hover:text-brand">
+                  <span>View Listing</span>
+                  <i data-lucide="arrow-right" class="h-4 w-4"></i>
+                </a>
+
+              </div>
+            </div>
+          </td>
+        </tr>
+        <% }) %>
         <% } %>
       </tbody>
     </table>
   </div>
 
   <% if (pag.total > 0) { %>
-    <div class="border-t border-slate-100 p-4 text-sm text-slate-500">
-      Showing <%= (pag.page - 1) * pag.limit + 1 %>–<%= Math.min(pag.page * pag.limit, pag.total) %> of <%= pag.total %>
-    </div>
+  <div class="border-t border-slate-100 p-4 text-sm text-slate-500">
+    Showing <%= (pag.page - 1) * pag.limit + 1 %>–<%= Math.min(pag.page * pag.limit, pag.total) %> of <%= pag.total %>
+  </div>
   <% } %>
 </div>
+
+<script type="module" src="/scripts/pages/show.js"></script>
 
 <%- include('./_add-item-modal', { store, inventory }) %>
 <%- include('./_unit-add-modal', { store, inventory }) %>

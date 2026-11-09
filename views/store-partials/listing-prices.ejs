@@ -19,7 +19,7 @@
 
   <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
     <div class="flex items-start gap-3">
-      <img id="variantImage" src="" alt="" class="hidden h-12 w-12 shrink-0 rounded-lg object-cover ring-1 ring-slate-200">
+      <img id="variantImage" src="" alt="" class="hidden h-20 w-20 shrink-0 rounded-lg object-contain ring-1 ring-slate-200">
       <div class="min-w-0">
         <h1 class="text-xl font-bold tracking-tight text-slate-950 sm:text-2xl">Pricing</h1>
         <p class="mt-1 truncate text-sm text-slate-500">
@@ -61,14 +61,12 @@
       </div>
     </div>
 
-    <!-- Table skeleton -->
     <div class="mt-5 rounded-xl border border-slate-200 bg-white shadow-sm">
       <div class="border-b border-slate-100 px-4 py-3 sm:px-5">
         <div class="h-4 w-32 rounded bg-slate-200"></div>
         <div class="mt-1 h-3 w-24 rounded bg-slate-200"></div>
       </div>
 
-      <!-- Rows -->
       <div class="divide-y divide-slate-100">
         <% for (let i = 0; i < 3; i++) { %>
         <div class="flex items-center gap-4 px-5 py-4">
@@ -84,9 +82,6 @@
     </div>
   </div>
 
-  <!-- ═══════════════════════════════════════════════════
-       ERROR STATE
-  ════════════════════════════════════════════════════ -->
   <div id="pricesError" class="mt-5 hidden rounded-2xl border border-rose-200 bg-white p-6 text-center shadow-sm sm:p-8">
     <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-rose-50">
       <svg class="h-7 w-7 text-rose-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -105,16 +100,12 @@
     </div>
   </div>
 
-  <!-- ═══════════════════════════════════════════════════
-       CONTENT STATE
-  ════════════════════════════════════════════════════ -->
   <div id="pricesContent" class="hidden opacity-0">
 
-    <!-- Summary cards — filled by JS -->
     <div class="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-      <div class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-        <p class="text-[10px] font-bold uppercase tracking-wider text-slate-500">Current price</p>
-        <p id="currentPriceValue" class="mt-1.5 text-2xl font-extrabold text-slate-950">—</p>
+      <div class="rounded-xl border border-green-800 bg-green-50 text-green-800 p-4 shadow-sm ">
+        <p class="text-[10px] font-bold uppercase tracking-wider">Current price</p>
+        <p id="currentPriceValue" class="mt-1.5 text-2xl font-extrabold">—</p>
         <p id="currentSaleBadge" class="mt-1 hidden items-center gap-1.5 text-xs"></p>
       </div>
       <div class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
@@ -125,13 +116,12 @@
         <p class="text-[10px] font-bold uppercase tracking-wider text-slate-500">Effective from</p>
         <p id="currentStartsAt" class="mt-1.5 text-sm font-semibold text-slate-950">—</p>
       </div>
-      <div class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+      <div class="rounded-xl border border-red-800 bg-red-50 p-4 shadow-sm">
         <p class="text-[10px] font-bold uppercase tracking-wider text-slate-500">Ends</p>
         <p id="currentEndsAt" class="mt-1.5 text-sm font-semibold text-slate-950">—</p>
       </div>
     </div>
 
-    <!-- Prices table -->
     <div class="mt-5 rounded-xl border border-slate-200 bg-white shadow-sm">
 
       <div class="flex items-center justify-between border-b border-slate-100 px-4 py-3 sm:px-5">
@@ -141,7 +131,6 @@
         </div>
       </div>
 
-      <!-- Empty state — toggled by JS -->
       <div id="pricesEmpty" class="hidden px-4 py-16 text-center sm:px-5">
         <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-slate-100">
           <svg class="h-6 w-6 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -158,13 +147,11 @@
         </button>
       </div>
 
-      <!-- Desktop table body — filled by JS -->
       <div id="pricesTableWrap" class="hidden overflow-x-auto lg:block">
         <table class="w-full text-left text-sm">
           <thead class="bg-slate-50 text-[10px] uppercase tracking-wider text-slate-500">
             <tr>
               <th class="px-5 py-3 font-semibold"></th>
-              <th class="px-5 py-3 font-semibold">Currency</th>
               <th class="px-5 py-3 font-semibold">Price</th>
               <th class="px-5 py-3 font-semibold">Sale price</th>
               <th class="px-5 py-3 font-semibold">Period</th>
@@ -176,15 +163,11 @@
         </table>
       </div>
 
-      <!-- Mobile cards — filled by JS -->
       <div id="pricesMobileList" class="divide-y divide-slate-100 lg:hidden"></div>
     </div>
   </div>
 </div>
 
-<!-- ══════════════════════════════════════════════════════════
-     ADD PRICE MODAL
-══════════════════════════════════════════════════════════ -->
 <div id="addPriceModal" class="fixed inset-0 z-[60] hidden items-end justify-center bg-slate-950/50 p-0 backdrop-blur-sm sm:items-center sm:p-4" role="dialog" aria-modal="true" aria-labelledby="addPriceTitle">
 
   <div id="addPriceBackdrop" class="absolute inset-0" aria-hidden="true"></div>
@@ -208,7 +191,6 @@
         </button>
       </div>
 
-      <!-- Global form error -->
       <div id="addPriceError" class="mt-4 hidden rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-700" role="alert"></div>
 
       <form id="addPriceForm" class="mt-5 space-y-4" novalidate>
@@ -218,7 +200,6 @@
             Currency
           </label>
           <select id="currency_id" name="currency_id" required class="h-10 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm outline-none focus:border-brand focus:ring-2 focus:ring-brand/20">
-            <!-- options filled by JS -->
           </select>
         </div>
 
@@ -232,7 +213,7 @@
           </div>
           <div>
             <label for="sale_price" class="mb-1 block text-xs font-bold uppercase tracking-wider text-slate-500">
-              Sale price <span class="font-normal normal-case text-slate-400">(optional)</span>
+              Sale price <span class="font-normal normal-case text-slate-400" id="salePriceModalTag"></span>
             </label>
             <input id="sale_price" name="sale_price" type="number" step="0.01" min="0" class="h-10 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm outline-none focus:border-brand focus:ring-2 focus:ring-brand/20" placeholder="Leave empty if none">
             <p class="mt-1 hidden text-xs text-brand" data-error-for="sale_price"></p>
@@ -280,6 +261,17 @@
     </div>
   </div>
 </div>
+
+<%- include('../partials/footer', 
+{
+  baseUrl: `/stores/${locals.store?.id}/dashboard`, 
+  navs: [
+  {link: `/stores/${locals.store?.id}/dashboard/listings`, title: 'Listings'}, 
+  {link: `/stores/${locals.store?.id}/dashboard/inventory`, title: 'Inventory'},
+  {link: `/dashboard`, title: 'Store'},
+  {link: `/dashboard`, title: 'Vendor'},
+  ]
+}) %>
 
 <script>
   // Legacy globals if any page template uses them

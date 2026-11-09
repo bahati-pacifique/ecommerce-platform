@@ -1221,6 +1221,12 @@ class ListingModel {
                     LIMIT 1
                 )
             ) AS variant,
+            (SELECT jsonb_build_object(
+                'currency_name', cy.name,
+                'currency_code', cy.code,
+                'currency_symbol', cy.symbol,
+                'currency_id', cy.id
+            ) FROM currencies cy WHERE cy.is_base AND cy.status = 'active') AS base_currency,
             COALESCE(
                 jsonb_agg(
                     jsonb_build_object(

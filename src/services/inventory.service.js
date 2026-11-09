@@ -388,6 +388,7 @@ class InventoryService {
         return {
             id: i.id,
             listing: {
+                id: i.listing_id,
                 title: i.listing_title,
                 image: i.listing_image,
                 sku: i.listing_sku,
