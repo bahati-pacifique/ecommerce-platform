@@ -130,7 +130,7 @@
                 throw new Error('Malformed response: no variant');
             }
 
-            
+
             data = {
                 variant: payload.variant,
                 prices: Array.isArray(payload.prices) ? payload.prices : [],
@@ -236,7 +236,7 @@
         }
 
         currencySel.disabled = false;
-        
+
         currencySel.innerHTML = currencies.map(c => `
             <option value="${c.currency_id}">${escapeHtml(c.currency_code)} — ${escapeHtml(c.currency_name)}</option>
         `).join('');
@@ -263,6 +263,7 @@
 
         const tbody = document.getElementById('pricesTableBody');
         tbody.innerHTML = prices.map(renderDesktopRow).join('');
+        lucide?.createIcons();
 
         mobileEl.innerHTML = prices.map(renderMobileCard).join('');
     }
@@ -286,7 +287,7 @@
             : 'border-brand bg-brand text-white hover:bg-brand-dark';
 
         return `
-            <tr class="${activeClass}" data-price-id="${p.id}">
+            <tr class="${activeClass}" data-price-id="${p.id} relative">
                 <td class="px-5 py-3">
                     ${p.is_current ? `<span class="block h-2 w-2 rounded-full bg-green-800" title="Currently active"></span>` : ''}
                 </td>
@@ -305,20 +306,31 @@
                     </span>
                 </td>
                 <td class="px-5 py-3 text-right">
-                    <div class="flex justify-end gap-1.5">
-                        <button type="button"
-                                data-action="toggle"
-                                data-price-id="${p.id}"
-                                class="rounded-lg border px-2.5 py-1.5 text-xs font-semibold transition ${toggleClass}">
-                            ${toggleLabel}
-                        </button>
-                        <button type="button"
-                                data-action="delete"
-                                data-price-id="${p.id}"
-                                class="rounded-lg border border-rose-200 bg-white px-2.5 py-1.5 text-xs font-semibold text-rose-700 transition hover:bg-rose-50">
-                            Delete
-                        </button>
+
+                    <button type="button" 
+                            class="inline-flex items-center gap-1 rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-sm font-semibold text-slate-700 shadow-sm hover:bg-slate-50 toggle-actions-btn" 
+                            title="More Actions">
+                        <span>Actions</span>
+                        <i data-lucide="chevron-down" class="h-4 w-4"></i>
+                    </button>
+
+                    <div class="absolute right-45 z-50 mt-2 w-48 origin-top-right scale-95 transform opacity-0 pointer-events-none rounded-lg border border-slate-200 bg-white p-1 shadow-lg transition-all duration-100 ease-out actions-dropdown">
+                        <div class="flex flex-col gap-0.5">
+                            <button type="button"
+                                    data-action="toggle"
+                                    data-price-id="${p.id}" class="w-full inline-flex items-center gap-2 rounded-md px-3 py-2 text-left text-sm text-slate-700 hover:bg-slate-100 hover:text-brand">
+                                <i data-lucide="move-horizontal" class="h-4 w-4"></i>
+                                <span>${toggleLabel}</span>
+                            </button>
+                            <button type="button"
+                                    data-action="delete"
+                                    data-price-id="${p.id}" class="w-full inline-flex items-center gap-2 rounded-md px-3 py-2 text-left text-sm text-slate-700 hover:bg-slate-100 hover:text-brand">
+                                <i data-lucide="trash" class="h-4 w-4"></i>
+                                <span>Delete</span>
+                            </button>
+                        </div>
                     </div>
+
                 </td>
             </tr>`;
     }
@@ -382,7 +394,6 @@
             </div>`;
     }
 
-    // ─── Delegated actions ───────────────────────────────
     document.addEventListener('click', async (e) => {
         const btn = e.target.closest('[data-action]');
         if (!btn) return;
@@ -407,19 +418,27 @@
         }
 
         if (action === 'delete') {
-            if (!confirm('Delete this price? This cannot be undone.')) return;
-            btn.disabled = true;
-            try {
-                await axios.post(`${API_BASE}/${priceId}/delete`, null, {
-                    withCredentials: true,
-                    headers: { Accept: 'application/json' },
-                });
-                await load();
-            } catch (err) {
-                console.error('[delete] failed:', err);
-                btn.disabled = false;
-                flashError(err.response?.data?.message || 'Could not delete price.');
-            }
+            showSnackbar({
+                autoClose: false,
+                type: 'warning',
+                message: 'Dou you to remove this price?',
+                actionText: 'Remove',
+                onAction: async () => {
+                    btn.disabled = true;
+                    try {
+                        await axios.post(`${API_BASE}/${priceId}/delete`, null, {
+                            withCredentials: true,
+                            headers: { Accept: 'application/json' },
+                        });
+                        await load();
+                    } catch (err) {
+                        console.error('[delete] failed:', err);
+                        btn.disabled = false;
+                        flashError(err.response?.data?.message || 'Could not delete price.');
+                    }
+                }
+            })
+
         }
     });
 
@@ -551,4 +570,25 @@
 
     load();
     lucide?.createIcons();
+
+    document.addEventListener('click', (event) => {
+        const isToggleBtn = event.target.closest('.toggle-actions-btn');
+        const activeDropdown = isToggleBtn ? isToggleBtn.nextElementSibling : null;
+
+        // 1. Close all other open dropdowns
+        document.querySelectorAll('.actions-dropdown').forEach((dropdown) => {
+            if (dropdown !== activeDropdown) {
+                dropdown.classList.add('opacity-0', 'pointer-events-none', 'scale-95');
+            }
+        });
+
+        // 2. Toggle the targeted dropdown if clicked
+        if (activeDropdown) {
+            event.stopPropagation();
+            activeDropdown.classList.toggle('opacity-0');
+            activeDropdown.classList.toggle('pointer-events-none');
+            activeDropdown.classList.toggle('scale-95');
+        }
+    });
+
 })();

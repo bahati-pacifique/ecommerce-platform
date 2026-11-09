@@ -528,8 +528,26 @@
   .right-8 {
     right: calc(var(--spacing) * 8);
   }
+  .right-20 {
+    right: calc(var(--spacing) * 20);
+  }
   .right-24 {
     right: calc(var(--spacing) * 24);
+  }
+  .right-30 {
+    right: calc(var(--spacing) * 30);
+  }
+  .right-40 {
+    right: calc(var(--spacing) * 40);
+  }
+  .right-45 {
+    right: calc(var(--spacing) * 45);
+  }
+  .right-50 {
+    right: calc(var(--spacing) * 50);
+  }
+  .right-80 {
+    right: calc(var(--spacing) * 80);
   }
   .right-\[-5\%\] {
     right: -5%;

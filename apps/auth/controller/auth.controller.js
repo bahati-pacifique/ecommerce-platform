@@ -148,7 +148,7 @@ function renderLoginPage(req, res) {
         homeImageUrl = '/images/logos/business.png';
         heroMessage = `<h2 class="text-2xl text-gray-500 leading-tight pl-8">
               <span>
-                Welcome to <span class="text-3xl text-brand font-extrabold">COCOCE Business</span>, The Hub of <span class="text-black">Digital Vendors</span>. 
+                Welcome to <span class="text-3xl text-brand font-extrabold">COCOCE Business</span>, The Hub for <span class="text-black">Digital Vendors</span>
               </span>
               <div class="bg-brand max-w-[140px] min-h-[4px] rounded-full mt-3"></div> 
             </h2>`;

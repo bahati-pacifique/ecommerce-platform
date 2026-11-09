@@ -1,0 +1,10 @@
+<button type="button" class="inline-flex items-center gap-1 rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-sm font-semibold text-slate-700 shadow-sm hover:bg-slate-50 toggle-actions-btn" title="More Actions">
+  <span>Manage</span>
+  <i data-lucide="chevron-down" class="h-4 w-4"></i>
+</button>
+
+<div class="absolute right-3 z-50 mt-2 w-48 origin-top-right scale-95 transform opacity-0 pointer-events-none rounded-lg border border-slate-200 bg-white p-1 shadow-lg transition-all duration-100 ease-out actions-dropdown">
+  <div class="flex flex-col gap-0.5">
+    <%- menus.join('') %>
+  </div>
+</div>
