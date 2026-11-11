@@ -782,19 +782,20 @@ class ListingModel {
     //     return rows[0] || null;
     // }
 
+
     static async getListingById(storeId, listingId) {
         const { rows } = await db.query(`
         SELECT
 
-        -- vendor
+        -- Vendor
         v.id AS vendor_id,
         v.business_name AS vendor_name,
         v.verification_status AS vendor_verification,
-        
-        -- store
+
+        -- Store
         s.id AS store_id,
         s.name AS store_name,
-        s.rating as store_rating,
+        s.rating AS store_rating,
         s.meta AS store_meta,
 
         -- Listing
@@ -820,42 +821,106 @@ class ListingModel {
         -- Category
         ct.title AS category,
 
-        (CONCAT('listings/videos/', l.id, '/', l.id, '.mp4')) AS listing_video_storage_key,
+        CONCAT(
+            'listings/videos/',
+            l.id,
+            '/',
+            l.id,
+            '.mp4'
+        ) AS listing_video_storage_key,
 
-        -- Variants
+        -- Base currency
+        COALESCE(
+            (
+                SELECT jsonb_build_object(
+                    'id', c.id,
+                    'code', c.code,
+                    'symbol', c.symbol,
+                    'name', c.name
+                )
+                FROM currencies c
+                WHERE c.is_base
+                LIMIT 1
+            ),
+            '{}'::jsonb
+        ) AS base_currency,
+
+        -- Listing variants
         COALESCE((
             SELECT jsonb_agg(
                 jsonb_build_object(
                     'id', lv.id,
                     'product_variant_id', pv.id,
                     'sku', pv.sku,
+                    'status', lv.status,
 
                     -- Pricing
-                    'price', lcp.price,
+                    'base_price_id', lcp.base_price_id,
+                    'regular_price', lcp.regular_price,
+
+                    'promotion_id', lcp.promotion_id,
                     'sale_price', lcp.sale_price,
+
                     'current_price', lcp.current_price,
                     'currency_id', lcp.currency_id,
-                    'is_on_sale', COALESCE(lcp.is_on_sale, FALSE),
+
+                    'is_on_sale',
+                        COALESCE(lcp.is_on_sale, FALSE),
+
+                    'discount_percentage',
+                        COALESCE(lcp.discount_percentage, 0),
+
+                    -- Regular price validity
+                    'regular_price_starts_at',
+                        lcp.regular_price_starts_at,
+
+                    'regular_price_ends_at',
+                        lcp.regular_price_ends_at,
+
+                    -- Promotion validity
+                    'promotion_starts_at',
+                        lcp.promotion_starts_at,
+
+                    'promotion_ends_at',
+                        lcp.promotion_ends_at,
 
                     -- Inventory availability
                     'inventory', jsonb_build_object(
                         'available_quantity',
-                            COALESCE(inventory_data.available_quantity, 0),
+                            COALESCE(
+                                inventory_data.available_quantity,
+                                0
+                            ),
 
                         'reserved_quantity',
-                            COALESCE(inventory_data.reserved_quantity, 0),
+                            COALESCE(
+                                inventory_data.reserved_quantity,
+                                0
+                            ),
 
                         'inventory_records',
-                            COALESCE(inventory_data.inventory_records, 0),
+                            COALESCE(
+                                inventory_data.inventory_records,
+                                0
+                            ),
 
                         'availability_status',
                             CASE
-                                WHEN COALESCE(inventory_data.inventory_records, 0) = 0
+                                WHEN COALESCE(
+                                    inventory_data.inventory_records,
+                                    0
+                                ) = 0
                                     THEN 'untracked'
-                                WHEN COALESCE(inventory_data.available_quantity, 0) = 0
+
+                                WHEN COALESCE(
+                                    inventory_data.available_quantity,
+                                    0
+                                ) = 0
                                     THEN 'out_of_stock'
+
                                 WHEN inventory_data.available_quantity <= 5
                                     THEN 'low_stock'
+
                                 ELSE 'in_stock'
                             END
                     ),
@@ -873,10 +938,13 @@ class ListingModel {
                                 ORDER BY a.title
                             )
                             FROM variant_attribute_values vav
+
                             JOIN attribute_values av
                                 ON av.id = vav.attribute_value_id
+
                             JOIN attributes a
                                 ON a.id = av.attribute_id
+
                             WHERE vav.variant_id = pv.id
                         ),
                         '[]'::jsonb
@@ -887,22 +955,30 @@ class ListingModel {
                         SELECT lvm.storage_key
                         FROM listing_variants_media lvm
                         WHERE lvm.listing_variant_id = lv.id
-                            AND lvm.is_primary = TRUE
+                          AND lvm.is_primary = TRUE
                         ORDER BY lvm.id
                         LIMIT 1
                     )
                 )
                 ORDER BY lv.id
             )
+
             FROM listing_variants lv
 
             JOIN product_variants pv
                 ON pv.id = lv.product_variant_id
 
+            -- Current pricing in base currency only
             LEFT JOIN listing_variant_current_prices lcp
                 ON lcp.listing_variant_id = lv.id
+                AND lcp.currency_id = (
+                    SELECT id
+                    FROM currencies
+                    WHERE is_base
+                    LIMIT 1
+                )
 
-            -- Inventory aggregation for this listing variant
+            -- Inventory aggregation
             LEFT JOIN LATERAL (
                 SELECT
                     COUNT(ii.id)::int AS inventory_records,
@@ -911,10 +987,16 @@ class ListingModel {
                         SUM(
                             CASE
                                 WHEN ii.tracking_mode = 'bulk'
-                                    THEN GREATEST(ii.quantity - ii.reserved, 0)
+                                    THEN GREATEST(
+                                        ii.quantity - ii.reserved,
+                                        0
+                                    )
 
                                 WHEN ii.tracking_mode = 'serialized'
-                                    THEN COALESCE(unit_stock.available_units, 0)
+                                    THEN COALESCE(
+                                        unit_stock.available_units,
+                                        0
+                                    )
 
                                 ELSE 0
                             END
@@ -929,7 +1011,10 @@ class ListingModel {
                                     THEN ii.reserved
 
                                 WHEN ii.tracking_mode = 'serialized'
-                                    THEN COALESCE(unit_stock.reserved_units, 0)
+                                    THEN COALESCE(
+                                        unit_stock.reserved_units,
+                                        0
+                                    )
 
                                 ELSE 0
                             END
@@ -941,7 +1026,7 @@ class ListingModel {
 
                 JOIN inventories inv
                     ON inv.id = ii.inventory_id
-                    AND inv.store_id = l.store_id
+                   AND inv.store_id = l.store_id
 
                 LEFT JOIN LATERAL (
                     SELECT
@@ -958,9 +1043,11 @@ class ListingModel {
                 ) unit_stock ON TRUE
 
                 WHERE ii.listing_variant_id = lv.id
+
             ) inventory_data ON TRUE
 
             WHERE lv.listing_id = l.id
+
         ), '[]'::jsonb) AS variants,
 
         -- Product media
@@ -1011,6 +1098,7 @@ class ListingModel {
 
         return rows[0] || null;
     }
+
 
     static async getListingVariantPrices(storeId, listingId, variantId) {
         const { rows } = await db.query(`
@@ -1128,26 +1216,413 @@ class ListingModel {
         listing_variant_id,
         currency_id,
         price,
-        sale_price = null
+        is_initial = false,
+        starts_at = null,
+        ends_at = null
     }) {
-        const { rows } = await client.query(
+
+        const dbInstance = client || db;
+
+        const { rows } = await dbInstance.query(
             `
             INSERT INTO listing_prices (
                 listing_variant_id,
                 currency_id,
-                price
+                price,
+                is_initial,
+                starts_at,
+                ends_at
             )
-            VALUES ($1, $2, $3)
+            VALUES (
+                $1, $2, $3, $4,
+                COALESCE($5::timestamptz, NOW()),
+                $6
+            )
             RETURNING *
-            `,
+        `,
             [
                 listing_variant_id,
                 currency_id,
                 price,
+                is_initial,
+                starts_at,
+                ends_at
             ]
         );
 
         return rows[0] ?? null;
+    }
+
+    static async insertListingPromotionPrice({
+        listing_variant_id,
+        currency_id,
+        base_price_id,
+        sale_price,
+        starts_at = null,
+        ends_at
+    }) {
+        const { rows } = await db.query(
+            `
+                INSERT INTO listing_prices (
+                    listing_variant_id,
+                    currency_id,
+                    base_price_id,
+                    sale_price,
+                    starts_at,
+                    ends_at
+                )
+                VALUES (
+                    $1, $2, $3, $4,
+                    COALESCE($5::timestamptz, NOW()),
+                    $6
+                )
+                RETURNING *
+            `,
+            [
+                listing_variant_id,
+                currency_id,
+                base_price_id,
+                sale_price,
+                starts_at,
+                ends_at
+            ]
+        );
+
+        return rows[0] ?? null;
+    }
+
+    /**
+     * Replaces the current regular price with a new price.
+     * Creates the initial price if the variant has no initial price.
+     *
+     * The original initial price is preserved in price history.
+     */
+    // static async makeInitialPrice(variantId, newPrice) {
+    //     const client = await db.connect();
+
+    //     try {
+    //         await client.query('BEGIN');
+
+    //         if (
+    //             newPrice === null ||
+    //             newPrice === undefined ||
+    //             !Number.isFinite(Number(newPrice)) ||
+    //             Number(newPrice) < 0
+    //         ) {
+    //             throw new Error('A valid non-negative price is required');
+    //         }
+
+    //         // Lock the variant to prevent concurrent price changes.
+    //         const { rows: variantRows } = await client.query(
+    //             `
+    //             SELECT lv.id
+    //             FROM listing_variants lv
+    //             WHERE lv.id = $1
+    //             FOR UPDATE
+    //         `,
+    //             [variantId]
+    //         );
+
+    //         if (!variantRows.length) {
+    //             throw new Error('Listing variant not found');
+    //         }
+
+    //         // Resolve the active base currency.
+    //         const { rows: currencyRows } = await client.query(
+    //             `
+    //         SELECT id
+    //         FROM currencies
+    //         WHERE is_base = TRUE
+    //           AND status = 'active'
+    //         LIMIT 1
+    //         `
+    //         );
+
+    //         if (!currencyRows.length) {
+    //             throw new Error('No active base currency configured');
+    //         }
+
+    //         const currencyId = currencyRows[0].id;
+
+    //         // Find the original initial price, if one exists.
+    //         const { rows: initialRows } = await client.query(
+    //             `
+    //             SELECT id, price, starts_at, ends_at, status
+    //             FROM listing_prices
+    //             WHERE listing_variant_id = $1
+    //             AND currency_id = $2
+    //             AND is_initial = TRUE
+    //             FOR UPDATE
+    //         `,
+    //             [variantId, currencyId]
+    //         );
+
+    //         const hasInitialPrice = initialRows.length > 0;
+
+    //         // Reject an already scheduled future regular price.
+    //         const { rows: futureRows } = await client.query(
+    //             `
+    //         SELECT id
+    //         FROM listing_prices
+    //         WHERE listing_variant_id = $1
+    //           AND currency_id = $2
+    //           AND price IS NOT NULL
+    //           AND status = 'active'
+    //           AND starts_at > NOW()
+    //           AND (ends_at IS NULL OR ends_at > NOW())
+    //         LIMIT 1
+    //         `,
+    //             [variantId, currencyId]
+    //         );
+
+    //         if (futureRows.length) {
+    //             throw new Error(
+    //                 'A future regular price is already scheduled for this variant'
+    //             );
+    //         }
+
+    //         // Close the currently effective regular price period.
+    //         // This also closes the initial price when it is still current.
+    //         await client.query(
+    //             `
+    //         UPDATE listing_prices
+    //         SET ends_at = NOW(),
+    //             updated_at = NOW()
+    //         WHERE listing_variant_id = $1
+    //           AND currency_id = $2
+    //           AND price IS NOT NULL
+    //           AND status = 'active'
+    //           AND starts_at <= NOW()
+    //           AND (ends_at IS NULL OR ends_at > NOW())
+    //         `,
+    //             [variantId, currencyId]
+    //         );
+
+    //         // Insert the replacement price.
+    //         const newPriceRecord = await this.insertListingPrice(client, {
+    //             listing_variant_id: variantId,
+    //             currency_id: currencyId,
+    //             price: Number(newPrice),
+    //             is_initial: !hasInitialPrice
+    //         });
+
+    //         await client.query('COMMIT');
+
+    //         return newPriceRecord;
+
+    //     } catch (error) {
+    //         await client.query('ROLLBACK');
+    //         throw error;
+    //     } finally {
+    //         client.release();
+    //     }
+    // }
+
+    //======
+    /**
+     * Creates the initial regular price for a listing variant.
+     * Rejects the operation if an initial price already exists.
+     */
+    static async createInitialPrice(variantId, price) {
+        const client = await db.connect();
+
+        try {
+            await client.query('BEGIN');
+
+            if (
+                price === null ||
+                price === undefined ||
+                !Number.isFinite(Number(price)) ||
+                Number(price) <= 0
+            ) {
+                throw new Error('A valid non-negative price is required');
+            }
+
+            const { rows: variantRows } = await client.query(
+                `
+            SELECT id
+            FROM listing_variants
+            WHERE id = $1
+            FOR UPDATE
+            `,
+                [variantId]
+            );
+
+            if (!variantRows.length) {
+                throw new Error('Listing variant not found');
+            }
+
+            const { rows: currencyRows } = await client.query(
+                `
+            SELECT id
+            FROM currencies
+            WHERE is_base = TRUE
+              AND status = 'active'
+            LIMIT 1
+            `
+            );
+
+            if (!currencyRows.length) {
+                throw new Error('No active base currency configured');
+            }
+
+            const currencyId = currencyRows[0].id;
+
+            const { rows: existingRows } = await client.query(
+                `
+            SELECT id
+            FROM listing_prices
+            WHERE listing_variant_id = $1
+              AND currency_id = $2
+              AND is_initial = TRUE
+            LIMIT 1
+            `,
+                [variantId, currencyId]
+            );
+
+            if (existingRows.length) {
+                throw new Error('Initial price already exists for this variant');
+            }
+
+            const newPriceRecord = await this.insertListingPrice(client, {
+                listing_variant_id: variantId,
+                currency_id: currencyId,
+                price: Number(price),
+                is_initial: true
+            });
+
+            await client.query('COMMIT');
+
+            return newPriceRecord;
+
+        } catch (error) {
+            await client.query('ROLLBACK');
+            throw error;
+        } finally {
+            client.release();
+        }
+    }
+    //=======
+    /**
+     * Closes the current regular price and inserts a replacement.
+     * Preserves the original initial price in price history.
+     */
+    static async updateRegularPrice(variantId, newPrice) {
+        const client = await db.connect();
+
+        try {
+            await client.query('BEGIN');
+
+            if (
+                newPrice === null ||
+                newPrice === undefined ||
+                !Number.isFinite(Number(newPrice)) ||
+                Number(newPrice) < 0
+            ) {
+                throw new Error('A valid non-negative price is required');
+            }
+
+            const { rows: variantRows } = await client.query(
+                `
+            SELECT id
+            FROM listing_variants
+            WHERE id = $1
+            FOR UPDATE
+            `,
+                [variantId]
+            );
+
+            if (!variantRows.length) {
+                throw new Error('Listing variant not found');
+            }
+
+            const { rows: currencyRows } = await client.query(
+                `
+            SELECT id
+            FROM currencies
+            WHERE is_base = TRUE
+              AND status = 'active'
+            LIMIT 1
+            `
+            );
+
+            if (!currencyRows.length) {
+                throw new Error('No active base currency configured');
+            }
+
+            const currencyId = currencyRows[0].id;
+
+            const { rows: initialRows } = await client.query(
+                `
+            SELECT id
+            FROM listing_prices
+            WHERE listing_variant_id = $1
+              AND currency_id = $2
+              AND is_initial = TRUE
+            LIMIT 1
+            `,
+                [variantId, currencyId]
+            );
+
+            if (!initialRows.length) {
+                throw new Error(
+                    'Initial price not found. Create the initial price first.'
+                );
+            }
+
+            const { rows: futureRows } = await client.query(
+                `
+            SELECT id
+            FROM listing_prices
+            WHERE listing_variant_id = $1
+              AND currency_id = $2
+              AND price IS NOT NULL
+              AND status = 'active'
+              AND starts_at > NOW()
+              AND (ends_at IS NULL OR ends_at > NOW())
+            LIMIT 1
+            `,
+                [variantId, currencyId]
+            );
+
+            if (futureRows.length) {
+                throw new Error(
+                    'A future regular price is already scheduled for this variant'
+                );
+            }
+
+            await client.query(
+                `
+            UPDATE listing_prices
+            SET ends_at = NOW(),
+                updated_at = NOW()
+            WHERE listing_variant_id = $1
+              AND currency_id = $2
+              AND price IS NOT NULL
+              AND status = 'active'
+              AND starts_at <= NOW()
+              AND (ends_at IS NULL OR ends_at > NOW())
+            `,
+                [variantId, currencyId]
+            );
+
+            const newPriceRecord = await this.insertListingPrice(client, {
+                listing_variant_id: variantId,
+                currency_id: currencyId,
+                price: Number(newPrice),
+                is_initial: false
+            });
+
+            await client.query('COMMIT');
+
+            return newPriceRecord;
+
+        } catch (error) {
+            await client.query('ROLLBACK');
+            throw error;
+        } finally {
+            client.release();
+        }
     }
 
     static async getBaseCurrency(client) {
@@ -1176,12 +1651,12 @@ class ListingModel {
     static async createVariantPrice({ listing_variant_id, currency_id, price, sale_price, starts_at, ends_at, status }) {
         const { rows } = await db.query(
             `INSERT INTO listing_prices
-                 (listing_variant_id, currency_id, price, sale_price, starts_at, ends_at, status)
+            (listing_variant_id, currency_id, price, sale_price, starts_at, ends_at, status)
              VALUES ($1, $2, $3, $4, $5, $6, $7)
-             RETURNING id`,
+             RETURNING *`,
             [listing_variant_id, currency_id, price, sale_price, starts_at, ends_at, status || 'active']
         );
-        return rows[0];
+        return rows[0] ?? null;
     }
 
     static async toggleVariantPriceStatus(priceId) {
@@ -1201,17 +1676,19 @@ class ListingModel {
     }
 
     static async deleteVariantPrice(priceId) {
-        await db.query(`DELETE FROM listing_prices WHERE id = $1`, [priceId]);
+        await db.query(`UPDATED listing_prices SET status = 'deleted' WHERE id = $1`, [priceId]);
     }
 
     static async findPricesByVariant(variantId) {
         const { rows } = await db.query(
-            `SELECT
+            `
+        SELECT
             jsonb_build_object(
                 'listing_id', l.id,
                 'listing_title', l.title,
                 'variant_id', lv.id,
                 'variant_sku', lv.sku,
+                'variant_status', lv.status,
                 'variant_image', (
                     SELECT lvm.storage_key
                     FROM listing_variants_media lvm
@@ -1221,66 +1698,126 @@ class ListingModel {
                     LIMIT 1
                 )
             ) AS variant,
-            (SELECT jsonb_build_object(
-                'currency_name', cy.name,
-                'currency_code', cy.code,
-                'currency_symbol', cy.symbol,
-                'currency_id', cy.id
-            ) FROM currencies cy WHERE cy.is_base AND cy.status = 'active') AS base_currency,
+
+            (
+                SELECT jsonb_build_object(
+                    'currency_id', cy.id,
+                    'currency_name', cy.name,
+                    'currency_code', cy.code,
+                    'currency_symbol', cy.symbol
+                )
+                FROM currencies cy
+                WHERE cy.is_base = TRUE
+                  AND cy.status = 'active'
+                LIMIT 1
+            ) AS base_currency,
+
             COALESCE(
                 jsonb_agg(
                     jsonb_build_object(
                         'id', lp.id,
+                        'listing_variant_id', lp.listing_variant_id,
                         'currency_id', lp.currency_id,
                         'currency_code', c.code,
                         'currency_symbol', c.symbol,
+
+                        -- Price type
                         'price', lp.price,
                         'sale_price', lp.sale_price,
+                        'base_price_id', lp.base_price_id,
+                        'is_initial', lp.is_initial,
+
+                        -- Validity period
                         'starts_at', lp.starts_at,
                         'ends_at', lp.ends_at,
+
+                        -- Status and timestamps
                         'status', lp.status,
                         'created_at', lp.created_at,
                         'updated_at', lp.updated_at,
-                        'is_current', (lp.id = vpc.listing_price_id)
+
+                        -- Current pricing information
+                        'is_current', (lcp.base_price_id = lp.id),
+                        'is_current_promotion', (lcp.promotion_id = lp.id),
+                        'current_price', lcp.current_price,
+                        'is_on_sale', COALESCE(lcp.is_on_sale, FALSE),
+                        'discount_percentage',
+                            COALESCE(lcp.discount_percentage, 0)
                     )
-                    ORDER BY lp.starts_at DESC, lp.created_at DESC
+                    ORDER BY
+                        lp.starts_at DESC,
+                        lp.created_at DESC,
+                        lp.id DESC
                 ) FILTER (WHERE lp.id IS NOT NULL),
                 '[]'::jsonb
             ) AS prices
-         FROM listing_variants lv
-         JOIN listings l ON l.id = lv.listing_id
-         LEFT JOIN listing_prices lp ON lp.listing_variant_id = lv.id
-         LEFT JOIN currencies c ON c.id = lp.currency_id
-         LEFT JOIN listing_variant_current_prices vpc
-                ON vpc.listing_variant_id = lp.listing_variant_id
-               AND vpc.listing_price_id = lp.id
-         WHERE lv.id = $1
-         GROUP BY lv.id, l.id`,
+
+        FROM listing_variants lv
+        JOIN listings l
+            ON l.id = lv.listing_id
+
+        LEFT JOIN listing_prices lp
+            ON lp.listing_variant_id = lv.id
+
+        LEFT JOIN currencies c
+            ON c.id = lp.currency_id
+
+        LEFT JOIN listing_variant_current_prices lcp
+            ON lcp.listing_variant_id = lv.id
+           AND lcp.currency_id = lp.currency_id
+
+        WHERE lv.id = $1
+
+        GROUP BY lv.id, l.id
+        `,
             [variantId]
         );
+
         return rows[0] || null;
     }
 
     static async findCurrentPriceForVariant(variantId) {
         const { rows } = await db.query(
-            `SELECT
-                 vpc.listing_variant_id,
-                 vpc.listing_price_id,
-                 vpc.currency_id,
-                 c.code AS currency_code,
-                 c.symbol AS currency_symbol,
-                 vpc.price,
-                 vpc.sale_price,
-                 vpc.current_price,
-                 vpc.is_on_sale,
-                 vpc.starts_at,
-                 vpc.ends_at
-             FROM listing_variant_current_prices vpc
-             JOIN currencies c ON c.id = vpc.currency_id
-             WHERE vpc.listing_variant_id = $1`,
+            `
+        SELECT
+            vpc.listing_variant_id,
+
+            -- Regular/base price
+            vpc.base_price_id,
+            vpc.regular_price,
+            vpc.regular_price_starts_at,
+            vpc.regular_price_ends_at,
+
+            -- Currently selected promotion
+            vpc.promotion_id,
+            vpc.sale_price,
+            vpc.promotion_starts_at,
+            vpc.promotion_ends_at,
+
+            -- Effective price
+            vpc.current_price,
+            vpc.is_on_sale,
+            vpc.discount_percentage,
+
+            -- Currency
+            vpc.currency_id,
+            c.name AS currency_name,
+            c.code AS currency_code,
+            c.symbol AS currency_symbol
+
+        FROM listing_variant_current_prices vpc
+
+        JOIN currencies c
+            ON c.id = vpc.currency_id
+
+        WHERE vpc.listing_variant_id = $1
+
+        ORDER BY c.is_base DESC, c.code ASC
+        `,
             [variantId]
         );
-        return rows[0] || null;
+
+        return rows;
     }
 
 }

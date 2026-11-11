@@ -8,16 +8,15 @@
 (function () {
     'use strict';
 
-    const { storeId, listingId, variantId, baseUrl } = window.__PRICES__ || {};
+    let active;
 
-    if (!storeId || !listingId || !variantId) {
+    const { storeId, variantId, baseUrl } = window.__PRICES__ || {};
+
+    if (!storeId || !variantId) {
         console.error('[prices] missing __PRICES__ config');
         return;
     }
 
-    const API_BASE = `/stores/${storeId}/listings/${listingId}/variants/${variantId}/prices`;
-
-    // ─── CDN helper ──────────────────────────────────────
     const CDN = 'https://cdn.cococe.rw/';
 
     function imageUrl(storageKey) {
@@ -45,7 +44,17 @@
     const formError = document.getElementById('addPriceError');
     const currencySel = document.getElementById('currency_id');
 
+    const initPriceModal = document.getElementById('addInitialPriceModal');
+    const initialPriceForm = document.getElementById('addInitialPriceForm');
+    const modalInitialVariantSku = document.getElementById('modalInitialVariantSku');
+    const closeInitialAddPrice = document.getElementById('closeInitialAddPrice');
+    const cancelInitialPrice = document.getElementById('cancelInitialPrice');
+    const addInitialPriceError = document.getElementById('addInitialPriceError');
+    const submitInitialPrice = document.getElementById('submitInitialPrice');
+    const initCurrencySel = document.getElementById('initial_currency_id');
+
     // ─── State ───────────────────────────────────────────
+
     let data = { variant: null, prices: [], current: null, currencies: [] };
     let fetchController = null;
 
@@ -75,7 +84,7 @@
     function periodLabel(startsAt, endsAt) {
         if (!startsAt && !endsAt) return 'No period set';
         if (!endsAt) return `From ${formatDate(startsAt)}`;
-        return `${formatDate(startsAt)} → ${formatDate(endsAt)}`;
+        return `${formatDateTime(startsAt)} → ${formatDateTime(endsAt)}`;
     }
     function statusTone(status) {
         return {
@@ -118,18 +127,17 @@
         showLoading();
 
         try {
-            const res = await axios.get(API_BASE, {
+            const res = await axios.get(`/stores/${storeId}/variants/${variantId}/prices`, {
                 withCredentials: true,
                 headers: { Accept: 'application/json' },
                 signal: fetchController.signal,
             });
 
-            // Handle both { data: {...} } and flat { ... }
             const payload = res.data?.data ?? res.data;
+
             if (!payload || !payload.variant) {
                 throw new Error('Malformed response: no variant');
             }
-
 
             data = {
                 variant: payload.variant,
@@ -139,6 +147,7 @@
 
             hydrate();
             showContent();
+
         } catch (err) {
             if (axios.isCancel(err)) return;
             console.error('[prices] failed:', err);
@@ -153,6 +162,24 @@
     // ─── Hydrate ─────────────────────────────────────────
     function hydrate() {
         const { variant, prices, currency } = data;
+
+        const hasInitialPrice = prices.some(
+            price => price.is_initial === true
+        );
+
+        if (!hasInitialPrice) {
+            showSnackbar({
+                type: 'warning',
+                autoClose: false,
+                message: `<i data-lucide="triangle-exclamation-point"></i> This Variant has no initial price set`,
+                actionText: 'Set price',
+                onAction: async () => {
+                    //Fire initial price modal
+                    openInitialPriceModal();
+                }
+            });
+            lucide?.createIcons();
+        }
 
         document.getElementById('variantSku').textContent = variant.variant_sku || '—';
         document.getElementById('variantTitle').textContent =
@@ -170,23 +197,29 @@
         }
 
         modalSku.textContent = variant.variant_sku || 'variant';
+        modalInitialVariantSku.textContent = variant.variant_sku || '';
         $('#salePriceModalTag').text(`(${variant.currency_code})`)
 
         addBtn.disabled = false;
 
+        if (endsAtCountdownInterval) {
+            clearInterval(endsAtCountdownInterval);
+            endsAtCountdownInterval = null;
+        }
         renderSummary(prices, currency);
         renderCurrencyOptions([currency]);
         renderPrices(prices);
     }
 
     function renderSummary(prices, baseCurrency) {
+
         const priceEl = document.getElementById('currentPriceValue');
         const saleEl = document.getElementById('currentSaleBadge');
         const currencyEl = document.getElementById('currentCurrency');
         const startsEl = document.getElementById('currentStartsAt');
         const endsEl = document.getElementById('currentEndsAt');
 
-        const active = Array.isArray(prices) ? prices.find(p => p.is_current) : null;
+        active = Array.isArray(prices) ? prices.find(p => p.is_current) : null;
 
         if (!active) {
             priceEl.innerHTML = `<span class="text-base font-medium text-slate-400">No active price</span>`;
@@ -198,7 +231,7 @@
             return;
         }
 
-        const symbol = active.currency_symbol || active.currency_code || 'RWF';
+        const symbol = active.currency_code || active.currency_symbol || 'USD';
 
         // Sale vs regular: if sale_price is set and < price, use it
         const hasSale = active.sale_price != null && Number(active.sale_price) < Number(active.price);
@@ -211,7 +244,27 @@
             : '—';
 
         startsEl.textContent = formatDateTime(active.starts_at);
-        endsEl.textContent = active.ends_at ? formatDateTime(active.ends_at) : 'No end date';
+        //endsEl.textContent = active.ends_at ? formatDateTime(active.ends_at) : 'No end date';
+
+        if (active.ends_at) {
+            endsEl.textContent = formatDateTime(active.ends_at);
+
+            const countdownEl = document.createElement('div');
+
+            countdownEl.className =
+                'mt-1 text-xs font-bold text-brand';
+
+            endsEl.appendChild(countdownEl);
+
+            startPriceCountdown(active.ends_at, countdownEl);
+        } else {
+            endsEl.textContent = 'No end date';
+
+            if (endsAtCountdownInterval) {
+                clearInterval(endsAtCountdownInterval);
+                endsAtCountdownInterval = null;
+            }
+        }
 
         if (hasSale) {
             saleEl.classList.remove('hidden');
@@ -222,6 +275,53 @@
         } else {
             saleEl.classList.add('hidden');
             saleEl.innerHTML = '';
+        }
+    }
+
+    let endsAtCountdownInterval = null;
+
+    function startPriceCountdown(endsAt, container) {
+        // Clear any previous countdown
+        if (endsAtCountdownInterval) {
+            clearInterval(endsAtCountdownInterval);
+            endsAtCountdownInterval = null;
+        }
+
+        if (!endsAt) return;
+
+        const endTime = new Date(endsAt).getTime();
+
+        if (Number.isNaN(endTime)) {
+            container.textContent = 'Invalid expiration date';
+            return;
+        }
+
+        const updateCountdown = () => {
+            const remaining = endTime - Date.now();
+
+            if (remaining <= 0) {
+                container.textContent = 'Price period ended';
+                clearInterval(endsAtCountdownInterval);
+                endsAtCountdownInterval = null;
+                return;
+            }
+
+            const days = Math.floor(remaining / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((remaining / (1000 * 60 * 60)) % 24);
+            const minutes = Math.floor((remaining / (1000 * 60)) % 60);
+            const seconds = Math.floor((remaining / 1000) % 60);
+
+            const pad = value => String(value).padStart(2, '0');
+
+            container.textContent = days > 0
+                ? `${days}d ${pad(hours)}h ${pad(minutes)}m ${pad(seconds)}s remaining`
+                : `${pad(hours)}h ${pad(minutes)}m ${pad(seconds)}s remaining`;
+        };
+
+        updateCountdown();
+
+        if (endTime > Date.now()) {
+            endsAtCountdownInterval = setInterval(updateCountdown, 1000);
         }
     }
 
@@ -238,6 +338,10 @@
         currencySel.disabled = false;
 
         currencySel.innerHTML = currencies.map(c => `
+            <option value="${c.currency_id}">${escapeHtml(c.currency_code)} — ${escapeHtml(c.currency_name)}</option>
+        `).join('');
+
+        initCurrencySel.innerHTML = currencies.map(c => `
             <option value="${c.currency_id}">${escapeHtml(c.currency_code)} — ${escapeHtml(c.currency_name)}</option>
         `).join('');
     }
@@ -263,18 +367,52 @@
 
         const tbody = document.getElementById('pricesTableBody');
         tbody.innerHTML = prices.map(renderDesktopRow).join('');
-        lucide?.createIcons();
 
+        lucide?.createIcons();
+        tbody.addEventListener('click', (e) => {
+            const toggleBtn = e.target.closest('.toggle-actions-btn');
+
+            if (!toggleBtn) return;
+
+            const currentRow = toggleBtn.closest('tr');
+            const actionsRow = currentRow.nextElementSibling;
+
+            if (!actionsRow?.classList.contains('actions-row')) return;
+
+            const isOpen = !actionsRow.classList.contains('hidden');
+
+            tbody.querySelectorAll('.actions-row').forEach(row => {
+                row.classList.add('hidden');
+            });
+
+            tbody.querySelectorAll('.toggle-actions-btn').forEach(btn => {
+                btn.setAttribute('aria-expanded', 'false');
+                btn.querySelector('[data-lucide="chevron-down"]')
+                    ?.classList.remove('rotate-180');
+            });
+
+            if (!isOpen) {
+                actionsRow.classList.remove('hidden');
+                toggleBtn.setAttribute('aria-expanded', 'true');
+
+                toggleBtn.querySelector('[data-lucide="chevron-down"]')
+                    ?.classList.add('rotate-180');
+            }
+        });
         mobileEl.innerHTML = prices.map(renderMobileCard).join('');
     }
 
+
     function renderDesktopRow(p) {
-        const activeClass = p.is_current ? 'bg-brand-ultralight' : 'hover:bg-slate-50';
-        const symbol = p.currency_symbol || p.currency_code || 'RWF';
+        const activeClass = p.is_current
+            ? 'bg-brand-ultralight'
+            : 'hover:bg-slate-50';
+
+        const symbol = p.currency_code || p.currency_symbol || 'USD';
 
         const saleCell = p.sale_price != null
             ? `<p class="font-semibold text-brand">${formatMoney(p.sale_price, symbol)}</p>
-               <p class="text-[10px] text-slate-500">−${Math.round((1 - p.sale_price / p.price) * 100)}%</p>`
+           <p class="text-[10px] text-slate-500">−${Math.round((1 - p.sale_price / p.price) * 100)}%</p>`
             : `<span class="text-xs text-slate-400">—</span>`;
 
         const activeBadge = p.is_current
@@ -282,62 +420,84 @@
             : '';
 
         const toggleLabel = p.status === 'active' ? 'Disable' : 'Activate';
-        const toggleClass = p.status === 'active'
-            ? 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50'
-            : 'border-brand bg-brand text-white hover:bg-brand-dark';
+
+        let statusContent = `<span class="block h-3 w-3 rounded-full bg-[#1e90ff] cursor-pointer" title="Initial price"></span>`;
+
+        if (p.is_current) statusContent = `<span class="block h-3 w-3 rounded-full bg-green-800 cursor-pointer" title="Currently active"></span>`;
+        if (!p.is_current && !p.is_initial) statusContent = `<span class="block h-3 w-3 rounded-full bg-yellow-500 cursor-pointer" title="Price record"></span>`
 
         return `
-            <tr class="${activeClass}" data-price-id="${p.id} relative">
-                <td class="px-5 py-3">
-                    ${p.is_current ? `<span class="block h-2 w-2 rounded-full bg-green-800" title="Currently active"></span>` : ''}
-                </td>
-                
-                <td class="px-5 py-3">
-                    <p class="font-semibold text-slate-900">${formatMoney(p.price, symbol)}</p>
-                </td>
-                <td class="px-5 py-3">${saleCell}</td>
-                <td class="px-5 py-3">
-                    <p class="text-xs text-slate-700">${periodLabel(p.starts_at, p.ends_at)}</p>
-                    ${activeBadge}
-                </td>
-                <td class="px-5 py-3">
-                    <span class="rounded-full px-2 py-0.5 text-[10px] font-semibold capitalize ${statusTone(p.status)}">
-                        ${escapeHtml(p.status)}
-                    </span>
-                </td>
-                <td class="px-5 py-3 text-right">
+                <tr class="${activeClass}" data-price-id="${p.id}">
+                    <td class="px-5 py-3">
+                    ${statusContent
+            }
+                    </td>
 
-                    <button type="button" 
-                            class="inline-flex items-center gap-1 rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-sm font-semibold text-slate-700 shadow-sm hover:bg-slate-50 toggle-actions-btn" 
-                            title="More Actions">
-                        <span>Actions</span>
-                        <i data-lucide="chevron-down" class="h-4 w-4"></i>
-                    </button>
+                    <td class="px-5 py-3">
+                        <p class="font-semibold text-slate-900">${formatMoney(p.price, symbol)}</p>
+                    </td>
 
-                    <div class="absolute right-45 z-50 mt-2 w-48 origin-top-right scale-95 transform opacity-0 pointer-events-none rounded-lg border border-slate-200 bg-white p-1 shadow-lg transition-all duration-100 ease-out actions-dropdown">
-                        <div class="flex flex-col gap-0.5">
+                    <td class="px-5 py-3">${saleCell}</td>
+
+                    <td class="px-5 py-3">
+                        <p class="text-xs text-slate-700">${periodLabel(p.starts_at, p.ends_at)}</p>
+                        ${activeBadge}
+                    </td>
+
+                    <td class="px-5 py-3">
+                        <span class="rounded-full px-2 py-0.5 text-[10px] font-semibold capitalize ${statusTone(p.status)}">
+                            ${escapeHtml(p.status)}
+                        </span>
+                    </td>
+
+                    <td class="px-5 py-3 text-right">
+                        <button type="button"
+                            class="${p.is_initial ? 'hidden' : 'inline-flex'} items-center gap-1 rounded-lg border border-slate-300
+                                bg-white px-3 py-1.5 text-sm font-semibold text-slate-700
+                                shadow-sm hover:bg-slate-50 toggle-actions-btn"
+                            aria-expanded="false">
+
+                            <span>Actions</span>
+                            <i data-lucide="chevron-down"
+                                class="h-4 w-4 transition-transform duration-200"></i>
+                        </button>
+                    </td>
+                </tr>
+
+                <tr class="hidden actions-row" data-for-price="${p.id}">
+                    <td colspan="6"
+                        class="border-b border-slate-200 bg-slate-50 px-5 py-3">
+
+                        <div class="flex flex-wrap items-center justify-end gap-2">
+
                             <button type="button"
-                                    data-action="toggle"
-                                    data-price-id="${p.id}" class="w-full inline-flex items-center gap-2 rounded-md px-3 py-2 text-left text-sm text-slate-700 hover:bg-slate-100 hover:text-brand">
-                                <i data-lucide="move-horizontal" class="h-4 w-4"></i>
+                                data-action="toggle"
+                                data-price-id="${p.id}"
+                                class="inline-flex items-center gap-2 rounded-lg border border-slate-300
+                                    bg-white px-3 py-2 text-sm font-medium text-slate-700
+                                    hover:bg-slate-100">
                                 <span>${toggleLabel}</span>
                             </button>
+
                             <button type="button"
-                                    data-action="delete"
-                                    data-price-id="${p.id}" class="w-full inline-flex items-center gap-2 rounded-md px-3 py-2 text-left text-sm text-slate-700 hover:bg-slate-100 hover:text-brand">
-                                <i data-lucide="trash" class="h-4 w-4"></i>
+                                data-action="delete"
+                                data-price-id="${p.id}"
+                                class="inline-flex items-center gap-2 rounded-lg border border-red-200
+                                    bg-white px-3 py-2 text-sm font-medium text-red-600
+                                    hover:bg-red-50">
                                 <span>Delete</span>
                             </button>
-                        </div>
-                    </div>
 
-                </td>
-            </tr>`;
+                        </div>
+                    </td>
+                </tr>
+            `;
     }
+
 
     function renderMobileCard(p) {
         const activeClass = p.is_current ? 'bg-brand-ultralight' : '';
-        const symbol = p.currency_symbol || p.currency_code || 'RWF';
+        const symbol = p.currency_code || p.currency_symbol || 'USD';
 
         const saleLine = p.sale_price != null
             ? `<p class="mt-0.5 text-sm font-semibold text-brand">
@@ -405,7 +565,7 @@
         if (action === 'toggle') {
             btn.disabled = true;
             try {
-                await axios.post(`${API_BASE}/${priceId}/toggle`, null, {
+                await axios.post(``, null, {
                     withCredentials: true,
                     headers: { Accept: 'application/json' },
                 });
@@ -426,7 +586,7 @@
                 onAction: async () => {
                     btn.disabled = true;
                     try {
-                        await axios.post(`${API_BASE}/${priceId}/delete`, null, {
+                        await axios.delete(`/stores/${storeId}/variants/${variantId}/prices/${priceId}`, null, {
                             withCredentials: true,
                             headers: { Accept: 'application/json' },
                         });
@@ -442,7 +602,6 @@
         }
     });
 
-    // Empty-state "Add first price" delegates to the same modal
     document.addEventListener('click', (e) => {
         const btn = e.target.closest('[data-open-add-price]');
         if (btn) openModal();
@@ -456,10 +615,10 @@
         }
     }
 
-    // ─── Add price modal ─────────────────────────────────
     function openModal() {
         if (!modal) return;
-        form.reset();
+        //form.reset();
+        if (active) document.getElementById('price').value = active.price;
         formError.classList.add('hidden');
         clearFieldErrors();
         modal.classList.remove('hidden');
@@ -474,15 +633,37 @@
         document.body.style.overflow = '';
     }
 
+    function openInitialPriceModal() {
+        if (!initPriceModal) return;
+        initialPriceForm.reset();
+        addInitialPriceError.classList.add('hidden');
+
+        initPriceModal.classList.remove('hidden');
+        initPriceModal.classList.add('flex');
+        document.body.style.overflow = 'hidden';
+
+    }
+    function closeInitialPriceModal() {
+        if (!initPriceModal) return;
+        addInitialPriceError.classList.add('hidden');
+        initPriceModal.classList.add('hidden');
+        initPriceModal.classList.remove('flex');
+        document.body.style.overflow = '';
+    }
+
     addBtn?.addEventListener('click', openModal);
     closeBtn?.addEventListener('click', closeModal);
     cancelBtn?.addEventListener('click', closeModal);
-    backdrop?.addEventListener('click', closeModal);
+
+    closeInitialAddPrice?.addEventListener('click', closeInitialPriceModal);
+    cancelInitialPrice?.addEventListener('click', closeInitialPriceModal)
+
+    //backdrop?.addEventListener('click', closeModal);
+
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape' && modal && !modal.classList.contains('hidden')) closeModal();
     });
 
-    // ─── Validation ──────────────────────────────────────
     function clearFieldErrors() {
         form.querySelectorAll('[data-error-for]').forEach(el => {
             el.textContent = '';
@@ -538,17 +719,18 @@
         formError.classList.add('hidden');
 
         const fd = new FormData(form);
+
         const payload = {
             currency_id: fd.get('currency_id'),
             price: fd.get('price'),
             sale_price: fd.get('sale_price') || null,
-            starts_at: fd.get('starts_at') || null,
-            ends_at: fd.get('ends_at') || null,
+            starts_at: toUTC(fd.get('starts_at')),
+            ends_at: toUTC(fd.get('ends_at')),
             status: fd.get('status') || 'active',
         };
 
         try {
-            await axios.post(API_BASE, payload, {
+            await axios.post(`/stores/${storeId}/variants/${variantId}/price`, payload, {
                 withCredentials: true,
                 headers: { Accept: 'application/json' },
             });
@@ -566,6 +748,40 @@
         }
     });
 
+    initialPriceForm?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        if (!$('#initial_price_value').val()) {
+            $('#addInitialPriceError').removeClass('hidden').text('Price must be greater than 0');
+            return;
+        }
+
+        try {
+            submitInitialPrice.disabled = true;
+            submitInitialPrice.textContent = 'Setting price...';
+            const fd = new FormData(initialPriceForm);
+            await axios.post(`/stores/${storeId}/variants/${variantId}/price/initial`, {
+                price: fd.get('initial_price'),
+                currency_id: fd.get('initial_currency_id'),
+            }, {
+                withCredentials: true
+            });
+            closeInitialPriceModal();
+            Notification.showNotification({
+                type: 'success',
+                message: 'Price set successfully'
+            });
+            await load();
+        } catch (error) {
+            console.log(error);
+            $('#addInitialPriceError').removeClass('hidden').text(error.response?.data?.message || 'Internal Server Error');
+        } finally {
+            submitInitialPrice.disabled = false;
+            submitInitialPrice.textContent = 'Set price';
+        }
+
+    })
+
     retryBtn?.addEventListener('click', load);
 
     load();
@@ -574,15 +790,11 @@
     document.addEventListener('click', (event) => {
         const isToggleBtn = event.target.closest('.toggle-actions-btn');
         const activeDropdown = isToggleBtn ? isToggleBtn.nextElementSibling : null;
-
-        // 1. Close all other open dropdowns
         document.querySelectorAll('.actions-dropdown').forEach((dropdown) => {
             if (dropdown !== activeDropdown) {
                 dropdown.classList.add('opacity-0', 'pointer-events-none', 'scale-95');
             }
         });
-
-        // 2. Toggle the targeted dropdown if clicked
         if (activeDropdown) {
             event.stopPropagation();
             activeDropdown.classList.toggle('opacity-0');

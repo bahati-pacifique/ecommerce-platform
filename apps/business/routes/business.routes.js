@@ -47,8 +47,11 @@ router.get('/stores/:storeId/data/product-listing/inventories', business, busine
 router.get('/stores/:storeId/listings', business, businessController.getStoreListings);
 
 router.get('/stores/:storeId/listings/:listingId/review', business, businessController.renderListingPage);
-router.get('/stores/:storeId/listings/:listingId/variants/:variantId/prices', business, businessController.getListingVariantPrices);
-router.get('/stores/:storeId/listings/:listingId/variants/:variantId/pricing', business, businessController.renderListingPricing);
+
+router.post('/stores/:storeId/variants/:variantId/price', business, businessController.createVariantSalePrice);
+router.post('/stores/:storeId/variants/:variantId/price/initial', business, businessController.createVariantInitialPrice);
+router.get('/stores/:storeId/variants/:variantId/prices', business, businessController.getListingVariantPrices);
+router.get('/stores/:storeId/variants/:variantId/pricing', business, businessController.renderListingPricing);
 
 
 router.get('/stores/:storeId/listings/:listingId', business, businessController.getListing);

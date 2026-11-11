@@ -232,3 +232,15 @@ function _formatDate(d) {
 
     return dt.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 }
+
+function toUTC(value) {
+    if (!value) return null;
+
+    const date = new Date(value);
+
+    if (Number.isNaN(date.getTime())) {
+        throw new Error('Invalid date/time');
+    }
+
+    return date.toISOString();
+}

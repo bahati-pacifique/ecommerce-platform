@@ -44,13 +44,16 @@
         return CDN + storageKey.replace(/^\/+/, '');
     }
 
-    function formatMoney(amount) {
-        if (amount == null) return '';
+    function formatMoney(amount, currencyCode = 'USD') {
+        const numericAmount = Number(amount);
+        if (amount == null || Number.isNaN(numericAmount)) return '';
+
         return new Intl.NumberFormat('en-RW', {
             style: 'currency',
-            currency: 'RWF',
+            currency: currencyCode,
+            currencyDisplay: 'code',
             maximumFractionDigits: 0,
-        }).format(Number(amount));
+        }).format(numericAmount);
     }
 
     function stockLabel(inv) {
@@ -116,12 +119,12 @@
             id: v.id,
             sku: v.sku,
             price: Number(v.price),
-            priceLabel: formatMoney(v.price),
+            priceLabel: formatMoney(v.price, data.base_currency?.code),
             salePrice: v.sale_price != null ? Number(v.sale_price) : null,
-            salePriceLabel: v.sale_price != null ? formatMoney(v.sale_price) : null,
+            salePriceLabel: v.sale_price != null ? formatMoney(v.sale_price, data.base_currency?.code) : null,
             isOnSale: !!v.is_on_sale,
             currentPrice: Number(v.current_price ?? v.price),
-            currentPriceLabel: formatMoney(v.current_price ?? v.price),
+            currentPriceLabel: formatMoney(v.current_price ?? v.price, data.base_currency?.code),
             imageUrl: imageUrl(v.image_url),
             attributes: v.attributes || [],
             inventory: v.inventory || null,
@@ -259,9 +262,8 @@
             const list = document.getElementById('variantList');
             list.innerHTML = '';
 
-            document.getElementById('pricingLink').href = `/stores/${storeId}/listings/${listingId}/variants/${variants[0].id}/pricing`;
-
             variants.forEach((v, idx) => {
+                if (idx === 0) document.getElementById('pricingLink').href = `/stores/${storeId}/variants/${variants[0].id}/pricing`;
                 const label = document.createElement('label');
                 label.className = 'group relative w-[170px] shrink-0 snap-start cursor-pointer sm:w-auto';
                 label.innerHTML = `
@@ -440,7 +442,7 @@
             if (el) el.disabled = oos;
         });
 
-        document.getElementById('pricingLink').href = `/stores/${storeId}/listings/${listingId}/varinats/${variant.id}/pricing`;
+        document.getElementById('pricingLink').href = `/stores/${storeId}/variants/${variant.id}/pricing`;
     }
 
     function highlightThumb(thumbsEl, activeIdx) {
@@ -702,7 +704,7 @@
                     })
                     loadListing();
                 } catch (error) {
-                    console.log('[Error changing listing status]', error);
+                    console.error('[Error changing listing status]', error);
                     Notification.showNotification({
                         type: 'error',
                         message: error.response?.data?.message || 'Internal Server Error'

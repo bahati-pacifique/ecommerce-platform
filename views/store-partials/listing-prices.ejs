@@ -21,7 +21,7 @@
     <div class="flex items-start gap-3">
       <img id="variantImage" src="" alt="" class="hidden h-20 w-20 shrink-0 rounded-lg object-contain ring-1 ring-slate-200">
       <div class="min-w-0">
-        <h1 class="text-xl font-bold tracking-tight text-slate-950 sm:text-2xl">Pricing</h1>
+        <h1 class="text-xl font-bold tracking-tight text-slate-700 sm:text-2xl">Pricing</h1>
         <p class="mt-1 truncate text-sm text-slate-500">
           <span id="variantSku" class="font-mono">—</span>
           · <span id="variantTitle">Loading…</span>
@@ -37,11 +37,9 @@
     </button>
   </div>
 
-  <!-- ═══════════════════════════════════════════════════
-       LOADING STATE
-  ════════════════════════════════════════════════════ -->
+
   <div id="pricesLoading" class="animate-pulse">
-    <!-- Summary cards -->
+
     <div class="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
       <div class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
         <div class="h-2.5 w-24 rounded bg-slate-200"></div>
@@ -103,10 +101,14 @@
   <div id="pricesContent" class="hidden opacity-0">
 
     <div class="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-      <div class="rounded-xl border border-green-800 bg-green-50 text-green-800 p-4 shadow-sm ">
+      <div class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
         <p class="text-[10px] font-bold uppercase tracking-wider">Current price</p>
         <p id="currentPriceValue" class="mt-1.5 text-2xl font-extrabold">—</p>
         <p id="currentSaleBadge" class="mt-1 hidden items-center gap-1.5 text-xs"></p>
+      </div>
+      <div class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+        <p class="text-[10px] font-bold uppercase tracking-wider text-slate-500">Ends</p>
+        <p id="currentEndsAt" class="mt-1.5 text-sm font-semibold text-slate-950">—</p>
       </div>
       <div class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
         <p class="text-[10px] font-bold uppercase tracking-wider text-slate-500">Currency</p>
@@ -116,10 +118,7 @@
         <p class="text-[10px] font-bold uppercase tracking-wider text-slate-500">Effective from</p>
         <p id="currentStartsAt" class="mt-1.5 text-sm font-semibold text-slate-950">—</p>
       </div>
-      <div class="rounded-xl border border-red-800 bg-red-50 p-4 shadow-sm">
-        <p class="text-[10px] font-bold uppercase tracking-wider text-slate-500">Ends</p>
-        <p id="currentEndsAt" class="mt-1.5 text-sm font-semibold text-slate-950">—</p>
-      </div>
+
     </div>
 
     <div class="mt-5 rounded-xl border border-slate-200 bg-white shadow-sm">
@@ -156,7 +155,7 @@
               <th class="px-5 py-3 font-semibold">Sale price</th>
               <th class="px-5 py-3 font-semibold">Period</th>
               <th class="px-5 py-3 font-semibold">Status</th>
-              <th class="px-5 py-3 text-right font-semibold">Actions</th>
+              <th class="px-5 py-3 text-right font-semibold hidden md:block">Actions</th>
             </tr>
           </thead>
           <tbody id="pricesTableBody" class="divide-y divide-slate-100"></tbody>
@@ -215,7 +214,7 @@
             <label for="sale_price" class="mb-1 block text-xs font-bold uppercase tracking-wider text-slate-500">
               Sale price <span class="font-normal normal-case text-slate-400" id="salePriceModalTag"></span>
             </label>
-            <input id="sale_price" name="sale_price" type="number" step="0.01" min="0" class="h-10 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm outline-none focus:border-brand focus:ring-2 focus:ring-brand/20" placeholder="Leave empty if none">
+            <input id="sale_price" name="sale_price" type="number" step="0.01" min="0" class="h-10 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm outline-none focus:border-brand focus:ring-2 focus:ring-brand/20" placeholder="New Selling price">
             <p class="mt-1 hidden text-xs text-brand" data-error-for="sale_price"></p>
           </div>
         </div>
@@ -255,6 +254,63 @@
           </button>
           <button type="submit" id="submitAddPrice" class="rounded-lg bg-brand px-5 py-2.5 text-sm font-bold text-white transition hover:bg-brand-dark disabled:cursor-not-allowed disabled:opacity-60">
             <span id="submitAddPriceText">Add price</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div id="addInitialPriceModal" class="fixed inset-0 z-[60] hidden items-end justify-center bg-slate-950/50 p-0 backdrop-blur-sm sm:items-center sm:p-4" role="dialog" aria-modal="true" aria-labelledby="addPriceTitle">
+
+  <div id="addInitialPriceBackdrop" class="absolute inset-0" aria-hidden="true"></div>
+
+  <div class="relative w-full max-w-lg overflow-hidden rounded-t-2xl bg-white shadow-2xl sm:rounded-2xl">
+    <div class="h-1 w-full bg-gradient-to-r from-brand via-brand-dark to-brand"></div>
+
+    <div class="max-h-[90vh] overflow-y-auto p-5 sm:p-6">
+
+      <div class="flex items-start justify-between gap-3">
+        <div>
+          <h2 id="addInitialPriceTitle" class="text-lg font-bold text-slate-950">Initial price</h2>
+          <p class="mt-0.5 text-xs text-slate-500">
+            For <span id="modalInitialVariantSku" class="font-mono">variant</span>
+          </p>
+        </div>
+        <button type="button" id="closeInitialAddPrice" aria-label="Close" class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-slate-500 hover:bg-slate-100">
+          <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18 18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      <div id="addInitialPriceError" class="mt-4 hidden rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-700" role="alert">hell</div>
+
+      <form id="addInitialPriceForm" class="mt-5 space-y-4" novalidate>
+
+        <div class="flex flex-col gap-3">
+          <div>
+            <label for="initial_price_value" class="mb-1 block text-xs font-bold uppercase tracking-wider text-slate-500">
+              Variant Initial Price
+            </label>
+            <input id="initial_price_value" name="initial_price" type="number" placeholder="eg. 100000" class="h-12 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm outline-none focus:border-brand focus:ring-2 focus:ring-brand/20">
+            <p class="mt-1 text-[10px] text-slate-400">Applied to marketplace currency</p>
+          </div>
+          <div>
+            <label for="currency_id" class="mb-1 block text-xs font-bold uppercase tracking-wider text-slate-500">
+              Currency
+            </label>
+            <select id="initial_currency_id" name="initial_currency_id" required class="h-12 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm outline-none focus:border-brand focus:ring-2 focus:ring-brand/20"></select>
+          </div>
+        </div>
+
+
+        <div class="flex flex-col-reverse gap-2 pt-2 sm:flex-row sm:justify-end">
+          <button type="button" id="cancelInitialPrice" class="rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50">
+            Cancel
+          </button>
+          <button type="submit" id="submitInitialPrice" class="rounded-lg bg-brand px-5 py-2.5 text-sm font-bold text-white transition hover:bg-brand-dark disabled:cursor-not-allowed disabled:opacity-60">
+            <span id="submitAddPriceText">Set price</span>
           </button>
         </div>
       </form>

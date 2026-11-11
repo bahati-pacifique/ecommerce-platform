@@ -737,14 +737,14 @@ async function renderListingPricing(req, res) {
 
         updateStoreLastActive(vendorStore.id);
 
-        return res.render('store-partials/listing-prices', { 
-            layout: 'focused', 
+        return res.render('store-partials/listing-prices', {
+            layout: 'focused',
             variantId,
-            listingId, 
-            store: vendorStore, 
-            user, protocal, 
-            domainName, 
-            title: 'Listing Prices' 
+            listingId,
+            store: vendorStore,
+            user, protocal,
+            domainName,
+            title: 'Listing Prices'
         });
     } catch (error) {
         console.log(error);
@@ -762,7 +762,7 @@ async function renderListingPricing(req, res) {
 
 async function getListingVariantPrices(req, res) {
     try {
-        const {storeId, variantId, listingId} = req.params;
+        const { storeId, variantId, listingId } = req.params;
         const user = req.user;
 
         const vendorStore = await StoreService.getVendorStore(storeId, user.vendor?.id || null);
@@ -775,13 +775,87 @@ async function getListingVariantPrices(req, res) {
 
         const result = await ListingService.getListingVariantPrices(variantId);
 
-        console.log(result)
-
         return res.json(result);
 
     } catch (error) {
         console.log('[getListingVariantPrices]', error);
-        return res.status(500).json({message: `Unable to get prices — Internal error`})
+        return res.status(500).json({ message: `Unable to get prices — Internal error` })
+    }
+}
+
+async function createVariantPrice(req, res) {
+    try {
+        const { storeId, variantId } = req.params;
+        const user = req.user;
+
+        const { currency_id, price, sale_price, starts_at, ends_at, status } = req.body;
+
+        const vendorStore = await StoreService.getVendorStore(storeId, user.vendor?.id || null);
+
+        if (!vendorStore) {
+            return res.status(401).json({
+                message: 'Store validation failed'
+            })
+        }
+
+        const result = await ListingService.insertVariantPrice({
+            listing_variant_id: variantId,
+            currency_id,
+            price,
+            sale_price,
+            starts_at,
+            ends_at,
+            status
+        });
+
+        return res.json(result);
+
+    } catch (error) {
+        let message = 'Unable to get prices — Internal error';
+        if (!error.code) message = error.message;
+        console.log('[createVariantPrice]', error);
+        return res.status(500).json({ message })
+    }
+}
+
+async function createVariantInitialPrice(req, res) {
+    const { storeId, variantId } = req.params;
+    const user = req.user;
+    try {
+        const { price } = req.body;
+        await validateVendorStore(storeId, user.vendor?.id || null, res);
+        const result = await ListingService.createInitialPrice(variantId, price);
+        return res.json(result);
+    } catch (error) {
+        console.error('[makeVariantInitialPrice]', error);
+        let message = 'Unable to create initial price — Internal Error';
+        if (!error.code) message = error.message;
+        return res.status(500).json({
+            message,
+        });
+    }
+}
+
+async function createVariantSalePrice(req, res) {
+    const { storeId, variantId } = req.params;
+    const user = req.user;
+    try {
+        await validateVendorStore(storeId, user.vendor?.id || null, res);
+        const result = await ListingService.createPromotionalPrice({
+            listing_variant_id: variantId,
+            currency_id: req.body.currency_id,
+            base_price_id: req.body.base_price_id,
+            sale_price: req.body.sale_price,
+            starts_at: req.body.starts_at,
+            ends_at: req.body.ends_at
+        });
+
+        return res.json(result);
+    } catch (error) {
+        console.error('[createVariantSalePrice]', error);
+        return res.status(500).json({
+            message: 'Unable to make initial price — Internal Error'
+        });
     }
 }
 
@@ -1577,7 +1651,6 @@ async function insertNewList(req, res) {
             }
         }
 
-        console.log(errors)
         if (errors.length) {
             return res.status(422).json({
                 success: false,
@@ -2005,7 +2078,7 @@ async function patchListing(req, res) {
 
         const result = await ListingService.patchListingOnStoreLevel(listingId, vendorStore.id, status);
 
-        return result ? res.status(201).json(result) : res.status(404).json({message: 'Unable to settle listing — Please check listing id'});
+        return result ? res.status(201).json(result) : res.status(404).json({ message: 'Unable to settle listing — Please check listing id' });
     } catch (error) {
         console.log('patchListing', error);
         return res.status(500).json({ message: error.message || `Unable to settle listing — Internal error` })
@@ -2062,6 +2135,16 @@ async function getStoreDashboard(req, res) {
 }
 
 
+async function validateVendorStore(storeId, vendorId, res) {
+    const vendorStore = await StoreService.getVendorStore(storeId, vendorId);
+
+    if (!vendorStore) {
+        return res.status(401).json({
+            message: 'Store validation failed'
+        })
+    }
+}
+
 module.exports = {
     businessHomePage,
     renderVendorCreation,
@@ -2101,6 +2184,9 @@ module.exports = {
     getListing,
     patchListing,
 
+    createVariantInitialPrice,
+    createVariantSalePrice,
+    createVariantPrice,
     getListingVariantPrices,
 
     createInventoryItem,

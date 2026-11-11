@@ -157,6 +157,15 @@ $(document).ready(() => {
         window.lucide?.createIcons();
     }
 
+    function formatMoney(amount, symbol = 'RWF') {
+        if (amount == null) return '—';
+        const n = Number(amount);
+        const formatted = new Intl.NumberFormat('en-RW', {
+            maximumFractionDigits: 2,
+            minimumFractionDigits: 0,
+        }).format(n);
+        return `${formatted} ${symbol}`;
+    }
     function renderCardHTML(l) {
         const statusTone = {
             active: 'bg-emerald-50 text-emerald-700',
@@ -164,13 +173,7 @@ $(document).ready(() => {
             archived: 'bg-rose-50 text-rose-700',
         }[l.status] || 'bg-slate-100 text-slate-600';
 
-        const priceLabel = l.starting_price != null ?
-            new Intl.NumberFormat('en-US', {
-                style: 'currency',
-                currency: l.currency || 'USD'
-            })
-                .format(l.starting_price / 100) :
-            '—';
+        const priceLabel = formatMoney(l.starting_price, l.currency || 'USD');
 
         const updatedLabel = l.updated_at ?
             new Date(l.updated_at).toLocaleDateString('en-UK', {
@@ -225,8 +228,8 @@ $(document).ready(() => {
                 ${l.product_slug ? `<div><dt class="text-slate-400" title="Product slug">P. SLUG</dt><dd class="truncate font-medium text-slate-700">${escapeHtml(l.product_slug)}</dd></div>` : ''}
                 <div><dt class="text-slate-400 cursor-pointer" title="Starting price">S. Price</dt><dd class="font-medium text-slate-700">${priceLabel}</dd></div>
                 <div><dt class="text-slate-400 cursor-pointer" title="Inventory records">Inv. Records</dt><dd class="font-medium text-slate-700">${Number(l.inventory_records)}</dd></div>
-                <div><dt class="text-slate-400 cursor-pointer" title="Total sold">T. Sold</dt><dd class="font-medium text-slate-700">${l.total_sold || '— Not provided —'}</dd></div>
-                <div><dt class="text-slate-400 cursor-pointer" title="Reserved quantity">Rsv. Qty</dt><dd class="font-medium text-slate-700">${l.reserved_quantity || '— Not provided —'}</dd></div>
+                <div><dt class="text-slate-400 cursor-pointer" title="Total sold">T. Sold</dt><dd class="font-medium text-slate-700">${l.total_sold || '—'}</dd></div>
+                <div><dt class="text-slate-400 cursor-pointer" title="Reserved quantity">Rsv. Qty</dt><dd class="font-medium text-slate-700">${l.reserved_quantity || '—'}</dd></div>
                 <div><dt class="text-slate-400 cursor-pointer font-bold" title="Available quantity">Avail. Qty</dt><dd class="font-medium text-slate-700">${Number(l.available_quantity)}</dd></div>
                 ${l.stock != null ? `<div><dt class="text-slate-400">Stock</dt><dd class="font-medium ${l.stock === 0 ? 'text-rose-600' : (l.stock < 10 ? 'text-amber-600' : 'text-slate-700')}">${l.stock === 0 ? 'Out of stock' : `${l.stock} available`}</dd></div>` : ''}
                 <div><dt class="text-slate-400">Updated</dt><dd class="font-medium text-slate-700">${updatedLabel}</dd></div>

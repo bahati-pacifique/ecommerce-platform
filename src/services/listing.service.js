@@ -151,7 +151,8 @@ class ListingServices {
                     await ListingModel.insertListingPrice(client, {
                         listing_variant_id: createdVariant.id,
                         currency_id: currency.id,
-                        price: variant.price
+                        price: variant.price,
+                        is_initial: true
                     });
 
                 createdVariants.push({
@@ -302,24 +303,46 @@ class ListingServices {
         return await ListingModel.patchListingOnStoreLevel(listingId, storeId, newStatus);
     }
 
-    
-    static async getListingVariantPrices(variantId){
+    static async getListingVariantPrices(variantId) {
         return await ListingModel.findPricesByVariant(variantId);
     }
 
-    static async getListingVariantCurrentPrice(variantId){
+    static async getListingVariantCurrentPrice(variantId) {
         return await ListingModel.findCurrentPriceForVariant(variantId);
     }
 
     /**
-     * 
-     * @param {*} payload 
-     * payload: { listing_variant_id, currency_id, price, sale_price, starts_at, ends_at, status }
-     * @returns 
+     * Sets the initial base price for a listing variant.
+     *
+     * @param {string} variantId - The UUID of the listing variant.
+     * @param {number} newPrice - The initial base price amount to assign.
+     * @returns {Promise<Object>} A promise that resolves to the created price record.
      */
-    static async insertVariantPrice(payload) {
-        return await ListingModel.createVariantPrice(payload)
+    static async createInitialPrice(variantId, newPrice) {
+        return await ListingModel.createInitialPrice(variantId, newPrice);
     }
+
+    static async updateInitialPrice(variantId, newPrice) {
+        return await ListingModel.updateRegularPrice(variantId, newPrice)
+    }
+
+
+    /**
+     * Creates a new promotional price record for a listing variant.
+     *
+     * @param {Object} pricePayload - The promotional price details.
+     * @param {number|string} pricePayload.listing_variant_id - The ID of the listing variant.
+     * @param {number|string} pricePayload.currency_id - The ID of the currency.
+     * @param {number|string} pricePayload.base_price_id - The ID of the base price being discounted.
+     * @param {number} pricePayload.sale_price - The discounted promotional price amount.
+     * @param {Date|string|null} [pricePayload.starts_at=null] - Optional start date/time for the promotion.
+     * @param {Date|string} pricePayload.ends_at - The expiration date/time for the promotion.
+     * @returns {Promise<Object>} A promise that resolves to the newly created promotional price record.
+     */
+    static async createPromotionalPrice(pricePayload) {
+        return await ListingModel.insertListingPromotionPrice(pricePayload);
+    }
+
 
     static async toggleVariantPriceStatus(priceId) {
         return await ListingModel.toggleVariantPriceStatus(priceId)
