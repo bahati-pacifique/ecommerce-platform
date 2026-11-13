@@ -224,7 +224,7 @@
                     ${escapeHtml(listing.product_title)}
                   </div>
                 </td>
-                <td class="px-4 py-3">${renderStatus(listing.listing_status)}</td>
+                <td class="px-4 py-3 capitalize">${renderStatus(listing.listing_status.replace('_', ' '))}</td>
                 <td class="px-4 py-3">${formatNumber(listing.inventory_records)}</td>
                 <td class="px-4 py-3">${formatNumber(listing.quantity)}</td>
                 <td class="px-4 py-3">${formatNumber(listing.reserved)}</td>
@@ -278,7 +278,7 @@
             </div>
           </td>
 
-          <td class="px-5 py-4">${renderStatus(inventory.status)}</td>
+          <td class="px-5 py-4 capitalize">${renderStatus(inventory.status?.replace('_', ' ') || '')}</td>
 
           <td class="px-5 py-4 ${
             Number(inventory.low_stock) > 0

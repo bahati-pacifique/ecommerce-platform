@@ -115,11 +115,12 @@
 
     function hydrate(data) {
 
+        console.log('Variant:', data.variants)
         const variants = (data.variants || []).map(v => ({
             id: v.id,
             sku: v.sku,
-            price: Number(v.price),
-            priceLabel: formatMoney(v.price, data.base_currency?.code),
+            price: Number(v.regular_price),
+            priceLabel: formatMoney(v.regular_price, data.base_currency?.code),
             salePrice: v.sale_price != null ? Number(v.sale_price) : null,
             salePriceLabel: v.sale_price != null ? formatMoney(v.sale_price, data.base_currency?.code) : null,
             isOnSale: !!v.is_on_sale,
@@ -129,6 +130,8 @@
             attributes: v.attributes || [],
             inventory: v.inventory || null,
             stock: stockLabel(v.inventory),
+            saleStartAt: v.promotion_starts_at,
+            saleEndsAt: v.promotion_ends_at,
         }));
 
         const variantImages = variants
@@ -238,6 +241,7 @@
         }
 
         const defaultVariant = variants[0];
+
         if (defaultVariant) {
             setText('priceMain', defaultVariant.currentPriceLabel);
             if (defaultVariant.isOnSale && defaultVariant.salePriceLabel) {
@@ -362,6 +366,7 @@
         initLightbox(gallery, mainImg);
 
         populateStatusSelect(data.status);
+
         if (data.status !== 'active') {
             $('#listingAlert').html(`<div class="mb-3 flex gap-2 rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800 shadow-sm text-center">
             <svg class="h-6 w-6 shrink-0 text-amber-500" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
@@ -382,6 +387,71 @@
               <span class="text-xs font-medium text-emerald-700">It is visible and available for sale on the marketplace.</span>
             </p>
           </div>`);
+        }
+
+        if (endsAtCountdownInterval) {
+            clearInterval(endsAtCountdownInterval);
+            endsAtCountdownInterval = null;
+        }
+
+        if (defaultVariant.isOnSale) document.getElementById('counter').classList.remove('hidden');
+        startPriceCountdown(defaultVariant.isOnSale, defaultVariant.saleEndsAt, document.getElementById('counter'));
+
+    }
+
+    let endsAtCountdownInterval = null;
+
+    function startPriceCountdown(isOnSale, endsAt, container) {
+        
+        if (!isOnSale) {
+            container.textContent = '';
+            container.classList.add('hidden')
+            return;
+        }
+
+        container.classList.remove('hidden');
+
+        if (endsAtCountdownInterval) {
+            clearInterval(endsAtCountdownInterval);
+            endsAtCountdownInterval = null;
+        }
+
+        if (!endsAt) return;
+
+        const endTime = new Date(endsAt).getTime();
+
+        if (Number.isNaN(endTime)) {
+            container.textContent = 'Invalid date';
+            return;
+        }
+
+        const updateCountdown = () => {
+            const remaining = endTime - Date.now();
+
+            if (remaining <= 0) {
+                container.textContent = 'Price period ended';
+                clearInterval(endsAtCountdownInterval);
+                endsAtCountdownInterval = null;
+                container.classList.addClass('hidden');
+                return;
+            }
+
+            const days = Math.floor(remaining / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((remaining / (1000 * 60 * 60)) % 24);
+            const minutes = Math.floor((remaining / (1000 * 60)) % 60);
+            const seconds = Math.floor((remaining / 1000) % 60);
+
+            const pad = value => String(value).padStart(2, '0');
+
+            container.textContent = days > 0
+                ? `${days}d ${pad(hours)}h ${pad(minutes)}m ${pad(seconds)}s remaining`
+                : `${pad(hours)}h ${pad(minutes)}m ${pad(seconds)}s remaining`;
+        };
+
+        updateCountdown();
+
+        if (endTime > Date.now()) {
+            endsAtCountdownInterval = setInterval(updateCountdown, 1000);
         }
     }
 
@@ -443,6 +513,9 @@
         });
 
         document.getElementById('pricingLink').href = `/stores/${storeId}/variants/${variant.id}/pricing`;
+        if (variant.isOnSale) document.getElementById('counter').classList.remove('hidden');
+
+        startPriceCountdown(variant.isOnSale, variant.saleEndsAt, document.getElementById('counter'));
     }
 
     function highlightThumb(thumbsEl, activeIdx) {

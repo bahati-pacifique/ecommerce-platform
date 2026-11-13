@@ -29,7 +29,7 @@ async function updateStoreLastActive(id) {
     try {
         await StoreService.setStoreLastActive(id);
     } catch (error) {
-        console.log("setting store active status", error)
+        console.error("setting store active status", error)
     }
 }
 
@@ -115,7 +115,7 @@ async function renderDashboard(req, res) {
     if (String(user.vendor.id).replaceAll('-', '') !== String(vendorParam)) {
         //TODO log activity
         //User attempt to access page without owning or having the vendor id stated
-        console.log(`User attempt to access page without owning or having the vendor id stated from ip Add. ${req.ip}`)
+        console.warn(`User attempt to access page without owning or having the vendor id stated from ip Add. ${req.ip}`);
         return res.redirect(`${protocal}/business.${domainName}/`);
     }
 
@@ -130,7 +130,7 @@ async function renderDashboard(req, res) {
     try {
         await VendorService.updateLastActive(user.vendor.id);
     } catch (error) {
-        console.log('updating vendor last active:', error)
+        console.error('updating vendor last active:', error)
     }
 
     return res.render('business-dashboard',
@@ -200,7 +200,7 @@ async function renderStoreDashboardWelcome(req, res) {
         updateStoreLastActive(vendorStore.id);
         return res.render('store-partials/welcome', { layout: 'store-center', store: vendorStore, user, protocal, domainName, title: 'dashboard-welcome' });
     } catch (error) {
-        console.log(error);
+        console.error(error);
         return res.render('store-no-access', {
             layout: false,
             message: `<span class="text-black/70">Oops!</span> <span class="text-brand">${user.username}</span>, we're unable to get you authenticated to this Store.`,
@@ -234,7 +234,7 @@ async function renderStoreInventory(req, res) {
         updateStoreLastActive(vendorStore.id);
         return res.render('store-partials/inventory', { layout: 'store-center', store: vendorStore, user, protocal, domainName, title: 'inventory' });
     } catch (error) {
-        console.log(error);
+        console.error(error);
         return res.render('store-no-access', {
             layout: false,
             message: `<span class="text-black/70">Oops!</span> <span class="text-brand">${user.username}</span>, we're unable to get you authenticated to this Store.`,
@@ -282,7 +282,7 @@ async function renderInventoryHome(req, res) {
             welcomeAlert
         });
     } catch (error) {
-        console.log(error);
+        console.error(error);
         return res.render('store-no-access', {
             layout: false,
             message: `<span class="text-black/70">Oops!</span> <span class="text-brand">${user.username}</span>, we're unable to give you access to the requested page.`,
@@ -426,7 +426,7 @@ async function getItemUnit(req, res) {
             ...(!result && { message: 'Unit not found, please check unit id/serial number/barcode' }),
         });
     } catch (error) {
-        console.log(error);
+        console.error(error);
         return res.status(500).json({
             message: 'Unable to get unit — Internal error'
         })
@@ -463,7 +463,7 @@ async function createInventoryItem(req, res) {
 
         return res.status(201).json({ success: true, result })
     } catch (error) {
-        console.log('[addInventoryItem]', error);
+        console.error('[addInventoryItem]', error);
 
         return res.status(500).json({
             success: false,
@@ -508,7 +508,7 @@ async function insertInventoryUnit(req, res) {
         return res.status(201).json(result);
 
     } catch (error) {
-        console.log('[insertInventoryItemUnit]', error);
+        console.error('[insertInventoryItemUnit]', error);
 
         let message = 'Unable to insert unit — Internal Error';
 
@@ -543,7 +543,7 @@ async function searchUnit(req, res) {
             result
         });
     } catch (err) {
-        console.log('[searching unit]: ', err);
+        console.error('[searching unit]: ', err);
         return res.status(404).json({
             message: 'Failed — Internal error'
         })
@@ -557,7 +557,7 @@ async function searchListingByStore(req, res) {
         const result = await ListingService.searchListingByStore(storeId, query, { limit });
         return res.json(result);
     } catch (error) {
-        console.log('searchListingByStore()', error);
+        console.error('searchListingByStore()', error);
         return res.status(500).json({
             message: `Failed — Internal Error`
         })
@@ -628,7 +628,7 @@ async function renderStoreDashboard(req, res) {
 
         return res.render('store-partials/dashboard', { layout: 'store-center', dashboard: data, store: vendorStore, user, protocal, domainName, title: 'home' });
     } catch (error) {
-        console.log(error);
+        console.error(error);
         return res.render('store-no-access', {
             layout: false,
             message: `<span class="text-black/70">Oops!</span> <span class="text-brand">${user.username}</span>, we're unable to get you authenticated to this Store.`,
@@ -665,7 +665,7 @@ async function renderStoreListing(req, res) {
         updateStoreLastActive(vendorStore.id);
         return res.render('store-partials/listings', { layout: 'store-center', store: vendorStore, user, protocal, domainName, title: 'listings' });
     } catch (error) {
-        console.log(error);
+        console.error(error);
         return res.render('store-no-access', {
             layout: false,
             message: `<span class="text-black/70">Oops!</span> <span class="text-brand">${user.username}</span>, we're unable to get you authenticated to this Store.`,
@@ -703,7 +703,7 @@ async function renderListingPage(req, res) {
 
         return res.render('store-partials/listing', { listingId, layout: 'focused', store: vendorStore, user, protocal, domainName, title: 'listings' });
     } catch (error) {
-        console.log(error);
+        console.error(error);
         return res.render('store-no-access', {
             layout: false,
             message: `<span class="text-black/70">Oops!</span> <span class="text-brand">${user.username}</span>, we're unable to get you authenticated to this Store.`,
@@ -747,7 +747,7 @@ async function renderListingPricing(req, res) {
             title: 'Listing Prices'
         });
     } catch (error) {
-        console.log(error);
+        console.error(error);
         return res.render('store-no-access', {
             layout: false,
             message: `<span class="text-black/70">Oops!</span> <span class="text-brand">${user.username}</span>, we're unable to get you authenticated to this Store.`,
@@ -762,8 +762,9 @@ async function renderListingPricing(req, res) {
 
 async function getListingVariantPrices(req, res) {
     try {
-        const { storeId, variantId, listingId } = req.params;
+        const { storeId, variantId } = req.params;
         const user = req.user;
+        const { page, limit } = req.query;
 
         const vendorStore = await StoreService.getVendorStore(storeId, user.vendor?.id || null);
 
@@ -773,12 +774,12 @@ async function getListingVariantPrices(req, res) {
             })
         }
 
-        const result = await ListingService.getListingVariantPrices(variantId);
+        const result = await ListingService.getListingVariantPrices(variantId, {page, limit});
 
         return res.json(result);
 
     } catch (error) {
-        console.log('[getListingVariantPrices]', error);
+        console.error('[getListingVariantPrices]', error);
         return res.status(500).json({ message: `Unable to get prices — Internal error` })
     }
 }
@@ -813,7 +814,7 @@ async function createVariantPrice(req, res) {
     } catch (error) {
         let message = 'Unable to get prices — Internal error';
         if (!error.code) message = error.message;
-        console.log('[createVariantPrice]', error);
+        console.error('[createVariantPrice]', error);
         return res.status(500).json({ message })
     }
 }
@@ -844,7 +845,6 @@ async function createVariantSalePrice(req, res) {
         const result = await ListingService.createPromotionalPrice({
             listing_variant_id: variantId,
             currency_id: req.body.currency_id,
-            base_price_id: req.body.base_price_id,
             sale_price: req.body.sale_price,
             starts_at: req.body.starts_at,
             ends_at: req.body.ends_at
@@ -854,7 +854,58 @@ async function createVariantSalePrice(req, res) {
     } catch (error) {
         console.error('[createVariantSalePrice]', error);
         return res.status(500).json({
-            message: 'Unable to make initial price — Internal Error'
+            message: 'Unable to make price — Internal Error'
+        });
+    }
+}
+
+async function toggleVariantPriceStatus(req, res) {
+    const { storeId, priceId } = req.params;
+    const user = req.user;
+    try {
+        await validateVendorStore(storeId, user.vendor?.id || null, res);
+
+        const result = await ListingService.toggleVariantPriceStatus(priceId);
+
+        return res.json(result);
+    } catch (error) {
+        console.error('[toggleVariantPriceStatus]', error);
+        return res.status(500).json({
+            message: 'Unable to patch price — Internal Error'
+        });
+    }
+}
+
+async function removeVariantPrice(req, res) {
+    const { storeId, priceId } = req.params;
+    const user = req.user;
+    try {
+        await validateVendorStore(storeId, user.vendor?.id || null, res);
+
+        const result = await ListingService.deleteVariantPrice(priceId);
+
+        return res.json(result);
+    } catch (error) {
+        console.error('[removeVariantPrice]', error);
+        return res.status(500).json({
+            message: 'Unable to remove price — Internal Error'
+        });
+    }
+}
+
+async function alterVariantPricePeriod(req, res) {
+    const { storeId, priceId } = req.params;
+    const user = req.user;
+    try {
+        await validateVendorStore(storeId, user.vendor?.id || null, res);
+
+        const result = await ListingService.changeVariantPricePeriod(priceId, req.body);
+
+        return res.json(result);
+    } catch (error) {
+        console.error('[removeVariantPrice]', error);
+        return res.status(500).json({
+            message: 'Unable to remove price — Internal Error'
         });
     }
 }
@@ -943,6 +994,7 @@ async function renderStoreProducts(req, res) {
 
         return res.render('store-partials/products', {
             layout: 'store-center',
+            pageScript: '/scripts/pages/store-products.js',
             title: 'Products',
             store: vendorStore,
             user,
@@ -985,7 +1037,7 @@ async function getStoreListingProductAnalytics(req, res) {
 
         return res.json(result)
     } catch (error) {
-        console.log('getStoreListingProductAnalytics():', error);
+        console.error('getStoreListingProductAnalytics():', error);
         return res.status(500).json({ message: 'Internal Error — Unable to get listing analytic' });
     }
 }
@@ -1014,7 +1066,7 @@ async function getInventoriesByStoreId(req, res) {
 
         return res.json(result);
     } catch (error) {
-        console.log('getInventoriesByStoreId()', error);
+        console.error('getInventoriesByStoreId()', error);
         return res.status(500).json({ message: 'Internal Error — Unable to get listing analytic' });
     }
 }
@@ -1124,7 +1176,7 @@ async function transferUnit(req, res) {
 
         return res.status(201).json(result);
     } catch (error) {
-        console.log(error);
+        console.error(error);
         let message = 'Failed — Internal Error';
         if (!error.code) message = error.message;
         return res.status(500).json({
@@ -1145,7 +1197,7 @@ async function getVendorOrderDashboard(req, res) {
 
         return res.json(result);
     } catch (error) {
-        console.log('getVendorOrderDashboard():', error);
+        console.error('getVendorOrderDashboard():', error);
         res.status(500).json({ message: !error.code ? error.message : 'Failed — Internal Server Error' });
     }
 }
@@ -1166,7 +1218,7 @@ async function getAnalyticVendorDashboardData(req, res) {
 
         return res.json(result);
     } catch (error) {
-        console.log('getVendorOrderDashboard():', error);
+        console.error('getVendorOrderDashboard():', error);
         res.status(500).json({ message: !error.code ? error.message : 'Failed — Internal Server Error' });
     }
 }
@@ -1187,7 +1239,7 @@ async function getVendorOverviewData(req, res) {
 
         return res.json(result);
     } catch (error) {
-        console.log('getVendorOrderDashboard():', error);
+        console.error('getVendorOrderDashboard():', error);
         return res.status(500).json({ message: !error.code ? error.message : 'Failed — Internal Server Error' });
     }
 }
@@ -1224,7 +1276,7 @@ async function renderListingcataloging(req, res) {
         updateStoreLastActive(vendorStore.id);
         return res.render('partials/listing/new', { layout: 'focused', store: vendorStore, user, protocal, domainName, title: 'New Listing' });
     } catch (error) {
-        console.log(error);
+        console.error(error);
         return res.render('store-no-access', {
             layout: false,
             message: `<span class="text-black/70">Oops!</span> <span class="text-brand">${user.username}</span>, we're unable to get you authenticated to this Store.`,
@@ -1699,7 +1751,7 @@ async function getPaginatedProductsCatalog(req, res) {
         return res.json(result);
 
     } catch (error) {
-        console.log(`getPaginatedProductsCatalog()`, error);
+        console.error(`getPaginatedProductsCatalog()`, error);
         res.status(500).json({
             message: 'Failed — Internal Error'
         });
@@ -1717,7 +1769,7 @@ async function deepSearchProductsCatalog(req, res) {
 
         return res.json(result);
     } catch (error) {
-        console.log(`deepSearchProductsCatalog()`, error);
+        console.error(`deepSearchProductsCatalog()`, error);
         res.status(500).json({
             message: 'Failed — Internal Error'
         });
@@ -1791,7 +1843,7 @@ async function getProductById(req, res) {
         const result = await ProductService.getProductById(id);
         return res.json(result);
     } catch (error) {
-        console.log(`getProductById()`, error);
+        console.error(`getProductById()`, error);
         res.status(500).json({
             message: 'Failed — Internal Error'
         });
@@ -1804,7 +1856,7 @@ async function deleteProduct(req, res) {
         const result = await ProductService.deleteProduct(id);
         return res.json(result);
     } catch (error) {
-        console.log(`deleteProduct()`, error);
+        console.error(`deleteProduct()`, error);
         res.status(500).json({
             message: 'Failed — Internal Error'
         });
@@ -1817,7 +1869,7 @@ async function deleteProductVariant(req, res) {
         const result = await ProductService.deleteProductVariant(variantId);
         return res.json(result);
     } catch (error) {
-        console.log(`deleteProductVariant()`, error);
+        console.error(`deleteProductVariant()`, error);
         res.status(500).json({
             message: 'Failed — Internal Error'
         });
@@ -1830,7 +1882,7 @@ async function deleteVariantAttributeValue(req, res) {
         const result = await ProductService.deleteVariantAttributeValue(variantId, attributeValueId);
         return res.json(result);
     } catch (error) {
-        console.log(`deleteProductVariant()`, error);
+        console.error(`deleteProductVariant()`, error);
         res.status(500).json({
             message: 'Failed — Internal Error'
         });
@@ -1843,7 +1895,7 @@ async function deleteVariantAttributes(req, res) {
         const result = await ProductService.deleteVariantAttributes(variantId);
         return res.json(result);
     } catch (error) {
-        console.log(`deleteVariantAttributes()`, error);
+        console.error(`deleteVariantAttributes()`, error);
         res.status(500).json({
             message: 'Failed — Internal Error'
         });
@@ -1856,7 +1908,7 @@ async function getProductVariants(req, res) {
         const result = await ProductService.getProductVariants(productId);
         return res.json(result);
     } catch (error) {
-        console.log(`getProductVariants()`, error);
+        console.error(`getProductVariants()`, error);
         res.status(500).json({
             message: 'Failed — Internal Error'
         });
@@ -1869,7 +1921,7 @@ async function getProductVariantOnly(req, res) {
         const result = await ProductService.getProductVariantOnly(productId);
         return res.json(result);
     } catch (error) {
-        console.log(`getProductVariantOnly()`, error);
+        console.error(`getProductVariantOnly()`, error);
         res.status(500).json({
             message: 'Failed — Internal Error'
         });
@@ -1882,7 +1934,7 @@ async function getVariantAttributeValues(req, res) {
         const result = await ProductService.getVariantAttributeValues(variantId);
         return res.json(result);
     } catch (error) {
-        console.log(`getVariantAttributeValues()`, error);
+        console.error(`getVariantAttributeValues()`, error);
         res.status(500).json({
             message: 'Failed — Internal Error'
         });
@@ -1895,7 +1947,7 @@ async function deleteProductVariant(req, res) {
         const result = await ProductService.deleteProductVariant(variantId);
         return res.json(result);
     } catch (error) {
-        console.log(`deleteProductVariant()`, error);
+        console.error(`deleteProductVariant()`, error);
         res.status(500).json({
             message: 'Failed — Internal Error'
         });
@@ -1909,7 +1961,7 @@ async function updateProduct(req, res) {
         const result = await ProductService.updateProduct(productId, data);
         return res.json(result);
     } catch (error) {
-        console.log(`updateProduct()`, error);
+        console.error(`updateProduct()`, error);
         res.status(500).json({
             message: 'Failed — Internal Error'
         });
@@ -1924,7 +1976,7 @@ async function updateProductStatus(req, res) {
         const result = await ProductService.updateProductStatus(productId, status, userId);
         return res.json(result);
     } catch (error) {
-        console.log(`updateProductStatus()`, error);
+        console.error(`updateProductStatus()`, error);
         res.status(500).json({
             message: 'Failed — Internal Error'
         });
@@ -1938,7 +1990,7 @@ async function updateProductVariant(req, res) {
         const result = await ProductService.updateProductVariant(variantId, data);
         return res.json(result);
     } catch (error) {
-        console.log(`updateProductVariant()`, error);
+        console.error(`updateProductVariant()`, error);
         res.status(500).json({
             message: 'Failed — Internal Error'
         });
@@ -1954,7 +2006,7 @@ async function insertVariantAttributeValue(req, res) {
 
         return res.json(result);
     } catch (error) {
-        console.log(`insertVariantAttributeValue()`, error);
+        console.error(`insertVariantAttributeValue()`, error);
         res.status(500).json({
             message: 'Failed — Internal Error'
         });
@@ -1972,7 +2024,7 @@ async function activateProduct(req, res) {
         }
         return res.json(result);
     } catch (error) {
-        console.log(`insertVariantAttributeValue()`, error);
+        console.error(`insertVariantAttributeValue()`, error);
         res.status(500).json({
             message: 'Failed — Internal Error'
         });
@@ -1986,7 +2038,7 @@ async function getStoreDashboardAnalytics(req, res) {
         const result = await StoreService.getStoreDashboardAnalytics(storeId, period);
         return res.json(result)
     } catch (error) {
-        console.log('getStoreDashboardAnalytics()', error);
+        console.error('getStoreDashboardAnalytics()', error);
         return res.status(500).json({ message: 'Unable to get Dashboard data — Internal Error' })
     }
 }
@@ -2020,7 +2072,7 @@ async function getStoreListings(req, res) {
 
         return res.json(result);
     } catch (error) {
-        console.log(error);
+        console.error(error);
         return res.status(500).json({
             message: `Unable to get listings — Internal Error`
         })
@@ -2056,7 +2108,7 @@ async function getListing(req, res) {
         //res.locals.layout = 'store-center';
         // updateStoreLastActive(vendorStore.id);
     } catch (error) {
-        console.log('[getListing]', error);
+        console.error('[getListing]', error);
         return res.status(500).json({ message: 'Unable to get listing — Internal Error' })
     }
 }
@@ -2080,7 +2132,7 @@ async function patchListing(req, res) {
 
         return result ? res.status(201).json(result) : res.status(404).json({ message: 'Unable to settle listing — Please check listing id' });
     } catch (error) {
-        console.log('patchListing', error);
+        console.error('patchListing', error);
         return res.status(500).json({ message: error.message || `Unable to settle listing — Internal error` })
     }
 }
@@ -2143,6 +2195,7 @@ async function validateVendorStore(storeId, vendorId, res) {
             message: 'Store validation failed'
         })
     }
+    return vendorStore;
 }
 
 module.exports = {
@@ -2188,6 +2241,9 @@ module.exports = {
     createVariantSalePrice,
     createVariantPrice,
     getListingVariantPrices,
+    toggleVariantPriceStatus,
+    alterVariantPricePeriod,
+    removeVariantPrice,
 
     createInventoryItem,
     transferUnit,

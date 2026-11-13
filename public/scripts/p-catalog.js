@@ -560,7 +560,7 @@
             const id = p.id;
             const isActive = String(id) === String(State.selectedId);
             const image = p.primary_image || p.image_url || '';
-            
+
             const title = p.title || 'Untitled';
             const subtitle = [
                 p.category_title || p.category?.title,
@@ -803,7 +803,7 @@
         const delta = editor.clipboard.convert({ html: desc });
         if (desc) {
             editor.setContents(delta, 'api');
-            
+
             //els.detailDescription.classList.remove('text-ink-400');
             // requestAnimationFrame(() => {
             //     const overflowing = els.detailDescription.scrollHeight > els.detailDescription.clientHeight + 4;
@@ -943,7 +943,6 @@
     els.closeDetailBtn.addEventListener('click', closeDetailDrawer);
     els.detailBackdrop.addEventListener('click', closeDetailDrawer);
 
-    // Description expand/collapse
     els.toggleDescriptionBtn.addEventListener('click', () => {
         const expanded = els.detailDescription.dataset.expanded === 'true';
         if (expanded) {
@@ -957,7 +956,6 @@
         }
     });
 
-    // Keyboard shortcuts
     document.addEventListener('keydown', (e) => {
         if (e.key === '/' && !['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement.tagName)) {
             e.preventDefault();
@@ -994,6 +992,81 @@
     els.activateBtn?.addEventListener('click', (e) => {
         activateProduct(e.target);
     });
+
+
+    const mobileNavToggle = document.getElementById('mobileNavToggle');
+    const headerNavigation = document.getElementById('headerNavigation');
+
+    function setNavigationState(open) {
+        headerNavigation.classList.toggle('is-open', open);
+        mobileNavToggle.classList.toggle('is-open', open);
+
+        mobileNavToggle.setAttribute('aria-expanded', String(open));
+
+        mobileNavToggle.setAttribute(
+            'aria-label',
+            open ? 'Close navigation menu' : 'Open navigation menu'
+        );
+    }
+
+    mobileNavToggle.addEventListener('click', () => {
+        const isOpen = headerNavigation.classList.contains('is-open');
+        setNavigationState(!isOpen);
+    });
+
+    headerNavigation.querySelectorAll('a').forEach(link => {
+        link.addEventListener('click', () => {
+            setNavigationState(false);
+        });
+    });
+
+    document.addEventListener('keydown', event => {
+        if (event.key === 'Escape') {
+            setNavigationState(false);
+        }
+    });
+
+    document.addEventListener('click', event => {
+        if (
+            !event.target.closest('.cococe-header') &&
+            headerNavigation.classList.contains('is-open')
+        ) {
+            setNavigationState(false);
+        }
+    });
+
+    window.matchMedia('(min-width: 768px)').addEventListener('change', event => {
+        if (event.matches) {
+            setNavigationState(false);
+        }
+    });
+
+    const waveEmoji = document.querySelector('.wave-emoji');
+
+    if (!waveEmoji) return;
+
+    // Respect reduced-motion preferences
+    const prefersReducedMotion = window.matchMedia(
+        '(prefers-reduced-motion: reduce)'
+    );
+
+    if (prefersReducedMotion.matches) return;
+
+    function wave() {
+        // Restart animation
+        waveEmoji.classList.remove('is-waving');
+
+        // Force browser to restart animation
+        void waveEmoji.offsetWidth;
+
+        waveEmoji.classList.add('is-waving');
+    }
+
+    // Wave shortly after page load
+    setTimeout(wave, 500);
+
+    // Repeat every 8 seconds
+    setInterval(wave, 8000);
 
     ImageSearch.init();
     showDetailState('empty');

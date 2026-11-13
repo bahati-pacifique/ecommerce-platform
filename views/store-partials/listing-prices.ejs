@@ -6,9 +6,12 @@
     baseUrl: "<%= locals.baseUrl %>",
   };
 </script>
-<%- include('./header', {sidebarToggerVisibility: 'hidden', mobileMenuButtonVisibility: 'hidden', subTitle: store.name }) %>
+
+<%- include('./header', { sidebarToggerVisibility: 'hidden', mobileMenuButtonVisibility: 'hidden', subTitle: store.name }) %>
+
 <div class="mx-auto w-full max-w-7xl px-4 py-4 sm:px-6 sm:py-6 lg:px-8">
 
+  <!-- Breadcrumb -->
   <nav aria-label="Breadcrumb" class="mb-3 flex flex-wrap items-center gap-1.5 text-xs text-slate-500">
     <a href="/stores/<%= store.id %>/listings" class="hover:text-brand">Listings</a>
     <span class="text-slate-300">/</span>
@@ -17,6 +20,7 @@
     <span class="truncate font-medium text-slate-900">Pricing</span>
   </nav>
 
+  <!-- Page header -->
   <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
     <div class="flex items-start gap-3">
       <img id="variantImage" src="" alt="" class="hidden h-20 w-20 shrink-0 rounded-lg object-contain ring-1 ring-slate-200">
@@ -29,17 +33,32 @@
       </div>
     </div>
 
-    <button type="button" id="openAddPrice" disabled class="inline-flex shrink-0 items-center justify-center gap-2 rounded-lg bg-brand px-4 py-2.5 text-sm font-bold text-white transition hover:bg-brand-dark disabled:cursor-not-allowed disabled:opacity-50">
-      <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v14M5 12h14" />
-      </svg>
-      Add new price
-    </button>
+    <div class="flex items-center gap-3">
+      <button type="button" id="openAddPrice" disabled class="inline-flex shrink-0 items-center justify-center gap-2 rounded-lg bg-brand px-4 py-3 text-sm font-bold text-white transition hover:bg-brand-dark disabled:cursor-not-allowed disabled:opacity-50">
+        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v14M5 12h14" />
+        </svg>
+        Add new price
+      </button>
+      <div class="inline-flex shrink-0 items-center justify-center gap-2 rounded-lg border border-brand px-4 py-2.5 text-sm font-medium text-brand hover:border-brand-dark hover:text-dark transition disabled:cursor-not-allowed disabled:opacity-50">
+        <select id="pageLimitSelect" class="cursor-pointer appearance-none">
+          <option value="3">3/Page</option>
+          <option value="7">7/Page</option>
+          <option value="11">11/Page</option>
+          <option value="17">17/Page</option>
+          <option value="21">21/Page</option>
+          <option value="51">51/Page</option>
+          <option value="100">100/Page</option>
+        </select>
+        <i data-lucide="table-of-contents"></i>
+      </div>
+    </div>
   </div>
 
-
+  <!-- ═══════════════════════════════════════════════════════════
+       LOADING STATE
+  ═══════════════════════════════════════════════════════════ -->
   <div id="pricesLoading" class="animate-pulse">
-
     <div class="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
       <div class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
         <div class="h-2.5 w-24 rounded bg-slate-200"></div>
@@ -64,7 +83,6 @@
         <div class="h-4 w-32 rounded bg-slate-200"></div>
         <div class="mt-1 h-3 w-24 rounded bg-slate-200"></div>
       </div>
-
       <div class="divide-y divide-slate-100">
         <% for (let i = 0; i < 3; i++) { %>
         <div class="flex items-center gap-4 px-5 py-4">
@@ -80,6 +98,9 @@
     </div>
   </div>
 
+  <!-- ═══════════════════════════════════════════════════════════
+       ERROR STATE
+  ═══════════════════════════════════════════════════════════ -->
   <div id="pricesError" class="mt-5 hidden rounded-2xl border border-rose-200 bg-white p-6 text-center shadow-sm sm:p-8">
     <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-rose-50">
       <svg class="h-7 w-7 text-rose-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -98,9 +119,12 @@
     </div>
   </div>
 
+  <!-- ═══════════════════════════════════════════════════════════
+       CONTENT STATE
+  ═══════════════════════════════════════════════════════════ -->
   <div id="pricesContent" class="hidden opacity-0">
 
-    <div class="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+    <div class="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4" id="summaryCard">
       <div class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
         <p class="text-[10px] font-bold uppercase tracking-wider">Current price</p>
         <p id="currentPriceValue" class="mt-1.5 text-2xl font-extrabold">—</p>
@@ -118,7 +142,6 @@
         <p class="text-[10px] font-bold uppercase tracking-wider text-slate-500">Effective from</p>
         <p id="currentStartsAt" class="mt-1.5 text-sm font-semibold text-slate-950">—</p>
       </div>
-
     </div>
 
     <div class="mt-5 rounded-xl border border-slate-200 bg-white shadow-sm">
@@ -155,7 +178,8 @@
               <th class="px-5 py-3 font-semibold">Sale price</th>
               <th class="px-5 py-3 font-semibold">Period</th>
               <th class="px-5 py-3 font-semibold">Status</th>
-              <th class="px-5 py-3 text-right font-semibold hidden md:block">Actions</th>
+              <th class="px-5 py-3 font-semibold">Created/Updated</th>
+              <th class="px-5 py-3 text-right font-semibold">Actions</th>
             </tr>
           </thead>
           <tbody id="pricesTableBody" class="divide-y divide-slate-100"></tbody>
@@ -163,10 +187,15 @@
       </div>
 
       <div id="pricesMobileList" class="divide-y divide-slate-100 lg:hidden"></div>
+
+      <div id="pricesPagination" class="hidden border-t border-slate-100 px-4 py-3 sm:px-5"></div>
     </div>
   </div>
 </div>
 
+<!-- ══════════════════════════════════════════════════════════════
+     ADD PRICE MODAL
+══════════════════════════════════════════════════════════════ -->
 <div id="addPriceModal" class="fixed inset-0 z-[60] hidden items-end justify-center bg-slate-950/50 p-0 backdrop-blur-sm sm:items-center sm:p-4" role="dialog" aria-modal="true" aria-labelledby="addPriceTitle">
 
   <div id="addPriceBackdrop" class="absolute inset-0" aria-hidden="true"></div>
@@ -175,7 +204,6 @@
     <div class="h-1 w-full bg-gradient-to-r from-brand via-brand-dark to-brand"></div>
 
     <div class="max-h-[90vh] overflow-y-auto p-5 sm:p-6">
-
       <div class="flex items-start justify-between gap-3">
         <div>
           <h2 id="addPriceTitle" class="text-lg font-bold text-slate-950">Add a new price</h2>
@@ -193,30 +221,19 @@
       <div id="addPriceError" class="mt-4 hidden rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-700" role="alert"></div>
 
       <form id="addPriceForm" class="mt-5 space-y-4" novalidate>
-
         <div>
           <label for="currency_id" class="mb-1 block text-xs font-bold uppercase tracking-wider text-slate-500">
             Currency
           </label>
-          <select id="currency_id" name="currency_id" required class="h-10 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm outline-none focus:border-brand focus:ring-2 focus:ring-brand/20">
-          </select>
+          <select id="currency_id" name="currency_id" required class="h-10 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm outline-none focus:border-brand focus:ring-2 focus:ring-brand/20"></select>
         </div>
 
-        <div class="grid grid-cols-2 gap-3">
-          <div>
-            <label for="price" class="mb-1 block text-xs font-bold uppercase tracking-wider text-slate-500">
-              Regular price
-            </label>
-            <input id="price" name="price" type="number" step="0.01" min="0" required class="h-10 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm outline-none focus:border-brand focus:ring-2 focus:ring-brand/20" placeholder="0.00">
-            <p class="mt-1 hidden text-xs text-brand" data-error-for="price"></p>
-          </div>
-          <div>
-            <label for="sale_price" class="mb-1 block text-xs font-bold uppercase tracking-wider text-slate-500">
-              Sale price <span class="font-normal normal-case text-slate-400" id="salePriceModalTag"></span>
-            </label>
-            <input id="sale_price" name="sale_price" type="number" step="0.01" min="0" class="h-10 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm outline-none focus:border-brand focus:ring-2 focus:ring-brand/20" placeholder="New Selling price">
-            <p class="mt-1 hidden text-xs text-brand" data-error-for="sale_price"></p>
-          </div>
+        <div>
+          <label for="sale_price" class="mb-1 block text-xs font-bold uppercase tracking-wider text-slate-500">
+            Sale price <span class="font-normal normal-case text-slate-400" id="salePriceModalTag"></span>
+          </label>
+          <input id="sale_price" name="sale_price" type="number" step="0.01" min="0" class="h-12 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm outline-none focus:border-brand focus:ring-2 focus:ring-brand/20" placeholder="New selling price">
+          <p class="mt-1 hidden font-medium text-xs text-brand" data-error-for="sale_price"></p>
         </div>
 
         <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
@@ -225,15 +242,15 @@
               Starts at
             </label>
             <input id="starts_at" name="starts_at" type="datetime-local" class="h-10 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm outline-none focus:border-brand focus:ring-2 focus:ring-brand/20">
-            <p class="mt-1 text-[10px] text-slate-400">Leave empty to start now</p>
+            <p class="mt-1 text-[10px] text-slate-400">Sale start date and time</p>
             <p class="mt-1 hidden text-xs text-brand" data-error-for="starts_at"></p>
           </div>
           <div>
             <label for="ends_at" class="mb-1 block text-xs font-bold uppercase tracking-wider text-slate-500">
-              Ends at <span class="font-normal normal-case text-slate-400">(optional)</span>
+              Ends at
             </label>
             <input id="ends_at" name="ends_at" type="datetime-local" class="h-10 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm outline-none focus:border-brand focus:ring-2 focus:ring-brand/20">
-            <p class="mt-1 text-[10px] text-slate-400">Leave empty for no end date</p>
+            <p class="mt-1 text-[10px] text-slate-400">Sale end date and time</p>
             <p class="mt-1 hidden text-xs text-brand" data-error-for="ends_at"></p>
           </div>
         </div>
@@ -261,7 +278,10 @@
   </div>
 </div>
 
-<div id="addInitialPriceModal" class="fixed inset-0 z-[60] hidden items-end justify-center bg-slate-950/50 p-0 backdrop-blur-sm sm:items-center sm:p-4" role="dialog" aria-modal="true" aria-labelledby="addPriceTitle">
+<!-- ══════════════════════════════════════════════════════════════
+     INITIAL PRICE MODAL
+══════════════════════════════════════════════════════════════ -->
+<div id="addInitialPriceModal" class="fixed inset-0 z-[60] hidden items-end justify-center bg-slate-950/50 p-0 backdrop-blur-sm sm:items-center sm:p-4" role="dialog" aria-modal="true" aria-labelledby="addInitialPriceTitle">
 
   <div id="addInitialPriceBackdrop" class="absolute inset-0" aria-hidden="true"></div>
 
@@ -269,7 +289,6 @@
     <div class="h-1 w-full bg-gradient-to-r from-brand via-brand-dark to-brand"></div>
 
     <div class="max-h-[90vh] overflow-y-auto p-5 sm:p-6">
-
       <div class="flex items-start justify-between gap-3">
         <div>
           <h2 id="addInitialPriceTitle" class="text-lg font-bold text-slate-950">Initial price</h2>
@@ -284,26 +303,24 @@
         </button>
       </div>
 
-      <div id="addInitialPriceError" class="mt-4 hidden rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-700" role="alert">hell</div>
+      <div id="addInitialPriceError" class="mt-4 hidden rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-700" role="alert"></div>
 
       <form id="addInitialPriceForm" class="mt-5 space-y-4" novalidate>
-
         <div class="flex flex-col gap-3">
           <div>
             <label for="initial_price_value" class="mb-1 block text-xs font-bold uppercase tracking-wider text-slate-500">
-              Variant Initial Price
+              Variant initial price
             </label>
-            <input id="initial_price_value" name="initial_price" type="number" placeholder="eg. 100000" class="h-12 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm outline-none focus:border-brand focus:ring-2 focus:ring-brand/20">
+            <input id="initial_price_value" name="initial_price" type="number" placeholder="e.g. 100000" class="h-12 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm outline-none focus:border-brand focus:ring-2 focus:ring-brand/20">
             <p class="mt-1 text-[10px] text-slate-400">Applied to marketplace currency</p>
           </div>
           <div>
-            <label for="currency_id" class="mb-1 block text-xs font-bold uppercase tracking-wider text-slate-500">
+            <label for="initial_currency_id" class="mb-1 block text-xs font-bold uppercase tracking-wider text-slate-500">
               Currency
             </label>
             <select id="initial_currency_id" name="initial_currency_id" required class="h-12 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm outline-none focus:border-brand focus:ring-2 focus:ring-brand/20"></select>
           </div>
         </div>
-
 
         <div class="flex flex-col-reverse gap-2 pt-2 sm:flex-row sm:justify-end">
           <button type="button" id="cancelInitialPrice" class="rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50">
@@ -318,19 +335,83 @@
   </div>
 </div>
 
-<%- include('../partials/footer', 
-{
-  baseUrl: `/stores/${locals.store?.id}/dashboard`, 
+<!-- ══════════════════════════════════════════════════════════════
+     EDIT PRICE MODAL
+══════════════════════════════════════════════════════════════ -->
+<div id="editPriceModal" class="fixed inset-0 z-[60] hidden items-end justify-center bg-slate-950/50 p-0 backdrop-blur-sm sm:items-center sm:p-4" role="dialog" aria-modal="true">
+
+  <div id="editPriceBackdrop" class="absolute inset-0" aria-hidden="true"></div>
+
+  <div class="relative w-full max-w-lg overflow-hidden rounded-t-2xl bg-white shadow-2xl sm:rounded-2xl">
+    <div class="h-1 w-full bg-gradient-to-r from-brand via-brand-dark to-brand"></div>
+
+    <div class="max-h-[90vh] overflow-y-auto p-5 sm:p-6">
+      <div class="flex items-start justify-between gap-3">
+        <div>
+          <h2 class="text-lg font-bold text-slate-950">Edit price period</h2>
+          <p class="mt-0.5 text-xs text-slate-500">
+            Update the start and end dates for
+            <span id="editPriceSku" class="font-mono">variant</span>
+          </p>
+        </div>
+        <button type="button" id="closeEditPrice" aria-label="Close" class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-slate-500 hover:bg-slate-100">
+          <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18 18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      <div id="editPriceError" class="mt-4 hidden rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-700" role="alert"></div>
+
+      <form id="editPriceForm" class="mt-5 space-y-4" novalidate>
+
+        <div class="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-600">
+          <p>Price value: <span id="editPriceValue" class="font-semibold text-slate-900">—</span></p>
+          <p class="mt-0.5">The price value cannot be changed. Only the period is editable.</p>
+        </div>
+
+        <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <div>
+            <label for="edit_starts_at" class="mb-1 block text-xs font-bold uppercase tracking-wider text-slate-500">
+              Starts at
+            </label>
+            <input id="edit_starts_at" name="starts_at" type="datetime-local" class="h-10 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm outline-none focus:border-brand focus:ring-2 focus:ring-brand/20">
+            <p class="mt-1 hidden text-xs text-brand" data-edit-error-for="starts_at"></p>
+          </div>
+          <div>
+            <label for="edit_ends_at" class="mb-1 block text-xs font-bold uppercase tracking-wider text-slate-500">
+              Ends at
+            </label>
+            <input id="edit_ends_at" name="ends_at" type="datetime-local" class="h-10 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm outline-none focus:border-brand focus:ring-2 focus:ring-brand/20">
+            <p class="mt-1 text-[10px] text-slate-400">Leave empty for no end date</p>
+            <p class="mt-1 hidden text-xs text-brand" data-edit-error-for="ends_at"></p>
+          </div>
+        </div>
+
+        <div class="flex flex-col-reverse gap-2 pt-2 sm:flex-row sm:justify-end">
+          <button type="button" id="cancelEditPrice" class="rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50">
+            Cancel
+          </button>
+          <button type="submit" id="submitEditPrice" class="rounded-lg bg-brand px-5 py-2.5 text-sm font-bold text-white transition hover:bg-brand-dark disabled:cursor-not-allowed disabled:opacity-60">
+            <span id="submitEditPriceText">Save changes</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<%- include('../partials/footer', {
+  baseUrl: `/stores/${locals.store?.id}/dashboard`,
   navs: [
-  {link: `/stores/${locals.store?.id}/dashboard/listings`, title: 'Listings'}, 
-  {link: `/stores/${locals.store?.id}/dashboard/inventory`, title: 'Inventory'},
-  {link: `/dashboard`, title: 'Store'},
-  {link: `/dashboard`, title: 'Vendor'},
+    { link: `/stores/${locals.store?.id}/dashboard/listings`, title: 'Listings' },
+    { link: `/stores/${locals.store?.id}/dashboard/inventory`, title: 'Inventory' },
+    { link: `/stores/${locals.store?.id}/dashboard`, title: 'Store' },
+    { link: `/dashboard`, title: 'Vendor' },
   ]
 }) %>
 
 <script>
-  // Legacy globals if any page template uses them
   const _LISTING_ID = "<%= listingId %>";
   const _STORE_ID = "<%= store.id %>";
   const _VARIANT_ID = "<%= variantId %>";

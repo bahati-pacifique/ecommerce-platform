@@ -1253,35 +1253,91 @@ class ListingModel {
         return rows[0] ?? null;
     }
 
+    // static async insertListingPromotionPrice({
+    //     listing_variant_id,
+    //     currency_id,
+    //     base_price_id,
+    //     sale_price,
+    //     starts_at = null,
+    //     ends_at
+    // }) {
+    //     const { rows } = await db.query(
+    //         `
+    //             INSERT INTO listing_prices (
+    //                 listing_variant_id,
+    //                 currency_id,
+    //                 base_price_id,
+    //                 sale_price,
+    //                 starts_at,
+    //                 ends_at
+    //             )
+    //             VALUES (
+    //                 $1, $2, $3, $4,
+    //                 COALESCE($5::timestamptz, NOW()),
+    //                 $6
+    //             )
+    //             RETURNING *
+    //         `,
+    //         [
+    //             listing_variant_id,
+    //             currency_id,
+    //             base_price_id,
+    //             sale_price,
+    //             starts_at,
+    //             ends_at
+    //         ]
+    //     );
+
+    //     return rows[0] ?? null;
+    // }
+
     static async insertListingPromotionPrice({
         listing_variant_id,
         currency_id,
-        base_price_id,
         sale_price,
         starts_at = null,
         ends_at
     }) {
+        const { rows: initialRows } = await db.query(
+            `
+                SELECT id
+                FROM listing_prices
+                WHERE listing_variant_id = $1
+                AND currency_id = $2
+                AND is_initial = TRUE
+                AND price IS NOT NULL
+                FOR UPDATE
+            `,
+            [listing_variant_id, currency_id]
+        );
+
+        if (!initialRows.length) {
+            throw new Error(
+                'Initial regular price must be configured before creating a promotion'
+            );
+        }
+
         const { rows } = await db.query(
             `
-                INSERT INTO listing_prices (
-                    listing_variant_id,
-                    currency_id,
-                    base_price_id,
-                    sale_price,
-                    starts_at,
-                    ends_at
-                )
-                VALUES (
-                    $1, $2, $3, $4,
-                    COALESCE($5::timestamptz, NOW()),
-                    $6
-                )
-                RETURNING *
-            `,
-            [
+            INSERT INTO listing_prices (
                 listing_variant_id,
                 currency_id,
                 base_price_id,
+                sale_price,
+                starts_at,
+                ends_at
+            )
+            VALUES (
+                $1, $2, $3, $4,
+                COALESCE($5::timestamptz, NOW()),
+                $6
+            )
+            RETURNING *
+        `,
+            [
+                listing_variant_id,
+                currency_id,
+                initialRows[0].id,
                 sale_price,
                 starts_at,
                 ends_at
@@ -1665,6 +1721,7 @@ class ListingModel {
                 SET status = CASE
                     WHEN status = 'active' THEN 'inactive'
                     WHEN status = 'inactive' THEN 'active'
+                    WHEN status = 'deleted' THEN 'inactive'
                     ELSE status
                 END,
                 updated_at = NOW()
@@ -1672,16 +1729,297 @@ class ListingModel {
               RETURNING id, status`,
             [priceId]
         );
-        return rows[0];
+        return rows[0] ?? null;
     }
+
+    static async changeVariantPricePeriod(priceId, { starts_at, ends_at = null } = {}) {
+        if (!priceId) {
+            throw new Error('Price ID is required');
+        }
+        if (!starts_at) {
+            throw new Error('Price start date time is required');
+        }
+        if (ends_at && new Date(ends_at) <= new Date(starts_at)) {
+            throw new Error('End date time must be after start date time');
+        }
+
+        const { rows } = await db.query(
+            `UPDATE listing_prices
+                SET starts_at = $1, ends_at = $2, updated_at = NOW()
+                WHERE id = $3
+                RETURNING *;
+            `,
+            [starts_at, ends_at, priceId]
+        );
+
+        return rows[0] ?? null;
+    }
+
 
     static async deleteVariantPrice(priceId) {
-        await db.query(`UPDATED listing_prices SET status = 'deleted' WHERE id = $1`, [priceId]);
+        await db.query(`UPDATE listing_prices SET status = 'deleted' WHERE id = $1`, [priceId]);
     }
 
-    static async findPricesByVariant(variantId) {
+
+    // static async findPricesByVariant(variantId) {
+    //     const { rows } = await db.query(
+    //         `
+    //     SELECT
+    //         jsonb_build_object(
+    //             'listing_id', l.id,
+    //             'listing_title', l.title,
+    //             'variant_id', lv.id,
+    //             'variant_sku', lv.sku,
+    //             'variant_status', lv.status,
+    //             'variant_image', (
+    //                 SELECT lvm.storage_key
+    //                 FROM listing_variants_media lvm
+    //                 WHERE lvm.listing_variant_id = lv.id
+    //                   AND lvm.is_primary = TRUE
+    //                 ORDER BY lvm.id
+    //                 LIMIT 1
+    //             )
+    //         ) AS variant,
+
+    //         (
+    //             SELECT jsonb_build_object(
+    //                 'currency_id', cy.id,
+    //                 'currency_name', cy.name,
+    //                 'currency_code', cy.code,
+    //                 'currency_symbol', cy.symbol
+    //             )
+    //             FROM currencies cy
+    //             WHERE cy.is_base = TRUE
+    //               AND cy.status = 'active'
+    //             LIMIT 1
+    //         ) AS base_currency,
+
+    //         COALESCE(
+    //             jsonb_agg(
+    //                 jsonb_build_object(
+    //                     'id', lp.id,
+    //                     'listing_variant_id', lp.listing_variant_id,
+    //                     'currency_id', lp.currency_id,
+    //                     'currency_code', c.code,
+    //                     'currency_symbol', c.symbol,
+
+    //                     -- Price information
+    //                     'price', lp.price,
+    //                     'sale_price', lp.sale_price,
+    //                     'base_price_id', lp.base_price_id,
+    //                     'is_initial', lp.is_initial,
+
+    //                     -- Initial price reference
+    //                     'initial_price', initial_price.price,
+
+    //                     -- Individual promotion discount
+    //                     'discount_percentage',
+    //                     CASE
+    //                         WHEN lp.sale_price IS NOT NULL
+    //                              AND initial_price.price > 0
+    //                         THEN ROUND(
+    //                             (
+    //                                 (
+    //                                     initial_price.price - lp.sale_price
+    //                                 ) / initial_price.price
+    //                             ) * 100,
+    //                             2
+    //                         )
+    //                         ELSE 0
+    //                     END,
+
+    //                     -- Validity period
+    //                     'starts_at', lp.starts_at,
+    //                     'ends_at', lp.ends_at,
+
+    //                     -- Status and timestamps
+    //                     'status', lp.status,
+    //                     'created_at', lp.created_at,
+    //                     'updated_at', lp.updated_at,
+
+    //                     -- Current selling-price record
+    //                     'is_current',
+    //                     (
+    //                         (
+    //                             lp.price IS NOT NULL
+    //                             AND lcp.base_price_id = lp.id
+    //                             AND COALESCE(lcp.is_on_sale, FALSE) = FALSE
+    //                         )
+    //                         OR
+    //                         (
+    //                             lp.sale_price IS NOT NULL
+    //                             AND lcp.promotion_id = lp.id
+    //                         )
+    //                     ),
+
+    //                     'is_current_base_price',
+    //                     (
+    //                         lp.price IS NOT NULL
+    //                         AND lcp.base_price_id = lp.id
+    //                     ),
+
+    //                     'is_current_promotion',
+    //                     (
+    //                         lp.sale_price IS NOT NULL
+    //                         AND lcp.promotion_id = lp.id
+    //                     ),
+
+    //                     'is_next',
+    //                     (
+    //                         lp.status = 'active'
+    //                         AND lp.starts_at > NOW()
+    //                         AND lp.id = (
+    //                             SELECT next_price.id
+    //                             FROM listing_prices next_price
+    //                             WHERE next_price.listing_variant_id = lv.id
+    //                             AND next_price.currency_id = lp.currency_id
+    //                             AND next_price.status = 'active'
+    //                             AND next_price.starts_at > NOW()
+    //                             ORDER BY
+    //                                 next_price.starts_at ASC,
+    //                                 next_price.created_at ASC,
+    //                                 next_price.id ASC
+    //                             LIMIT 1
+    //                         )
+    //                     ),
+
+    //                     -- Effective pricing information
+    //                     'current_price', lcp.current_price,
+    //                     'is_on_sale', COALESCE(lcp.is_on_sale, FALSE)
+    //                 )
+    //                 ORDER BY
+    //                     lp.starts_at DESC,
+    //                     lp.created_at DESC,
+    //                     lp.id DESC
+    //             ) FILTER (WHERE lp.id IS NOT NULL),
+    //             '[]'::jsonb
+    //         ) AS prices
+
+    //     FROM listing_variants lv
+
+    //     JOIN listings l
+    //         ON l.id = lv.listing_id
+
+    //     LEFT JOIN listing_prices lp
+    //         ON lp.listing_variant_id = lv.id
+
+    //     LEFT JOIN currencies c
+    //         ON c.id = lp.currency_id
+
+    //     -- Initial price for each currency
+    //     LEFT JOIN listing_prices initial_price
+    //         ON initial_price.listing_variant_id = lv.id
+    //        AND initial_price.currency_id = lp.currency_id
+    //        AND initial_price.is_initial = TRUE
+    //        AND initial_price.price IS NOT NULL
+
+    //     LEFT JOIN listing_variant_current_prices lcp
+    //         ON lcp.listing_variant_id = lv.id
+    //        AND lcp.currency_id = lp.currency_id
+
+    //     WHERE lv.id = $1
+
+    //     GROUP BY lv.id, l.id
+    //     `,
+    //         [variantId]
+    //     );
+
+    //     return rows[0] || null;
+    // }
+
+
+    static async findPricesByVariant(
+        variantId,
+        { page = 1, limit = 20 } = {}
+    ) {
+        page = Math.max(1, Number.parseInt(page, 10) || 1);
+        limit = Math.min(
+            100,
+            Math.max(1, Number.parseInt(limit, 10) || 20)
+        );
+
         const { rows } = await db.query(
             `
+        WITH priority_prices AS (
+            -- Current regular price for each currency.
+            -- This remains the priority record even when a promotion is active.
+            SELECT lp.id
+            FROM listing_prices lp
+            JOIN listing_variant_current_prices lcp
+                ON lcp.listing_variant_id = lp.listing_variant_id
+               AND lcp.currency_id = lp.currency_id
+               AND lcp.base_price_id = lp.id
+            WHERE lp.listing_variant_id = $1
+              AND lp.price IS NOT NULL
+        ),
+
+        priority_count AS (
+            SELECT COUNT(*)::INTEGER AS total
+            FROM priority_prices
+        ),
+
+        other_prices AS (
+            SELECT lp.id
+            FROM listing_prices lp
+            WHERE lp.listing_variant_id = $1
+              AND NOT EXISTS (
+                  SELECT 1
+                  FROM priority_prices pp
+                  WHERE pp.id = lp.id
+              )
+        ),
+
+        pagination_values AS (
+            SELECT
+                CASE
+                    WHEN $3 = 1
+                    THEN GREATEST($2 - pc.total, 0)
+                    ELSE $2
+                END AS page_limit,
+
+                CASE
+                    WHEN $3 = 1
+                    THEN 0
+                    ELSE GREATEST((($3 - 1) * $2) - pc.total, 0)
+                END AS page_offset
+            FROM priority_count pc
+        ),
+
+        selected_other_prices AS (
+            SELECT lp.id
+            FROM other_prices op
+            JOIN listing_prices lp
+                ON lp.id = op.id
+            CROSS JOIN pagination_values pv
+
+            ORDER BY
+                lp.starts_at DESC,
+                lp.created_at DESC,
+                lp.id DESC
+
+            LIMIT (SELECT page_limit FROM pagination_values)
+            OFFSET (SELECT page_offset FROM pagination_values)
+        ),
+
+        page_prices AS (
+            -- Always include priority prices on the first page.
+            SELECT pp.id
+            FROM priority_prices pp
+            WHERE $3 = 1
+
+            UNION ALL
+
+            -- Fill the remaining page slots or retrieve the next page.
+            SELECT sop.id
+            FROM selected_other_prices sop
+        ),
+
+        total_prices AS (
+            SELECT COUNT(*)::INTEGER AS total
+            FROM listing_prices
+            WHERE listing_variant_id = $1
+        )
+
         SELECT
             jsonb_build_object(
                 'listing_id', l.id,
@@ -1721,11 +2059,30 @@ class ListingModel {
                         'currency_code', c.code,
                         'currency_symbol', c.symbol,
 
-                        -- Price type
+                        -- Price information
                         'price', lp.price,
                         'sale_price', lp.sale_price,
                         'base_price_id', lp.base_price_id,
                         'is_initial', lp.is_initial,
+
+                        -- Initial price reference
+                        'initial_price', initial_price.price,
+
+                        -- Individual promotion discount
+                        'discount_percentage',
+                        CASE
+                            WHEN lp.sale_price IS NOT NULL
+                                 AND initial_price.price > 0
+                            THEN ROUND(
+                                (
+                                    (
+                                        initial_price.price - lp.sale_price
+                                    ) / initial_price.price
+                                ) * 100,
+                                2
+                            )
+                            ELSE 0
+                        END,
 
                         -- Validity period
                         'starts_at', lp.starts_at,
@@ -1736,31 +2093,106 @@ class ListingModel {
                         'created_at', lp.created_at,
                         'updated_at', lp.updated_at,
 
-                        -- Current pricing information
-                        'is_current', (lcp.base_price_id = lp.id),
-                        'is_current_promotion', (lcp.promotion_id = lp.id),
+                        -- Current selling-price record
+                        'is_current',
+                        (
+                            (
+                                lp.price IS NOT NULL
+                                AND lcp.base_price_id = lp.id
+                                AND COALESCE(lcp.is_on_sale, FALSE) = FALSE
+                            )
+                            OR
+                            (
+                                lp.sale_price IS NOT NULL
+                                AND lcp.promotion_id = lp.id
+                            )
+                        ),
+
+                        'is_current_base_price',
+                        (
+                            lp.price IS NOT NULL
+                            AND lcp.base_price_id = lp.id
+                        ),
+
+                        'is_current_promotion',
+                        (
+                            lp.sale_price IS NOT NULL
+                            AND lcp.promotion_id = lp.id
+                        ),
+
+                        -- Next scheduled price record
+                        'is_next',
+                        (
+                            lp.status = 'active'
+                            AND lp.starts_at > NOW()
+                            AND lp.id = (
+                                SELECT next_price.id
+                                FROM listing_prices next_price
+                                WHERE next_price.listing_variant_id = lv.id
+                                  AND next_price.currency_id = lp.currency_id
+                                  AND next_price.status = 'active'
+                                  AND next_price.starts_at > NOW()
+                                ORDER BY
+                                    next_price.starts_at ASC,
+                                    next_price.created_at ASC,
+                                    next_price.id ASC
+                                LIMIT 1
+                            )
+                        ),
+
+                        -- Effective pricing information
                         'current_price', lcp.current_price,
-                        'is_on_sale', COALESCE(lcp.is_on_sale, FALSE),
-                        'discount_percentage',
-                            COALESCE(lcp.discount_percentage, 0)
+                        'is_on_sale', COALESCE(lcp.is_on_sale, FALSE)
                     )
                     ORDER BY
+                        CASE
+                            WHEN priority.id = lp.id THEN 0
+                            ELSE 1
+                        END,
                         lp.starts_at DESC,
                         lp.created_at DESC,
                         lp.id DESC
                 ) FILTER (WHERE lp.id IS NOT NULL),
                 '[]'::jsonb
-            ) AS prices
+            ) AS prices,
+
+            jsonb_build_object(
+                'page', $3,
+                'limit', $2,
+                'total', tp.total,
+                'totalPages',
+                    CEIL(tp.total::NUMERIC / $2)::INTEGER,
+                'hasNextPage',
+                    $3 < CEIL(tp.total::NUMERIC / $2),
+                'hasPreviousPage',
+                    $3 > 1
+            ) AS pagination
 
         FROM listing_variants lv
+
         JOIN listings l
             ON l.id = lv.listing_id
 
+        CROSS JOIN total_prices tp
+
+        LEFT JOIN page_prices selected
+            ON TRUE
+
         LEFT JOIN listing_prices lp
-            ON lp.listing_variant_id = lv.id
+            ON lp.id = selected.id
+
+        LEFT JOIN priority_prices priority
+            ON priority.id = lp.id
 
         LEFT JOIN currencies c
             ON c.id = lp.currency_id
+
+        -- Initial price for each currency
+        LEFT JOIN listing_prices initial_price
+            ON initial_price.listing_variant_id = lv.id
+           AND initial_price.currency_id = lp.currency_id
+           AND initial_price.is_initial = TRUE
+           AND initial_price.price IS NOT NULL
 
         LEFT JOIN listing_variant_current_prices lcp
             ON lcp.listing_variant_id = lv.id
@@ -1768,13 +2200,18 @@ class ListingModel {
 
         WHERE lv.id = $1
 
-        GROUP BY lv.id, l.id
+        GROUP BY
+            lv.id,
+            l.id,
+            tp.total
         `,
-            [variantId]
+            [variantId, limit, page]
         );
 
         return rows[0] || null;
     }
+
+
 
     static async findCurrentPriceForVariant(variantId) {
         const { rows } = await db.query(

@@ -51,6 +51,9 @@ router.get('/stores/:storeId/listings/:listingId/review', business, businessCont
 router.post('/stores/:storeId/variants/:variantId/price', business, businessController.createVariantSalePrice);
 router.post('/stores/:storeId/variants/:variantId/price/initial', business, businessController.createVariantInitialPrice);
 router.get('/stores/:storeId/variants/:variantId/prices', business, businessController.getListingVariantPrices);
+router.patch('/stores/:storeId/variants/:variantId/prices/:priceId/s', business, businessController.toggleVariantPriceStatus);
+router.patch('/stores/:storeId/variants/:variantId/prices/:priceId/p', business, businessController.alterVariantPricePeriod)
+router.delete('/stores/:storeId/variants/:variantId/prices/:priceId', business, businessController.removeVariantPrice);
 router.get('/stores/:storeId/variants/:variantId/pricing', business, businessController.renderListingPricing);
 
 

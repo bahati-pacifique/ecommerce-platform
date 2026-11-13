@@ -303,8 +303,8 @@ class ListingServices {
         return await ListingModel.patchListingOnStoreLevel(listingId, storeId, newStatus);
     }
 
-    static async getListingVariantPrices(variantId) {
-        return await ListingModel.findPricesByVariant(variantId);
+    static async getListingVariantPrices(variantId, opts) {
+        return await ListingModel.findPricesByVariant(variantId, opts);
     }
 
     static async getListingVariantCurrentPrice(variantId) {
@@ -346,6 +346,10 @@ class ListingServices {
 
     static async toggleVariantPriceStatus(priceId) {
         return await ListingModel.toggleVariantPriceStatus(priceId)
+    }
+
+    static async changeVariantPricePeriod(priceId, payload) {
+        return await ListingModel.changeVariantPricePeriod(priceId, payload);
     }
 
     static async deleteVariantPrice(priceId) {
