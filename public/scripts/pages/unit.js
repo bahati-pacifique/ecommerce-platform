@@ -1,4 +1,3 @@
-// public/js/units.js
 $(function () {
   const modal = document.getElementById('unit-add-modal');
   if (!modal) return;
@@ -11,13 +10,11 @@ $(function () {
   const submitTxt = document.getElementById('unit-add-submit-text');
   const errorBox = document.getElementById('unit-add-error');
 
-  // ── Open / close 
   function openUnitModal() {
     modal.classList.remove('hidden');
     modal.classList.add('flex');
     document.body.style.overflow = 'hidden';
     document.addEventListener('keydown', onKey);
-    // Focus first input
     const first = modal.querySelector('input, select, textarea, button');
     first?.focus();
   }
@@ -33,7 +30,6 @@ $(function () {
     if (e.key === 'Escape') closeUnitModal();
   }
 
-  // ── Focus trap 
   modal.addEventListener('keydown', (e) => {
     if (e.key !== 'Tab') return;
     const f = modal.querySelectorAll(
@@ -49,7 +45,6 @@ $(function () {
     }
   });
 
-  // ── Wire triggers 
   $(document).on('click', '[data-open-unit-modal]', function (e) {
     const itemId = e.currentTarget.dataset.itemId;
     if (!itemId) return;
@@ -62,12 +57,10 @@ $(function () {
   closeBtn?.addEventListener('click', closeUnitModal);
   cancelBtn?.addEventListener('click', closeUnitModal);
 
-  // Reopen if the server re-rendered with errors
   if (modal.dataset.reopen === 'true') {
     openUnitModal();
   }
 
-  // ── Client-side validation 
   function setError(field, message) {
     const el = modal.querySelector(`[data-error-for="${field}"]`);
     if (el) {
@@ -125,12 +118,10 @@ $(function () {
     return ok;
   }
 
-  // Normalize MAC input as user types
   form.mac_address?.addEventListener('input', function () {
     this.value = this.value.toUpperCase();
   });
 
-  // ── Meta (JSONB) — dynamic key/value rows ─────────────────
   const metaRowsEl = document.getElementById('unit-meta-rows');
   const metaEmptyEl = document.getElementById('unit-meta-empty');
   const metaAddBtn = document.getElementById('unit-meta-add');
@@ -184,7 +175,6 @@ $(function () {
     if (!metaRowsEl) return;
     metaRowsEl.insertAdjacentHTML('beforeend', metaRowTemplate(key, value));
     refreshMetaEmptyState();
-    // Focus the key input of the last row
     const last = metaRowsEl.lastElementChild;
     last?.querySelector('[data-meta-key]')?.focus();
   }
@@ -200,10 +190,8 @@ $(function () {
     metaHidden.value = JSON.stringify(obj);
   }
 
-  // Add row button
   metaAddBtn?.addEventListener('click', () => addMetaRow());
 
-  // Remove row (event delegation)
   metaRowsEl?.addEventListener('click', (e) => {
     const btn = e.target.closest('[data-meta-remove]');
     if (!btn) return;
@@ -212,10 +200,8 @@ $(function () {
     serializeMeta();
   });
 
-  // Re-serialize on any keystroke (so the hidden input is always current)
   metaRowsEl?.addEventListener('input', serializeMeta);
-
-  // Before submit, serialize once more (belt and suspenders)
+  
   form.addEventListener('submit', serializeMeta, true);
 
   form.addEventListener('submit', async (e) => {

@@ -1,0 +1,414 @@
+<div id="adjustQuantityModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+
+  <div id="adjustQuantityBackdrop" class="absolute inset-0 bg-slate-950/40 backdrop-blur-sm"></div>
+
+  <div class="relative w-full max-w-md max-h-[90vh] flex flex-col">
+    <div class="rounded-2xl border border-slate-200 bg-white shadow-2xl overflow-hidden flex flex-col">
+
+      <div class="flex items-center justify-between border-b border-slate-100 px-5 py-4 shrink-0">
+        <div class="flex items-center gap-3 min-w-0">
+          <img id="adjustQtyItemImage" src="" alt=""
+               class="h-9 w-9 rounded object-cover ring-1 ring-slate-200 hidden" />
+          <div class="min-w-0">
+            <div class="text-sm font-semibold text-slate-900">Adjust quantity</div>
+            <div class="text-xs text-slate-500 truncate">
+              <span id="adjustQtyItemTitle">Loading…</span>
+            </div>
+            <div class="text-xs text-slate-400 truncate">
+              <span id="adjustQtyItemInventory">—</span>
+              <span class="text-slate-300 mx-1">·</span>
+              <span id="adjustQtyItemSku" class="font-mono">—</span>
+            </div>
+          </div>
+        </div>
+        <button type="button" id="adjustQtyClose" class="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 shrink-0">
+          <i data-lucide="x" class="h-4 w-4"></i>
+        </button>
+      </div>
+
+      <form id="adjustQtyForm" class="flex-1 overflow-y-auto">
+
+        <div class="p-5 space-y-5">
+
+          <div id="adjustQtyLoading" class="flex items-center justify-center gap-2 rounded-lg border border-slate-200 bg-slate-50 p-6 text-sm text-slate-500">
+            <i data-lucide="loader-circle" class="h-4 w-4 animate-lucide-spin"></i>
+            Loading item…
+          </div>
+
+          <div id="adjustQtyContent" class="space-y-5 hidden">
+
+            <div class="flex items-center gap-2 flex-wrap">
+              <span class="inline-flex items-center gap-1 rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-medium text-slate-600">
+                <i data-lucide="boxes" class="h-3 w-3"></i>
+                <span id="adjustQtyModeText">—</span>
+              </span>
+              <span class="inline-flex items-center gap-1 rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-medium text-slate-600">
+                <i data-lucide="hash" class="h-3 w-3"></i>
+                <span id="adjustQtyUnitCountText">—</span>
+              </span>
+            </div>
+
+            <div class="rounded-lg border border-slate-200 bg-slate-50 p-3">
+              <div class="flex items-center justify-between">
+                <div class="text-xs font-medium text-slate-500">Current quantity</div>
+                <div class="text-2xl font-semibold text-slate-900 tabular-nums" id="adjustQtyCurrent">0</div>
+              </div>
+            </div>
+
+            <div>
+              <label class="mb-2 block text-xs font-semibold text-slate-600">
+                Quantity change delta <span class="text-rose-500">*</span>
+              </label>
+
+              <div class="flex items-stretch gap-2">
+                <button type="button" id="adjustQtyMinus"
+                        class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed"
+                        aria-label="Decrease quantity">
+                  <i data-lucide="minus" class="h-4 w-4"></i>
+                </button>
+
+                <input type="number" name="delta" id="deltaAdjustInput" step="1" value="0" required
+                       class="flex-1 rounded-lg border border-slate-200 px-3 py-2 text-center text-lg font-semibold tabular-nums outline-none focus:border-[var(--color-brand)] disabled:bg-slate-50 disabled:text-slate-400" />
+
+                <button type="button" id="adjustQtyPlus"
+                        class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed"
+                        aria-label="Increase quantity">
+                  <i data-lucide="plus" class="h-4 w-4"></i>
+                </button>
+              </div>
+
+              <div class="mt-3 flex flex-wrap gap-2" id="adjustQtyPresets">
+                <button type="button" data-delta="1"  class="adjust-qty-preset rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed">+1</button>
+                <button type="button" data-delta="5"  class="adjust-qty-preset rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed">+5</button>
+                <button type="button" data-delta="10" class="adjust-qty-preset rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed">+10</button>
+                <button type="button" data-delta="-1" class="adjust-qty-preset rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed">−1</button>
+                <button type="button" data-delta="-5" class="adjust-qty-preset rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed">−5</button>
+              </div>
+
+              <div id="adjustQtyDelta" class="mt-2 text-xs text-slate-500"></div>
+            </div>
+
+          </div>
+
+          <div id="adjustQtyError" class="hidden rounded-lg border border-rose-200 bg-rose-50 p-3 text-xs text-rose-700"></div>
+
+        </div>
+
+        <div class="flex items-center justify-end gap-2 border-t border-slate-100 bg-slate-50 px-5 py-3 shrink-0">
+          <button type="button" id="adjustQtyCancel" class="rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">
+            Cancel
+          </button>
+          <button type="submit" id="adjustQtySubmit" disabled
+                  class="inline-flex items-center gap-2 rounded-lg bg-[var(--color-brand)] px-4 py-2 text-sm font-semibold text-white hover:bg-[var(--color-brand-dark)] disabled:opacity-50 disabled:cursor-not-allowed">
+            <i data-lucide="check" class="h-4 w-4"></i>
+            Submit
+          </button>
+        </div>
+
+      </form>
+
+    </div>
+  </div>
+</div>
+
+<script type="module">
+  $(function () {
+  initAdjustQuantityModal();
+});
+
+function initAdjustQuantityModal() {
+  const $modal = $('#adjustQuantityModal');
+  if (!$modal.length) return;
+
+  const $backdrop = $('#adjustQuantityBackdrop');
+  const $closeBtn = $('#adjustQtyClose');
+  const $cancelBtn = $('#adjustQtyCancel');
+  const $form = $('#adjustQtyForm');
+  const $submitBtn = $('#adjustQtySubmit');
+  const $errorBox = $('#adjustQtyError');
+  const $loading = $('#adjustQtyLoading');
+  const $content = $('#adjustQtyContent');
+  const $input = $('#deltaAdjustInput'); 
+  const $minusBtn = $('#adjustQtyMinus');
+  const $plusBtn = $('#adjustQtyPlus');
+  const $presets = $('.adjust-qty-preset');
+  const $currentEl = $('#adjustQtyCurrent');
+  const $deltaEl = $('#adjustQtyDelta');
+  const $titleEl = $('#adjustQtyItemTitle');
+  const $inventoryEl = $('#adjustQtyItemInventory');
+  const $skuEl = $('#adjustQtyItemSku');
+  const $imageEl = $('#adjustQtyItemImage');
+  const $modeText = $('#adjustQtyModeText');
+  const $unitCountText = $('#adjustQtyUnitCountText');
+
+  let ctx = null;
+  let fetchAbort = null;
+
+  const CDN = 'https://cdn.cococe.rw';
+  const MAX_ABS_DELTA = 10000;
+
+  function imageUrl(path) {
+    if (!path) return null;
+    return path.startsWith('http') ? path : `${CDN}/${path}`;
+  }
+
+  function readDelta() {
+    const n = Number.parseInt($input.val(), 10);
+    if (!Number.isFinite(n)) return 0;
+    return Math.max(-MAX_ABS_DELTA, Math.min(MAX_ABS_DELTA, n));
+  }
+
+  function setDelta(n) {
+    if (isSerialized()) return;
+    const parsed = Number.parseInt(n, 10) || 0;
+    const clamped = Math.max(-MAX_ABS_DELTA, Math.min(MAX_ABS_DELTA, parsed));
+    $input.val(clamped);
+    updateDelta();
+  }
+
+  function isSerialized() {
+    return ctx?.item?.trackingMode === 'serialized';
+  }
+
+  function setControlsEnabled(enabled) {
+    $input.prop('disabled', !enabled);
+    $minusBtn.prop('disabled', !enabled);
+    $plusBtn.prop('disabled', !enabled);
+    $presets.prop('disabled', !enabled);
+  }
+
+  function showError(message) {
+    $errorBox.text(message).removeClass('hidden');
+  }
+
+  function hideError() {
+    $errorBox.addClass('hidden').text('');
+  }
+
+  async function openModal(newCtx) {
+    if (!newCtx?.inventoryId || !newCtx?.storeId || !newCtx?.itemId) {
+      console.error('openAdjustQuantityModal: missing inventoryId/storeId/itemId');
+      return;
+    }
+
+    if (fetchAbort) fetchAbort.abort();
+    fetchAbort = new AbortController();
+
+    ctx = {
+      inventoryId: newCtx.inventoryId,
+      storeId:     newCtx.storeId,
+      itemId:      newCtx.itemId,
+      item:        null,
+    };
+
+    $titleEl.text('Loading…');
+    $inventoryEl.text('—');
+    $skuEl.text('—');
+    $modeText.text('—');
+    $unitCountText.text('—');
+    $currentEl.text('0');
+    $input.val(0);                                             // ← 0, not 1
+    $deltaEl.text('').removeClass('text-emerald-600 text-amber-600').addClass('text-slate-500');
+    $imageEl.addClass('hidden').attr('src', '');
+    hideError();
+    $loading.removeClass('hidden');
+    $content.addClass('hidden');
+    setControlsEnabled(false);
+    $submitBtn.prop('disabled', true);
+
+    $modal.removeClass('hidden');
+    $('body').css('overflow', 'hidden');
+    window.lucide?.createIcons?.();
+
+    try {
+      const { data } = await axios.get(
+        `/inventories/${ctx.inventoryId}/${ctx.storeId}/items/${ctx.itemId}`,
+        { withCredentials: true, signal: fetchAbort.signal }
+      );
+
+      if (!data) throw new Error('Item not found.');
+
+      ctx.item = {
+        id:             data.id,
+        inventoryId:    data.inventory_id,
+        inventoryTitle: data.inventory_title || 'Inventory item',
+        listingTitle:   data.listing_title || data.inventory_title || 'Inventory item',
+        sku:            data.listing_variant_sku || data.listing_sku || '',
+        image:          data.listing_image || '',
+        quantity:       Number(data.quantity ?? 0),
+        trackingMode:   data.tracking_mode || null,
+        unitCount:      Number(data.unit_count ?? 0),
+      };
+
+      // Header
+      $titleEl.text(ctx.item.listingTitle);
+      $inventoryEl.text(ctx.item.inventoryTitle);
+      $skuEl.text(ctx.item.sku || '—');
+
+      const img = imageUrl(ctx.item.image);
+      if (img) {
+        $imageEl.attr('src', img).removeClass('hidden');
+      } else {
+        $imageEl.addClass('hidden').attr('src', '');
+      }
+
+      // Badges
+      const modeLabels = { bulk: 'Bulk', serialized: 'Serialized' };
+      $modeText.text(modeLabels[ctx.item.trackingMode] || ctx.item.trackingMode || '—');
+      $unitCountText.text(`${ctx.item.unitCount} unit${ctx.item.unitCount === 1 ? '' : 's'}`);
+
+      $currentEl.text(ctx.item.quantity);
+      $input.val(1);
+      updateDelta();
+
+      // Show content
+      $loading.addClass('hidden');
+      $content.removeClass('hidden');
+
+      // Serialized guard
+      if (isSerialized()) {
+        setControlsEnabled(false);
+        $submitBtn.prop('disabled', true);
+        showError(
+          'Serialized items are counted from inventory units. Add or remove units instead of editing quantity.'
+        );
+      } else {
+        setControlsEnabled(true);
+        $submitBtn.prop('disabled', true);  // ← disabled until delta !== 0
+        setTimeout(() => { $input.trigger('focus').trigger('select'); }, 50);
+      }
+
+      window.lucide?.createIcons?.();
+    } catch (err) {
+      if (err.name === 'CanceledError' || err.code === 'ERR_CANCELED') return;
+
+      console.error(err);
+      $loading.addClass('hidden');
+      showError(err.response?.data?.message || err.message || 'Failed to load data.');
+    }
+  }
+
+  function closeModal() {
+    if (fetchAbort) { fetchAbort.abort(); fetchAbort = null; }
+
+    $modal.addClass('hidden');
+    $('body').css('overflow', '');
+    $form[0]?.reset();
+    hideError();
+    $content.addClass('hidden');
+    $loading.addClass('hidden');
+    $input.val(1);
+    ctx = null;
+  }
+
+  window.openAdjustQuantityModal = openModal;
+
+  $(document).on('click', '[adjust-quantity]', function () {
+    const $btn = $(this);
+    openModal({
+      inventoryId: $btn.data('inventoryId'),
+      storeId:     $btn.data('storeId'),
+      itemId:      $btn.data('itemId'),
+    });
+  });
+
+  $backdrop.on('click', closeModal);
+  $closeBtn.on('click', closeModal);
+  $cancelBtn.on('click', closeModal);
+
+  $(document).on('keydown', (e) => {
+    if (e.key === 'Escape' && !$modal.hasClass('hidden')) closeModal();
+  });
+
+  $minusBtn.on('click', () => setDelta(readDelta() - 1));
+  $plusBtn.on('click',  () => setDelta(readDelta() + 1));
+  $input.on('input change', updateDelta);
+
+  $(document).on('click', '.adjust-qty-preset', function () {
+    if (isSerialized()) return;
+    const step = Number.parseInt($(this).data('delta'), 10) || 0;
+    setDelta(readDelta() + step);
+  });
+
+  function updateDelta() {
+    if (!ctx?.item) return;
+    if (isSerialized()) return;
+
+    const delta = readDelta();
+    const current = Number(ctx.item.quantity ?? 0);
+
+    $submitBtn.prop('disabled', delta === 0);
+
+    $deltaEl.removeClass('text-emerald-600 text-amber-600 text-slate-500');
+
+    if (delta === 0) {
+      $deltaEl.text('').addClass('text-slate-500');
+      return;
+    }
+
+    const sign = delta > 0 ? '+' : '';
+    const projected = Math.max(0, current + delta);
+    $deltaEl
+      .text(`Change: ${sign}${delta} (${current} → ${projected})`)
+      .addClass(delta > 0 ? 'text-emerald-600' : 'text-amber-600');
+  }
+
+  $form.on('submit', async (e) => {
+    e.preventDefault();
+    hideError();
+
+    if (!ctx?.item) {
+      showError('Item not loaded yet.');
+      return;
+    }
+    if (isSerialized()) {
+      showError('Cannot edit quantity for serialized items.');
+      return;
+    }
+
+    const delta = readDelta();
+    if (delta === 0) {
+      closeModal();
+      return;
+    }
+
+    setControlsEnabled(false);
+    $submitBtn
+      .prop('disabled', true)
+      .html('<i data-lucide="loader-2" class="h-4 w-4 animate-spin"></i> Submitting…');
+    window.lucide?.createIcons?.();
+
+    try {
+      const { data } = await axios.patch(
+        `/inventories/${ctx.inventoryId}/${ctx.storeId}/items/${ctx.itemId}/adjust-quantity`,
+        { delta },
+        { withCredentials: true }
+      );
+
+      if (data?.success === false) {
+        showError(data.message || 'Failed to update quantity.');
+        setControlsEnabled(true);
+        $submitBtn.prop('disabled', delta === 0);
+        return;
+      }
+
+      Notification?.showNotification?.({
+        type: 'success',
+        message: data?.message || 'Quantity updated',
+      });
+      closeModal();
+      window.location.reload();
+    } catch (err) {
+      console.error(err);
+      showError(err.response?.data?.message || err.message || 'Failed to update quantity.');
+      setControlsEnabled(true);
+      $submitBtn.prop('disabled', readDelta() === 0);
+    } finally {
+      $submitBtn
+        .prop('disabled', isSerialized() || readDelta() === 0)
+        .html('<i data-lucide="check" class="h-4 w-4"></i> Save quantity');
+      window.lucide?.createIcons?.();
+    }
+  });
+}
+</script>

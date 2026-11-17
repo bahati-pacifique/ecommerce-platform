@@ -322,6 +322,10 @@ class InventoryService {
         return await InventoryModel.listUnitsByInventory(inventoryId, opts);
     }
 
+    static async getInventoryItemById(itemId) {
+        return await InventoryModel.getInventoryItemById(itemId);
+    }
+
     static async getUnitById(unitId) {
         return await InventoryModel.getUnitById(unitId);
     }
@@ -330,14 +334,35 @@ class InventoryService {
         return await InventoryModel.searchUnit(storeId, query, opts);
     }
 
+    static async adjustQuantity(itemId, quantity) {
+
+        const item = await InventoryModel.getInventoryItemById(itemId);
+        if (!item) {
+            throw new Error('Inventory item not found');
+        }
+
+        return await InventoryModel.adjustInventoryItemQuantity(itemId, quantity);
+    }
+
+    static async patchUnit(unitId, statusPatch, condition) {
+
+        const unit = await InventoryModel.getUnitById(unitId);
+        if (!unit) {
+            throw new Error('Item Unit not found');
+        }
+
+        if (statusPatch !== undefined && unit.status === 'sold') {
+            throw new Error("Sold unit can't change status");
+        }
+
+        return await InventoryModel.patchUnit(unitId, statusPatch, condition);
+    }
+
+
     /**
      * 
      * @param {*} payload 
-     * {
-            inventory_id, listing_id, quantity = 0, reserved = 0,
-            batch_number = null, mfg_at = null, expires_at = null,
-            status = 'in_stock',
-        }
+     * 
      *
      */
     static async insertItem(storeId, payload) {
@@ -468,7 +493,6 @@ class InventoryService {
         };
     }
 
-    // FIX 4: Made private as well since it's an internal shaper
     static #shapeTotals(t) {
         return {
             units: t.total_units || 0,

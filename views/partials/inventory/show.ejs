@@ -91,7 +91,7 @@
   </div>
 
   <div class="overflow-x-auto">
-    <table class="w-full text-left text-sm">
+    <table class="w-full text-left text-sm table-fixed">
       <thead class="bg-slate-50 text-xs uppercase tracking-wider text-slate-500">
         <tr>
           <th class="px-5 py-3">Listing</th>
@@ -139,7 +139,7 @@
           <td class="px-5 py-3 text-right text-amber-600"><%= fmtNum(item.reserved) %></td>
           <td class="px-5 py-3 text-right font-semibold text-emerald-600"><%= fmtNum(item.available) %></td>
           <td class="px-5 py-3">
-            <span class="rounded-full px-2.5 py-1 text-xs font-semibold
+            <span class="capitalize rounded-full px-2.5 py-1 text-xs font-semibold
                   <%= item.status === 'in_stock' ? 'bg-emerald-50 text-emerald-700' : '' %>
                   <%= item.status === 'low_stock' ? 'bg-amber-50 text-amber-700' : '' %>
                   <%= item.status === 'out_of_stock' ? 'bg-rose-50 text-rose-700' : '' %>">
@@ -152,10 +152,15 @@
                   <span>Add Unit</span>
                   <i data-lucide="plus" class="h-4 w-4"></i>
                 </button>`,
-                `<button data-item-id="${item.id}" data-adjust-item-modal class="${item.tracking_mode === 'bulk' ? 'flex' : 'hidden'} 
+                `<button data-inventory-id="${inventory.id}" data-store-id="${store.id}" data-item-id="${item.id}" adjust-quantity class="${item.tracking_mode === 'bulk' ? 'flex' : 'hidden'} 
                   w-full items-center gap-2 rounded-md px-3 py-2 text-left text-sm text-slate-700 hover:bg-slate-100 hover:text-brand add-quantity-btn">
                   <span>Adjust Quantity</span>
                   <i data-lucide="settings-2" class="h-4 w-4"></i>
+                </button>`,
+                `<button data-inventory-id="${inventory.id}" data-store-id="${store.id}" data-item-id="${item.id}" reserve-quantity class="${item.tracking_mode === 'bulk' ? 'flex' : 'hidden'} 
+                  w-full items-center gap-2 rounded-md px-3 py-2 text-left text-sm text-slate-700 hover:bg-slate-100 hover:text-brand add-quantity-btn">
+                  <span>Reserve Quantity</span>
+                  <i data-lucide="can" class="h-4 w-4"></i>
                 </button>`,
                 `<a href="/stores/${store.id}/listings/${item.listing?.id}/review" target="_blank" data-item-id="${item.id}" data-unit-pricing class="w-full flex items-center gap-2 rounded-md px-3 py-2 text-left text-sm text-slate-700 hover:bg-slate-100 hover:text-brand">
                   <span>View Listing</span>
@@ -173,7 +178,7 @@
 
   <% if (pag.total > 0) { %>
   <div class="border-t border-slate-100 p-4 text-sm text-slate-500">
-    Showing <%= (pag.page - 1) * pag.limit + 1 %>–<%= Math.min(pag.page * pag.limit, pag.total) %> of <%= pag.total %>
+    Showing <%= (pag.page - 1) * pag.limit + 1 %>-<%= Math.min(pag.page * pag.limit, pag.total) %> of <%= pag.total %>
   </div>
   <% } %>
 </div>
@@ -182,3 +187,4 @@
 
 <%- include('./_add-item-modal', { store, inventory }) %>
 <%- include('./_unit-add-modal', { store, inventory }) %>
+<%- include('./_adjust-quantity-modal', { store, inventory }) %>

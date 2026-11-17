@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
 
-    let currentUnitFull = null;     // the "full" fetched data
-    let currentRequest = null;     // AbortController for in-flight fetch
+    let currentUnitFull = null;
+    let currentRequest = null;
     let currentUnitId = null;
 
     const sheet = document.getElementById('unitSheet');
@@ -10,6 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const closeBtn = document.getElementById('unitSheetClose');
     const errorBox = document.getElementById('unitSheetError');
     const successBox = document.getElementById('unitSheetSuccess');
+    const unitSheetSold = document.getElementById('unitSheetSold');
 
     const skeletonEl = document.getElementById('unitSheetSkeleton');
     const contentEl = document.getElementById('unitSheetContent');
@@ -20,63 +21,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (!sheet) return;
 
-    const { storeId, inventoryId, baseUrl } = window.__UNITS__ || {};
+    const { storeId, inventoryId } = window.__UNITS__ || {};
 
-    // Populate location select once
     const locationSelect = document.getElementById('unitSheetLocationSelect');
 
-    // Current unit being edited
     let currentUnit = null;
-
-    // function openSheet(unit) {
-    //     hydrate(unit);
-    //     clearFeedback();
-
-    //     // 1. Make the container interactive & visible
-    //     sheet.classList.remove('pointer-events-none', 'opacity-0', 'invisible');
-    //     sheet.classList.add('pointer-events-auto', 'opacity-100', 'visible');
-
-    //     // 2. Fade in the backdrop
-    //     backdrop.classList.remove('opacity-0');
-    //     backdrop.classList.add('opacity-100');
-
-    //     // 3. Slide the panel up — on the next frame, after styles are committed
-    //     requestAnimationFrame(() => {
-    //         requestAnimationFrame(() => {
-    //             panel.classList.remove('translate-y-full');
-    //             panel.classList.add('translate-y-0');
-    //         });
-    //     });
-
-    //     // 4. Lock body scroll
-    //     document.body.style.overflow = 'hidden';
-
-    //     document.addEventListener('keydown', onKey);
-    //     setTimeout(() => closeBtn?.focus(), 100);
-    // }
-
-    // function closeSheet() {
-    //     // 1. Slide out
-    //     panel.classList.remove('translate-y-0');
-    //     panel.classList.add('translate-y-full');
-
-    //     // 2. Fade out the backdrop
-    //     backdrop.classList.remove('opacity-100');
-    //     backdrop.classList.add('opacity-0');
-
-    //     // 3. Fade out the container
-    //     sheet.classList.remove('pointer-events-auto', 'opacity-100', 'visible');
-    //     sheet.classList.add('pointer-events-none', 'opacity-0', 'invisible');
-
-    //     // 4. Restore body scroll
-    //     document.body.style.overflow = '';
-    //     document.removeEventListener('keydown', onKey);
-
-    //     // 5. Clear the unit after the transition completes
-    //     setTimeout(() => {
-    //         currentUnit = null;
-    //     }, 420);
-    // }
 
     function openSheet(id) {
         currentUnit = id;
@@ -92,9 +41,6 @@ document.addEventListener('DOMContentLoaded', () => {
         sheet.classList.add('pointer-events-auto', 'opacity-100', 'visible');
         backdrop.classList.remove('opacity-0');
         backdrop.classList.add('opacity-100');
-
-        // Show header info immediately (from the card the user tapped)
-        hydrateHeader(id);
 
         // Show skeleton, hide content & error
         showSkeleton();
@@ -126,28 +72,6 @@ document.addEventListener('DOMContentLoaded', () => {
         document.documentElement.style.removeProperty('--scrollbar-width');
     }
 
-    // ── Show the immediate header (from the search card) ─────
-    function hydrateHeader(id) {
-
-        //     document.getElementById('unitSheetTitle').textContent =
-        //         unit.listing_title || 'Unit';
-        //     document.getElementById('unitSheetSubtitle').textContent =
-        //         `${unit.inventory_title || 'Unknown inventory'}${unit.location_title ? ' · ' + unit.location_title : ''
-        //         }`;
-
-        //     const imgWrap = document.getElementById('unitSheetImageWrap');
-        //     if (unit.listing_image) {
-        //         imgWrap.innerHTML = `<img src="https://cdn.cococe.rw/${esc(unit.listing_image)}"
-        //   class="h-12 w-12 rounded-lg object-cover ring-1 ring-slate-200" />`;
-        //     } else {
-        //         imgWrap.innerHTML = `<div class="flex h-12 w-12 items-center justify-center rounded-lg bg-slate-100">
-        //   <svg class="h-5 w-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        //     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-        //           d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
-        //   </svg></div>`;
-        //     }
-    }
-
     // ── Fetch the full unit ───────────────────────────────────
     async function fetchUnit(unitId) {
         const controller = new AbortController();
@@ -158,8 +82,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 `/inventories/units/${storeId}/${unitId}`,
                 { withCredentials: true, signal: controller.signal }
             );
-
-            console.log(res.data);
 
             currentUnitFull = res.data;
             hydrateContent(currentUnitFull);
@@ -298,6 +220,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const metaEl = document.getElementById('unitSheetMeta');
         const meta = u.meta && typeof u.meta === 'object' ? u.meta : null;
         const metaEntries = meta ? Object.entries(meta) : [];
+
         if (metaEntries.length) {
             metaSection.classList.remove('hidden');
             metaEl.innerHTML = metaEntries.map(([k, v]) => `
@@ -343,44 +266,63 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelectorAll('.unit-status-action-btn').forEach((btn) => {
             const btnStatus = btn.dataset.statusAction;
             if (u.status === btnStatus) btn.disabled = true;
-            if (u.status === 'sold') btn.classList.add('hidden');
-        })
+        });
+
+        if (u.status === 'sold') {
+            document.getElementById('sheetStatus').classList.add('hidden');
+            document.getElementById('soldBadge').classList.remove('hidden');
+            document.getElementById('soldBadge').innerHTML = `<h3>${u.sold_at ? 'Unit sold at ' + formatDate(u.sold_at) : 'Unit sold'}</h3>`;
+        } else {
+            document.getElementById('soldBadge').classList.add('hidden');
+            document.getElementById('sheetStatus').classList.remove('hidden');
+        }
     }
 
     // ── Actions ──────────────────────────────────────────────
-    async function patchUnit(payload) {
+    async function patchUnit(payload, target) {
 
         if (!currentUnit) return;
 
         clearFeedback();
-        try {
-            const res = await axios.patch(
-                `/api/stores/${storeId}/units/${currentUnit.id}`,
-                payload,
-                { withCredentials: true }
-            );
-            showSuccess('Unit updated.');
-            // Merge response back into currentUnit and re-hydrate
-            currentUnit = { ...currentUnit, ...(res.data.result || payload) };
-            hydrate(currentUnit);
-            // Update the row in the search results list too
-            updateResultCard(currentUnit);
-        } catch (err) {
-            showError(err.response?.data?.message || 'Could not update unit.');
+        let targetContent = ''
+        if (target) {
+            targetContent = target.textContent;
         }
+
+        showSnackbar({
+            autoClose: false,
+            type: 'warning',
+            message: `${payload ? `Patch unit <strong>${Object.entries(payload || {})
+                .map(([key, value]) => `${key.toUpperCase()} ➝ ${value.toUpperCase().replace('_', ' ')}`)
+                .join(",")}</strong>?` : 'Do you to patch this unit?'}`,
+            actionText: 'Patch',
+            onAction: async () => {
+                try {
+                    if (target) {
+                        target.disabled = true;
+                        target.textContent = 'Patching...';
+                    }
+                    await axios.patch(
+                        `/inventories/units/${currentUnit}/${inventoryId}/${storeId}/patch`,
+                        payload,
+                        { withCredentials: true }
+                    );
+
+                    location.reload();
+                } catch (err) {
+                    console.error(err);
+                    if (target) {
+                        target.disabled = false;
+                        target.textContent = targetContent;
+                    }
+                    Notification.showNotification({
+                        message: err.response?.data?.message || 'Could not update unit.',
+                        type: 'error'
+                    });
+                }
+            }
+        });
     }
-
-    // document.querySelectorAll('[data-status-action]').forEach(btn => {
-    //     btn.addEventListener('click', () => {
-    //         patchUnit({ status: btn.dataset.statusAction });
-    //     });
-    // });
-
-    // document.querySelectorAll('[data-condition-action]').forEach(btn => {
-    //     btn.addEventListener('click', () => {
-    //         patchUnit({ condition: btn.dataset.conditionAction });
-    //     });
-    // });
 
     document.getElementById('unitSheetLocationSave').addEventListener('click', (e) => {
 
@@ -400,7 +342,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         window.location.reload()
                     }
                 } catch (error) {
-                    console.log("[Error transfering unit]",error);
+                    console.log("[Error transfering unit]", error);
                     showSnackbar({
                         type: 'error',
                         message: error.response?.data?.message || 'Internal Server Error'
@@ -410,34 +352,44 @@ document.addEventListener('DOMContentLoaded', () => {
                     e.target.textContent = 'Move';
                 }
             },
-        })
+        });
     });
 
     document.getElementById('unitSheetDelete').addEventListener('click', (e) => {
 
         if (!currentUnit) return;
 
+        const eContent = e.innerHTML;
+
         showSnackbar({
+            autoClose: false,
             type: 'warning',
-            message: 'Are you sure you want to delete this unit?',
-            actionText: 'Delete',
+            message: 'Do you want to remove this unit from inventory and tracking?',
+            actionText: 'Remove',
             onAction: async () => {
                 try {
-                    await axios.delete(
-                        `/api/stores/${storeId}/units/${currentUnit.id}`,
+                    e.target.innerHTML = 'Removing...';
+                    e.target.disabled = true;
+                    await axios.patch(
+                        `/inventories/units/${currentUnit}/${inventoryId}/${storeId}/patch`,
+                        {status: 'removed'},
                         { withCredentials: true }
                     );
-                    showSuccess('Unit deleted.');
-                    removeResultCard(currentUnit.id);
-                    setTimeout(closeSheet, 600);
+
+                    location.reload();
                 } catch (err) {
-                    showError(err.response?.data?.message || 'Could not delete unit.');
+                    console.error(err);
+
+                    e.target.innerHTML = eContent;
+                    e.target.disabled = false;
+                    Notification.showNotification({
+                        message: err.response?.data?.message || 'Could not update unit.',
+                        type: 'error'
+                    });
                 }
             }
         });
     });
-
-    // ── Feedback ─────────────────────────────────────────────
 
     function showSuccess(msg) {
         successBox.textContent = msg;
@@ -486,15 +438,19 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('[data-status-action]').forEach(btn => {
         btn.addEventListener('click', () => {
             if (!currentUnitFull) return;
-            patchUnit({ status: btn.dataset.statusAction });
+            patchUnit({ status: btn.dataset.statusAction }, btn);
         });
     });
 
     document.querySelectorAll('[data-condition-action]').forEach(btn => {
         btn.addEventListener('click', () => {
             if (!currentUnitFull) return;
-            patchUnit({ condition: btn.dataset.conditionAction });
+            patchUnit({ condition: btn.dataset.conditionAction }, btn);
         });
+    });
+
+    unitSheetSold.addEventListener('click', () => {
+        patchUnit({ status: 'sold' }, unitSheetSold);
     });
 
     window.UnitSheet = { open: openSheet };

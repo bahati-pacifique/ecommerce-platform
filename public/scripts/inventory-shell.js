@@ -6,12 +6,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function open() {
         menu.classList.remove('hidden');
+        menu.classList.add('flex');
         button?.setAttribute('aria-expanded', 'true');
         document.body.style.overflow = 'hidden';
     }
 
     function closeMenu() {
         menu.classList.add('hidden');
+        menu.classList.remove('flex');
         button?.setAttribute('aria-expanded', 'false');
         document.body.style.overflow = '';
     }

@@ -405,6 +405,96 @@ async function renderInventoryUnit(req, res) {
     }
 }
 
+async function getInventoryItem(req, res) {
+    const user = req.user;
+    const { storeId, itemId } = req.params;
+
+    try {
+        await validateVendorStore(storeId, user?.vendor?.id, res);
+
+        const result = await InventoryService.getInventoryItemById(itemId);
+
+        return res.status(result ? 200 : 404).json({
+            ...result,
+            ...(!result && { message: 'Item not found, please check item id/serial number/barcode' }),
+        });
+
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({
+            message: 'Unable to get unit — Internal error'
+        });
+    }
+}
+
+async function adjustItemQuantity(req, res) {
+    const user = req.user;
+    const { storeId, itemId } = req.params;
+
+    try {
+        await validateVendorStore(storeId, user?.vendor?.id, res);
+
+        const delta = Number.parseInt(req.body?.delta, 10);
+
+        if (!Number.isFinite(delta) || delta === 0) {
+            return res.status(400).json({ success: false, message: 'Invalid quantity delta.' });
+        }
+
+        const result = await InventoryService.adjustQuantity(itemId, delta);
+
+        return res.status(result ? 200 : 404).json({
+            ...result,
+            ...(!result && { message: 'Item not found, please check item id/serial number/barcode' }),
+        });
+
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({
+            message: 'Unable to adjust inventory quantity — Internal error'
+        })
+    }
+}
+
+async function patchUnit(req, res) {
+    try {
+        const { unitId, storeId } = req.params;
+        const { status, condition } = req.body;
+        const user = req.user;
+
+        console.log(req.params)
+
+        const vendorStore = await validateVendorStore(storeId, user.vendor.id);
+
+        const result = await InventoryService.patchUnit(
+            unitId,
+            status,
+            condition,
+            vendorStore.id
+        );
+
+        return res.json(result);
+
+    } catch (error) {
+        console.error('patchUnit error:', error);
+
+        if (error.message === 'Item Unit not found') {
+            return res.status(404).json({ message: error.message });
+        }
+
+        if (
+            error.message.includes('Invalid item') ||
+            error.message.includes('No valid fields') ||
+            error.message.includes("Sold unit can't change status")
+        ) {
+            return res.status(400).json({ message: error.message });
+        }
+
+        return res.status(500).json({
+            message: 'Unable to patch item unit — Internal error'
+        });
+    }
+}
+
 async function getItemUnit(req, res) {
     const user = req.user;
     const storeId = req.params.storeId;
@@ -774,7 +864,7 @@ async function getListingVariantPrices(req, res) {
             })
         }
 
-        const result = await ListingService.getListingVariantPrices(variantId, {page, limit});
+        const result = await ListingService.getListingVariantPrices(variantId, { page, limit });
 
         return res.json(result);
 
@@ -2228,6 +2318,9 @@ module.exports = {
     renderInventoryOverview,
 
     renderInventoryUnit,
+
+    getInventoryItem,
+
     searchUnit,
     getItemUnit,
     insertInventoryUnit,
@@ -2245,8 +2338,11 @@ module.exports = {
     alterVariantPricePeriod,
     removeVariantPrice,
 
+    adjustItemQuantity,
+
     createInventoryItem,
     transferUnit,
+    patchUnit,
 
     getStoreDashboardAnalytics,
     getStoreDashboard,

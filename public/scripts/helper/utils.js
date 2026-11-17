@@ -79,6 +79,8 @@ function truncateText(str = '', limit = 10) {
 
 function formatDate(dateStr) {
 
+    if (!dateStr) return '';
+
     const options = {
         day: 'numeric',
         month: 'long',

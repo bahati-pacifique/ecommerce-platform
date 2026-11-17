@@ -1796,19 +1796,27 @@ class InventoryModel {
      * Atomically adjust quantity by a delta (+ or -).
      * Auto-recomputes status based on new quantity.
      */
-    static async adjustInventoryItemQuantity(itemId, delta) {
+    static async adjustInventoryItemQuantity(itemId, delta, { inventoryId = null } = {}) {
+        const params = [delta, itemId];
+        let inventoryGuard = '';
+        if (inventoryId) {
+            params.push(inventoryId);
+            inventoryGuard = `AND inventory_id = $${params.length}`;
+        }
+
         const { rows: [row] } = await db.query(`
-        UPDATE inventory_items
-        SET quantity = GREATEST(quantity + $1, 0),
-            status = CASE
-            WHEN quantity + $1 <= 0 THEN 'out_of_stock'::inventory_status
-            WHEN quantity + $1 <= 10 THEN 'low_stock'::inventory_status
-            ELSE 'in_stock'::inventory_status
-            END,
-            updated_at = NOW()
-        WHERE id = $2
-        RETURNING id, quantity, reserved, (quantity - reserved) AS available, status
-    `, [delta, itemId]);
+            UPDATE inventory_items
+            SET quantity = GREATEST(quantity + $1, 0),
+                status = CASE
+                    WHEN quantity + $1 <= 0 THEN 'out_of_stock'::inventory_status
+                    WHEN quantity + $1 <= 10 THEN 'low_stock'::inventory_status
+                    ELSE 'in_stock'::inventory_status
+                END,
+                updated_at = NOW()
+            WHERE id = $2
+            ${inventoryGuard}
+            RETURNING id, quantity, reserved, (quantity - reserved) AS available, status
+        `, params);
 
         return row || null;
     }
@@ -2143,7 +2151,7 @@ class InventoryModel {
             RETURNING *
         `, [
             inventoryItemId, serialNumber || null, barcode || null, imei || null, macAddress || null,
-            status, condition, receivedAt || null, soldAt || null, meta,
+            status, condition, receivedAt || new Date(), soldAt || null, meta,
         ]);
 
         return row;
@@ -2185,12 +2193,99 @@ class InventoryModel {
         return rows;
     }
 
+    // static async listUnitsByInventory(inventoryId, {
+    //     page = 1,
+    //     limit = 20,
+    //     status = '',
+    //     sort = 'recent',
+    // } = {}) {
+    //     const params = [inventoryId];
+    //     const where = ['ii.inventory_id = $1'];
+
+    //     if (status) {
+    //         params.push(status);
+    //         where.push(`u.status = $${params.length}::inventory_unit_status`);
+    //     }
+
+    //     const ORDER = {
+    //         recent: 'u.created_at DESC',
+    //         serial_asc: 'u.serial_number ASC NULLS LAST',
+    //         warranty: 'u.warranty_end_date ASC NULLS LAST',
+    //     };
+    //     const orderBy = ORDER[sort] || ORDER.recent;
+
+    //     const offset = (page - 1) * limit;
+
+    //     const { rows } = await db.query(`
+    //         SELECT
+    //         u.id,
+    //         u.serial_number,
+    //         u.imei,
+    //         u.barcode,
+    //         u.mac_address,
+    //         u.status,
+    //         u.condition,
+    //         u.received_at,
+    //         u.sold_at,
+    //         i.title AS inventory_title,
+    //         i.description AS inventory_description,
+    //         u.inventory_item_id,
+    //         ii.inventory_id,
+    //         l.id AS listing_id,
+    //         l.title AS listing_title,
+    //         (SELECT storage_key FROM listing_variants_media
+    //         WHERE listing_variant_id = lv.id) AS listing_image,
+    //         w.title AS warranty_title,
+    //         w.provider AS warranty_provider,
+    //         w.description AS warranty_description,
+    //         w.duration_months AS warranty_months_duration,
+    //         w.terms_url AS warranty_terms_url,
+    //         w.status AS warranty_status,
+    //         w.updated_at AS warranty_updated_at,
+    //         wr.starts_at AS unit_warrant_start,
+    //         wr.expires_at AS unit_warrant_end
+    //         FROM inventory_units u
+    //         JOIN inventory_items ii ON ii.id = u.inventory_item_id
+    //         JOIN inventories i ON i.id = ii.inventory_id
+    //         JOIN listing_variants lv ON lv.id = ii.listing_variant_id
+    //         JOIN listings l ON l.id = lv.listing_id 
+    //         LEFT JOIN warranty_registrations wr ON wr.inventory_unit_id = u.id
+    //         LEFT JOIN warranties w ON w.id = wr.warranty_id
+    //         WHERE ${where.join(' AND ')}
+    //         ORDER BY ${orderBy}
+    //         LIMIT $${params.length + 1} OFFSET $${params.length + 2}
+    //     `, [...params, limit, offset]);
+
+    //     const { rows: [{ count }] } = await db.query(`
+    //         SELECT COUNT(*)::int AS count
+    //         FROM inventory_units u
+    //         JOIN inventory_items ii ON ii.id = u.inventory_item_id
+    //         WHERE ${where.join(' AND ')}
+    //     `, params);
+
+    //     return {
+    //         units: rows,
+    //         pagination: {
+    //             total: count,
+    //             page,
+    //             limit,
+    //             totalPages: Math.max(1, Math.ceil(count / limit)),
+    //             hasNextPage: offset + limit < count,
+    //             hasPreviousPage: page > 1,
+    //         }
+    //     };
+    // }
+
+
     static async listUnitsByInventory(inventoryId, {
         page = 1,
         limit = 20,
         status = '',
         sort = 'recent',
     } = {}) {
+        page = Math.max(1, Number.parseInt(page, 10) || 1);
+        limit = Math.min(100, Math.max(1, Number.parseInt(limit, 10) || 20));
+
         const params = [inventoryId];
         const where = ['ii.inventory_id = $1'];
 
@@ -2202,14 +2297,15 @@ class InventoryModel {
         const ORDER = {
             recent: 'u.created_at DESC',
             serial_asc: 'u.serial_number ASC NULLS LAST',
-            warranty: 'u.warranty_end_date ASC NULLS LAST',
+            warranty: 'wr.expires_at ASC NULLS LAST',
         };
-        const orderBy = ORDER[sort] || ORDER.recent;
 
+        const orderBy = ORDER[sort] || ORDER.recent;
         const offset = (page - 1) * limit;
 
-        const { rows } = await db.query(`
-            SELECT
+        const { rows } = await db.query(
+            `
+        SELECT
             u.id,
             u.serial_number,
             u.imei,
@@ -2219,14 +2315,25 @@ class InventoryModel {
             u.condition,
             u.received_at,
             u.sold_at,
+
             i.title AS inventory_title,
             i.description AS inventory_description,
+
             u.inventory_item_id,
             ii.inventory_id,
+
             l.id AS listing_id,
             l.title AS listing_title,
-            (SELECT storage_key FROM listing_variants_media
-            WHERE listing_variant_id = lv.id) AS listing_image,
+
+            (
+                SELECT lvm.storage_key
+                FROM listing_variants_media lvm
+                WHERE lvm.listing_variant_id = lv.id
+                  AND lvm.is_primary = TRUE
+                ORDER BY lvm.id
+                LIMIT 1
+            ) AS listing_image,
+
             w.title AS warranty_title,
             w.provider AS warranty_provider,
             w.description AS warranty_description,
@@ -2234,26 +2341,64 @@ class InventoryModel {
             w.terms_url AS warranty_terms_url,
             w.status AS warranty_status,
             w.updated_at AS warranty_updated_at,
+
             wr.starts_at AS unit_warrant_start,
             wr.expires_at AS unit_warrant_end
-            FROM inventory_units u
-            JOIN inventory_items ii ON ii.id = u.inventory_item_id
-            JOIN inventories i ON i.id = ii.inventory_id
-            JOIN listing_variants lv ON lv.id = ii.listing_variant_id
-            JOIN listings l ON l.id = lv.listing_id 
-            LEFT JOIN warranty_registrations wr ON wr.inventory_unit_id = u.id
-            LEFT JOIN warranties w ON w.id = wr.warranty_id
-            WHERE ${where.join(' AND ')}
-            ORDER BY ${orderBy}
-            LIMIT $${params.length + 1} OFFSET $${params.length + 2}
-        `, [...params, limit, offset]);
 
-        const { rows: [{ count }] } = await db.query(`
-            SELECT COUNT(*)::int AS count
-            FROM inventory_units u
-            JOIN inventory_items ii ON ii.id = u.inventory_item_id
-            WHERE ${where.join(' AND ')}
-        `, params);
+        FROM inventory_units u
+
+        JOIN inventory_items ii
+            ON ii.id = u.inventory_item_id
+
+        JOIN inventories i
+            ON i.id = ii.inventory_id
+
+        JOIN listing_variants lv
+            ON lv.id = ii.listing_variant_id
+
+        JOIN listings l
+            ON l.id = lv.listing_id
+
+        -- Pick at most ONE warranty registration per unit (most recent)
+        LEFT JOIN LATERAL (
+            SELECT
+                wr2.warranty_id,
+                wr2.starts_at,
+                wr2.expires_at
+            FROM warranty_registrations wr2
+            WHERE wr2.inventory_unit_id = u.id
+            ORDER BY wr2.expires_at DESC NULLS LAST, wr2.id DESC
+            LIMIT 1
+        ) wr ON TRUE
+
+        LEFT JOIN warranties w
+            ON w.id = wr.warranty_id
+
+        WHERE ${where.join(' AND ')}
+
+        ORDER BY ${orderBy}
+
+        LIMIT $${params.length + 1}
+        OFFSET $${params.length + 2}
+        `,
+            [...params, limit, offset]
+        );
+
+        const { rows: [{ count }] } = await db.query(
+            `
+        SELECT COUNT(*)::int AS count
+
+        FROM inventory_units u
+
+        JOIN inventory_items ii
+            ON ii.id = u.inventory_item_id
+
+        WHERE ${where.join(' AND ')}
+        `,
+            params
+        );
+
+        const totalPages = Math.ceil(count / limit);
 
         return {
             units: rows,
@@ -2261,17 +2406,188 @@ class InventoryModel {
                 total: count,
                 page,
                 limit,
-                totalPages: Math.max(1, Math.ceil(count / limit)),
-                hasNextPage: offset + limit < count,
+                totalPages,
+                hasNextPage: page < totalPages,
                 hasPreviousPage: page > 1,
-            }
+            },
         };
     }
 
-    static async getUnitById(unitId) {
+    static async patchUnit(unitId, status, condition) {
+
+        const allowedStatuses = [
+            'available', 'reserved', 'sold', 'returned', 'damaged',
+            'repair', 'lost', 'disposed', 'checked_out', 'removed'
+        ];
+
+        const allowedConditions = [
+            'new',
+            'open_box',
+            'used',
+            'used_like_new',
+            'used_good',
+            'used_fair',
+            'refurbished',
+            'for_parts',
+            'not_working',
+            'damaged'
+        ];
+
+        const updates = [];
+        const values = [];
+        let paramIndex = 1;
+
+        if (status !== undefined) {
+            if (!allowedStatuses.includes(status)) {
+                throw new Error('Invalid item status');
+            }
+            updates.push(`status = $${paramIndex++}`);
+            values.push(status);
+        }
+
+        if (condition !== undefined) {
+            if (!allowedConditions.includes(condition)) {
+                throw new Error('Invalid item condition');
+            }
+            updates.push(`condition = $${paramIndex++}`);
+            values.push(condition);
+        }
+
+        if (updates.length > 0 && (status && status === 'sold')) {
+            updates.push(`sold_at = NOW()`);
+        }
+
+        if (updates.length > 0) {
+            updates.push(`updated_at = NOW()`);
+        }
+
+        if (updates.length === 0) {
+            throw new Error('No valid fields provided for update');
+        }
+
+        values.push(unitId);
+        const query = `
+            UPDATE inventory_units 
+            SET ${updates.join(', ')} 
+            WHERE id = $${paramIndex} 
+            RETURNING *
+        `;
+
+        const result = await db.query(query, values);
+        return result.rows[0]; // Returns the updated row directly (assuming node-postgres)
+    }
+
+
+    static async getInventoryItemById(itemId, { inventoryId = null } = {}) {
+        const params = [itemId];
+        const where = ['ii.id = $1'];
+
+        if (inventoryId) {
+            params.push(inventoryId);
+            where.push(`ii.inventory_id = $${params.length}`);
+        }
 
         const { rows } = await db.query(`
-            SELECT
+                SELECT
+                ii.id,
+                ii.inventory_id,
+                ii.listing_variant_id,
+                ii.quantity,
+                ii.tracking_mode,
+                ii.batch_number,
+                ii.mfg_at,
+                ii.expires_at,
+                ii.created_at,
+                ii.updated_at,
+
+                i.title AS inventory_title,
+                i.description  AS inventory_description,
+
+                lv.sku AS listing_sku,
+                lv.sku AS listing_variant_sku,
+
+                l.id AS listing_id,
+                l.title AS listing_title,
+
+                (
+                    SELECT lvm.storage_key
+                    FROM listing_variants_media lvm
+                    WHERE lvm.listing_variant_id = lv.id
+                    AND lvm.is_primary = TRUE
+                    ORDER BY lvm.id
+                    LIMIT 1
+                ) AS listing_image,
+
+                (
+                    SELECT COUNT(*)::int
+                    FROM inventory_units u
+                    WHERE u.inventory_item_id = ii.id
+                ) AS unit_count
+
+                FROM inventory_items ii
+
+                JOIN inventories i
+                    ON i.id = ii.inventory_id
+
+                JOIN listing_variants lv
+                    ON lv.id = ii.listing_variant_id
+
+                JOIN listings l
+                    ON l.id = lv.listing_id
+
+                WHERE ${where.join(' AND ')}
+                LIMIT 1
+            `, params);
+
+        return rows[0] ?? null;
+    }
+
+    // static async getUnitById(unitId) {
+
+    //     const { rows } = await db.query(`
+    //         SELECT
+    //         u.id,
+    //         u.serial_number,
+    //         u.imei,
+    //         u.barcode,
+    //         u.mac_address,
+    //         u.status,
+    //         u.condition,
+    //         u.received_at,
+    //         u.sold_at,
+    //         i.title AS inventory_title,
+    //         i.description AS inventory_description,
+    //         u.inventory_item_id,
+    //         ii.inventory_id,
+    //         l.id AS listing_id,
+    //         l.title AS listing_title,
+    //         (SELECT storage_key FROM listing_variants_media
+    //         WHERE listing_variant_id = lv.id) AS listing_image,
+    //         w.title AS warranty_title,
+    //         w.provider AS warranty_provider,
+    //         w.description AS warranty_description,
+    //         w.duration_months AS warranty_months_duration,
+    //         w.terms_url AS warranty_terms_url,
+    //         w.status AS warranty_status,
+    //         w.updated_at AS warranty_updated_at,
+    //         wr.starts_at AS unit_warrant_start,
+    //         wr.expires_at AS unit_warrant_end
+    //         FROM inventory_units u
+    //         JOIN inventory_items ii ON ii.id = u.inventory_item_id
+    //         JOIN inventories i ON i.id = ii.inventory_id
+    //         JOIN listing_variants lv ON lv.id = ii.listing_variant_id
+    //         JOIN listings l ON l.id = lv.listing_id 
+    //         LEFT JOIN warranty_registrations wr ON wr.inventory_unit_id = u.id
+    //         LEFT JOIN warranties w ON w.id = wr.warranty_id
+    //         WHERE u.id = $1
+    //     `, [unitId]);
+
+    //     return rows[0] ?? null;
+    // }
+
+    static async getUnitById(unitId) {
+        const { rows } = await db.query(`
+        SELECT
             u.id,
             u.serial_number,
             u.imei,
@@ -2281,14 +2597,25 @@ class InventoryModel {
             u.condition,
             u.received_at,
             u.sold_at,
+
             i.title AS inventory_title,
             i.description AS inventory_description,
+
             u.inventory_item_id,
             ii.inventory_id,
+
             l.id AS listing_id,
             l.title AS listing_title,
-            (SELECT storage_key FROM listing_variants_media
-            WHERE listing_variant_id = lv.id) AS listing_image,
+
+            (
+                SELECT lvm.storage_key
+                FROM listing_variants_media lvm
+                WHERE lvm.listing_variant_id = lv.id
+                  AND lvm.is_primary = TRUE
+                ORDER BY lvm.id
+                LIMIT 1
+            ) AS listing_image,
+
             w.title AS warranty_title,
             w.provider AS warranty_provider,
             w.description AS warranty_description,
@@ -2296,17 +2623,40 @@ class InventoryModel {
             w.terms_url AS warranty_terms_url,
             w.status AS warranty_status,
             w.updated_at AS warranty_updated_at,
+
             wr.starts_at AS unit_warrant_start,
             wr.expires_at AS unit_warrant_end
-            FROM inventory_units u
-            JOIN inventory_items ii ON ii.id = u.inventory_item_id
-            JOIN inventories i ON i.id = ii.inventory_id
-            JOIN listing_variants lv ON lv.id = ii.listing_variant_id
-            JOIN listings l ON l.id = lv.listing_id 
-            LEFT JOIN warranty_registrations wr ON wr.inventory_unit_id = u.id
-            LEFT JOIN warranties w ON w.id = wr.warranty_id
-            WHERE u.id = $1
-        `, [unitId]);
+
+        FROM inventory_units u
+
+        JOIN inventory_items ii
+            ON ii.id = u.inventory_item_id
+
+        JOIN inventories i
+            ON i.id = ii.inventory_id
+
+        JOIN listing_variants lv
+            ON lv.id = ii.listing_variant_id
+
+        JOIN listings l
+            ON l.id = lv.listing_id
+
+        LEFT JOIN LATERAL (
+            SELECT
+                wr2.warranty_id,
+                wr2.starts_at,
+                wr2.expires_at
+            FROM warranty_registrations wr2
+            WHERE wr2.inventory_unit_id = u.id
+            ORDER BY wr2.expires_at DESC NULLS LAST, wr2.id DESC
+            LIMIT 1
+        ) wr ON TRUE
+
+        LEFT JOIN warranties w
+            ON w.id = wr.warranty_id
+
+        WHERE u.id = $1
+    `, [unitId]);
 
         return rows[0] ?? null;
     }
