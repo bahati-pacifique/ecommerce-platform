@@ -429,7 +429,7 @@ async function getInventoryItem(req, res) {
 
 async function adjustItemQuantity(req, res) {
     const user = req.user;
-    const { storeId, itemId } = req.params;
+    const { inventoryId, storeId, itemId } = req.params;
 
     try {
         await validateVendorStore(storeId, user?.vendor?.id, res);
@@ -440,7 +440,7 @@ async function adjustItemQuantity(req, res) {
             return res.status(400).json({ success: false, message: 'Invalid quantity delta.' });
         }
 
-        const result = await InventoryService.adjustQuantity(itemId, delta);
+        const result = await InventoryService.adjustQuantity(itemId, delta, inventoryId, user.id || null);
 
         return res.status(result ? 200 : 404).json({
             ...result,

@@ -589,7 +589,7 @@ class InventoryModel {
     */
     static async getInventoryVendorDashboardData(
         vendorId,
-        lowStockThreshold = 5
+        lowStockThreshold = 10
     ) {
 
         const query = `
@@ -1813,9 +1813,9 @@ class InventoryModel {
                     ELSE 'in_stock'::inventory_status
                 END,
                 updated_at = NOW()
-            WHERE id = $2
+            WHERE id = $2 AND tracking_mode = 'bulk'
             ${inventoryGuard}
-            RETURNING id, quantity, reserved, (quantity - reserved) AS available, status
+            RETURNING *
         `, params);
 
         return row || null;

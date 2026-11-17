@@ -20,11 +20,13 @@
   <meta name="twitter:card" content="https://cdn.cococe.rw/meta/cococe.png">
   <meta property="twitter:domain" content="cococe.onrender.com">
   <meta property="twitter:url" content="https://cococe.rw">
-  <meta name="twitter:title" content="Laptops, Printers, Accessories, Game consoles, Electronics, and much more, cococe, your wish our priority">
-  <meta name="twitter:description" content="COCOCE Kigali Rwanda, Laptops, Desktops, Computer accessories, Smart tv, projectors, discover what you want about digital assets near you at Kigali">
+  <meta property="twitter:title" content="Laptops, Printers, Accessories, Game consoles, Electronics, and much more, cococe, your wish our priority">
+  <meta property="twitter:description" content="COCOCE Kigali Rwanda, Laptops, Desktops, Computer accessories, Smart tv, projectors, discover what you want about digital assets near you at Kigali">
 
   <link rel="icon" href="/favicon.ico" type="image/x-icon">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+  
+  <!-- Note: /styles/main.css is the compiled Tailwind CSS output file -->
   <link rel="stylesheet" href="/styles/main.css">
 
   <style>
@@ -49,17 +51,9 @@
     }
 
     @keyframes glow-pulse {
-      0% {
-        box-shadow: 0 0 0 0 rgba(237, 27, 36, 0.3);
-      }
-
-      70% {
-        box-shadow: 0 0 0 12px rgba(237, 27, 36, 0);
-      }
-
-      100% {
-        box-shadow: 0 0 0 0 rgba(237, 27, 36, 0);
-      }
+      0% { box-shadow: 0 0 0 0 rgba(237, 27, 36, 0.3); }
+      70% { box-shadow: 0 0 0 12px rgba(237, 27, 36, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(237, 27, 36, 0); }
     }
 
     .countdown-digit {
@@ -69,18 +63,9 @@
     }
 
     /* custom scrollbar minimal */
-    ::-webkit-scrollbar {
-      width: 5px;
-    }
-
-    ::-webkit-scrollbar-track {
-      background: #f1f1f1;
-    }
-
-    ::-webkit-scrollbar-thumb {
-      background: #ED1B24;
-      border-radius: 10px;
-    }
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: #f1f1f1; }
+    ::-webkit-scrollbar-thumb { background: #ED1B24; border-radius: 10px; }
 
     .signin-btn {
       background: #ED1B24;
@@ -89,29 +74,43 @@
 
     .signin-btn:hover {
       background: #C9171F;
-      transform: translateY(-2px) scale(1.02);
       box-shadow: 0 8px 30px rgba(237, 27, 36, 0.35);
     }
 
-    .signin-btn:active {
-      transform: scale(0.96);
-    }
+    .signin-btn:active { transform: scale(0.96); }
 
     .admin-badge {
       background: rgba(237, 27, 36, 0.08);
       border: 1px solid rgba(237, 27, 36, 0.12);
     }
+
+    @keyframes rich-shake-loop {
+      0%, 10% { transform: translateX(0); }
+      1%, 3%, 5%, 7%, 9% { transform: translateX(-5px); }
+      2%, 4%, 6%, 8% { transform: translateX(5px); }
+      11%, 100% { transform: translateX(0); }
+    }
+
+    .animate-rich-shake-loop {
+      animation: rich-shake-loop 8s cubic-bezier(.36,.07,.19,.97) infinite; 
+    }
+
+    @keyframes rich-shake {
+      0%, 100% { transform: translateX(0); }
+      10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+      20%, 40%, 60%, 80% { transform: translateX(5px); }
+    }
   </style>
 </head>
 
-<body class="w-screen h-screen bg-bg-soft text-gray-800 overflow-x-hidden flex items-center justify-center flex-col relative">
+<body class="w-screen h-screen bg-bg-soft text-gray-800 overflow-x-hidden flex items-center justify-center flex-col relative" style="background: url('/images/bg/b-pattern.png'); background-repeat: no-repeat; background-size: cover;">
 
-  <% if (locals.user) { %>
-  <div class="inline-block mb-6 absolute left-8 top-8">
-    <img src="/images/logos/administration.png" alt="Logo-brand" class="max-w-[120px] md:max-w-[160px] mb-3">
-    <div class="h-1 w-20 bg-brand/60 mx-auto mb-6 rounded-full"></div>
+  <div class="absolute top-6 left-6 md:top-8 md:left-8 z-50">
+    <div class="inline-block">
+      <img src="/images/logos/administration.png" alt="Logo-brand" class="max-w-[100px] md:max-w-[140px] object-contain">
+      <div class="bg-[#ED1B24] rounded-full w-[56px] h-[8px] mt-1"></div>
+    </div>
   </div>
-  <% } %>
 
   <div class="absolute inset-0 pointer-events-none overflow-hidden">
     <div class="absolute top-[-10%] left-[-5%] w-96 h-96 bg-brand-light rounded-full blur-3xl opacity-30 animate-float"></div>
@@ -121,20 +120,14 @@
 
   <main class="h-full w-full max-w-4xl mx-auto px-6 py-6 relative z-10 flex-1 flex items-center justify-center">
     <div class="text-center animate-fade-in">
-
-      <% if (!locals.user) { %>
-      <div class="relative inline-block mb-6">
-        <img src="/images/logos/administration.png" alt="Logo-brand" class="max-w-[200px] mb-3">
-        <div class="h-1 w-20 bg-brand/60 mx-auto mb-6 rounded-full"></div>
-      </div>
-      <% } %>
-
+      
       <% if (locals.user) { %>
       <h1 class="text-3xl text-gray-500 mb-4">
         Hi, <%- locals.user.username %>
       </h1>
       <% } %>
-      <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 leading-tight mb-4 animate-slide-up">
+      
+      <h1 class="inline-block text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 leading-tight mb-4 animate-slide-up cursor-default">
         Welcome
         <span class="bg-gradient-to-r from-brand to-brand-dark bg-clip-text text-transparent">Back!</span>
       </h1>
@@ -142,26 +135,32 @@
       <p class="text-gray-500 text-lg md:text-xl max-w-2xl mx-auto mb-8 animate-slide-up" style="animation-delay: 0.1s">
         Secure access to store operations and management.
       </p>
+      
       <p class="text-gray-500 text-lg md:text-xl max-w-2xl mx-auto mb-8 animate-slide-up" style="animation-delay: 0.1s">
-        <span class="bg-gradient-to-r from-brand to-brand-dark bg-clip-text text-transparent font-bold">Quality Services,</span> <span class="font-bold text-black">Reliable Returns</span>
+        <span class="bg-gradient-to-r from-brand to-brand-dark bg-clip-text text-transparent font-bold">Quality Services,</span> 
+        <span class="font-bold text-gray-900 tracking-wide">Seamless Operations</span>
       </p>
 
       <% if (!locals.user) { %>
       <div class="animate-slide-up" style="animation-delay: 0.2s">
-        <a href="<%-locals.auth_host%>" id="signinBtn" class="signin-btn inline-flex items-center gap-3 px-8 py-4 rounded-2xl text-white font-semibold text-lg shadow-lg shadow-brand/20">
-          <span>Sign in</span>
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-          </svg>
+        <a href="<%-locals.auth_host%>" id="signinBtn" class="signin-btn inline-block animate-rich-shake-loop hover-shake px-8 py-4 rounded-2xl text-white font-semibold text-lg shadow-lg shadow-brand/20">
+          <div class="flex items-center gap-3">
+            <span>Sign in</span>
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+            </svg>
+          </div>
         </a>
       </div>
       <%} else {%>
         <div class="animate-slide-up" style="animation-delay: 0.2s">
-        <a href="<%-locals.dashboard_host%>" id="signinBtn" class="signin-btn inline-flex items-center gap-3 px-8 py-4 rounded-2xl text-white font-semibold text-lg shadow-lg shadow-brand/20">
-          <span>Continue to Dashboard</span>
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-          </svg>
+        <a href="<%-locals.dashboard_host%>" id="signinBtn" class="signin-btn inline-block animate-rich-shake-loop hover-shake px-8 py-4 rounded-2xl text-white font-semibold text-lg shadow-lg shadow-brand/20">
+          <div class="flex items-center gap-3">
+            <span>Continue to Dashboard</span>
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+            </svg>
+          </div>
         </a>
       </div>
       <%}%>
@@ -169,11 +168,11 @@
     </div>
   </main>
 
-  <footer class="w-full mt-auto py-4 px-6 border-t border-gray-100 relative z-10">
+  <footer class="w-full mt-auto py-4 px-6 border-t border-gray-100 relative z-10 bg-white/80">
     <div class="w-full md:max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
-      <div class="flex items-center gap-3">
-        <img src="/images/logos/cococe.png" alt="Logo-brand" class="max-w-[75px]">
-        <span class="text-xs text-gray-400">© 2026 — Admin Portal</span>
+      <div class="flex items-center gap-1">
+        <h1 class="text-brand text-lg font-bold tracking-wider">COCOCE</h1>
+        <span class="text-xs text-gray-500">— Administration ©</span>
       </div>
       <div class="flex gap-6 text-xs text-gray-400">
         <a href="/docs/admin-privacy" target="_blank" class="hover:text-brand transition">Privacy</a>
@@ -182,7 +181,7 @@
         <a href="/status" class="hover:text-brand transition">Status</a>
       </div>
     </div>
-    <div class="w-full md:max-w-7xl mx-auto text-center text-gray-400 text-xs mt-3">
+    <div class="w-full md:max-w-7xl mx-auto text-center text-gray-500 text-xs mt-3">
       Terms of Service apply · Secure access only
     </div>
   </footer>

@@ -334,14 +334,38 @@ class InventoryService {
         return await InventoryModel.searchUnit(storeId, query, opts);
     }
 
-    static async adjustQuantity(itemId, quantity) {
+    static async adjustQuantity(itemId, delta, inventoryId, userId) {
 
         const item = await InventoryModel.getInventoryItemById(itemId);
         if (!item) {
             throw new Error('Inventory item not found');
         }
 
-        return await InventoryModel.adjustInventoryItemQuantity(itemId, quantity);
+        const inventory = await InventoryModel.getInventoryItemById(itemId, { inventoryId });
+
+        const result = await InventoryModel.adjustInventoryItemQuantity(itemId, delta, { inventoryId });
+
+        if (result) {
+
+            //Record transaction
+            try {
+                const type = delta > 0 ? 'transfer_in' : 'transfer_out';
+                const transactionPayload = {
+                    inventoryItemId: itemId,
+                    type,
+                    quantityChange: delta,
+                    referenceType: randomUId(),
+                    notes: `Inventory quantity adjusted by delta. Previous quantity ${inventory.quantity || 'Unrecored'} — New quantity ${result.quantity}`,
+                    createdBy: userId || null
+                }
+
+                await InventoryModel.createInventoryTransaction(transactionPayload);
+            } catch (error) {
+                console.log('Insert unit transaction failed', error);
+            }
+        }
+
+        return result;
     }
 
     static async patchUnit(unitId, statusPatch, condition) {
@@ -383,7 +407,7 @@ class InventoryService {
                     inventoryItemId: payload.inventoryItemId,
                     type: 'initial_stock',
                     quantityChange: 1,
-                    reference_type: randomUId(),
+                    referenceType: randomUId(),
                     notes: `Unit registration. Unit id: ${result.id}`,
                     createdBy: user?.id || null
                 }
@@ -459,7 +483,7 @@ class InventoryService {
             id: t.id,
             quantity_change: t.quantity_change,
             type: t.type,
-            reference_type: t.reference_type,
+            referenceType: t.reference_type,
             reference_id: t.reference_id,
             notes: t.notes,
             created_by: t.created_by_name ? { name: t.created_by_name } : null,
