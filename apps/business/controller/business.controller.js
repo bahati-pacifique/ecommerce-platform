@@ -455,13 +455,93 @@ async function adjustItemQuantity(req, res) {
     }
 }
 
+async function reserveBulkItem(req, res) {
+    const user = req.user;
+    const { inventoryId, storeId, itemId } = req.params;
+
+    try {
+        await validateVendorStore(storeId, user?.vendor?.id, res);
+
+        const quantity = Number.parseInt(req.body.quantity, 10);
+
+        if (!Number.isInteger(quantity) || quantity <= 0) {
+            return res.status(400).json({ 
+                success: false,
+                message: 'Invalid reserve quantity.' 
+            });
+        }
+
+        const result = await InventoryService.reserveBulkItem(itemId, quantity, { inventoryId });
+
+        if (!result) {
+            return res.status(409).json({ 
+                success: false,
+                message: 'Failed — Not enough stock available.' 
+            });
+        }
+
+        return res.status(200).json({
+            success: true,
+            message: 'Item reserved successfully.',
+            data: result
+        });
+
+    } catch (error) {
+        console.error('reserveBulkItem error:', error);
+        
+        return res.status(500).json({
+            success: false,
+            message: 'Unable to reserve item — Internal error'
+        });
+    }
+}
+
+async function releaseBulkItem(req, res) {
+    const user = req.user;
+    const { inventoryId, storeId, itemId } = req.params;
+
+    try {
+        await validateVendorStore(storeId, user?.vendor?.id, res);
+
+        const quantity = Number.parseInt(req.body.quantity, 10);
+
+        if (!Number.isInteger(quantity) || quantity <= 0) {
+            return res.status(400).json({ 
+                success: false,
+                message: 'Invalid reserve quantity.' 
+            });
+        }
+
+        const result = await InventoryService.releaseBulkItem(itemId, quantity, { inventoryId });
+
+        if (!result) {
+            return res.status(409).json({ 
+                success: false,
+                message: 'Failed — Not enough stock available.' 
+            });
+        }
+
+        return res.status(200).json({
+            success: true,
+            message: 'Item reserved successfully.',
+            data: result
+        });
+
+    } catch (error) {
+        console.error('reserveBulkItem error:', error);
+        
+        return res.status(500).json({
+            success: false,
+            message: 'Unable to reserve item — Internal error'
+        });
+    }
+}
+
 async function patchUnit(req, res) {
     try {
         const { unitId, storeId } = req.params;
         const { status, condition } = req.body;
         const user = req.user;
-
-        console.log(req.params)
 
         const vendorStore = await validateVendorStore(storeId, user.vendor.id);
 
@@ -520,6 +600,72 @@ async function getItemUnit(req, res) {
         return res.status(500).json({
             message: 'Unable to get unit — Internal error'
         })
+    }
+}
+
+// router.get('/items/unit/verify', async (req, res) => {
+    
+// });
+
+async function verifyItemUnit(req, res) {
+    try {
+        const { t } = req.query;
+
+        if (!t) {
+            return res.status(400).render('partials/unit-review', { 
+                layout: 'main-layout', 
+                error: 'Missing verification tag. Please scan the QR code again.' 
+            });
+        }
+
+        let payload;
+        try {
+            // Decrypt the token
+            const decryptedString = decrypt(t);
+            payload = JSON.parse(decryptedString);
+        } catch (e) {
+            return res.status(400).render('partials/unit-review', { 
+                layout: 'main-layout', 
+                error: 'Invalid or tampered tag. This product cannot be verified.' 
+            });
+        }
+
+        const { unitId, storeId } = payload;
+
+        if (!unitId || !storeId) {
+            return res.status(400).render('partials/unit-review', { 
+                layout: 'main-layout', 
+                error: 'Malformed verification data.' 
+            });
+        }
+
+        // Fetch the public unit details
+        // Note: Use the storeId guard to prevent cross-store leaks!
+        const unit = await InventoryService.getUnitPublicDetails(unitId, { storeId });
+
+        if (!unit) {
+            return res.status(404).render('partials/unit-review', { 
+                layout: 'main-layout', 
+                error: 'Unit not found. It may have been removed or the tag is no longer active.' 
+            });
+        }
+
+        // Calculate Warranty Status for the UI
+        const now = new Date();
+        const isWarrantyActive = unit.unit_warrant_end && new Date(unit.unit_warrant_end) > now;
+
+        return res.render('partials/unit-review', { 
+            layout: 'main-layout', 
+            unit, 
+            isWarrantyActive 
+        });
+
+    } catch (err) {
+        console.error('Verification Error:', err);
+        return res.status(500).render('partials/unit-review', { 
+            layout: 'main-layout', 
+            error: 'A system error occurred while verifying this tag. Please try again later.' 
+        });
     }
 }
 
@@ -2339,6 +2485,8 @@ module.exports = {
     removeVariantPrice,
 
     adjustItemQuantity,
+    reserveBulkItem,
+    releaseBulkItem,
 
     createInventoryItem,
     transferUnit,
@@ -2374,4 +2522,6 @@ module.exports = {
 
     getProductVariantsOnly,
     getProductVariants,
+
+    verifyItemUnit,
 }

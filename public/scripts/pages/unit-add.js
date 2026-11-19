@@ -224,8 +224,8 @@ $(function () {
     try {
       const response = await axios.post(`/inventories/${__ADD_ITEM__.inventoryId}/${__ADD_ITEM__.storeId}/add-item`, new FormData(form), { withCredentials: true });
 
-
       if (response.data) {
+        closeUnitModal();
         Notification.showNotification({
           type: 'success',
           message: 'Inventory unit inserted successfully'

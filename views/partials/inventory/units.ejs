@@ -55,6 +55,7 @@
       <option value="warranty" <%= locals.sort === 'warranty' ? 'selected' : '' %>>Warranty ending soon</option>
     </select>
     <select name="limit" class="rounded-lg border border-slate-200 px-3 py-2 text-sm">
+      <option value="7" <%= locals.limit === 7 ? 'selected' : '' %>>7 / page</option>
       <option value="20" <%= locals.limit === 20 ? 'selected' : '' %>>20 / page</option>
       <option value="50" <%= locals.limit === 50 ? 'selected' : '' %>>50 / page</option>
       <option value="100" <%= locals.limit === 100 ? 'selected' : '' %>>100 / page</option>

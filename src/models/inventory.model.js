@@ -1353,64 +1353,128 @@ class InventoryModel {
     //     return stats;
     // }
 
+    // static async getStats(inventoryId) {
+    //     const { rows: [stats] } = await db.query(`
+    //     SELECT
+    //         COUNT(*)::int AS item_records,
+
+    //         COALESCE(SUM(
+    //             CASE
+    //                 WHEN ii.tracking_mode = 'bulk'
+    //                 THEN ii.quantity
+    //                 ELSE unit_stats.total_units
+    //             END
+    //         ), 0)::int AS total_units,
+
+    //         COALESCE(SUM(
+    //             CASE
+    //                 WHEN ii.tracking_mode = 'bulk'
+    //                 THEN ii.reserved
+    //                 ELSE unit_stats.reserved_units
+    //             END
+    //         ), 0)::int AS reserved_units,
+
+    //         COALESCE(SUM(
+    //             CASE
+    //                 WHEN ii.tracking_mode = 'bulk'
+    //                 THEN ii.quantity - ii.reserved
+    //                 ELSE unit_stats.available_units
+    //             END
+    //         ), 0)::int AS available_units,
+
+    //         COUNT(*) FILTER (
+    //             WHERE ii.status = 'low_stock'
+    //         )::int AS low_stock_items,
+
+    //         COUNT(*) FILTER (
+    //             WHERE ii.status = 'out_of_stock'
+    //         )::int AS out_of_stock_items
+
+    //         FROM inventory_items ii
+
+    //         LEFT JOIN LATERAL (
+    //             SELECT
+    //                 COUNT(*) FILTER (
+    //                     WHERE iu.status IN ('available', 'reserved', 'sold')
+    //                 )::int AS total_units,
+
+    //                 COUNT(*) FILTER (
+    //                     WHERE iu.status = 'reserved'
+    //                 )::int AS reserved_units,
+
+    //                 COUNT(*) FILTER (
+    //                     WHERE iu.status = 'available'
+    //                 )::int AS available_units
+
+    //             FROM inventory_units iu
+    //             WHERE iu.inventory_item_id = ii.id
+    //         ) unit_stats ON TRUE
+
+    //     WHERE ii.inventory_id = $1
+    // `, [inventoryId]);
+
+    //     return stats;
+    // }
+
     static async getStats(inventoryId) {
         const { rows: [stats] } = await db.query(`
-        SELECT
-            COUNT(*)::int AS item_records,
-
-            COALESCE(SUM(
+        WITH item_stats AS (
+            SELECT
+                ii.id,
+                ii.tracking_mode,
+                ii.quantity,
+                ii.reserved,
+                ii.status,
+                
+                -- Calculate the true total and available based on mode
                 CASE
-                    WHEN ii.tracking_mode = 'bulk'
-                    THEN ii.quantity
-                    ELSE unit_stats.total_units
-                END
-            ), 0)::int AS total_units,
+                    WHEN ii.tracking_mode = 'bulk' THEN ii.quantity
+                    ELSE COALESCE(unit_stats.total_units, 0)
+                END AS calc_total_units,
 
-            COALESCE(SUM(
                 CASE
-                    WHEN ii.tracking_mode = 'bulk'
-                    THEN ii.reserved
-                    ELSE unit_stats.reserved_units
-                END
-            ), 0)::int AS reserved_units,
+                    WHEN ii.tracking_mode = 'bulk' THEN ii.reserved
+                    ELSE COALESCE(unit_stats.reserved_units, 0)
+                END AS calc_reserved_units,
 
-            COALESCE(SUM(
                 CASE
-                    WHEN ii.tracking_mode = 'bulk'
-                    THEN ii.quantity - ii.reserved
-                    ELSE unit_stats.available_units
-                END
-            ), 0)::int AS available_units,
-
-            COUNT(*) FILTER (
-                WHERE ii.status = 'low_stock'
-            )::int AS low_stock_items,
-
-            COUNT(*) FILTER (
-                WHERE ii.status = 'out_of_stock'
-            )::int AS out_of_stock_items
+                    WHEN ii.tracking_mode = 'bulk' THEN (ii.quantity - ii.reserved)
+                    ELSE COALESCE(unit_stats.available_units, 0)
+                END AS calc_available_units
 
             FROM inventory_items ii
-
             LEFT JOIN LATERAL (
                 SELECT
                     COUNT(*) FILTER (
                         WHERE iu.status IN ('available', 'reserved', 'sold')
                     )::int AS total_units,
-
                     COUNT(*) FILTER (
                         WHERE iu.status = 'reserved'
                     )::int AS reserved_units,
-
                     COUNT(*) FILTER (
                         WHERE iu.status = 'available'
                     )::int AS available_units
-
                 FROM inventory_units iu
                 WHERE iu.inventory_item_id = ii.id
             ) unit_stats ON TRUE
+            WHERE ii.inventory_id = $1
+        )
+        SELECT
+            COUNT(*)::int AS item_records,
+            
+            COALESCE(SUM(calc_total_units), 0)::int AS total_units,
+            COALESCE(SUM(calc_reserved_units), 0)::int AS reserved_units,
+            COALESCE(SUM(calc_available_units), 0)::int AS available_units,
 
-        WHERE ii.inventory_id = $1
+            COUNT(*) FILTER (
+                WHERE calc_available_units <= 10 AND calc_available_units > 0
+            )::int AS low_stock_items,
+
+            COUNT(*) FILTER (
+                WHERE calc_available_units = 0
+            )::int AS out_of_stock_items
+
+        FROM item_stats
     `, [inventoryId]);
 
         return stats;
@@ -1498,8 +1562,8 @@ class InventoryModel {
     // }
 
     /**
- * List items in an inventory, with optional search / filter / sort.
- */
+     * List items in an inventory, with optional search / filter / sort.
+     */
     static async listByInventory(inventoryId, {
         page = 1,
         limit = 20,
@@ -1513,9 +1577,7 @@ class InventoryModel {
         // Search by listing title, SKU, or batch number.
         if (search) {
             params.push(`%${search}%`);
-
             const p = `$${params.length}`;
-
             where.push(`(
             l.title ILIKE ${p}
             OR lv.sku ILIKE ${p}
@@ -1526,7 +1588,22 @@ class InventoryModel {
         // Filter by inventory item status.
         if (status) {
             params.push(status);
-            where.push(`ii.status = $${params.length}::inventory_status`);
+
+            // Note: If you filter by status, we need to handle serialized items
+            // because their DB status is NULL. We check if they asked for 'out_of_stock' or 'in_stock'.
+            if (status === 'out_of_stock') {
+                where.push(`(
+                (ii.tracking_mode = 'bulk' AND ii.status = 'out_of_stock'::inventory_status)
+                OR (ii.tracking_mode = 'serialized' AND stock.available_units = 0)
+            )`);
+            } else if (status === 'in_stock') {
+                where.push(`(
+                (ii.tracking_mode = 'bulk' AND ii.status = 'in_stock'::inventory_status)
+                OR (ii.tracking_mode = 'serialized' AND stock.available_units > 0)
+            )`);
+            } else {
+                where.push(`ii.status = $${params.length}::inventory_status`);
+            }
         }
 
         // Whitelisted sorting options.
@@ -1545,102 +1622,133 @@ class InventoryModel {
         const offset = (page - 1) * limit;
 
         const { rows } = await db.query(`
+    SELECT
+        ii.id,
+        ii.inventory_id,
+        ii.listing_variant_id,
+        ii.tracking_mode,
+
+        ii.quantity,
+        ii.reserved,
+
+        stock.total_units,
+        stock.reserved_units,
+        stock.available_units,
+
+        stock.available_units AS available,
+
+        ii.batch_number,
+        ii.mfg_at,
+        ii.expires_at,
+
+        CASE
+            WHEN ii.tracking_mode = 'serialized' THEN
+                CASE 
+                    WHEN stock.available_units = 0 THEN 'out_of_stock'::inventory_status
+                    WHEN stock.available_units <= 2 THEN 'low_stock'::inventory_status
+                    ELSE 'in_stock'::inventory_status 
+                END
+            ELSE 
+                ii.status
+        END AS status,
+
+        ii.created_at,
+        ii.updated_at,
+
+        l.id AS listing_id,
+        l.title AS listing_title,
+        l.condition AS listing_condition,
+
+        lv.sku AS listing_sku,
+        lv.product_variant_id,
+
+        (
+            SELECT lvm.storage_key
+            FROM listing_variants_media lvm
+            WHERE lvm.listing_variant_id = lv.id
+              AND lvm.is_primary = TRUE
+            LIMIT 1
+        ) AS listing_image
+
+    FROM inventory_items ii
+
+    JOIN listing_variants lv
+        ON lv.id = ii.listing_variant_id
+
+    JOIN listings l
+        ON l.id = lv.listing_id
+
+    LEFT JOIN LATERAL (
         SELECT
-            ii.id,
-            ii.inventory_id,
-            ii.listing_variant_id,
-            ii.tracking_mode,
+            CASE
+                WHEN ii.tracking_mode = 'bulk'
+                THEN ii.quantity
+                ELSE COUNT(*) FILTER (
+                    WHERE iu.status IN ('available', 'reserved')
+                )::int
+            END AS total_units,
 
-            ii.quantity,
-            ii.reserved,
+            CASE
+                WHEN ii.tracking_mode = 'bulk'
+                THEN ii.reserved
+                ELSE COUNT(*) FILTER (
+                    WHERE iu.status = 'reserved'
+                )::int
+            END AS reserved_units,
 
-            stock.total_units,
-            stock.reserved_units,
-            stock.available_units,
+            CASE
+                WHEN ii.tracking_mode = 'bulk'
+                THEN ii.quantity - ii.reserved
+                ELSE COUNT(*) FILTER (
+                    WHERE iu.status = 'available'
+                )::int
+            END AS available_units
 
-            stock.available_units AS available,
+        FROM inventory_units iu
+        WHERE iu.inventory_item_id = ii.id
+    ) stock ON TRUE
 
-            ii.batch_number,
-            ii.mfg_at,
-            ii.expires_at,
-            ii.status,
-            ii.created_at,
-            ii.updated_at,
+    WHERE ${where.join(' AND ')}
 
-            l.id AS listing_id,
-            l.title AS listing_title,
-            l.condition AS listing_condition,
+    ORDER BY ${orderBy}
 
-            lv.sku AS listing_sku,
-            lv.product_variant_id,
-
-            (
-                SELECT lvm.storage_key
-                FROM listing_variants_media lvm
-                WHERE lvm.listing_variant_id = lv.id
-                  AND lvm.is_primary = TRUE
-                LIMIT 1
-            ) AS listing_image
-
-        FROM inventory_items ii
-
-        JOIN listing_variants lv
-            ON lv.id = ii.listing_variant_id
-
-        JOIN listings l
-            ON l.id = lv.listing_id
-
-        LEFT JOIN LATERAL (
-            SELECT
-                CASE
-                    WHEN ii.tracking_mode = 'bulk'
-                    THEN ii.quantity
-                    ELSE COUNT(*) FILTER (
-                        WHERE iu.status IN ('available', 'reserved')
-                    )::int
-                END AS total_units,
-
-                CASE
-                    WHEN ii.tracking_mode = 'bulk'
-                    THEN ii.reserved
-                    ELSE COUNT(*) FILTER (
-                        WHERE iu.status = 'reserved'
-                    )::int
-                END AS reserved_units,
-
-                CASE
-                    WHEN ii.tracking_mode = 'bulk'
-                    THEN ii.quantity - ii.reserved
-                    ELSE COUNT(*) FILTER (
-                        WHERE iu.status = 'available'
-                    )::int
-                END AS available_units
-
-            FROM inventory_units iu
-            WHERE iu.inventory_item_id = ii.id
-        ) stock ON TRUE
-
-        WHERE ${where.join(' AND ')}
-
-        ORDER BY ${orderBy}
-
-        LIMIT $${params.length + 1}
-        OFFSET $${params.length + 2}
+    LIMIT $${params.length + 1}
+    OFFSET $${params.length + 2}
     `, [...params, limit, offset]);
 
         // Count matching inventory items for pagination.
         const { rows: [{ count }] } = await db.query(`
-        SELECT COUNT(*)::int AS count
+    SELECT COUNT(*)::int AS count
 
-        FROM inventory_items ii
+    FROM inventory_items ii
 
-        JOIN listing_variants lv
-            ON lv.id = ii.listing_variant_id
+    JOIN listing_variants lv
+        ON lv.id = ii.listing_variant_id
 
-        JOIN listings l
-            ON l.id = lv.listing_id
+    JOIN listings l
+        ON l.id = lv.listing_id
 
-        WHERE ${where.join(' AND ')}
+    LEFT JOIN LATERAL (
+        SELECT
+            CASE
+                WHEN ii.tracking_mode = 'bulk'
+                THEN ii.quantity
+                ELSE COUNT(*) FILTER (
+                    WHERE iu.status IN ('available', 'reserved')
+                )::int
+            END AS total_units,
+            CASE
+                WHEN ii.tracking_mode = 'bulk'
+                THEN ii.quantity - ii.reserved
+                ELSE COUNT(*) FILTER (
+                    WHERE iu.status = 'available'
+                )::int
+            END AS available_units
+        FROM inventory_units iu
+        WHERE iu.inventory_item_id = ii.id
+    ) stock ON TRUE
+
+    WHERE ${where.join(' AND ')}
     `, params);
 
         const total = Number(count);
@@ -1703,19 +1811,19 @@ class InventoryModel {
 
         const {
             inventoryId, listing_variant_id, tracking_mode, quantity = 0, reserved = 0,
-            batchNumber = null, mfg_at = null, expires_at = null,
-            status = 'in_stock',
+            batchNumber = null, mfg_at = null, expires_at = null
         } = data;
 
         const { rows: [row] } = await db.query(`
             INSERT INTO inventory_items (
             inventory_id, listing_variant_id, tracking_mode, quantity, reserved,
-            batch_number, mfg_at, expires_at, status
+            batch_number, mfg_at, expires_at
             )
-            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
             RETURNING *
-        `, [inventoryId, listing_variant_id, tracking_mode, quantity, reserved,
-            batchNumber, mfg_at, expires_at, status
+        `, [
+            inventoryId, listing_variant_id, tracking_mode, quantity, reserved,
+            batchNumber, mfg_at, expires_at
         ]);
 
         return row;
@@ -1760,7 +1868,10 @@ class InventoryModel {
     }
 
     /**
+     * @Deprecated use reserveBulkItem
+     * 
      * Atomically reserve N units.
+     * 
      * Returns null if insufficient available (prevents over-reservation).
      */
     async reserveInventoryItem(itemId, quantity) {
@@ -1774,6 +1885,63 @@ class InventoryModel {
         `, [quantity, itemId]);
 
         return row || null;   // null = not enough available
+    }
+
+    /**
+     * Atomically reserves bulk inventory.
+     * Returns the updated row if successful, or null if insufficient stock.
+    */
+    static async reserveBulkItem(itemId, quantity, { inventoryId = null } = {}) {
+        if (!Number.isInteger(quantity) || quantity <= 0) {
+            throw new Error('reserveBulkItem: quantity must be a positive integer');
+        }
+
+        const params = [quantity, itemId];
+        let inventoryGuard = '';
+        if (inventoryId) {
+            params.push(inventoryId);
+            inventoryGuard = `AND inventory_id = $${params.length}`;
+        }
+
+        const { rows: [row] } = await db.query(`
+            UPDATE inventory_items
+            SET reserved = reserved + $1,
+                updated_at = NOW()
+            WHERE id = $2
+            ${inventoryGuard}
+            AND tracking_mode = 'bulk' 
+            AND (quantity - reserved) >= $1 
+            RETURNING id, quantity, reserved, (quantity - reserved) AS available, status
+        `, params);
+
+        return row || null;
+    }
+
+    static async releaseBulkItem(itemId, quantity, { inventoryId = null } = {}) {
+        if (!Number.isInteger(quantity) || quantity <= 0) {
+            throw new Error('releaseBulkItem: quantity must be a positive integer');
+        }
+
+        const params = [quantity, itemId];
+        let inventoryGuard = '';
+        if (inventoryId) {
+            params.push(inventoryId);
+            inventoryGuard = `AND inventory_id = $${params.length}`;
+        }
+
+        const { rows: [row] } = await db.query(`
+            UPDATE inventory_items
+            SET reserved = reserved - $1,
+                updated_at = NOW()
+            WHERE id = $2
+            ${inventoryGuard}
+            AND tracking_mode = 'bulk'
+            -- Ensure we don't release more than we have reserved
+            AND reserved >= $1
+            RETURNING id, quantity, reserved, (quantity - reserved) AS available, status
+        `, params);
+
+        return row || null; // null means "Not enough reserved stock to release"
     }
 
     /**
@@ -1796,6 +1964,36 @@ class InventoryModel {
      * Atomically adjust quantity by a delta (+ or -).
      * Auto-recomputes status based on new quantity.
      */
+    // static async adjustInventoryItemQuantity(itemId, delta, { inventoryId = null } = {}) {
+    //     const params = [delta, itemId];
+    //     let inventoryGuard = '';
+    //     if (inventoryId) {
+    //         params.push(inventoryId);
+    //         inventoryGuard = `AND inventory_id = $${params.length}`;
+    //     }
+
+    //     const { rows: [row] } = await db.query(`
+    //         UPDATE inventory_items
+    //         SET quantity = GREATEST(quantity + $1, 0),
+    //             status = CASE
+    //                 WHEN quantity + $1 <= 0 THEN 'out_of_stock'::inventory_status
+    //                 WHEN quantity + $1 <= 10 THEN 'low_stock'::inventory_status
+    //                 ELSE 'in_stock'::inventory_status
+    //             END,
+    //             updated_at = NOW()
+    //         WHERE id = $2 AND tracking_mode = 'bulk'
+    //         ${inventoryGuard}
+    //         RETURNING *
+    //     `, params);
+
+    //     return row || null;
+    // }
+
+    //Status is now generated
+    /**
+     * Atomically adjust quantity by a delta (+ or -).
+     * Auto-recomputes status based on new quantity.
+     */
     static async adjustInventoryItemQuantity(itemId, delta, { inventoryId = null } = {}) {
         const params = [delta, itemId];
         let inventoryGuard = '';
@@ -1807,12 +2005,7 @@ class InventoryModel {
         const { rows: [row] } = await db.query(`
             UPDATE inventory_items
             SET quantity = GREATEST(quantity + $1, 0),
-                status = CASE
-                    WHEN quantity + $1 <= 0 THEN 'out_of_stock'::inventory_status
-                    WHEN quantity + $1 <= 10 THEN 'low_stock'::inventory_status
-                    ELSE 'in_stock'::inventory_status
-                END,
-                updated_at = NOW()
+            updated_at = NOW()
             WHERE id = $2 AND tracking_mode = 'bulk'
             ${inventoryGuard}
             RETURNING *
@@ -2661,6 +2854,85 @@ class InventoryModel {
         return rows[0] ?? null;
     }
 
+    static async getUnitPublicDetails(unitId, { storeId = null } = {}) {
+        const params = [unitId];
+        let storeGuard = '';
+
+        if (storeId) {
+            params.push(storeId);
+            storeGuard = `AND i.store_id = $${params.length}`;
+        }
+
+        const { rows } = await db.query(`
+        SELECT
+            u.id,
+            u.serial_number,
+            u.imei,
+            u.barcode,
+            u.mac_address,
+            u.status,
+            u.condition,
+            u.received_at,
+            u.sold_at,
+            
+            l.title AS listing_title,
+            lv.sku AS listing_sku, -- Added SKU for the UI
+
+            (
+                SELECT lvm.storage_key
+                FROM listing_variants_media lvm
+                WHERE lvm.listing_variant_id = lv.id
+                  AND lvm.is_primary = TRUE
+                ORDER BY lvm.id
+                LIMIT 1
+            ) AS listing_image,
+
+            w.title AS warranty_title,
+            w.provider AS warranty_provider,
+            w.description AS warranty_description,
+            w.duration_months AS warranty_months_duration,
+            w.terms_url AS warranty_terms_url,
+            w.status AS warranty_status,
+            w.updated_at AS warranty_updated_at,
+
+            wr.starts_at AS unit_warrant_start,
+            wr.expires_at AS unit_warrant_end
+
+        FROM inventory_units u
+
+        JOIN inventory_items ii
+            ON ii.id = u.inventory_item_id
+
+        JOIN inventories i
+            ON i.id = ii.inventory_id
+
+        JOIN listing_variants lv
+            ON lv.id = ii.listing_variant_id
+
+        JOIN listings l
+            ON l.id = lv.listing_id
+
+        LEFT JOIN LATERAL (
+            SELECT
+                wr2.warranty_id,
+                wr2.starts_at,
+                wr2.expires_at
+            FROM warranty_registrations wr2
+            WHERE wr2.inventory_unit_id = u.id
+            ORDER BY wr2.expires_at DESC NULLS LAST, wr2.id DESC
+            LIMIT 1
+        ) wr ON TRUE
+
+        LEFT JOIN warranties w
+            ON w.id = wr.warranty_id
+
+        WHERE u.id = $1
+          ${storeGuard}
+    `, params);
+
+        return rows[0] ?? null;
+    }
+
     /**
      * Update a unit's status / metadata.
      */
@@ -2871,17 +3143,6 @@ class InventoryModel {
     // ═══════════════════════════════════════════════════════════════════════════
     // INVENTORY SERVICE — IMPLEMENTATION ROADMAP
     // ═══════════════════════════════════════════════════════════════════════════
-    //
-    // This service currently implements the CORE operations needed for a
-    // store. The functions below cover ~80% of real-world usage:
-    //
-    //   ✅ Inventory locations (CRUD + stats)
-    //   ✅ Inventory items (list, search, filter, sort)
-    //   ✅ Manual quantity adjustments
-    //   ✅ Reserve / release units
-    //   ✅ Serialized unit tracking
-    //   ✅ Transaction audit log
-    //   ✅ Per-store and per-location reporting
     //
     // The remaining functionality is documented below as TODO. Each item is
     // implemented WHEN the operational pain appears, not before. Building features

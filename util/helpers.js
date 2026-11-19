@@ -156,6 +156,32 @@ function randomUId() {
     return result;
 }
 
+const SECRET_KEY = process.env.QR_SECRET;
+const ALGORITHM = 'aes-256-ctr';
+const IV_LENGTH = 16;
+
+const keyBuffer = Buffer.from(SECRET_KEY, 'hex');
+
+// Safety check: ensure the key is exactly 32 bytes (256 bits)
+if (keyBuffer.length !== 32) {
+    throw new Error('QR_SECRET must be exactly 64 hexadecimal characters (32 bytes)');
+}
+
+function encrypt(text) {
+    const iv = crypto.randomBytes(IV_LENGTH);
+    const cipher = crypto.createCipheriv(ALGORITHM, keyBuffer, iv);
+    const encrypted = Buffer.concat([cipher.update(text), cipher.final()]);
+    return iv.toString('hex') + ':' + encrypted.toString('hex');
+}
+
+function decrypt(hash) {
+    const [ivHex, encryptedHex] = hash.split(':');
+    const iv = Buffer.from(ivHex, 'hex');
+    const encryptedText = Buffer.from(encryptedHex, 'hex');
+    const decipher = crypto.createDecipheriv(ALGORITHM, keyBuffer, iv);
+    const decrypted = Buffer.concat([decipher.update(encryptedText), decipher.final()]);
+    return decrypted.toString();
+}
 
 module.exports = {
   acceptsHtml,
@@ -171,4 +197,6 @@ module.exports = {
   isSameOrigin,
   formatError,
   randomUId,
+  encrypt,
+  decrypt,
 }

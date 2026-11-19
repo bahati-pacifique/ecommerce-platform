@@ -26,7 +26,6 @@
   <link rel="icon" href="/favicon.ico" type="image/x-icon">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
   
-  <!-- Note: /styles/main.css is the compiled Tailwind CSS output file -->
   <link rel="stylesheet" href="/styles/main.css">
 
   <style>
@@ -143,7 +142,7 @@
 
       <% if (!locals.user) { %>
       <div class="animate-slide-up" style="animation-delay: 0.2s">
-        <a href="<%-locals.auth_host%>" id="signinBtn" class="signin-btn inline-block animate-rich-shake-loop hover-shake px-8 py-4 rounded-2xl text-white font-semibold text-lg shadow-lg shadow-brand/20">
+        <a href="<%-locals.auth_host%>" id="signinBtn" class="signin-btn inline-block animate-rich-shake-loop hover-shake px-8 py-4 rounded-xl text-white font-semibold text-lg shadow-lg shadow-brand/20">
           <div class="flex items-center gap-3">
             <span>Sign in</span>
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -154,7 +153,7 @@
       </div>
       <%} else {%>
         <div class="animate-slide-up" style="animation-delay: 0.2s">
-        <a href="<%-locals.dashboard_host%>" id="signinBtn" class="signin-btn inline-block animate-rich-shake-loop hover-shake px-8 py-4 rounded-2xl text-white font-semibold text-lg shadow-lg shadow-brand/20">
+        <a href="<%-locals.dashboard_host%>" id="signinBtn" class="signin-btn inline-block animate-rich-shake-loop hover-shake px-8 py-4 rounded-xl text-white font-semibold text-lg shadow-lg shadow-brand/20">
           <div class="flex items-center gap-3">
             <span>Continue to Dashboard</span>
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

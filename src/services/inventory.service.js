@@ -334,6 +334,10 @@ class InventoryService {
         return await InventoryModel.searchUnit(storeId, query, opts);
     }
 
+    static async getUnitPublicDetails(unitId, { storeId }) {
+        return await InventoryModel.getUnitPublicDetails(unitId, { storeId })
+    }
+
     static async adjustQuantity(itemId, delta, inventoryId, userId) {
 
         const item = await InventoryModel.getInventoryItemById(itemId);
@@ -366,6 +370,14 @@ class InventoryService {
         }
 
         return result;
+    }
+
+    static async reserveBulkItem(itemId, quantity, { inventoryId }) {
+        return await InventoryModel.reserveBulkItem(itemId, quantity, { inventoryId });
+    }
+
+    static async releaseBulkItem(itemId, quantity, { inventoryId }) {
+        return await InventoryModel.releaseBulkItem(itemId, quantity, { inventoryId });
     }
 
     static async patchUnit(unitId, statusPatch, condition) {

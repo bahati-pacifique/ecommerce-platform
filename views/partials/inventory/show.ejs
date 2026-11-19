@@ -91,7 +91,7 @@
   </div>
 
   <div class="overflow-x-auto">
-    <table class="w-full text-left text-sm table-fixed">
+    <table class="w-full text-left text-sm">
       <thead class="bg-slate-50 text-xs uppercase tracking-wider text-slate-500">
         <tr>
           <th class="px-5 py-3">Listing</th>
@@ -129,21 +129,22 @@
               </div>
               <% } %>
               <div class="min-w-0">
-                <div class="truncate font-medium"><%= item.listing?.title || '—' %></div>
-                <div class="font-mono text-[10px] text-slate-400"><%= item.listing?.sku || '—' %></div>
+                <div class="truncate max-w-[25ch] md:max-w-[40ch] font-medium"><%= item.listing?.title || '—' %></div>
+                <div class="font-mono text-[10px] truncate max-w-[25ch] text-slate-400"><%= item.listing?.sku || '—' %></div>
               </div>
             </div>
           </td>
-          <td class="px-5 py-3 text-right font-medium capitalize"><%= item.tracking_mode %></td>
-          <td class="px-5 py-3 text-right font-medium"><%= fmtNum(item.quantity) %></td>
-          <td class="px-5 py-3 text-right text-amber-600"><%= fmtNum(item.reserved) %></td>
-          <td class="px-5 py-3 text-right font-semibold text-emerald-600"><%= fmtNum(item.available) %></td>
-          <td class="px-5 py-3">
+          <td class="px-5 py-3 text-center font-medium capitalize"><%= item.tracking_mode %></td>
+          <td class="px-5 py-3 text-center font-medium"><%= fmtNum(item.quantity) %></td>
+          <td class="px-5 py-3 text-center text-amber-600"><%= fmtNum(item.reserved) %></td>
+          <td class="px-5 py-3 text-center font-semibold text-emerald-600"><%= fmtNum(item.available) %></td>
+          <td class="px-1 py-2">
             <span class="capitalize rounded-full px-2.5 py-1 text-xs font-semibold
                   <%= item.status === 'in_stock' ? 'bg-emerald-50 text-emerald-700' : '' %>
                   <%= item.status === 'low_stock' ? 'bg-amber-50 text-amber-700' : '' %>
-                  <%= item.status === 'out_of_stock' ? 'bg-rose-50 text-rose-700' : '' %>">
-              <%= (item.status || '').replace('_', ' ') %>
+                  <%= item.status === 'out_of_stock' ? 'bg-rose-50 text-rose-700' : '' %>
+                  <%= !item.status ? 'bg-gray-100 text-gray-700' : '' %>">
+              <%= (item.status || 'Unit item').replaceAll('_', ' ') %>
             </span>
           </td>
           <td class="px-3 py-3 text-right">
@@ -157,10 +158,15 @@
                   <span>Adjust Quantity</span>
                   <i data-lucide="settings-2" class="h-4 w-4"></i>
                 </button>`,
-                `<button data-inventory-id="${inventory.id}" data-store-id="${store.id}" data-item-id="${item.id}" reserve-quantity class="${item.tracking_mode === 'bulk' ? 'flex' : 'hidden'} 
+                `<button data-action="reserve" data-inventory-id="${inventory.id}" data-store-id="${store.id}" data-item-id="${item.id}" reserve-item class="${item.tracking_mode === 'bulk' ? 'flex' : 'hidden'} 
                   w-full items-center gap-2 rounded-md px-3 py-2 text-left text-sm text-slate-700 hover:bg-slate-100 hover:text-brand add-quantity-btn">
                   <span>Reserve Quantity</span>
-                  <i data-lucide="can" class="h-4 w-4"></i>
+                  <i data-lucide="layers-minus" class="h-4 w-4"></i>
+                </button>`,
+                `<button data-action="release" data-inventory-id="${inventory.id}" data-store-id="${store.id}" data-item-id="${item.id}" release-item class="${(item.tracking_mode === 'bulk' &&  item.reserved > 0) ? 'flex' : 'hidden'} 
+                  w-full items-center gap-2 rounded-md px-3 py-2 text-left text-sm text-slate-700 hover:bg-slate-100 hover:text-brand add-quantity-btn">
+                  <span>Release Quantity</span>
+                  <i data-lucide="layers-plus" class="h-4 w-4"></i>
                 </button>`,
                 `<a href="/stores/${store.id}/listings/${item.listing?.id}/review" target="_blank" data-item-id="${item.id}" data-unit-pricing class="w-full flex items-center gap-2 rounded-md px-3 py-2 text-left text-sm text-slate-700 hover:bg-slate-100 hover:text-brand">
                   <span>View Listing</span>

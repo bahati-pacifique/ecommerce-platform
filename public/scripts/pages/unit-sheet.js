@@ -19,6 +19,142 @@ document.addEventListener('DOMContentLoaded', () => {
     const retryBtn = document.getElementById('unitSheetRetry');
     const errorCloseBtn = document.getElementById('unitSheetErrorClose');
 
+    const printBtn = document.getElementById('unitSheetPrintTag');
+
+
+    printBtn?.addEventListener('click', async () => {
+        if (!currentUnitFull) return;
+
+        const btnContent = printBtn.innerHTML;
+        printBtn.disabled = true;
+        printBtn.innerHTML = 'Generating...';
+
+        try {
+            const u = currentUnitFull;
+
+            // 1. Get the QR code SVG from your API
+            const qrEndpoint = `/inventories/units/${storeId}/${u.id}/qr-tag?inventoryId=${inventoryId}`;
+            const response = await axios.get(qrEndpoint, { responseType: 'blob' }); // Change to blob
+            const qrImageUrl = URL.createObjectURL(response.data);
+
+            // 2. Open a new window synchronously (prevents popup blockers)
+            // We open it immediately before the async fetch to ensure the browser allows it.
+            const printWindow = window.open('', '_blank', 'width=600,height=600');
+            if (!printWindow) {
+                throw new Error('Popup blocked. Please allow popups for this site.');
+            }
+
+            // 3. Build the HTML with inline CSS
+            const printHtml = `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>COCOCE Print Tag - ${esc(u.serial_number || u.id)}</title>
+                    <style>
+                        /* Remove all page margins for edge-to-edge printing */
+                        @page { 
+                            size: auto; 
+                            margin: 0mm; 
+                        }
+                        
+                        body { 
+                            margin: 0; 
+                            padding: 20px;
+                            font-family: system-ui, -apple-system, sans-serif; 
+                            display: flex; 
+                            align-items: center; 
+                            justify-content: center;
+                            height: 100vh;
+                            background: #ffffff;
+                        }
+
+                        .sticker {
+                            /* Removed border, background, and padding */
+                            text-align: center;
+                            width: 280px;
+                        }
+
+                        .title {
+                            font-size: 14px;
+                            font-weight: 800; /* Extra bold for printing */
+                            color: #000000;   /* Pure black */
+                            margin-bottom: 4px;
+                            white-space: nowrap;
+                            overflow: hidden;
+                            text-overflow: ellipsis;
+                        }
+
+                        .sku {
+                            font-size: 12px;
+                            font-family: monospace;
+                            color: #000000;   /* Pure black */
+                            margin-bottom: 12px;
+                            text-transform: uppercase;
+                        }
+
+                        .qr-svg img {
+                            width: 180px; 
+                            height: 180px; 
+                            display: block; 
+                            margin: 0 auto; 
+                        }
+
+                        .serial {
+                            font-size: 13px;
+                            font-weight: 700;
+                            color: #000000;   /* Pure black */
+                            margin-top: 12px;
+                            font-family: monospace;
+                            letter-spacing: 1px;
+                        }
+                        
+                        /* Ensure print backgrounds don't hide the text */
+                        @media print {
+                            body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div class="sticker">
+                        <div class="title">${esc(u.listing_title || 'Unit')}</div>
+                        <div class="sku">${esc(u.listing_variant_sku || '')}</div>
+                        <div class="qr-svg">
+                            <img src="${qrImageUrl}" alt="QR Code" />
+                        </div>
+                        <div class="serial">${esc(u.serial_number || u.imei || 'COCOCE Rwanda')}</div>
+                    </div>
+                    <script>
+                        window.onload = () => {
+                            setTimeout(() => {
+                                window.print();
+                            }, 250);
+                        };
+                    <\/script>
+                </body>
+                </html>
+            `;
+
+            printWindow.document.open();
+            printWindow.document.write(printHtml);
+            printWindow.document.close();
+            printWindow.focus();
+
+            setTimeout(() => {
+                URL.revokeObjectURL(qrImageUrl);
+            }, 10000);
+
+        } catch (err) {
+            console.error('Failed to generate tag:', err);
+            Notification.showNotification({
+                message: err.message || 'Failed to generate print tag.',
+                type: 'error'
+            });
+        } finally {
+            printBtn.disabled = false;
+            printBtn.innerHTML = btnContent;
+        }
+    });
+
     if (!sheet) return;
 
     const { storeId, inventoryId } = window.__UNITS__ || {};
@@ -242,22 +378,12 @@ document.addEventListener('DOMContentLoaded', () => {
             u.inventory_title || 'Unassigned';
         document.getElementById('unitSheetStatus').textContent =
             u.status || 'Status';
-
-        // Active status button
-        // document.querySelectorAll('[data-status-action]').forEach(btn => {
-        //     btn.dataset.active = String(btn.dataset.statusAction === u.status);
-        // });
-
-        // Active condition button
         document.querySelectorAll('[data-condition-action]').forEach(btn => {
             btn.dataset.active = String(btn.dataset.conditionAction === u.condition);
         });
 
         // Location select
         locationSelect.value = u.inventory_id || '';
-
-        // document.getElementById('unitSheetOpenPage').href =
-        //     `/stores/${storeId}/inventory/${u.location?.id ?? inventoryId}/items/${u.inventory_item_id ?? ''}`;
 
         document.getElementById('unitWarrantPage').href =
             `/catalog/units/${u.id}/warranty`;
@@ -271,14 +397,13 @@ document.addEventListener('DOMContentLoaded', () => {
         if (u.status === 'sold') {
             document.getElementById('sheetStatus').classList.add('hidden');
             document.getElementById('soldBadge').classList.remove('hidden');
-            document.getElementById('soldBadge').innerHTML = `<h3>${u.sold_at ? 'Unit sold at ' + formatDate(u.sold_at) : 'Unit sold'}</h3>`;
+            document.getElementById('soldBadge').innerHTML = `<h3>${u.sold_at ? 'Unit item sold at ' + formatDate(u.sold_at) : 'Unit sold'}</h3>`;
         } else {
             document.getElementById('soldBadge').classList.add('hidden');
             document.getElementById('sheetStatus').classList.remove('hidden');
         }
     }
 
-    // ── Actions ──────────────────────────────────────────────
     async function patchUnit(payload, target) {
 
         if (!currentUnit) return;
@@ -372,7 +497,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     e.target.disabled = true;
                     await axios.patch(
                         `/inventories/units/${currentUnit}/${inventoryId}/${storeId}/patch`,
-                        {status: 'removed'},
+                        { status: 'removed' },
                         { withCredentials: true }
                     );
 

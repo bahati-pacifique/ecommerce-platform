@@ -7,26 +7,18 @@ const { v4: uuidv4 } = require("uuid");
 
 const {
     clearAuthentication,
-    clearAuthRedirect,
-    deny401,
     deny403,
-    success200,
     acceptsHtml
 } = require('../util/helpers');
 
 const {
     signAccessToken,
     signRefreshToken,
-    signRedirect,
     decodeRedirect,
     setAuthCookies,
     clearAuthCookie,
     normalizeUA,
-    decodeAccessToken,
-    decodeRefreshToken,
-    hashToken,
     decodeAuthCookies,
-    sameNetwork,
     allowRedirect
 } = require('../util/authTokens');
 

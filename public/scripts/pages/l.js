@@ -57,6 +57,7 @@
     }
 
     function stockLabel(inv) {
+        
         if (!inv) return { label: 'Unknown', tone: 'slate' };
         switch (inv.availability_status) {
             case 'in_stock': return { label: 'In stock', tone: 'emerald' };

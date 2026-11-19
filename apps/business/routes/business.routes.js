@@ -3,9 +3,10 @@ const router = express.Router();
 
 
 const businessController = require('../controller/business.controller');
+const toolsController = require('../../../controllers/tools.controller');
 
-const { dashboard, session, business, vendorBusinessRegister } = require('../../../middlewares/authGuards');
-const { getProductWithVariants } = require('../../../src/models/product.model');
+const { session, business, vendorBusinessRegister } = require('../../../middlewares/authGuards');
+//const { getProductWithVariants } = require('../../../src/models/product.model');
 
 router.get('/stores/docs/terms', session, businessController.renderTerms);
 router.get('/docs/attributes-registry-terms', session, businessController.renderAttributeRegistryTerms);
@@ -37,6 +38,8 @@ router.get('/inventories/:inventoryId/:storeId/units/search', business, business
 
 router.post('/inventories/:inventoryId/:storeId/add-item', business, businessController.insertInventoryUnit);
 router.patch('/inventories/:inventoryId/:storeId/items/:itemId/adjust-quantity', business, businessController.adjustItemQuantity);
+router.patch('/inventories/:inventoryId/:storeId/items/:itemId/reserve-quantity', business, businessController.reserveBulkItem);
+router.patch('/inventories/:inventoryId/:storeId/items/:itemId/release-quantity', business, businessController.releaseBulkItem);
 router.post('/inventories/:inventoryId/:storeId/items', business, businessController.createInventoryItem);
 
 router.get('/inventories/units/:storeId/:unitId', business, businessController.getItemUnit);
@@ -89,5 +92,12 @@ router.post('/cataloging/listing/:storeId/', business, businessController.insert
 
 router.get('/messages', business, businessController.renderMessages);
 router.get('/notifications', business, businessController.renderNotifications);
+
+//———————————————————————— Tools routes ——————————————————
+router.get('/inventories/units/:storeId/:unitId/qr-tag', business, toolsController.unitQRStickerGenerate);
+
+//———————————————————————— General business routes ——————————————————
+//items/unit/verify
+router.get('/items/unit/verify', session, businessController.verifyItemUnit);
 
 module.exports = router;
