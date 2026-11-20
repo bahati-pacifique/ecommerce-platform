@@ -12,12 +12,10 @@
 
 <div class="verification-bg min-h-screen flex flex-col items-center justify-center p-4 sm:p-6 antialiased">
 
-    <!-- Main Verification Card -->
     <div class="w-full max-w-md bg-white rounded-3xl shadow-xl overflow-hidden border border-slate-200">
         
         <% if (typeof error !== 'undefined' && error) { %>
             
-            <!-- 🛑 ERROR STATE -->
             <div class="p-8 text-center">
                 <div class="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-rose-50 mb-6 border border-rose-100">
                     <i data-lucide="shield-alert" class="h-10 w-10 text-rose-600"></i>
@@ -30,7 +28,6 @@
                     <i data-lucide="arrow-right" class="h-4 w-4"></i>
                 </a>
                 
-                <!-- Camera Scan Button -->
                 <button id="cameraOpenSCan" class="mt-3 inline-flex items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-6 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 w-full">
                     <i data-lucide="camera" class="h-4 w-4"></i>
                     Open Camera to Scan
@@ -39,10 +36,7 @@
 
         <% } else { %>
 
-            <!-- ✅ SUCCESS STATE -->
-            <!-- Header Banner -->
             <div class="relative bg-slate-900 px-6 py-8 text-center text-white">
-                <!-- Subtle pattern background -->
                 <div class="absolute inset-0 opacity-10" style="background-image: radial-gradient(#ffffff 1px, transparent 1px); background-size: 16px 16px;"></div>
                 
                 <div class="relative mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-emerald-500/20 mb-4 ring-1 ring-emerald-500/50">
@@ -52,13 +46,11 @@
                 <p class="relative text-slate-300 text-sm mt-1">This unit is registered in the Cococe network.</p>
             </div>
 
-            <!-- Product Details -->
-            <div class="p-6 sm:p-8">
+            <div class="p-6 sm:p-8 overflow-y-auto">
                 
-                <!-- Product Info -->
                 <div class="flex gap-4 items-center border-b border-slate-100 pb-6 mb-6">
                     <% if (unit.listing_image) { %>
-                        <img src="https://cdn.cococe.rw/<%= unit.listing_image %>" class="h-24 w-24 rounded-2xl object-cover ring-1 ring-slate-200 shadow-sm" />
+                        <img src="https://cdn.cococe.rw/<%= unit.listing_image %>" class="h-48 w-48 rounded-2xl object-container ring-1 ring-slate-200 shadow-sm" />
                     <% } else { %>
                         <div class="h-24 w-24 rounded-2xl bg-slate-50 flex items-center justify-center ring-1 ring-slate-200">
                             <i data-lucide="package" class="h-8 w-8 text-slate-300"></i>
@@ -74,7 +66,6 @@
                     </div>
                 </div>
 
-                <!-- Data List -->
                 <dl class="space-y-4 text-sm">
                     <div class="flex justify-between items-center">
                         <dt class="text-slate-500 font-medium">Serial Number</dt>
@@ -84,7 +75,6 @@
                     <div class="flex justify-between items-center">
                         <dt class="text-slate-500 font-medium">Condition</dt>
                         <dd class="font-semibold text-slate-900 capitalize flex items-center gap-1">
-                            <i data-lucide="sparkles" class="h-3.5 w-3.5 text-amber-500"></i>
                             <%= (unit.condition || 'Unknown').replace('_', ' ') %>
                         </dd>
                     </div>
@@ -97,7 +87,6 @@
                     </div>
                 </dl>
 
-                <!-- Warranty Section -->
                 <div class="mt-6 rounded-2xl border <%= isWarrantyActive ? 'border-emerald-200 bg-emerald-50/50' : 'border-slate-200 bg-slate-50' %> p-4">
                     <div class="flex items-start gap-3">
                         <div class="mt-0.5 shrink-0">
@@ -122,7 +111,6 @@
                     </div>
                 </div>
 
-                <!-- Footer / Trust Indicators -->
                 <div class="mt-8 text-center pt-6 border-t border-slate-100">
                     <div class="flex items-center justify-center gap-1.5 text-xs text-slate-400 mb-4">
                         <i data-lucide="lock" class="h-3 w-3"></i>
@@ -141,12 +129,9 @@
         <% } %>
     </div>
 
-    <!-- Tiny watermark -->
     <p class="mt-6 text-xs text-slate-400 font-medium">© <%= new Date().getFullYear() %> COCOCE — Rwanda. All rights reserved.</p>
 
-    <!-- 📷 Camera Scanner Modal -->
     <div id="scannerModal" class="hidden fixed inset-0 z-50 flex flex-col bg-slate-900/95 backdrop-blur-md">
-        <!-- Header -->
         <div class="flex items-center justify-between p-4 text-white">
             <h3 class="text-lg font-bold">Scan Product Tag</h3>
             <button id="closeScannerBtn" class="rounded-full bg-white/10 p-2 hover:bg-white/20 transition">
@@ -154,77 +139,12 @@
             </button>
         </div>
 
-        <!-- Camera View -->
         <div class="flex-1 flex flex-col items-center justify-center p-4">
             <div id="qr-reader" class="w-full max-w-sm rounded-2xl overflow-hidden bg-black ring-4 ring-white/10 aspect-square"></div>
             <p class="text-slate-300 text-sm mt-6 text-center">Align the QR code within the frame to scan.</p>
         </div>
     </div>
 
-    <!-- Scripts -->
     <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            // Initialize Lucide icons
-            lucide.createIcons();
-
-            // ─── Camera Scanner Logic ──────────────────────────────
-            const openBtn = document.getElementById('cameraOpenSCan');
-            const modal = document.getElementById('scannerModal');
-            const closeBtn = document.getElementById('closeScannerBtn');
-            
-            let html5QrCode = null;
-
-            if (openBtn) {
-                openBtn.addEventListener('click', async () => {
-                    modal.classList.remove('hidden');
-                    
-                    // Initialize scanner
-                    html5QrCode = new Html5Qrcode("qr-reader");
-                    
-                    const config = { 
-                        fps: 10, 
-                        qrbox: { width: 250, height: 250 },
-                        aspectRatio: 1.0
-                    };
-
-                    try {
-                        await html5QrCode.start(
-                            { facingMode: "environment" }, // Uses back camera
-                            config,
-                            (decodedText, decodedResult) => {
-                                // Success callback! Redirect to the scanned URL
-                                html5QrCode.stop().then(() => {
-                                    window.location.href = decodedText;
-                                }).catch(err => console.error("Failed to stop scanner", err));
-                            },
-                            (errorMessage) => {
-                                // Ignore constant parse errors while scanning
-                            }
-                        );
-                    } catch (err) {
-                        console.error("Camera start error:", err);
-                        alert("Could not access the camera. Please ensure you have granted camera permissions and are using HTTPS.");
-                        closeScanner();
-                    }
-                });
-            }
-
-            function closeScanner() {
-                modal.classList.add('hidden');
-                if (html5QrCode) {
-                    html5QrCode.stop().then(() => {
-                        html5QrCode.clear();
-                        html5QrCode = null;
-                    }).catch(err => {
-                        console.error("Failed to stop scanner on close", err);
-                    });
-                }
-            }
-
-            if (closeBtn) {
-                closeBtn.addEventListener('click', closeScanner);
-            }
-        });
-    </script>
+    <script src="/scripts/pages/unit-review.js" type="module"></script>
 </div>

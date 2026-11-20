@@ -622,7 +622,6 @@ async function verifyItemUnit(req, res) {
 
         let payload;
         try {
-            // Decrypt the token
             const decryptedString = decrypt(t);
             payload = JSON.parse(decryptedString);
         } catch (e) {
