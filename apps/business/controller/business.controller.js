@@ -21,9 +21,11 @@ const authDomain = `${sslUrlPrefix}auth.${process.env.DOMAIN}${portSuffix}?r=${d
 const protocal = sslUrlPrefix;
 const domainName = `${process.env.DOMAIN}${portSuffix}`;
 
-const { mockDashboard } = require('../../../src/mocks/store-dashboard.mock');
-const { stat } = require('fs/promises');
+//const { mockDashboard } = require('../../../src/mocks/store-dashboard.mock');
+//const { stat } = require('fs/promises');
+
 const { getProductVariantsOnly } = require('../../../src/models/product.model');
+const { decrypt } = require('../../../util/helpers');
 
 async function updateStoreLastActive(id) {
     try {
@@ -465,18 +467,18 @@ async function reserveBulkItem(req, res) {
         const quantity = Number.parseInt(req.body.quantity, 10);
 
         if (!Number.isInteger(quantity) || quantity <= 0) {
-            return res.status(400).json({ 
+            return res.status(400).json({
                 success: false,
-                message: 'Invalid reserve quantity.' 
+                message: 'Invalid reserve quantity.'
             });
         }
 
         const result = await InventoryService.reserveBulkItem(itemId, quantity, { inventoryId });
 
         if (!result) {
-            return res.status(409).json({ 
+            return res.status(409).json({
                 success: false,
-                message: 'Failed — Not enough stock available.' 
+                message: 'Failed — Not enough stock available.'
             });
         }
 
@@ -488,7 +490,7 @@ async function reserveBulkItem(req, res) {
 
     } catch (error) {
         console.error('reserveBulkItem error:', error);
-        
+
         return res.status(500).json({
             success: false,
             message: 'Unable to reserve item — Internal error'
@@ -506,18 +508,18 @@ async function releaseBulkItem(req, res) {
         const quantity = Number.parseInt(req.body.quantity, 10);
 
         if (!Number.isInteger(quantity) || quantity <= 0) {
-            return res.status(400).json({ 
+            return res.status(400).json({
                 success: false,
-                message: 'Invalid reserve quantity.' 
+                message: 'Invalid reserve quantity.'
             });
         }
 
         const result = await InventoryService.releaseBulkItem(itemId, quantity, { inventoryId });
 
         if (!result) {
-            return res.status(409).json({ 
+            return res.status(409).json({
                 success: false,
-                message: 'Failed — Not enough stock available.' 
+                message: 'Failed — Not enough stock available.'
             });
         }
 
@@ -529,7 +531,7 @@ async function releaseBulkItem(req, res) {
 
     } catch (error) {
         console.error('reserveBulkItem error:', error);
-        
+
         return res.status(500).json({
             success: false,
             message: 'Unable to reserve item — Internal error'
@@ -604,7 +606,7 @@ async function getItemUnit(req, res) {
 }
 
 // router.get('/items/unit/verify', async (req, res) => {
-    
+
 // });
 
 async function verifyItemUnit(req, res) {
@@ -612,9 +614,9 @@ async function verifyItemUnit(req, res) {
         const { t } = req.query;
 
         if (!t) {
-            return res.status(400).render('partials/unit-review', { 
-                layout: 'main-layout', 
-                error: 'Missing verification tag. Please scan the QR code again.' 
+            return res.status(400).render('partials/unit-review', {
+                layout: 'main-layout',
+                error: 'Missing verification tag. Please scan the QR code again.'
             });
         }
 
@@ -624,18 +626,19 @@ async function verifyItemUnit(req, res) {
             const decryptedString = decrypt(t);
             payload = JSON.parse(decryptedString);
         } catch (e) {
-            return res.status(400).render('partials/unit-review', { 
-                layout: 'main-layout', 
-                error: 'Invalid or tampered tag. This product cannot be verified.' 
+            console.log(e);
+            return res.status(400).render('partials/unit-review', {
+                layout: 'main-layout',
+                error: 'Invalid or tampered tag. This product cannot be verified.'
             });
         }
 
         const { unitId, storeId } = payload;
 
         if (!unitId || !storeId) {
-            return res.status(400).render('partials/unit-review', { 
-                layout: 'main-layout', 
-                error: 'Malformed verification data.' 
+            return res.status(400).render('partials/unit-review', {
+                layout: 'main-layout',
+                error: 'Malformed verification data.'
             });
         }
 
@@ -644,9 +647,9 @@ async function verifyItemUnit(req, res) {
         const unit = await InventoryService.getUnitPublicDetails(unitId, { storeId });
 
         if (!unit) {
-            return res.status(404).render('partials/unit-review', { 
-                layout: 'main-layout', 
-                error: 'Unit not found. It may have been removed or the tag is no longer active.' 
+            return res.status(404).render('partials/unit-review', {
+                layout: 'main-layout',
+                error: 'Unit not found. It may have been removed or the tag is no longer active.'
             });
         }
 
@@ -654,17 +657,17 @@ async function verifyItemUnit(req, res) {
         const now = new Date();
         const isWarrantyActive = unit.unit_warrant_end && new Date(unit.unit_warrant_end) > now;
 
-        return res.render('partials/unit-review', { 
-            layout: 'main-layout', 
-            unit, 
-            isWarrantyActive 
+        return res.render('partials/unit-review', {
+            layout: 'main-layout',
+            unit,
+            isWarrantyActive
         });
 
     } catch (err) {
         console.error('Verification Error:', err);
-        return res.status(500).render('partials/unit-review', { 
-            layout: 'main-layout', 
-            error: 'A system error occurred while verifying this tag. Please try again later.' 
+        return res.status(500).render('partials/unit-review', {
+            layout: 'main-layout',
+            error: 'A system error occurred while verifying this tag. Please try again later.'
         });
     }
 }
