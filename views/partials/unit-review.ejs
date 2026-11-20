@@ -10,20 +10,23 @@
     }
 </style>
 
-<div class="verification-bg min-h-screen flex flex-col items-center justify-center p-4 sm:p-6 antialiased">
+<!-- Changed to allow vertical scrolling and use dynamic viewport height -->
+<div class="verification-bg min-h-[100dvh] h-full w-full overflow-y-auto flex flex-col items-center p-3 sm:p-6 antialiased">
 
-    <div class="w-full max-w-md bg-white rounded-3xl shadow-xl overflow-hidden border border-slate-200">
+    <!-- Use margin top/bottom instead of justify-center to prevent top cut-off -->
+    <div class="w-full max-w-md bg-white rounded-2xl sm:rounded-3xl shadow-xl border border-slate-200 my-auto mx-auto shrink-0">
         
         <% if (typeof error !== 'undefined' && error) { %>
             
-            <div class="p-8 text-center">
-                <div class="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-rose-50 mb-6 border border-rose-100">
-                    <i data-lucide="shield-alert" class="h-10 w-10 text-rose-600"></i>
+            <!-- ERROR STATE -->
+            <div class="p-6 sm:p-8 text-center">
+                <div class="mx-auto flex h-16 w-16 sm:h-20 sm:w-20 items-center justify-center rounded-full bg-rose-50 mb-4 sm:mb-6 border border-rose-100">
+                    <i data-lucide="shield-alert" class="h-8 w-8 sm:h-10 sm:w-10 text-rose-600"></i>
                 </div>
-                <h2 class="text-xl font-bold text-slate-900 mb-2">Scan the QR Code to get details</h2>
+                <h2 class="text-lg sm:text-xl font-bold text-slate-900 mb-2">Scan the QR Code to get details</h2>
                 <p class="text-sm text-slate-500 leading-relaxed"><%= error %></p>
                 
-                <a href="/" class="mt-8 inline-flex items-center justify-center gap-2 rounded-xl bg-slate-900 px-6 py-3 text-sm font-semibold text-white transition hover:bg-slate-800 w-full">
+                <a href="/" class="mt-6 sm:mt-8 inline-flex items-center justify-center gap-2 rounded-xl bg-slate-900 px-6 py-3 text-sm font-semibold text-white transition hover:bg-slate-800 w-full">
                     Back Homepage
                     <i data-lucide="arrow-right" class="h-4 w-4"></i>
                 </a>
@@ -36,29 +39,34 @@
 
         <% } else { %>
 
-            <div class="relative bg-slate-900 px-6 py-8 text-center text-white">
+            <!-- SUCCESS STATE -->
+            <div class="relative bg-slate-900 px-6 py-6 sm:py-8 text-center text-white rounded-t-2xl sm:rounded-t-3xl">
                 <div class="absolute inset-0 opacity-10" style="background-image: radial-gradient(#ffffff 1px, transparent 1px); background-size: 16px 16px;"></div>
                 
-                <div class="relative mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-emerald-500/20 mb-4 ring-1 ring-emerald-500/50">
-                    <i data-lucide="shield-check" class="h-8 w-8 text-emerald-400"></i>
+                <div class="relative mx-auto flex h-14 w-14 sm:h-16 sm:w-16 items-center justify-center rounded-full bg-emerald-500/20 mb-3 sm:mb-4 ring-1 ring-emerald-500/50">
+                    <i data-lucide="shield-check" class="h-7 w-7 sm:h-8 sm:w-8 text-emerald-400"></i>
                 </div>
-                <h1 class="relative text-2xl font-bold tracking-tight">Official Verification</h1>
-                <p class="relative text-slate-300 text-sm mt-1">This unit is registered in the Cococe network.</p>
+                <h1 class="relative text-xl sm:text-2xl font-bold tracking-tight">Official Verification</h1>
+                <p class="relative text-slate-300 text-xs sm:text-sm mt-1">This unit is registered in the <span class="text-emerald-400 font-bold">COCOCE</span> network.</p>
             </div>
 
-            <div class="p-6 sm:p-8 overflow-y-auto">
+            <div class="p-5 sm:p-8">
                 
-                <div class="flex gap-4 items-center border-b border-slate-100 pb-6 mb-6">
+                <!-- Image and Title -->
+                <div class="flex flex-col items-center gap-4 border-b border-slate-100 pb-6 mb-6">
                     <% if (unit.listing_image) { %>
-                        <img src="https://cdn.cococe.rw/<%= unit.listing_image %>" class="h-48 w-48 rounded-2xl object-container ring-1 ring-slate-200 shadow-sm" />
+                        <!-- Changed to object-contain and removed fixed h/w, letting it scale to the card width -->
+                        <img src="https://cdn.cococe.rw/<%= unit.listing_image %>" class="w-full max-w-[200px] h-auto max-h-[220px] object-contain shrink-0 rounded-2xl shadow-sm bg-slate-50 p-2 ring-1 ring-slate-200" />
                     <% } else { %>
-                        <div class="h-24 w-24 rounded-2xl bg-slate-50 flex items-center justify-center ring-1 ring-slate-200">
+                        <div class="h-28 w-28 rounded-2xl bg-slate-50 flex items-center justify-center ring-1 ring-slate-200">
                             <i data-lucide="package" class="h-8 w-8 text-slate-300"></i>
                         </div>
                     <% } %>
-                    <div class="min-w-0 flex-1">
-                        <h2 class="text-lg font-bold text-slate-900 leading-tight truncate"><%= unit.listing_title %></h2>
-                        <p class="text-sm font-mono text-slate-500 mt-1 truncate"><%= unit.listing_sku || 'N/A' %></p>
+                    
+                    <div class="w-full text-center">
+                        <!-- Removed truncate so long titles wrap and are fully visible -->
+                        <h2 class="text-lg sm:text-xl font-bold text-slate-900 leading-tight"><%= unit.listing_title %></h2>
+                        <p class="text-sm font-mono text-slate-500 mt-1"><%= unit.listing_sku || 'N/A' %></p>
                         <div class="mt-2 inline-flex items-center gap-1 rounded-md bg-slate-100 px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-600">
                             <i data-lucide="check-circle" class="h-3 w-3 text-emerald-600"></i>
                             Genuine Product
@@ -66,28 +74,30 @@
                     </div>
                 </div>
 
-                <dl class="space-y-4 text-sm">
+                <!-- Data List -->
+                <dl class="space-y-3 sm:space-y-4 text-sm">
                     <div class="flex justify-between items-center">
                         <dt class="text-slate-500 font-medium">Serial Number</dt>
-                        <dd class="font-mono font-bold text-slate-900 bg-slate-50 px-2.5 py-1 rounded-md border border-slate-200"><%= unit.serial_number || 'N/A' %></dd>
+                        <dd class="font-mono font-bold text-slate-900 bg-slate-50 px-2 py-1 sm:px-2.5 rounded-md border border-slate-200 text-xs sm:text-sm break-all text-right max-w-[60%]"><%= unit.serial_number || 'N/A' %></dd>
                     </div>
                     
                     <div class="flex justify-between items-center">
                         <dt class="text-slate-500 font-medium">Condition</dt>
-                        <dd class="font-semibold text-slate-900 capitalize flex items-center gap-1">
+                        <dd class="font-semibold text-slate-900 capitalize flex items-center gap-1 text-right">
                             <%= (unit.condition || 'Unknown').replace('_', ' ') %>
                         </dd>
                     </div>
 
                     <div class="flex justify-between items-center">
                         <dt class="text-slate-500 font-medium">Status</dt>
-                        <dd class="font-semibold text-slate-900 capitalize">
+                        <dd class="font-semibold text-slate-900 capitalize text-right">
                             <%= (unit.status || 'Unknown').replace('_', ' ') %>
                         </dd>
                     </div>
                 </dl>
 
-                <div class="mt-6 rounded-2xl border <%= isWarrantyActive ? 'border-emerald-200 bg-emerald-50/50' : 'border-slate-200 bg-slate-50' %> p-4">
+                <!-- Warranty -->
+                <div class="mt-5 sm:mt-6 rounded-2xl border <%= isWarrantyActive ? 'border-emerald-200 bg-emerald-50/50' : 'border-slate-200 bg-slate-50' %> p-4">
                     <div class="flex items-start gap-3">
                         <div class="mt-0.5 shrink-0">
                             <i data-lucide="<%= isWarrantyActive ? 'shield-check' : 'shield-off' %>" class="h-5 w-5 <%= isWarrantyActive ? 'text-emerald-600' : 'text-slate-400' %>"></i>
@@ -111,8 +121,9 @@
                     </div>
                 </div>
 
-                <div class="mt-8 text-center pt-6 border-t border-slate-100">
-                    <div class="flex items-center justify-center gap-1.5 text-xs text-slate-400 mb-4">
+                <!-- Footer -->
+                <div class="mt-6 sm:mt-8 text-center pt-5 sm:pt-6 border-t border-slate-100 pb-2">
+                    <div class="flex items-center justify-center gap-1.5 text-xs text-slate-400 mb-3 sm:mb-4">
                         <i data-lucide="lock" class="h-3 w-3"></i>
                         <span>Encrypted Tamper-Proof Tag</span>
                     </div>
@@ -129,8 +140,9 @@
         <% } %>
     </div>
 
-    <p class="mt-6 text-xs text-slate-400 font-medium">© <%= new Date().getFullYear() %> COCOCE — Rwanda. All rights reserved.</p>
+    <p class="mt-6 mb-4 text-[10px] sm:text-xs text-slate-400 font-medium shrink-0">© <%= new Date().getFullYear() %> COCOCE — Rwanda. All rights reserved.</p>
 
+    <!-- Scanner Modal -->
     <div id="scannerModal" class="hidden fixed inset-0 z-50 flex flex-col bg-slate-900/95 backdrop-blur-md">
         <div class="flex items-center justify-between p-4 text-white">
             <h3 class="text-lg font-bold">Scan Product Tag</h3>
