@@ -93,6 +93,10 @@
                             <%= (unit.status || 'Unknown').replace('_', ' ') %>
                         </dd>
                     </div>
+                    <div class="flex justify-between items-center">
+                        <dt class="text-slate-500 font-medium">Store</dt>
+                        <dd class="font-mono font-bold text-slate-900 sm:px-2.5 text-xs sm:text-sm break-all text-right max-w-[60%]"><%= unit.store || 'N/A' %></dd>
+                    </div>
                 </dl>
 
                 <div class="mt-5 sm:mt-6 rounded-2xl border <%= isWarrantyActive ? 'border-emerald-200 bg-emerald-50/50' : 'border-slate-200 bg-slate-50' %> p-4">

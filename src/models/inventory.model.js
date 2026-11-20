@@ -2896,7 +2896,9 @@ class InventoryModel {
             w.updated_at AS warranty_updated_at,
 
             wr.starts_at AS unit_warrant_start,
-            wr.expires_at AS unit_warrant_end
+            wr.expires_at AS unit_warrant_end,
+
+            s.name AS store
 
         FROM inventory_units u
 
@@ -2905,6 +2907,9 @@ class InventoryModel {
 
         JOIN inventories i
             ON i.id = ii.inventory_id
+
+        LEFT JOIN stores s
+            ON s.id = i.store_id
 
         JOIN listing_variants lv
             ON lv.id = ii.listing_variant_id
