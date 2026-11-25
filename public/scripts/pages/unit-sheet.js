@@ -32,19 +32,15 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const u = currentUnitFull;
 
-            // 1. Get the QR code SVG from your API
             const qrEndpoint = `/inventories/units/${storeId}/${u.id}/qr-tag?inventoryId=${inventoryId}`;
             const response = await axios.get(qrEndpoint, { responseType: 'blob' }); // Change to blob
             const qrImageUrl = URL.createObjectURL(response.data);
 
-            // 2. Open a new window synchronously (prevents popup blockers)
-            // We open it immediately before the async fetch to ensure the browser allows it.
             const printWindow = window.open('', '_blank', 'width=600,height=600');
             if (!printWindow) {
                 throw new Error('Popup blocked. Please allow popups for this site.');
             }
 
-            // 3. Build the HTML with inline CSS
             const printHtml = `
                 <!DOCTYPE html>
                 <html>
@@ -402,6 +398,9 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('soldBadge').classList.add('hidden');
             document.getElementById('sheetStatus').classList.remove('hidden');
         }
+
+        unitSheetSold?.classList.add((u.status === 'sold' || u.status === 'removed') ? 'hidden' : 'flex' );
+        document.getElementById('unitSheetDelete')?.classList.add((u.status === 'removed' || u.status === 'sold') ? 'hidden' : 'flex' );
     }
 
     async function patchUnit(payload, target) {
@@ -464,6 +463,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     e.target.textContent = 'Transfering...';
                     const response = await axios.patch(`/inventories/units/${currentUnit}/${location_id}/${storeId}/transfer`);
                     if (response.data) {
+                        Notification.showNotification({
+                            message: 'Unit transfered',
+                            type: 'success'
+                        });
                         window.location.reload()
                     }
                 } catch (error) {
@@ -504,8 +507,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     location.reload();
                 } catch (err) {
                     console.error(err);
-
-                    e.target.innerHTML = eContent;
+                    e.target.innerHTML = eContent || `<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0 1 16.138 21H7.862a2 2 0 0 1-1.995-1.858L5 7m5 4v6m4-6v6M1 7h22M9 7V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v3" />
+                    </svg>Remove unit`;
                     e.target.disabled = false;
                     Notification.showNotification({
                         message: err.response?.data?.message || 'Could not update unit.',
@@ -528,7 +532,6 @@ document.addEventListener('DOMContentLoaded', () => {
         successBox.classList.add('hidden');
     }
 
-    // ── Sync back to search results list ─────────────────────
     function updateResultCard(unit) {
         // The card rendered by units-search.js uses data-unit-id — make sure it has one
         const card = document.querySelector(`[data-unit-id="${unit.id}"]`);

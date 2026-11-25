@@ -1181,8 +1181,7 @@ class StoreModel {
                     reserved,
                     batch_number,
                     mfg_at,
-                    expires_at,
-                    status
+                    expires_at
                 )
                 SELECT
                     $1,
@@ -1192,8 +1191,7 @@ class StoreModel {
                     0,
                     batch_number,
                     mfg_at,
-                    expires_at,
-                    status
+                    expires_at
                 FROM inventory_items
                 WHERE id = $2
                 RETURNING id`,
@@ -1252,6 +1250,203 @@ class StoreModel {
                 destinationItemId
             };
 
+        } catch (error) {
+            await client.query('ROLLBACK');
+            throw error;
+        } finally {
+            client.release();
+        }
+    }
+
+    static async transferBulkQuantity({
+        sourceItemId,
+        destinationInventoryId,
+        quantity,
+        userId,
+    }) {
+        const amount = Number.parseInt(quantity, 10);
+
+        if (!Number.isInteger(amount) || amount <= 0) {
+            throw new Error('Transfer quantity must be a positive integer.');
+        }
+
+        const client = await db.connect();
+
+        try {
+            await client.query('BEGIN');
+
+            // 1. Lock the source inventory item + its inventory.
+            const sourceResult = await client.query(
+                `SELECT
+                ii.id AS source_item_id,
+                ii.inventory_id AS source_inventory_id,
+                ii.listing_variant_id,
+                ii.tracking_mode,
+                ii.quantity,
+                ii.reserved,
+                source_inventory.title AS source_inventory_title
+             FROM inventory_items ii
+             JOIN inventories source_inventory
+                ON source_inventory.id = ii.inventory_id
+             WHERE ii.id = $1
+             FOR UPDATE OF ii`,
+                [sourceItemId]
+            );
+
+            if (!sourceResult.rowCount) {
+                throw new Error('Source inventory item not found.');
+            }
+
+            const source = sourceResult.rows[0];
+
+            // 2. Same-inventory guard.
+            if (source.source_inventory_id === destinationInventoryId) {
+                throw new Error(
+                    'Item already belongs to the destination inventory.'
+                );
+            }
+
+            // 3. Must be bulk.
+            if (source.tracking_mode !== 'bulk') {
+                throw new Error(
+                    'Only bulk (non-serialized) items can be transferred by quantity.'
+                );
+            }
+
+            // 4. Available quantity check (quantity - reserved >= amount).
+            const available = Number(source.quantity) - Number(source.reserved);
+
+            if (available < amount) {
+                throw new Error(
+                    `Insufficient available quantity: ${available} available, ${amount} requested.`
+                );
+            }
+
+            // 5. Lock / validate destination inventory.
+            const inventoryResult = await client.query(
+                `SELECT id, title
+             FROM inventories
+             WHERE id = $1
+               AND status = 'active'
+             FOR UPDATE`,
+                [destinationInventoryId]
+            );
+
+            if (!inventoryResult.rowCount) {
+                throw new Error(
+                    'Destination inventory not found or inactive.'
+                );
+            }
+
+            const destinationInventory = inventoryResult.rows[0];
+
+            // 6. Find-or-create destination item for same variant.
+            const itemResult = await client.query(
+                `SELECT id, tracking_mode
+             FROM inventory_items
+             WHERE inventory_id = $1
+               AND listing_variant_id = $2
+             FOR UPDATE`,
+                [destinationInventoryId, source.listing_variant_id]
+            );
+
+            let destinationItemId;
+
+            if (itemResult.rowCount) {
+                const destItem = itemResult.rows[0];
+
+                // Defensive: tracking mode must match per variant.
+                if (destItem.tracking_mode !== 'bulk') {
+                    throw new Error(
+                        'Destination item has a mismatched tracking mode.'
+                    );
+                }
+
+                destinationItemId = destItem.id;
+            } else {
+                const newItemResult = await client.query(
+                    `INSERT INTO inventory_items (
+                    inventory_id,
+                    listing_variant_id,
+                    quantity,
+                    tracking_mode,
+                    reserved,
+                    batch_number,
+                    mfg_at,
+                    expires_at
+                )
+                SELECT
+                    $1,
+                    listing_variant_id,
+                    0,
+                    tracking_mode,
+                    0,
+                    batch_number,
+                    mfg_at,
+                    expires_at
+                FROM inventory_items
+                WHERE id = $2
+                RETURNING id`,
+                    [destinationInventoryId, sourceItemId]
+                );
+
+                if (!newItemResult.rowCount) {
+                    throw new Error(
+                        'Failed to create destination inventory item.'
+                    );
+                }
+
+                destinationItemId = newItemResult.rows[0].id;
+            }
+
+            // 7. Decrement source, increment destination.
+            await client.query(
+                `UPDATE inventory_items
+             SET quantity = quantity - $1
+             WHERE id = $2`,
+                [amount, sourceItemId]
+            );
+
+            await client.query(
+                `UPDATE inventory_items
+             SET quantity = quantity + $1
+             WHERE id = $2`,
+                [amount, destinationItemId]
+            );
+
+            // 8. Ledger — now quantity_change is meaningful.
+            await client.query(
+                `INSERT INTO inventory_transactions (
+                inventory_item_id,
+                type,
+                quantity_change,
+                created_by,
+                notes
+            )
+            VALUES
+                ($1, 'transfer_out', $2, $4, $5),
+                ($3, 'transfer_in',  $2, $4, $6)`,
+                [
+                    sourceItemId,
+                    -amount,
+                    destinationItemId,
+                    userId,
+                    `Transferred ${amount} unit(s) to ${destinationInventory.title}`,
+                    `Received ${amount} unit(s) from ${source.source_inventory_title}`,
+                ]
+            );
+
+            await client.query('COMMIT');
+
+            return {
+                sourceItemId,
+                sourceInventoryId: source.source_inventory_id,
+                sourceInventoryTitle: source.source_inventory_title,
+                destinationInventoryId,
+                destinationInventoryTitle: destinationInventory.title,
+                destinationItemId,
+                quantity: amount,
+            };
         } catch (error) {
             await client.query('ROLLBACK');
             throw error;

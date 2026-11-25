@@ -83,8 +83,6 @@ $(document).ready(() => {
                 withCredentials: true
             });
 
-            console.log(response.data);
-
             state.pagination = response.data.pagination || {
                 page: 1,
                 hasNextPage: false,

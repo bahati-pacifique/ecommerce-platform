@@ -1566,13 +1566,16 @@ class InventoryModel {
      */
     static async listByInventory(inventoryId, {
         page = 1,
-        limit = 20,
+        limit = 2,
         search = '',
         status = '',
         sort = 'updated_desc',
     } = {}) {
         const where = ['ii.inventory_id = $1'];
         const params = [inventoryId];
+
+        page = Math.max(1, Number.parseInt(page, 10) || 1);
+        limit = Math.min(100, Math.max(1, Number.parseInt(limit, 10) || 20));
 
         // Search by listing title, SKU, or batch number.
         if (search) {
@@ -1620,146 +1623,148 @@ class InventoryModel {
 
         const orderBy = ORDER[sort] || ORDER.updated_desc;
         const offset = (page - 1) * limit;
+        
 
         const { rows } = await db.query(`
-    SELECT
-        ii.id,
-        ii.inventory_id,
-        ii.listing_variant_id,
-        ii.tracking_mode,
+            SELECT
+            ii.id,
+            ii.inventory_id,
+            ii.listing_variant_id,
+            ii.tracking_mode,
 
-        ii.quantity,
-        ii.reserved,
+            ii.quantity,
+            ii.reserved,
 
-        stock.total_units,
-        stock.reserved_units,
-        stock.available_units,
+            stock.total_units,
+            stock.reserved_units,
+            stock.available_units,
 
-        stock.available_units AS available,
+            stock.available_units AS available,
 
-        ii.batch_number,
-        ii.mfg_at,
-        ii.expires_at,
-
-        CASE
-            WHEN ii.tracking_mode = 'serialized' THEN
-                CASE 
-                    WHEN stock.available_units = 0 THEN 'out_of_stock'::inventory_status
-                    WHEN stock.available_units <= 2 THEN 'low_stock'::inventory_status
-                    ELSE 'in_stock'::inventory_status 
-                END
-            ELSE 
-                ii.status
-        END AS status,
-
-        ii.created_at,
-        ii.updated_at,
-
-        l.id AS listing_id,
-        l.title AS listing_title,
-        l.condition AS listing_condition,
-
-        lv.sku AS listing_sku,
-        lv.product_variant_id,
-
-        (
-            SELECT lvm.storage_key
-            FROM listing_variants_media lvm
-            WHERE lvm.listing_variant_id = lv.id
-              AND lvm.is_primary = TRUE
-            LIMIT 1
-        ) AS listing_image
-
-    FROM inventory_items ii
-
-    JOIN listing_variants lv
-        ON lv.id = ii.listing_variant_id
-
-    JOIN listings l
-        ON l.id = lv.listing_id
-
-    LEFT JOIN LATERAL (
-        SELECT
-            CASE
-                WHEN ii.tracking_mode = 'bulk'
-                THEN ii.quantity
-                ELSE COUNT(*) FILTER (
-                    WHERE iu.status IN ('available', 'reserved')
-                )::int
-            END AS total_units,
+            ii.batch_number,
+            ii.mfg_at,
+            ii.expires_at,
 
             CASE
-                WHEN ii.tracking_mode = 'bulk'
-                THEN ii.reserved
-                ELSE COUNT(*) FILTER (
-                    WHERE iu.status = 'reserved'
-                )::int
-            END AS reserved_units,
+                WHEN ii.tracking_mode = 'serialized' THEN
+                    CASE 
+                        WHEN stock.available_units = 0 THEN 'out_of_stock'::inventory_status
+                        WHEN stock.available_units <= 2 THEN 'low_stock'::inventory_status
+                        ELSE 'in_stock'::inventory_status 
+                    END
+                ELSE 
+                    ii.status
+            END AS status,
 
-            CASE
-                WHEN ii.tracking_mode = 'bulk'
-                THEN ii.quantity - ii.reserved
-                ELSE COUNT(*) FILTER (
-                    WHERE iu.status = 'available'
-                )::int
-            END AS available_units
+            ii.created_at,
+            ii.updated_at,
 
-        FROM inventory_units iu
-        WHERE iu.inventory_item_id = ii.id
-    ) stock ON TRUE
+            l.id AS listing_id,
+            l.title AS listing_title,
+            l.condition AS listing_condition,
 
-    WHERE ${where.join(' AND ')}
+            lv.sku AS listing_sku,
+            lv.product_variant_id,
 
-    ORDER BY ${orderBy}
+            (
+                SELECT lvm.storage_key
+                FROM listing_variants_media lvm
+                WHERE lvm.listing_variant_id = lv.id
+                AND lvm.is_primary = TRUE
+                LIMIT 1
+            ) AS listing_image
 
-    LIMIT $${params.length + 1}
-    OFFSET $${params.length + 2}
-    `, [...params, limit, offset]);
+        FROM inventory_items ii
+
+        JOIN listing_variants lv
+            ON lv.id = ii.listing_variant_id
+
+        JOIN listings l
+            ON l.id = lv.listing_id
+
+        LEFT JOIN LATERAL (
+            SELECT
+                CASE
+                    WHEN ii.tracking_mode = 'bulk'
+                    THEN ii.quantity
+                    ELSE COUNT(*) FILTER (
+                        WHERE iu.status IN ('available', 'reserved')
+                    )::int
+                END AS total_units,
+
+                CASE
+                    WHEN ii.tracking_mode = 'bulk'
+                    THEN ii.reserved
+                    ELSE COUNT(*) FILTER (
+                        WHERE iu.status = 'reserved'
+                    )::int
+                END AS reserved_units,
+
+                CASE
+                    WHEN ii.tracking_mode = 'bulk'
+                    THEN ii.quantity - ii.reserved
+                    ELSE COUNT(*) FILTER (
+                        WHERE iu.status = 'available'
+                    )::int
+                END AS available_units
+
+            FROM inventory_units iu
+            WHERE iu.inventory_item_id = ii.id
+        ) stock ON TRUE
+
+            WHERE ${where.join(' AND ')}
+
+            ORDER BY ${orderBy}
+
+            LIMIT $${params.length + 1}
+            OFFSET $${params.length + 2}
+            `, [...params, limit, offset]);
 
         // Count matching inventory items for pagination.
         const { rows: [{ count }] } = await db.query(`
-    SELECT COUNT(*)::int AS count
+            SELECT COUNT(*)::int AS count
 
-    FROM inventory_items ii
+            FROM inventory_items ii
 
-    JOIN listing_variants lv
-        ON lv.id = ii.listing_variant_id
+            JOIN listing_variants lv
+                ON lv.id = ii.listing_variant_id
 
-    JOIN listings l
-        ON l.id = lv.listing_id
+            JOIN listings l
+                ON l.id = lv.listing_id
 
-    LEFT JOIN LATERAL (
-        SELECT
-            CASE
-                WHEN ii.tracking_mode = 'bulk'
-                THEN ii.quantity
-                ELSE COUNT(*) FILTER (
-                    WHERE iu.status IN ('available', 'reserved')
-                )::int
-            END AS total_units,
-            CASE
-                WHEN ii.tracking_mode = 'bulk'
-                THEN ii.quantity - ii.reserved
-                ELSE COUNT(*) FILTER (
-                    WHERE iu.status = 'available'
-                )::int
-            END AS available_units
-        FROM inventory_units iu
-        WHERE iu.inventory_item_id = ii.id
-    ) stock ON TRUE
+            LEFT JOIN LATERAL (
+                SELECT
+                    CASE
+                        WHEN ii.tracking_mode = 'bulk'
+                        THEN ii.quantity
+                        ELSE COUNT(*) FILTER (
+                            WHERE iu.status IN ('available', 'reserved')
+                        )::int
+                    END AS total_units,
+                    CASE
+                        WHEN ii.tracking_mode = 'bulk'
+                        THEN ii.quantity - ii.reserved
+                        ELSE COUNT(*) FILTER (
+                            WHERE iu.status = 'available'
+                        )::int
+                    END AS available_units
+                FROM inventory_units iu
+                WHERE iu.inventory_item_id = ii.id
+            ) stock ON TRUE
 
-    WHERE ${where.join(' AND ')}
-    `, params);
+            WHERE ${where.join(' AND ')}
+            `, params);
 
         const total = Number(count);
+        const totalPages = Math.max(1, Math.ceil(total / limit));
 
         return {
             data: rows,
             total,
             page,
             limit,
-            totalPages: Math.max(1, Math.ceil(total / limit)),
-            hasNextPage: offset + limit < total,
+            totalPages,
+            hasNextPage: page < totalPages,
             hasPreviousPage: page > 1,
         };
     }
@@ -2686,6 +2691,7 @@ class InventoryModel {
                 ii.inventory_id,
                 ii.listing_variant_id,
                 ii.quantity,
+                ii.reserved,
                 ii.tracking_mode,
                 ii.batch_number,
                 ii.mfg_at,
@@ -2779,6 +2785,7 @@ class InventoryModel {
     // }
 
     static async getUnitById(unitId) {
+
         const { rows } = await db.query(`
         SELECT
             u.id,

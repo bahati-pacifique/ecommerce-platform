@@ -803,15 +803,6 @@
         const delta = editor.clipboard.convert({ html: desc });
         if (desc) {
             editor.setContents(delta, 'api');
-
-            //els.detailDescription.classList.remove('text-ink-400');
-            // requestAnimationFrame(() => {
-            //     const overflowing = els.detailDescription.scrollHeight > els.detailDescription.clientHeight + 4;
-            //     els.toggleDescriptionBtn.classList.toggle('hidden', !overflowing);
-            //     els.toggleDescriptionBtn.textContent = 'Expand';
-            //     els.detailDescription.dataset.expanded = 'false';
-            //     els.detailDescription.classList.add('max-h-40');
-            // });
         } else {
             editor.setContents('<em class="text-ink-400">No description</em>');
             els.toggleDescriptionBtn.classList.add('hidden');
@@ -1045,7 +1036,6 @@
 
     if (!waveEmoji) return;
 
-    // Respect reduced-motion preferences
     const prefersReducedMotion = window.matchMedia(
         '(prefers-reduced-motion: reduce)'
     );
@@ -1053,21 +1043,15 @@
     if (prefersReducedMotion.matches) return;
 
     function wave() {
-        // Restart animation
         waveEmoji.classList.remove('is-waving');
 
-        // Force browser to restart animation
         void waveEmoji.offsetWidth;
 
         waveEmoji.classList.add('is-waving');
     }
 
-    // Wave shortly after page load
     setTimeout(wave, 500);
-
-    // Repeat every 8 seconds
     setInterval(wave, 8000);
-
     ImageSearch.init();
     showDetailState('empty');
     loadList();

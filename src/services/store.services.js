@@ -727,13 +727,23 @@ class StoreService {
         return result;
     }
 
+    static async getListingsByInventoryId(opts) {
+        return await StoreDashboardModel.getListingsByInventoryId(opts);
+    }
+
     static async transferUnit(unitId, destinationInventoryId, userId) {
         const result = await StoreModel.transferUnit(unitId, destinationInventoryId, userId);
 
         return result;
     }
 
-
+    static async transferBulkQuantity(
+        sourceItemId,
+        destinationInventoryId,
+        quantity,
+        userId,) {
+        return await StoreModel.transferBulkQuantity({ sourceItemId, destinationInventoryId, quantity, userId })
+    }
 
 }
 

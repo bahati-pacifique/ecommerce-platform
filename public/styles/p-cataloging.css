@@ -368,13 +368,13 @@ body {
     overflow-y: hidden;
 }
 
-/* .quill-wrapper .ql-container.ql-snow {
+.quill-wrapper .ql-container.ql-snow {
     border: none !important;
     font-family: inherit;
     font-size: 14px;
-    min-height: 200px;
+    min-height: 300px;
     max-width: 100%;
-} */
+}
 
 .quill-wrapper .ql-toolbar.ql-snow {
     border: none !important;
@@ -407,12 +407,8 @@ body {
     color: #ED1B24;
 }
 
-.quill-wrapper .ql-container.ql-snow {
-    min-height: 350px;
-}
-
 .quill-wrapper .ql-editor {
-    min-height: 350px;
+    min-height: 300px;
     padding: 16px;
     line-height: 1.65;
     overflow-y: visible; /* Make — Let it grow instead of scrolling */

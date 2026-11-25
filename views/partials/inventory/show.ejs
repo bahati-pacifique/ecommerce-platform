@@ -3,6 +3,7 @@
   const loc = data.location || {};
   const st = data.stats    || {};
   const itms = Array.isArray(data.items) ? data.items : [];
+  const limit = 5;
   const pag = data.pagination || { page: 1, limit: 20, total: 0, totalPages: 1, hasNextPage: false, hasPreviousPage: false };
 
   const fmtNum = (n) => n == null || n === '' ? '0' : Number(n).toLocaleString('en-US');
@@ -85,7 +86,7 @@
 
 </div>
 
-<div class="relative mt-6 rounded-xl border border-slate-200 bg-white shadow-sm">
+<div class="relative mt-6 mb-3 rounded-xl border border-slate-200 bg-white shadow-sm">
   <div class="border-b border-slate-100 p-5">
     <h2 class="font-semibold">Items in this Inventory</h2>
   </div>
@@ -168,6 +169,11 @@
                   <span>Release Quantity</span>
                   <i data-lucide="layers-plus" class="h-4 w-4"></i>
                 </button>`,
+                `<button data-action="transfer" data-inventory-id="${inventory.id}" data-store-id="${store.id}" data-item-id="${item.id}" transfer-item class="${(item.tracking_mode === 'bulk') ? 'flex' : 'hidden'} 
+                  w-full items-center gap-2 rounded-md px-3 py-2 text-left text-sm text-slate-700 hover:bg-slate-100 hover:text-brand add-quantity-btn">
+                  <span>Transfer Quantity</span>
+                  <i data-lucide="arrow-right-left" class="h-4 w-4"></i>
+                </button>`,
                 `<a href="/stores/${store.id}/listings/${item.listing?.id}/review" target="_blank" data-item-id="${item.id}" data-unit-pricing class="w-full flex items-center gap-2 rounded-md px-3 py-2 text-left text-sm text-slate-700 hover:bg-slate-100 hover:text-brand">
                   <span>View Listing</span>
                   <i data-lucide="arrow-right" class="h-4 w-4"></i>
@@ -183,8 +189,13 @@
   </div>
 
   <% if (pag.total > 0) { %>
-  <div class="border-t border-slate-100 p-4 text-sm text-slate-500">
-    Showing <%= (pag.page - 1) * pag.limit + 1 %>-<%= Math.min(pag.page * pag.limit, pag.total) %> of <%= pag.total %>
+  <div class="border-t border-slate-100 p-4 text-sm text-slate-500 flex items-center justify-between">
+    <span>Showing <%= (pag.page - 1) * pag.limit + 1 %>-<%= Math.min(pag.page * pag.limit, pag.total) %> of <%= pag.total %></span>
+    <div class="flex items-center gap-2 md:gap-3">
+      <a href="/inventories/<%=inventory.id%>/<%=store.id%>/overview?limit=<%-limit%>&page=<%-(Number(pag.page)-1)%>"  class="rounded-lg border px-4 py-1.5 <%-!pag.hasPreviousPage ? 'hidden' : 'hover:bg-slate-50'%>" <%-!pag.hasPreviousPage ? 'disabled' : ''%>>Prev</a>
+      <span>Page <%-pag.page%> of <%-pag.totalPages%></span>
+      <a href="/inventories/<%=inventory.id%>/<%=store.id%>/overview?limit=<%-limit%>&page=<%-(Number(pag.page)+1)%>" class="rounded-lg border px-4 py-1.5 <%-!pag.hasNextPage ? 'hidden' : 'hover:bg-slate-50'%>" <%-!pag.hasNextPage ? 'disabled' : ''%>>Next</a>
+    </div>
   </div>
   <% } %>
 </div>
@@ -194,3 +205,4 @@
 <%- include('./_add-item-modal', { store, inventory }) %>
 <%- include('./_unit-add-modal', { store, inventory }) %>
 <%- include('./_adjust-quantity-modal', { store, inventory }) %>
+<%- include('./_bulk-transfer-modal', { store, inventory }) %>

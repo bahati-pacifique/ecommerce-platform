@@ -45,12 +45,14 @@ router.post('/inventories/:inventoryId/:storeId/items', business, businessContro
 router.get('/inventories/units/:storeId/:unitId', business, businessController.getItemUnit);
 router.get('/inventories/:inventoryId/:storeId/items/:itemId', business, businessController.getInventoryItem);
 router.patch('/inventories/units/:unitId/:inventoryId/:storeId/transfer', business, businessController.transferUnit);
+router.put('/inventories/:inventoryId/:storeId/transfer-bulk', business, businessController.transferBulkQuantity);
 
 router.patch('/inventories/units/:unitId/:inventoryId/:storeId/patch', business, businessController.patchUnit);
 
 router.get('/stores/:storeId/data/analytics', business, businessController.getStoreDashboardAnalytics);
 router.get('/stores/:storeId/data/product-listing/analytics', business, businessController.getStoreListingProductAnalytics);
 router.get('/stores/:storeId/data/product-listing/inventories', business, businessController.getInventoriesByStoreId);
+router.get('/stores/:storeId/data/product-listing/inventories/:inventoryId', business, businessController.getListingsByInventoryId);
 router.get('/stores/:storeId/listings', business, businessController.getStoreListings);
 
 router.get('/stores/:storeId/listings/:listingId/review', business, businessController.renderListingPage);

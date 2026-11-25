@@ -9,18 +9,36 @@ document.addEventListener('DOMContentLoaded', () => {
     return;
   }
 
-  // ═══════════════════════════════════════════════════════════
-  // CONSTANTS
-  // ═══════════════════════════════════════════════════════════
   const MAX_IMAGES_PER_VARIANT = 8;
   const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
   const MAX_VIDEO_SECONDS = 60;
   const MAX_VIDEO_BYTES = 50 * 1024 * 1024;
 
-  // ═══════════════════════════════════════════════════════════
-  // TEMPORAL ID GENERATOR
-  // ═══════════════════════════════════════════════════════════
   const _idState = { lastMs: 0, counter: 0 };
+
+  const quill = new Quill('#descriptionInput', {
+    theme: 'snow',
+    placeholder: 'Describe your listing — What actually it is, operational, conditional, appearance, what is inside the package etc... .',
+    modules: {
+      toolbar: [
+        [{
+          header: [1, 2, 3, 4, 5, 6, false]
+        }],
+        ['bold', 'italic', 'underline'],
+        [{
+          list: 'ordered'
+        }, {
+          list: 'bullet'
+        }],
+        ['link'],
+        ['clean']
+      ]
+    }
+  });
+
+  // const Size = Quill.import('attributors/style/size');
+  // Size.whitelist = ['12px', '14px', '16px', '18px', '24px'];
+  // Quill.register(Size, true);
 
   function generateId(prefix = 'tmp') {
     const now = Date.now();
@@ -34,9 +52,6 @@ document.addEventListener('DOMContentLoaded', () => {
     return `${prefix}-${now.toString(36)}-${_idState.counter}-${rnd}`;
   }
 
-  // ═══════════════════════════════════════════════════════════
-  // STATE
-  // ═══════════════════════════════════════════════════════════
   const state = {
     tab: 'welcome',
     product: null,
@@ -47,15 +62,16 @@ document.addEventListener('DOMContentLoaded', () => {
       condition: 'new',
       status: 'active',
       meta: {},
-      video: null,           // { file, previewUrl, duration }
+      video: null,
     },
-    variants: [],            // [{ tempId, catalogVariantId, catalogVariant, sku, price, salePrice, images: [{ id, file, previewUrl, isPrimary }] }]
+    variants: [],
     submitting: false,
   };
 
-  // ═══════════════════════════════════════════════════════════
-  // ELEMENT REFS
-  // ═══════════════════════════════════════════════════════════
+  quill.on('text-change', () => {
+    state.details.description = quill.root.innerHTML;
+  });
+
   const form = document.getElementById('createListingForm');
   const errorBox = document.getElementById('formError');
   const submitBtn = document.getElementById('submitBtn');
@@ -219,10 +235,6 @@ document.addEventListener('DOMContentLoaded', () => {
     searchTimer = setTimeout(() => searchProducts(q), 250);
   });
 
-
-  // ═══════════════════════════════════════════════════════════
-  // IMAGE SEARCH
-  // ═══════════════════════════════════════════════════════════
   const imageSearchButton = document.getElementById('imageSearchButton');
   const imageSearchInput = document.getElementById('imageSearchInput');
   const imageSearchPreview = document.getElementById('imageSearchPreview');
@@ -418,8 +430,7 @@ document.addEventListener('DOMContentLoaded', () => {
           </div>
           ${similarityPct !== null ? `
             <div class="mt-1 inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-semibold text-emerald-700">
-              <i data-lucide="sparkles" class="h-2.5 w-2.5"></i>
-              ${similarityPct}% match
+              ${similarityPct}% similar
             </div>
           ` : ''}
         </div>
@@ -488,7 +499,6 @@ document.addEventListener('DOMContentLoaded', () => {
     try {
       const res = await axios.get(`/products/${productId}/variants`, { withCredentials: true });
       state.catalogVariants = res.data?.data || res.data || [];
-      console.log('[catalog variants] loaded:', state.catalogVariants.length);
     } catch (err) {
       console.error('[catalog variants] failed:', err);
       state.catalogVariants = [];
@@ -529,19 +539,16 @@ document.addEventListener('DOMContentLoaded', () => {
     validateSubmit();
   });
 
-  // ═══════════════════════════════════════════════════════════
-  // DETAILS — live sync to state
-  // ═══════════════════════════════════════════════════════════
+
   titleInput.addEventListener('input', (e) => {
     state.details.title = e.target.value;
     validateSubmit();
   });
-  descriptionInput.addEventListener('input', (e) => {
-    state.details.description = e.target.value;
-  });
+
   conditionInput.addEventListener('change', (e) => {
     state.details.condition = e.target.value;
   });
+
   statusInput.addEventListener('change', (e) => {
     state.details.status = e.target.value;
   });
@@ -1032,48 +1039,80 @@ document.addEventListener('DOMContentLoaded', () => {
             ${_fmt(parseFloat(v.price) || 0, currency)}
           </div>
         </div>
-        <!--<div class="mt-1 flex items-center gap-3 text-xs text-slate-500">
+        <div class="mt-1 flex items-center gap-3 text-xs text-slate-500">
           <span>SKU: ${escapeHtml(v.sku || '—')}</span>
           <span>${v.images.length} image${v.images.length === 1 ? '' : 's'}</span>
           ${v.salePrice ? `<span class="text-emerald-600 font-medium">Sale: ${_fmt(parseFloat(v.salePrice), currency)}</span>` : ''}
-        </div>--!>
+        </div>
       </div>
     `).join('');
 
-    reviewSummary.innerHTML = `
-      <div class="rounded-lg border border-slate-200 bg-slate-50 p-4">
-        <div class="text-[10px] font-bold uppercase tracking-wider text-slate-500">Product</div>
-        <div class="mt-1 flex items-center gap-3">
-          ${state.product.primary_image
+    // reviewSummary.innerHTML = `
+      
+
+    //   <div class="rounded-lg border border-slate-200 bg-slate-50 p-4">
+    //     <div class="text-[10px] font-bold uppercase tracking-wider text-slate-500">Listing</div>
+    //     <div class="mt-1 text-sm font-medium text-slate-900">${escapeHtml(d.title || '—')}</div>
+    //     <div class="mt-1 text-xs text-slate-500" id="editorReview"><!--QUILL PREVIEW-->
+    //       ${d.description || 'No description'}
+    //     </div>
+    //     <div class="mt-2 flex flex-wrap gap-2">
+    //       <span class="rounded-full bg-white px-2 py-0.5 text-[10px] font-semibold text-slate-600 ring-1 ring-slate-200">${escapeHtml(d.condition)}</span>
+    //       <span class="rounded-full bg-white px-2 py-0.5 text-[10px] font-semibold text-slate-600 ring-1 ring-slate-200">${escapeHtml(d.status)}</span>
+    //       ${d.video ? `<span class="rounded-full bg-[var(--color-brand-ultralight)] px-2 py-0.5 text-[10px] font-semibold text-[var(--color-brand-dark)] ring-1 ring-[var(--color-brand)]/30">1 video</span>` : ''}
+    //     </div>
+    //   </div>
+
+    //   <div>
+    //     <div class="mb-2 text-[10px] font-bold uppercase tracking-wider text-slate-500">
+    //       Variants (${state.variants.length})
+    //     </div>
+    //     <div class="space-y-2">${variantsHtml}</div>
+    //   </div>
+    // `;
+
+    document.getElementById('productSummary').innerHTML = `
+      <div class="mt-1 flex items-center gap-3">
+        ${state.product.primary_image
         ? `<img src="${cdnBase}/${escapeHtml(state.product.primary_image)}" class="h-12 w-12 rounded-lg object-cover ring-1 ring-slate-200" />`
         : ''}
-          <div>
-            <div class="text-sm font-medium text-slate-900">${escapeHtml(state.product.title)}</div>
-            <div class="text-xs text-slate-500">
-              ${[state.product.brand, state.product.category].filter(Boolean).map(escapeHtml).join(' · ')}
-            </div>
+        <div>
+          <div class="text-sm font-medium text-slate-900">${escapeHtml(state.product.title)}</div>
+          <div class="text-xs text-slate-500">
+            ${[state.product.brand, state.product.category].filter(Boolean).map(escapeHtml).join(' · ')}
           </div>
         </div>
-      </div>
+      </div>`;
 
-      <div class="rounded-lg border border-slate-200 bg-slate-50 p-4">
-        <div class="text-[10px] font-bold uppercase tracking-wider text-slate-500">Listing</div>
-        <div class="mt-1 text-sm font-medium text-slate-900">${escapeHtml(d.title || '—')}</div>
-        <div class="mt-1 text-xs text-slate-500">${escapeHtml(d.description || 'No description')}</div>
-        <div class="mt-2 flex flex-wrap gap-2">
-          <span class="rounded-full bg-white px-2 py-0.5 text-[10px] font-semibold text-slate-600 ring-1 ring-slate-200">${escapeHtml(d.condition)}</span>
+    document.getElementById('summaryTitle').innerHTML = escapeHtml(d.title || '—');
+    //document.getElementById('summaryDescription').innerHTML = d.description || 'No description';
+
+    document.getElementById('summaryTagVideo').innerHTML = `<span class="rounded-full bg-white px-2 py-0.5 text-[10px] font-semibold text-slate-600 ring-1 ring-slate-200">${escapeHtml(d.condition)}</span>
           <span class="rounded-full bg-white px-2 py-0.5 text-[10px] font-semibold text-slate-600 ring-1 ring-slate-200">${escapeHtml(d.status)}</span>
           ${d.video ? `<span class="rounded-full bg-[var(--color-brand-ultralight)] px-2 py-0.5 text-[10px] font-semibold text-[var(--color-brand-dark)] ring-1 ring-[var(--color-brand)]/30">1 video</span>` : ''}
-        </div>
-      </div>
+    `;
 
-      <div>
-        <div class="mb-2 text-[10px] font-bold uppercase tracking-wider text-slate-500">
+    document.getElementById('summaryVariants').innerHTML = `<div class="mb-2 text-[10px] font-bold uppercase tracking-wider text-slate-500">
           Variants (${state.variants.length})
         </div>
-        <div class="space-y-2">${variantsHtml}</div>
-      </div>
-    `;
+    <div class="space-y-2">${variantsHtml}</div>`;
+
+    const editor = new Quill('#summaryDescription', {
+      readOnly: true,
+      theme: 'snow',
+      modules: {
+        toolbar: false
+      }
+    });
+
+    const desc = state.details.description || '';
+    const delta = editor.clipboard.convert({ html: desc });
+    if (desc) {
+      editor.setContents(delta, 'api');
+    } else {
+      editor.setContents('<em class="text-ink-400">No description</em>');
+      els.toggleDescriptionBtn.classList.add('hidden');
+    }
 
     window.lucide?.createIcons();
   }
@@ -1215,13 +1254,8 @@ document.addEventListener('DOMContentLoaded', () => {
         },
       });
 
-      const listing = res.data?.data;
-      
-      //Handle response....
-      if (!listing?.id) throw new Error('No listing ID returned');
-
       setSubmitState('done');
-      window.location.href = `/stores/${storeId}/listings/${listing.id}`;
+      window.location.href = `/stores/${storeId}/listings/`;
 
     } catch (err) {
       console.error('[submit] failed:', err);
@@ -1253,8 +1287,6 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function logFormData(fd, label = 'FormData') {
-    console.group(`[${label}]`);
-    console.log('Entries:', [...fd.entries()].length);
 
     const grouped = {
       text: {},
@@ -1284,9 +1316,9 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
 
-    console.log('Text fields:', grouped.text);
-    console.log('Files:', grouped.files);
-    console.groupEnd();
+    // console.log('Text fields:', grouped.text);
+    // console.log('Files:', grouped.files);
+    // console.groupEnd();
   }
 
   // ═══════════════════════════════════════════════════════════

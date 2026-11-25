@@ -56,7 +56,7 @@ class AuthService {
                 preauth
             };
         } catch (error) {
-            console.log("login() ", error);
+            console.error("login() ", error);
             if (error.code === '23505' && error.constraint === 'uniq_unused_preauth_per_user' && user) {
 
                 const preauth = await authModel.getUnusedPreauthByUser(user.id);
@@ -110,7 +110,7 @@ class AuthService {
                     preauth
                 };
             }
-            console.log("auth.service: login()", error.message)
+            console.error("auth.service: login()", error.message)
             throw new Error(error.message || 'Something went wrong — Please to login again')
         }
     }
@@ -132,7 +132,7 @@ class AuthService {
             const result = await sessionModel.create(payload);
             return result;
         } catch (error) {
-            console.log(error)
+            console.error(error)
             return null;
         }
     }
@@ -178,7 +178,7 @@ class AuthService {
                         user.vendor = vendorResult;
                     }
                 } catch (error) {
-                    console.log('Error getting vendor: ', error);
+                    console.error('Error getting vendor: ', error);
                 }
 
             }
@@ -190,7 +190,7 @@ class AuthService {
             }
 
         } catch (error) {
-            console.log(error)
+            console.error(error)
             return {
                 success: false,
                 message: 'Internal Error'
@@ -203,7 +203,7 @@ class AuthService {
             const accounts = await authModel.getUserAccounts(userId, { onlyValid: true });
             return accounts;
         } catch (error) {
-            console.log(error);
+            console.error(error);
 
             return null;
         }
@@ -265,7 +265,7 @@ class AuthService {
                         userAccount.vendor = vendorResult;
                     }
                 } catch (error) {
-                    console.log('Error getting vendor: ', error);
+                    console.error('Error getting vendor: ', error);
                 }
 
             }
@@ -278,7 +278,7 @@ class AuthService {
 
 
         } catch (error) {
-            console.log(error);
+            console.error(error);
             return {
                 success: false,
                 message: 'Failed: There was an internal error'
@@ -317,7 +317,7 @@ class AuthService {
             const session = await sessionModel.invalidateAllForUser(userAccount);
             return session;
         } catch (error) {
-            console.log(error);
+            console.error(error);
         }
     }
 

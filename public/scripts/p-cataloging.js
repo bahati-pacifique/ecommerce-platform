@@ -588,6 +588,7 @@ const Wizard = {
         ]
       }
     });
+
     this.quill = quill;
 
     if (p.description) quill.clipboard.dangerouslyPasteHTML(p.description);
@@ -2099,19 +2100,10 @@ const Wizard = {
     try {
       const fd = this._buildSubmissionFormData();
 
-      // Log for debugging — remove before shipping
-      for (const [k, v] of fd.entries()) console.log(k, v);
-
-      // const res = await Api.post('/cataloging/product', null, {
-      //   raw: true,
-      //   data: fd
-      // });
-
       const res = await axios.post(`${CFG.protocal}business.${CFG.domainName}/cataloging/product`, fd, {
         withCredentials: true
       });
 
-      console.log('[cataloging] submit response', res);
       this.renderSuccess(res);
 
     } catch (err) {
@@ -2131,7 +2123,7 @@ const Wizard = {
 
     const product = response?.product || response?.data || response || {};
     const productId = product.id || '';
-    const productSlug = product.slug || State.product.slug;
+    //const productSlug = product.slug || State.product.slug;
 
     document.getElementById('wizardBody').innerHTML = `
           <div class="max-w-lg mx-auto text-center py-10 fade-in">

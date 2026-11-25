@@ -199,7 +199,9 @@ async function renderStoreDashboardWelcome(req, res) {
             });
         }
         res.locals.layout = 'store-center';
-        updateStoreLastActive(vendorStore.id);
+        updateStoreLastActive(vendorStore.id).catch((err) => {
+            console.error('[inventory/index] updateStoreLastActive failed:', err);
+        });
         return res.render('store-partials/welcome', { layout: 'store-center', store: vendorStore, user, protocal, domainName, title: 'dashboard-welcome' });
     } catch (error) {
         console.error(error);
@@ -232,8 +234,11 @@ async function renderStoreInventory(req, res) {
                 domainName
             });
         }
-        res.locals.layout = 'store-center';
-        updateStoreLastActive(vendorStore.id);
+
+        updateStoreLastActive(vendorStore.id).catch((err) => {
+            console.error('[inventory/index] updateStoreLastActive failed:', err);
+        });
+
         return res.render('store-partials/inventory', { layout: 'store-center', store: vendorStore, user, protocal, domainName, title: 'inventory' });
     } catch (error) {
         console.error(error);
@@ -270,7 +275,9 @@ async function renderInventoryHome(req, res) {
         }
         res.locals.layout = 'inventory-center';
         const inventory = await InventoryService.getInventoryById(inventoryId, vendorStore.id);
-        updateStoreLastActive(vendorStore.id);
+        updateStoreLastActive(vendorStore.id).catch((err) => {
+            console.error('[inventory/index] updateStoreLastActive failed:', err);
+        });
         const welcomeAlert = `<span class="font-bold">Hi, ${user.username}!</span> Please click on 'Quick actions' button for navigations.`;
         return res.render('store-partials/welcome', {
             layout: 'inventory-center',
@@ -297,31 +304,254 @@ async function renderInventoryHome(req, res) {
     }
 }
 
+// async function renderInventoryOverview(req, res) {
+//     const user = req.user;
+//     const { storeId, inventoryId } = req.params;
+//     const {
+//         page = 1,
+//         limit = 100,
+//         search = '',
+//         status = '',
+//         sort = 'updated_desc',
+//     } = req.query;
+
+//     try {
+//         // --- Auth guard ---
+//         if (!user) {
+//             return res.status(401).render('store-no-access', {
+//                 layout: false,
+//                 message: 'You must be signed in to view this page.',
+//                 details: '',
+//                 code: 'UNAUTHENTICATED',
+//                 protocal,
+//                 domainName,
+//             });
+//         }
+
+//         const pageNum = Math.max(1, parseInt(page, 10) || 1);
+//         const limitNum = Math.min(500, Math.max(1, parseInt(limit, 10) || 100));
+
+//         const vendorId = user.vendor?.id ?? null;
+//         if (vendorId === null) {
+//             return res.status(403).render('store-no-access', {
+//                 layout: false,
+//                 message: `<span class="text-black/70">Oops!</span> <span class="text-brand">${user.username}</span>, we're unable to get you authenticated to this Store.`,
+//                 details: `<h1 class="text-left text-ink-700 text-lg">It's seems like:</h1><p class="text-sm sm:text-base text-left text-ink-500 leading-relaxed"><br>● This store does not belongs to you, <br>● This store have been disabled or does not exist. <br><br><i>Please contact our support team for clarification</i></p>`,
+//                 code: 'STORE_NOT_FOUND',
+//                 protocal,
+//                 domainName,
+//             });
+//         }
+
+//         const vendorStore = await StoreService.getVendorStore(storeId, vendorId);
+
+//         if (!vendorStore) {
+//             return res.status(404).render('store-no-access', {
+//                 layout: false,
+//                 message: `<span class="text-black/70">Oops!</span> <span class="text-brand">${user.username}</span>, we're unable to get you authenticated to this Store.`,
+//                 details: `<h1 class="text-left text-ink-700 text-lg">It's seems like:</h1><p class="text-sm sm:text-base text-left text-ink-500 leading-relaxed"><br>● This store does not belongs to you, <br>● This store have been disabled or does not exist. <br><br><i>Please contact our support team for clarification</i></p>`,
+//                 code: 'STORE_NOT_FOUND',
+//                 protocal,
+//                 domainName,
+//             });
+//         }
+
+//         const inventory = await InventoryService.getInventoryById(inventoryId, vendorStore.id);
+//         if (!inventory) {
+//             return res.status(404).render('store-no-access', {
+//                 layout: false,
+//                 message: 'Inventory not found.',
+//                 details: `<p class="text-sm sm:text-base text-left text-ink-500 leading-relaxed">This inventory may have been deleted, or it does not belong to this store.</p>`,
+//                 code: 'INVENTORY_NOT_FOUND',
+//                 protocal,
+//                 domainName,
+//             });
+//         }
+
+//         updateStoreLastActive(vendorStore.id).catch((err) => {
+//             console.error('[inventory/index] updateStoreLastActive failed:', err);
+//         });
+
+//         let data = await InventoryService.getInventoryDetail(vendorStore.id, inventoryId, {
+//             page: pageNum,
+//             limit: limitNum,
+//             search,
+//             status,
+//             sort,
+//         });
+
+//         // --- Out-of-range page: re-fetch clamped to the last valid page ---
+//         const totalPages = data?.pagination?.totalPages ?? 0;
+//         const isEmpty = Array.isArray(data?.items) ? data.items.length === 0 : true;
+
+//         if (isEmpty && pageNum > totalPages) {
+//             const targetPage = Math.min(totalPages, 1); // nearest valid page (1 if none)
+
+//             data = await InventoryService.getInventoryDetail(vendorStore.id, inventoryId, {
+//                 page: targetPage,
+//                 limit: limitNum,
+//                 search,
+//                 status,
+//                 sort,
+//             });
+//         }
+
+
+//         if (acceptsHtml(req)) {
+//             return res.render('partials/inventory/show', {
+//                 layout: 'inventory-center',
+//                 store: vendorStore,
+//                 inventory,
+//                 user,
+//                 protocal,
+//                 domainName,
+//                 title: 'Inventory Overview',
+//                 data,
+//             });
+//         }
+
+//         return res.json(data);
+
+//     } catch (err) {
+//         console.error('[inventory/index] failed:', {
+//             error: err,
+//             storeId,
+//             inventoryId,
+//             userId: user?.id,
+//         });
+
+//         return res.status(500).render('partials/inventory/inventory-overview', {
+//             layout: 'inventory-center',
+//             protocal,
+//             domainName,
+//             title: 'Inventory Overview',
+//             ...InventoryService.emptyInventoryOverview(),
+//         });
+//     }
+// }
+
 async function renderInventoryOverview(req, res) {
     const user = req.user;
     const { storeId, inventoryId } = req.params;
+    const {
+        page = 1,
+        limit = 100,
+        search = '',
+        status = '',
+        sort = 'updated_desc',
+    } = req.query;
+
+    const wantsHtml = acceptsHtml(req);
+
     try {
 
-        const vendorStore = await StoreService.getVendorStore(storeId, user.vendor?.id || null);
+        if (!user) {
+            if (!wantsHtml) {
+                return res.status(401).json({ error: 'UNAUTHENTICATED', message: 'You must be signed in.' });
+            }
+            return res.status(401).render('store-no-access', {
+                layout: false,
+                message: 'You must be signed in to view this page.',
+                details: '',
+                code: 'UNAUTHENTICATED',
+                protocal,
+                domainName,
+            });
+        }
 
-        if (!vendorStore) {
-            return res.render('store-no-access', {
+        const pageNum = Math.max(1, parseInt(page, 10) || 1);
+        const limitNum = Math.min(500, Math.max(1, parseInt(limit, 10) || 100));
+
+        const vendorId = user.vendor?.id ?? null;
+        if (vendorId === null) {
+            if (!wantsHtml) {
+                return res.status(403).json({ error: 'STORE_NOT_FOUND', message: 'No vendor associated with this account.' });
+            }
+            return res.status(403).render('store-no-access', {
                 layout: false,
                 message: `<span class="text-black/70">Oops!</span> <span class="text-brand">${user.username}</span>, we're unable to get you authenticated to this Store.`,
                 details: `<h1 class="text-left text-ink-700 text-lg">It's seems like:</h1><p class="text-sm sm:text-base text-left text-ink-500 leading-relaxed"><br>● This store does not belongs to you, <br>● This store have been disabled or does not exist. <br><br><i>Please contact our support team for clarification</i></p>`,
                 code: 'STORE_NOT_FOUND',
                 protocal,
-                domainName
+                domainName,
             });
         }
 
-        res.locals.layout = 'inventory-center';
+        const vendorStore = await StoreService.getVendorStore(storeId, vendorId);
+        if (!vendorStore) {
+            if (!wantsHtml) {
+                return res.status(404).json({ error: 'STORE_NOT_FOUND', message: 'Store not found or not accessible.' });
+            }
+            return res.status(404).render('store-no-access', {
+                layout: false,
+                message: `<span class="text-black/70">Oops!</span> <span class="text-brand">${user.username}</span>, we're unable to get you authenticated to this Store.`,
+                details: `<h1 class="text-left text-ink-700 text-lg">It's seems like:</h1><p class="text-sm sm:text-base text-left text-ink-500 leading-relaxed"><br>● This store does not belongs to you, <br>● This store have been disabled or does not exist. <br><br><i>Please contact our support team for clarification</i></p>`,
+                code: 'STORE_NOT_FOUND',
+                protocal,
+                domainName,
+            });
+        }
 
         const inventory = await InventoryService.getInventoryById(inventoryId, vendorStore.id);
+        if (!inventory) {
+            if (!wantsHtml) {
+                return res.status(404).json({ error: 'INVENTORY_NOT_FOUND', message: 'Inventory not found for this store.' });
+            }
+            return res.status(404).render('store-no-access', {
+                layout: false,
+                message: 'Inventory not found.',
+                details: `<p class="text-sm sm:text-base text-left text-ink-500 leading-relaxed">This inventory may have been deleted, or it does not belong to this store.</p>`,
+                code: 'INVENTORY_NOT_FOUND',
+                protocal,
+                domainName,
+            });
+        }
 
-        updateStoreLastActive(vendorStore.id);
+        updateStoreLastActive(vendorStore.id).catch((err) => {
+            console.error('[inventory/index] updateStoreLastActive failed:', err);
+        });
 
-        const data = await InventoryService.getInventoryDetail(vendorStore.id, inventoryId);
+        let data = await InventoryService.getInventoryDetail(vendorStore.id, inventoryId, {
+            page: pageNum,
+            limit: limitNum,
+            search,
+            status,
+            sort,
+        });
+
+        const totalPages = data?.pagination?.totalPages ?? 0;
+        const isEmpty = Array.isArray(data?.items) ? data.items.length === 0 : true;
+        const wasClamped = isEmpty && pageNum > totalPages;
+
+        if (wasClamped) {
+            const targetPage = Math.max(1, totalPages);
+            data = await InventoryService.getInventoryDetail(vendorStore.id, inventoryId, {
+                page: targetPage,
+                limit: limitNum,
+                search,
+                status,
+                sort,
+            });
+        }
+
+        if (!wantsHtml) {
+            return res.json({
+                store: {
+                    id: vendorStore.id,
+                    name: vendorStore.name,
+                },
+                inventory,
+                data,
+                meta: {
+                    requestedPage: pageNum,
+                    returnedPage: data?.pagination?.page ?? pageNum,
+                    ...(wasClamped && {
+                        clamped: true,
+                        note: `Requested page ${pageNum} exceeds total pages (${totalPages}); returned page ${Math.max(1, totalPages)}.`,
+                    }),
+                },
+            });
+        }
 
         return res.render('partials/inventory/show', {
             layout: 'inventory-center',
@@ -331,12 +561,27 @@ async function renderInventoryOverview(req, res) {
             protocal,
             domainName,
             title: 'Inventory Overview',
-            data
+            data,
+            wasClamped,
         });
-    } catch (err) {
-        console.error('[inventory/index] failed:', err);
 
-        res.render('partials/inventory/inventory-overview', {
+    } catch (err) {
+        console.error('[inventory/index] failed:', {
+            error: err,
+            storeId,
+            inventoryId,
+            userId: user?.id,
+            wantsHtml,
+        });
+
+        if (!wantsHtml) {
+            return res.status(500).json({
+                error: 'INTERNAL_ERROR',
+                message: 'Failed to load inventory overview.',
+            });
+        }
+
+        return res.status(500).render('partials/inventory/inventory-overview', {
             layout: 'inventory-center',
             protocal,
             domainName,
@@ -372,7 +617,9 @@ async function renderInventoryUnit(req, res) {
 
         const inventory = await InventoryService.getInventoryById(inventoryId, vendorStore.id);
 
-        updateStoreLastActive(vendorStore.id);
+        updateStoreLastActive(vendorStore.id).catch((err) => {
+            console.error('[inventory/index] updateStoreLastActive failed:', err);
+        });
 
         const result = await InventoryService.listUnitsByInventory(inventory.id, {
             page,
@@ -862,7 +1109,9 @@ async function renderStoreDashboard(req, res) {
         const data = await StoreService.getDashboard({ storeId: vendorStore.id, period: '7d' });
 
         res.locals.layout = 'store-center';
-        updateStoreLastActive(vendorStore.id);
+        updateStoreLastActive(vendorStore.id).catch((err) => {
+            console.error('[inventory/index] updateStoreLastActive failed:', err);
+        });
 
         return res.render('store-partials/dashboard', { layout: 'store-center', dashboard: data, store: vendorStore, user, protocal, domainName, title: 'home' });
     } catch (error) {
@@ -900,7 +1149,9 @@ async function renderStoreListing(req, res) {
 
         //Update store last active
         res.locals.layout = 'store-center';
-        updateStoreLastActive(vendorStore.id);
+        updateStoreLastActive(vendorStore.id).catch((err) => {
+            console.error('[inventory/index] updateStoreLastActive failed:', err);
+        });
         return res.render('store-partials/listings', { layout: 'store-center', store: vendorStore, user, protocal, domainName, title: 'listings' });
     } catch (error) {
         console.error(error);
@@ -936,8 +1187,10 @@ async function renderListingPage(req, res) {
         }
 
         //Update store last active
-        //res.locals.layout = 'store-center';
-        updateStoreLastActive(vendorStore.id);
+
+        updateStoreLastActive(vendorStore.id).catch((err) => {
+            console.error('[inventory/index] updateStoreLastActive failed:', err);
+        });
 
         return res.render('store-partials/listing', { listingId, layout: 'focused', store: vendorStore, user, protocal, domainName, title: 'listings' });
     } catch (error) {
@@ -973,7 +1226,9 @@ async function renderListingPricing(req, res) {
             });
         }
 
-        updateStoreLastActive(vendorStore.id);
+        updateStoreLastActive(vendorStore.id).catch((err) => {
+            console.error('[inventory/index] updateStoreLastActive failed:', err);
+        });
 
         return res.render('store-partials/listing-prices', {
             layout: 'focused',
@@ -1228,7 +1483,9 @@ async function renderStoreProducts(req, res) {
             });
         }
 
-        updateStoreLastActive(vendorStore.id);
+        updateStoreLastActive(vendorStore.id).catch((err) => {
+            console.error('[inventory/index] updateStoreLastActive failed:', err);
+        });
 
         return res.render('store-partials/products', {
             layout: 'store-center',
@@ -1283,7 +1540,8 @@ async function getStoreListingProductAnalytics(req, res) {
 async function getInventoriesByStoreId(req, res) {
     try {
         const storeId = req.params.storeId;
-        const { lowStockThreshold, search, status, stock, page, limit } = req.params;
+        const { lowStockThreshold = 10, search, status, stock, page, limit } = req.query;
+
         const user = req.user;
 
         const vendorStore = await StoreService.getVendorStore(
@@ -1299,12 +1557,57 @@ async function getInventoriesByStoreId(req, res) {
 
         const result = await StoreService.getInventoriesByStoreId({
             storeId,
-            search, status, stock, page, limit, lowStockThreshold
+            search,
+            status,
+            stock,
+            page,
+            limit,
+            lowStockThreshold
         });
 
         return res.json(result);
     } catch (error) {
         console.error('getInventoriesByStoreId()', error);
+        return res.status(500).json({ message: 'Internal Error — Unable to get listing analytic' });
+    }
+}
+
+async function getListingsByInventoryId(req, res) {
+    try {
+
+        /**
+         * storeId,
+        inventoryId,
+        page = 1,
+        limit = 20,
+        search = "",
+        status,
+        sortBy = "listing_title",
+        sortOrder = "ASC",
+         */
+        const { storeId, inventoryId } = req.params;
+        const { search, status, sortBy = 'listing_title', sortOrder = 'ASC', page, limit } = req.query;
+
+        const user = req.user;
+
+        const vendorStore = await StoreService.getVendorStore(
+            storeId,
+            user.vendor?.id || null
+        );
+
+        if (!vendorStore) {
+            return res.status(401).json({
+                message: 'Store verification failed'
+            })
+        }
+
+        const result = await StoreService.getListingsByInventoryId({
+            storeId, inventoryId, search, status, sortBy, sortOrder, page, limit
+        });
+
+        return res.json(result);
+    } catch (error) {
+        console.error('getListingsByInventoryId', error);
         return res.status(500).json({ message: 'Internal Error — Unable to get listing analytic' });
     }
 }
@@ -1423,6 +1726,48 @@ async function transferUnit(req, res) {
     }
 }
 
+async function renderNotifications(req, res) {
+    //const vendorId = req.params.vendor;
+    const user = req.user;
+
+    const conversations = [];
+    return res.render('notification-center', { layout: false, user, conversations });
+}
+
+async function transferBulkQuantity(req, res) {
+    const { storeId, quantity } = req.params;
+    const user = req.user;
+    try {
+        const vendorStore = await StoreService.getVendorStore(
+            storeId,
+            user.vendor?.id || null
+        );
+
+        if (!vendorStore) {
+            return res.status(401).json({
+                message: 'Vendor/Store verification failed'
+            });
+        }
+
+        const { sourceItemId,
+            destinationInventoryId,
+            quantity,
+            notes } = req.body;
+
+        console.log(notes)
+        const result = await StoreService.transferBulkQuantity(sourceItemId, destinationInventoryId, quantity, user.userId || user.id || user.user_id);
+
+        return res.status(201).json(result);
+    } catch (error) {
+        console.error(error);
+        let message = 'Failed — Internal Error';
+        if (!error.code) message = error.message;
+        return res.status(500).json({
+            message
+        });
+    }
+}
+
 async function getVendorOrderDashboard(req, res) {
     try {
         const vendorId = req.user.vendor.id;
@@ -1511,7 +1856,9 @@ async function renderListingcataloging(req, res) {
             });
         }
         res.locals.layout = 'focused';
-        updateStoreLastActive(vendorStore.id);
+        updateStoreLastActive(vendorStore.id).catch((err) => {
+            console.error('[inventory/index] updateStoreLastActive failed:', err);
+        });
         return res.render('partials/listing/new', { layout: 'focused', store: vendorStore, user, protocal, domainName, title: 'New Listing' });
     } catch (error) {
         console.error(error);
@@ -2295,6 +2642,7 @@ async function getStoreListings(req, res) {
             status = 'active',
             sort = 'recent' } = req.query;
 
+
         const vendorStore = await StoreService.getVendorStore(
             storeId,
             user.vendor?.id || null
@@ -2342,9 +2690,6 @@ async function getListing(req, res) {
             data: result
         });
 
-        //Update store last active
-        //res.locals.layout = 'store-center';
-        // updateStoreLastActive(vendorStore.id);
     } catch (error) {
         console.error('[getListing]', error);
         return res.status(500).json({ message: 'Unable to get listing — Internal Error' })
@@ -2492,12 +2837,14 @@ module.exports = {
 
     createInventoryItem,
     transferUnit,
+    transferBulkQuantity,
     patchUnit,
 
     getStoreDashboardAnalytics,
     getStoreDashboard,
     getStoreListingProductAnalytics,
     getInventoriesByStoreId,
+    getListingsByInventoryId,
 
     renderInvontoryForm,
     getVendorOrderDashboard,

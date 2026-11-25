@@ -57,7 +57,7 @@
     }
 
     function stockLabel(inv) {
-        
+
         if (!inv) return { label: 'Unknown', tone: 'slate' };
         switch (inv.availability_status) {
             case 'in_stock': return { label: 'In stock', tone: 'emerald' };
@@ -115,8 +115,6 @@
     }
 
     function hydrate(data) {
-
-        console.log('Variant:', data.variants)
         const variants = (data.variants || []).map(v => ({
             id: v.id,
             sku: v.sku,
@@ -341,13 +339,19 @@
         }
 
         let specsHtml = '';
+
         if (data.brand) specsHtml += specRow('Brand', data.brand);
         if (data.family) specsHtml += specRow('Family', data.family);
         if (data.category) specsHtml += specRow('Category', data.category);
+
         attrMap.forEach((values, name) => {
             specsHtml += specRow(name, Array.from(values).join(' / '));
         });
-        if (variants[0]?.sku) specsHtml += specRow('SKU', variants[0].sku);
+
+
+        const skuString = variants.map(v => v.sku).join('\n');
+
+        if (variants[0]?.sku) specsHtml += specRow('SKU', skuString);
         specs.innerHTML = specsHtml;
 
         const vendorName = data.vendor_name || 'COCOCE Vendor';
@@ -403,7 +407,7 @@
     let endsAtCountdownInterval = null;
 
     function startPriceCountdown(isOnSale, endsAt, container) {
-        
+
         if (!isOnSale) {
             container.textContent = '';
             container.classList.add('hidden')

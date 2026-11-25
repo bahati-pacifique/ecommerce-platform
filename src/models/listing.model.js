@@ -394,7 +394,7 @@ class ListingModel {
     }*/
 
 
-    static async getListingsByStore(storeId, {
+    /*static async getListingsByStore(storeId, {
         page = 1,
         limit = 20,
         status = 'active',
@@ -665,6 +665,260 @@ class ListingModel {
                 LIMIT $4
                 OFFSET $5
             `, [storeId, statusFilter, searchTerm, safeLimit, offset]);
+
+        const totalPages = Math.max(1, Math.ceil(total / safeLimit));
+
+        return {
+            listings: rows,
+            pagination: {
+                total,
+                page: safePage,
+                limit: safeLimit,
+                totalPages,
+                hasNextPage: safePage < totalPages,
+                hasPreviousPage: safePage > 1,
+            },
+        };
+    }*/
+
+    static async getListingsByStore(storeId, {
+        page = 1,
+        limit = 20,
+        status = '',
+        sort = 'recent',
+        search = '',
+    } = {}) {
+        const safePage = Math.max(1, Number(page) || 1);
+        const safeLimit = Math.min(Math.max(1, Number(limit) || 20), 100);
+        const offset = (safePage - 1) * safeLimit;
+
+        const searchTerm = String(search || '').trim() || null;
+
+        const params = [];
+
+        const addParam = (val) => {
+            params.push(val);
+            return `$${params.length}`;
+        };
+
+        
+        const storeIdParam = addParam(storeId);
+
+        let statusCondition = '';
+
+        if (status && [ 'active', 'inactive', 'not_available', 'draft', 'suspended', 'deleted'].includes(status)) {
+            const statusParam = addParam(status);
+            statusCondition = `AND l.status = ${statusParam}::listing_status`;
+        }
+
+        const searchParam = addParam(searchTerm);
+
+        const limitParam = addParam(safeLimit);
+        const offsetParam = addParam(offset);
+
+        const orderBy = {
+            recent: 'l.created_at DESC',
+            title_asc: 'l.title ASC',
+            title_desc: 'l.title DESC',
+            price_asc: 'starting_price ASC NULLS LAST',
+            price_desc: 'starting_price DESC NULLS LAST',
+            relevance: `
+        (
+            ts_rank(
+                COALESCE(l.search_vector, ''::tsvector),
+                websearch_to_tsquery('simple', ${searchParam})
+            ) +
+            ts_rank(
+                COALESCE(p.search_vector, ''::tsvector),
+                websearch_to_tsquery('simple', ${searchParam})
+            )
+        ) DESC,
+        l.created_at DESC
+        `,
+        }[sort] || 'l.created_at DESC';
+
+        const searchCondition = `
+        (
+            ${searchParam}::text IS NULL
+            OR ct.title ILIKE '%' || ${searchParam} || '%'
+            OR fm.title ILIKE '%' || ${searchParam} || '%'
+            OR br.title ILIKE '%' || ${searchParam} || '%'
+            OR (p.search_vector @@ websearch_to_tsquery('simple', ${searchParam}))
+            OR (l.search_vector @@ websearch_to_tsquery('simple', ${searchParam}))
+            OR EXISTS (
+                SELECT 1
+                FROM listing_variants lv
+                JOIN product_variants pv ON pv.id = lv.product_variant_id
+                WHERE lv.listing_id = l.id
+                AND pv.sku ILIKE '%' || ${searchParam} || '%'
+            )
+        )
+        `;
+        const countParams = [storeId];
+        let countStatusCondition = '';
+
+        if (status && ['active', 'draft', 'archived', 'paused'].includes(status)) {
+            countParams.push(status);
+            countStatusCondition = `AND l.status = $2::listing_status`;
+        }
+
+        countParams.push(searchTerm);
+        const countSearchIndex = `$${countParams.length}`;
+
+        const countSearchCondition = `
+        (
+            ${countSearchIndex}::text IS NULL
+            OR ct.title ILIKE '%' || ${countSearchIndex} || '%'
+            OR fm.title ILIKE '%' || ${countSearchIndex} || '%'
+            OR br.title ILIKE '%' || ${countSearchIndex} || '%'
+            OR (p.search_vector @@ websearch_to_tsquery('simple', ${countSearchIndex}))
+            OR (l.search_vector @@ websearch_to_tsquery('simple', ${countSearchIndex}))
+            OR EXISTS (
+                SELECT 1
+                FROM listing_variants lv
+                JOIN product_variants pv ON pv.id = lv.product_variant_id
+                WHERE lv.listing_id = l.id
+                AND pv.sku ILIKE '%' || ${countSearchIndex} || '%'
+            )
+        )
+        `;
+
+        const { rows: countRows } = await db.query(`
+            SELECT COUNT(*)::int AS total
+
+            FROM listings l
+
+            LEFT JOIN products p ON p.id = l.product_id
+            LEFT JOIN brands br ON br.id = p.brand_id
+            LEFT JOIN families fm ON fm.id = p.family_id
+            LEFT JOIN categories ct ON ct.id = fm.category_id
+
+            WHERE l.store_id = $1
+            ${countStatusCondition}
+            AND ${countSearchCondition}
+        `, countParams);
+
+        const total = countRows[0]?.total ?? 0;
+
+        const { rows } = await db.query(`
+            SELECT
+            l.id,
+            l.title,
+            l.product_id,
+            p.title AS product_title,
+            p.slug AS product_slug,
+            p.family_id,
+            br.title AS brand,
+            br.logo_url AS brand_logo_url,
+            fm.title AS family,
+            fm.category_id,
+            ct.title AS category,
+            l.status,
+            l.created_at,
+            COALESCE (l.updated_at, l.created_at) AS updated_at,
+
+            (
+                SELECT pv.sku
+                FROM listing_variants lv
+                JOIN product_variants pv ON pv.id = lv.product_variant_id
+                WHERE lv.listing_id = l.id
+                ORDER BY lv.id
+                LIMIT 1
+            ) AS sku,
+
+            (
+                SELECT lvm.storage_key
+                FROM listing_variants_media lvm
+                JOIN listing_variants lv ON lv.id = lvm.listing_variant_id
+                WHERE lv.listing_id = l.id
+                AND lvm.is_primary = TRUE
+                ORDER BY lvm.id
+                LIMIT 1
+            ) AS image_url,
+
+            (
+                SELECT COUNT(*)::int
+                FROM listing_variants lv
+                WHERE lv.listing_id = l.id
+            ) AS total_variants,
+
+            (
+                SELECT code FROM currencies WHERE is_base LIMIT 1
+            ) AS currency,
+
+            price_data.starting_price,
+            COALESCE(inventory_data.available_quantity, 0) AS available_quantity,
+            COALESCE(inventory_data.reserved_quantity, 0) AS reserved_quantity,
+            COALESCE(inventory_data.inventory_records, 0) AS inventory_records,
+
+            CASE
+                WHEN COALESCE(inventory_data.inventory_records, 0) = 0 THEN 'untracked'
+                WHEN COALESCE(inventory_data.available_quantity, 0) = 0 THEN 'out_of_stock'
+                WHEN inventory_data.available_quantity <= 5 THEN 'low_stock'
+                ELSE 'in_stock'
+            END AS availability_status
+
+            FROM listings l
+
+            LEFT JOIN products p ON p.id = l.product_id
+            LEFT JOIN brands br ON br.id = p.brand_id
+            LEFT JOIN families fm ON fm.id = p.family_id
+            LEFT JOIN categories ct ON ct.id = fm.category_id
+
+            LEFT JOIN LATERAL (
+                SELECT MIN(lcp.current_price) AS starting_price
+                FROM listing_variants lv
+                JOIN listing_variant_current_prices lcp ON lcp.listing_variant_id = lv.id
+                WHERE lv.listing_id = l.id
+            ) price_data ON TRUE
+
+            LEFT JOIN LATERAL (
+                SELECT
+                COUNT(ii.id)::int AS inventory_records,
+                COALESCE(
+                    SUM(
+                        CASE
+                            WHEN ii.tracking_mode = 'bulk'
+                            THEN GREATEST(ii.quantity - ii.reserved, 0)
+                            WHEN ii.tracking_mode = 'serialized'
+                            THEN COALESCE(unit_stock.available_units, 0)
+                            ELSE 0
+                        END
+                    ), 0
+                )::int AS available_quantity,
+                COALESCE(
+                    SUM(
+                        CASE
+                            WHEN ii.tracking_mode = 'bulk'
+                            THEN ii.reserved
+                            WHEN ii.tracking_mode = 'serialized'
+                            THEN COALESCE(unit_stock.reserved_units, 0)
+                            ELSE 0
+                        END
+                    ), 0
+                )::int AS reserved_quantity
+                FROM listing_variants lv
+                JOIN inventory_items ii ON ii.listing_variant_id = lv.id
+                JOIN inventories inv ON inv.id = ii.inventory_id AND inv.store_id = l.store_id
+                LEFT JOIN LATERAL (
+                    SELECT
+                        COUNT(*) FILTER (WHERE iu.status = 'available')::int AS available_units,
+                        COUNT(*) FILTER (WHERE iu.status = 'reserved')::int AS reserved_units
+                    FROM inventory_units iu
+                    WHERE iu.inventory_item_id = ii.id
+                ) unit_stock ON TRUE
+                WHERE lv.listing_id = l.id
+            ) inventory_data ON TRUE
+
+            WHERE l.store_id = $1
+            ${statusCondition}
+            AND ${searchCondition}
+
+            ORDER BY ${orderBy}
+
+            LIMIT ${limitParam}
+            OFFSET ${offsetParam}
+        `, params);
 
         const totalPages = Math.max(1, Math.ceil(total / safeLimit));
 

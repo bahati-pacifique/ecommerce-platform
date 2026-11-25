@@ -84,8 +84,8 @@
   <% } %>
 
 
-  <% if (typeof pageScripts !== 'undefined' && Array.isArray(pageScripts)) { console.log('OK', pageScripts) %>
-  <% pageScripts.forEach(src => { console.log(src)%>
+  <% if (typeof pageScripts !== 'undefined' && Array.isArray(pageScripts)) { %>
+  <% pageScripts.forEach(src => { %>
   <script src="<%= src %>" type="module" defer></script>
   <% }) %>
   <% } else {console.log('Error')}%>

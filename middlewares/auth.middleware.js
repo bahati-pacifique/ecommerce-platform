@@ -41,7 +41,7 @@ function verifyPreAuth(req, res, next) {
     const preauthToken = req.cookies.p_auth;
 
     const ua = normalizeUA(req.get('User-Agent'));
-    const ip = req.ip;
+    //const ip = req.ip;
 
     if (!preauthToken) {
         if (acceptsHtml(req)) {

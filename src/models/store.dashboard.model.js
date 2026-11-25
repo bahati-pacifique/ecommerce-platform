@@ -1128,14 +1128,6 @@ class StoreDashboardModel {
         };
     }
 
-    /**
-     * Get all inventories belonging to a store with stock metrics.
-     *
-     * @param {Object} params
-     * @param {string} params.storeId
-     * @param {number} [params.lowStockThreshold=5]
-     * @returns {Promise<Array>}
-     */
     // static async getInventoriesByStoreId({
     //     storeId,
     //     page = 1,
@@ -1655,6 +1647,422 @@ class StoreDashboardModel {
     //     };
     // }
 
+    //@Deprecated
+    // static async getInventoriesByStoreId({
+    //     storeId,
+    //     page = 1,
+    //     limit = 20,
+    //     search = "",
+    //     status,
+    //     stock,
+    //     sortBy = "created_at",
+    //     sortOrder = "DESC",
+    //     lowStockThreshold = 10,
+    // }) {
+    //     const validPage = Math.max(
+    //         1,
+    //         Number.parseInt(page, 10) || 1
+    //     );
+
+    //     const validLimit = Math.min(
+    //         100,
+    //         Math.max(1, Number.parseInt(limit, 10) || 20)
+    //     );
+
+    //     const offset = (validPage - 1) * validLimit;
+    //     const threshold = Number(lowStockThreshold);
+
+    //     if (!Number.isFinite(threshold) || threshold < 0) {
+    //         throw new Error(
+    //             "lowStockThreshold must be a non-negative number"
+    //         );
+    //     }
+
+    //     const allowedSortColumns = {
+    //         title: "fi.title",
+    //         status: "fi.status",
+    //         created_at: "fi.created_at",
+    //         updated_at: "fi.updated_at",
+    //         low_stock: "fi.low_stock",
+    //         out_of_stock: "fi.out_of_stock",
+    //         reserved: "fi.reserved",
+    //         items: "fi.items",
+    //         quantity: "fi.quantity",
+    //     };
+
+    //     const orderColumn =
+    //         allowedSortColumns[sortBy] ?? "fi.created_at";
+
+    //     const orderDirection =
+    //         String(sortOrder).toUpperCase() === "ASC"
+    //             ? "ASC"
+    //             : "DESC";
+
+    //     const validStockFilters = [
+    //         "low",
+    //         "out_of_stock",
+    //         "available",
+    //     ];
+
+    //     if (stock && !validStockFilters.includes(stock)) {
+    //         throw new Error(
+    //             `Invalid stock filter. Allowed values: ${validStockFilters.join(", ")}`
+    //         );
+    //     }
+
+    //     const values = [storeId, threshold];
+    //     const filters = ["i.store_id = $1"];
+
+    //     let paramIndex = 3;
+
+    //     if (search?.trim()) {
+    //         filters.push(`i.title ILIKE $${paramIndex}`);
+    //         values.push(`%${search.trim()}%`);
+    //         paramIndex++;
+    //     }
+
+    //     if (status) {
+    //         filters.push(`i.status::TEXT = $${paramIndex}`);
+    //         values.push(status);
+    //         paramIndex++;
+    //     }
+
+    //     const whereClause = filters.join(" AND ");
+
+    //     let stockParam = null;
+
+    //     if (stock) {
+    //         stockParam = `$${paramIndex++}`;
+    //         values.push(stock);
+    //     }
+
+    //     const limitParam = `$${paramIndex++}`;
+    //     const offsetParam = `$${paramIndex++}`;
+
+    //     const dataValues = [
+    //         ...values,
+    //         validLimit,
+    //         offset,
+    //     ];
+
+    //     const countValues = [...values];
+
+    //     const baseCtes = `
+    //     WITH unit_metrics AS (
+    //         SELECT
+    //             iu.inventory_item_id,
+
+    //             COUNT(*) FILTER (
+    //                 WHERE iu.status IN ('available', 'reserved')
+    //             )::BIGINT AS total_units,
+
+    //             COUNT(*) FILTER (
+    //                 WHERE iu.status = 'reserved'
+    //             )::BIGINT AS reserved_units,
+
+    //             COUNT(*) FILTER (
+    //                 WHERE iu.status = 'available'
+    //             )::BIGINT AS available_units
+
+    //         FROM inventory_units iu
+
+    //         GROUP BY iu.inventory_item_id
+    //     ),
+
+    //     item_stock AS (
+    //         SELECT
+    //             ii.id AS inventory_item_id,
+    //             ii.inventory_id,
+    //             ii.listing_variant_id,
+    //             ii.tracking_mode,
+    //             ii.status::TEXT AS item_status,
+
+    //             CASE
+    //                 WHEN ii.tracking_mode = 'bulk'
+    //                 THEN ii.quantity::BIGINT
+    //                 ELSE COALESCE(um.total_units, 0)
+    //             END AS quantity,
+
+    //             CASE
+    //                 WHEN ii.tracking_mode = 'bulk'
+    //                 THEN ii.reserved::BIGINT
+    //                 ELSE COALESCE(um.reserved_units, 0)
+    //             END AS reserved,
+
+    //             CASE
+    //                 WHEN ii.tracking_mode = 'bulk'
+    //                 THEN GREATEST(
+    //                     ii.quantity - ii.reserved, 0
+    //                 )::BIGINT
+    //                 ELSE COALESCE(um.available_units, 0)
+    //             END AS available_quantity
+
+    //         FROM inventory_items ii
+
+    //         LEFT JOIN unit_metrics um
+    //             ON um.inventory_item_id = ii.id
+    //     ),
+
+    //     inventory_metrics AS (
+    //         SELECT
+    //             i.id,
+    //             i.title,
+    //             i.status::TEXT AS status,
+    //             i.is_default,
+    //             i.created_at,
+    //             i.updated_at,
+
+    //             COUNT(s.inventory_item_id) FILTER (
+    //                 WHERE s.item_status NOT IN (
+    //                     'damaged',
+    //                     'returned',
+    //                     'discontinued'
+    //                 )
+    //                 AND s.available_quantity > 0
+    //                 AND s.available_quantity <= $2
+    //             )::INTEGER AS low_stock,
+
+    //             COUNT(s.inventory_item_id) FILTER (
+    //                 WHERE s.item_status NOT IN (
+    //                     'damaged',
+    //                     'returned',
+    //                     'discontinued'
+    //                 )
+    //                 AND s.available_quantity = 0
+    //             )::INTEGER AS out_of_stock,
+
+    //             COALESCE(
+    //                 SUM(s.reserved),
+    //                 0
+    //             )::BIGINT AS reserved,
+
+    //             COUNT(
+    //                 DISTINCT s.listing_variant_id
+    //             ) FILTER (
+    //                 WHERE s.inventory_item_id IS NOT NULL
+    //             )::INTEGER AS items,
+
+    //             COALESCE(
+    //                 SUM(s.quantity),
+    //                 0
+    //             )::BIGINT AS quantity,
+
+    //             COUNT(s.inventory_item_id) FILTER (
+    //                 WHERE s.item_status NOT IN (
+    //                     'damaged',
+    //                     'returned',
+    //                     'discontinued'
+    //                 )
+    //                 AND s.available_quantity > 0
+    //             )::INTEGER AS available_records
+
+    //         FROM inventories i
+
+    //         LEFT JOIN item_stock s
+    //             ON s.inventory_id = i.id
+
+    //         WHERE ${whereClause}
+
+    //         GROUP BY
+    //             i.id,
+    //             i.title,
+    //             i.status,
+    //             i.is_default,
+    //             i.created_at,
+    //             i.updated_at
+    //     ),
+
+    //     filtered_inventories AS (
+    //         SELECT
+    //             *,
+
+    //             CASE
+    //                 WHEN low_stock > 0
+    //                     THEN 'low'
+
+    //                 WHEN out_of_stock > 0
+    //                     THEN 'out_of_stock'
+
+    //                 WHEN available_records > 0
+    //                     THEN 'available'
+
+    //                 ELSE 'out_of_stock'
+    //             END AS stock_filter
+
+    //         FROM inventory_metrics
+    //     )
+    // `;
+
+    //     const stockCondition = stock
+    //         ? `WHERE stock_filter = ${stockParam}`
+    //         : "";
+
+    //     const query = `
+    //     ${baseCtes},
+
+    //     listing_details AS (
+    //         SELECT
+    //             s.inventory_id,
+
+    //             l.id AS listing_id,
+    //             l.title AS listing_title,
+    //             l.status::TEXT AS listing_status,
+
+    //             p.id AS product_id,
+    //             p.title AS product_title,
+
+    //             COUNT(
+    //                 DISTINCT s.inventory_item_id
+    //             )::INTEGER AS inventory_records,
+
+    //             COALESCE(
+    //                 SUM(s.quantity),
+    //                 0
+    //             )::BIGINT AS quantity,
+
+    //             COALESCE(
+    //                 SUM(s.reserved),
+    //                 0
+    //             )::BIGINT AS reserved,
+
+    //             COALESCE(
+    //                 SUM(s.available_quantity),
+    //                 0
+    //             )::BIGINT AS available_quantity
+
+    //         FROM item_stock s
+
+    //         JOIN listing_variants lv
+    //             ON lv.id = s.listing_variant_id
+
+    //         JOIN listings l
+    //             ON l.id = lv.listing_id
+
+    //         JOIN products p
+    //             ON p.id = l.product_id
+
+    //         WHERE s.inventory_id IN (
+    //             SELECT id
+    //             FROM filtered_inventories
+    //             ${stockCondition}
+    //         )
+
+    //         GROUP BY
+    //             s.inventory_id,
+    //             l.id,
+    //             l.title,
+    //             l.status,
+    //             p.id,
+    //             p.title
+    //     ),
+
+    //     listing_aggregates AS (
+    //         SELECT
+    //             inventory_id,
+
+    //             jsonb_agg(
+    //                 jsonb_build_object(
+    //                     'listing_id', listing_id,
+    //                     'listing_title', listing_title,
+    //                     'listing_status', listing_status,
+    //                     'product_id', product_id,
+    //                     'product_title', product_title,
+    //                     'inventory_records', inventory_records,
+    //                     'quantity', quantity,
+    //                     'reserved', reserved,
+    //                     'available_quantity', available_quantity
+    //                 )
+    //                 ORDER BY listing_title
+    //             ) AS listings
+
+    //         FROM listing_details
+
+    //         GROUP BY inventory_id
+    //     )
+
+    //     SELECT
+    //         fi.*,
+
+    //         COALESCE(
+    //             la.listings,
+    //             '[]'::JSONB
+    //         ) AS listings
+
+    //     FROM filtered_inventories fi
+
+    //     LEFT JOIN listing_aggregates la
+    //         ON la.inventory_id = fi.id
+
+    //     ${stockCondition}
+
+    //     ORDER BY
+    //         ${orderColumn} ${orderDirection},
+    //         fi.id DESC
+
+    //     LIMIT ${limitParam}
+    //     OFFSET ${offsetParam};
+    // `;
+
+    //     const countQuery = `
+    //     ${baseCtes}
+
+    //     SELECT COUNT(*)::INTEGER AS total
+
+    //     FROM filtered_inventories
+
+    //     ${stockCondition};
+    // `;
+
+    //     const [dataResult, countResult] = await Promise.all([
+    //         db.query(query, dataValues),
+    //         db.query(countQuery, countValues),
+    //     ]);
+
+    //     const data = dataResult.rows.map((row) => ({
+    //         ...row,
+
+    //         low_stock: Number(row.low_stock),
+    //         out_of_stock: Number(row.out_of_stock),
+    //         reserved: Number(row.reserved),
+    //         items: Number(row.items),
+    //         quantity: Number(row.quantity),
+    //         available_records: Number(row.available_records),
+
+    //         listings: (row.listings ?? []).map((listing) => ({
+    //             ...listing,
+    //             inventory_records: Number(
+    //                 listing.inventory_records
+    //             ),
+    //             quantity: Number(listing.quantity),
+    //             reserved: Number(listing.reserved),
+    //             available_quantity: Number(
+    //                 listing.available_quantity
+    //             ),
+    //         })),
+    //     }));
+
+    //     const total = Number(countResult.rows[0].total);
+
+    //     return {
+    //         data,
+    //         pagination: {
+    //             page: validPage,
+    //             limit: validLimit,
+    //             total,
+    //             totalPages: Math.ceil(total / validLimit),
+    //         },
+    //     };
+    // }
+
+
+    /**
+     * Get all inventories belonging to a store with stock metrics.
+     *
+     * @param {Object} params
+     * @param {string} params.storeId
+     * @param {number} [params.lowStockThreshold=5]
+     * @returns {Promise<Array>}
+     */
     static async getInventoriesByStoreId({
         storeId,
         page = 1,
@@ -1666,23 +2074,13 @@ class StoreDashboardModel {
         sortOrder = "DESC",
         lowStockThreshold = 5,
     }) {
-        const validPage = Math.max(
-            1,
-            Number.parseInt(page, 10) || 1
-        );
-
-        const validLimit = Math.min(
-            100,
-            Math.max(1, Number.parseInt(limit, 10) || 20)
-        );
-
+        const validPage = Math.max(1, Number.parseInt(page, 10) || 1);
+        const validLimit = Math.min(100, Math.max(1, Number.parseInt(limit, 10) || 20));
         const offset = (validPage - 1) * validLimit;
         const threshold = Number(lowStockThreshold);
 
         if (!Number.isFinite(threshold) || threshold < 0) {
-            throw new Error(
-                "lowStockThreshold must be a non-negative number"
-            );
+            throw new Error("lowStockThreshold must be a non-negative number");
         }
 
         const allowedSortColumns = {
@@ -1695,22 +2093,14 @@ class StoreDashboardModel {
             reserved: "fi.reserved",
             items: "fi.items",
             quantity: "fi.quantity",
+            listing_count: "fi.listing_count",
         };
 
-        const orderColumn =
-            allowedSortColumns[sortBy] ?? "fi.created_at";
-
+        const orderColumn = allowedSortColumns[sortBy] ?? "fi.created_at";
         const orderDirection =
-            String(sortOrder).toUpperCase() === "ASC"
-                ? "ASC"
-                : "DESC";
+            String(sortOrder).toUpperCase() === "ASC" ? "ASC" : "DESC";
 
-        const validStockFilters = [
-            "low",
-            "out_of_stock",
-            "available",
-        ];
-
+        const validStockFilters = ["low", "out_of_stock", "available"];
         if (stock && !validStockFilters.includes(stock)) {
             throw new Error(
                 `Invalid stock filter. Allowed values: ${validStockFilters.join(", ")}`
@@ -1719,7 +2109,6 @@ class StoreDashboardModel {
 
         const values = [storeId, threshold];
         const filters = ["i.store_id = $1"];
-
         let paramIndex = 3;
 
         if (search?.trim()) {
@@ -1737,7 +2126,6 @@ class StoreDashboardModel {
         const whereClause = filters.join(" AND ");
 
         let stockParam = null;
-
         if (stock) {
             stockParam = `$${paramIndex++}`;
             values.push(stock);
@@ -1746,33 +2134,17 @@ class StoreDashboardModel {
         const limitParam = `$${paramIndex++}`;
         const offsetParam = `$${paramIndex++}`;
 
-        const dataValues = [
-            ...values,
-            validLimit,
-            offset,
-        ];
-
+        const dataValues = [...values, validLimit, offset];
         const countValues = [...values];
 
         const baseCtes = `
         WITH unit_metrics AS (
             SELECT
                 iu.inventory_item_id,
-
-                COUNT(*) FILTER (
-                    WHERE iu.status IN ('available', 'reserved')
-                )::BIGINT AS total_units,
-
-                COUNT(*) FILTER (
-                    WHERE iu.status = 'reserved'
-                )::BIGINT AS reserved_units,
-
-                COUNT(*) FILTER (
-                    WHERE iu.status = 'available'
-                )::BIGINT AS available_units
-
+                COUNT(*) FILTER (WHERE iu.status IN ('available','reserved'))::BIGINT AS total_units,
+                COUNT(*) FILTER (WHERE iu.status = 'reserved')::BIGINT AS reserved_units,
+                COUNT(*) FILTER (WHERE iu.status = 'available')::BIGINT AS available_units
             FROM inventory_units iu
-
             GROUP BY iu.inventory_item_id
         ),
 
@@ -1784,30 +2156,19 @@ class StoreDashboardModel {
                 ii.tracking_mode,
                 ii.status::TEXT AS item_status,
 
-                CASE
-                    WHEN ii.tracking_mode = 'bulk'
-                    THEN ii.quantity::BIGINT
-                    ELSE COALESCE(um.total_units, 0)
-                END AS quantity,
+                CASE WHEN ii.tracking_mode = 'bulk'
+                     THEN ii.quantity::BIGINT
+                     ELSE COALESCE(um.total_units, 0) END AS quantity,
 
-                CASE
-                    WHEN ii.tracking_mode = 'bulk'
-                    THEN ii.reserved::BIGINT
-                    ELSE COALESCE(um.reserved_units, 0)
-                END AS reserved,
+                CASE WHEN ii.tracking_mode = 'bulk'
+                     THEN ii.reserved::BIGINT
+                     ELSE COALESCE(um.reserved_units, 0) END AS reserved,
 
-                CASE
-                    WHEN ii.tracking_mode = 'bulk'
-                    THEN GREATEST(
-                        ii.quantity - ii.reserved, 0
-                    )::BIGINT
-                    ELSE COALESCE(um.available_units, 0)
-                END AS available_quantity
-
+                CASE WHEN ii.tracking_mode = 'bulk'
+                     THEN GREATEST(ii.quantity - ii.reserved, 0)::BIGINT
+                     ELSE COALESCE(um.available_units, 0) END AS available_quantity
             FROM inventory_items ii
-
-            LEFT JOIN unit_metrics um
-                ON um.inventory_item_id = ii.id
+            LEFT JOIN unit_metrics um ON um.inventory_item_id = ii.id
         ),
 
         inventory_metrics AS (
@@ -1820,203 +2181,70 @@ class StoreDashboardModel {
                 i.updated_at,
 
                 COUNT(s.inventory_item_id) FILTER (
-                    WHERE s.item_status NOT IN (
-                        'damaged',
-                        'returned',
-                        'discontinued'
-                    )
-                    AND s.available_quantity > 0
-                    AND s.available_quantity <= $2
+                    WHERE s.item_status NOT IN ('damaged','returned','discontinued')
+                      AND s.available_quantity > 0
+                      AND s.available_quantity <= $2
                 )::INTEGER AS low_stock,
 
                 COUNT(s.inventory_item_id) FILTER (
-                    WHERE s.item_status NOT IN (
-                        'damaged',
-                        'returned',
-                        'discontinued'
-                    )
-                    AND s.available_quantity = 0
+                    WHERE s.item_status NOT IN ('damaged','returned','discontinued')
+                      AND s.available_quantity = 0
                 )::INTEGER AS out_of_stock,
 
-                COALESCE(
-                    SUM(s.reserved),
-                    0
-                )::BIGINT AS reserved,
+                COALESCE(SUM(s.reserved), 0)::BIGINT AS reserved,
 
-                COUNT(
-                    DISTINCT s.listing_variant_id
-                ) FILTER (
-                    WHERE s.inventory_item_id IS NOT NULL
+                -- item RECORDS (not distinct variants) — see note below
+                COUNT(s.inventory_item_id) FILTER (
+                    WHERE s.item_status NOT IN ('damaged','returned','discontinued')
                 )::INTEGER AS items,
 
-                COALESCE(
-                    SUM(s.quantity),
-                    0
-                )::BIGINT AS quantity,
+                COALESCE(SUM(s.quantity), 0)::BIGINT AS quantity,
+
+                -- distinct listing variants represented in this inventory
+                COUNT(DISTINCT s.listing_variant_id) FILTER (
+                    WHERE s.inventory_item_id IS NOT NULL
+                )::INTEGER AS listing_count,
 
                 COUNT(s.inventory_item_id) FILTER (
-                    WHERE s.item_status NOT IN (
-                        'damaged',
-                        'returned',
-                        'discontinued'
-                    )
-                    AND s.available_quantity > 0
+                    WHERE s.item_status NOT IN ('damaged','returned','discontinued')
+                      AND s.available_quantity > 0
                 )::INTEGER AS available_records
 
             FROM inventories i
-
-            LEFT JOIN item_stock s
-                ON s.inventory_id = i.id
-
+            LEFT JOIN item_stock s ON s.inventory_id = i.id
             WHERE ${whereClause}
-
             GROUP BY
-                i.id,
-                i.title,
-                i.status,
-                i.is_default,
-                i.created_at,
-                i.updated_at
+                i.id, i.title, i.status, i.is_default, i.created_at, i.updated_at
         ),
 
         filtered_inventories AS (
             SELECT
                 *,
-
                 CASE
-                    WHEN low_stock > 0
-                        THEN 'low'
-
-                    WHEN out_of_stock > 0
-                        THEN 'out_of_stock'
-
-                    WHEN available_records > 0
-                        THEN 'available'
-
+                    WHEN low_stock > 0      THEN 'low'
+                    WHEN out_of_stock > 0   THEN 'out_of_stock'
+                    WHEN available_records > 0 THEN 'available'
                     ELSE 'out_of_stock'
                 END AS stock_filter
-
             FROM inventory_metrics
         )
     `;
 
-        const stockCondition = stock
-            ? `WHERE stock_filter = ${stockParam}`
-            : "";
+        const stockCondition = stock ? `WHERE stock_filter = ${stockParam}` : "";
 
         const query = `
-        ${baseCtes},
-
-        listing_details AS (
-            SELECT
-                s.inventory_id,
-
-                l.id AS listing_id,
-                l.title AS listing_title,
-                l.status::TEXT AS listing_status,
-
-                p.id AS product_id,
-                p.title AS product_title,
-
-                COUNT(
-                    DISTINCT s.inventory_item_id
-                )::INTEGER AS inventory_records,
-
-                COALESCE(
-                    SUM(s.quantity),
-                    0
-                )::BIGINT AS quantity,
-
-                COALESCE(
-                    SUM(s.reserved),
-                    0
-                )::BIGINT AS reserved,
-
-                COALESCE(
-                    SUM(s.available_quantity),
-                    0
-                )::BIGINT AS available_quantity
-
-            FROM item_stock s
-
-            JOIN listing_variants lv
-                ON lv.id = s.listing_variant_id
-
-            JOIN listings l
-                ON l.id = lv.listing_id
-
-            JOIN products p
-                ON p.id = l.product_id
-
-            WHERE s.inventory_id IN (
-                SELECT id
-                FROM filtered_inventories
-                ${stockCondition}
-            )
-
-            GROUP BY
-                s.inventory_id,
-                l.id,
-                l.title,
-                l.status,
-                p.id,
-                p.title
-        ),
-
-        listing_aggregates AS (
-            SELECT
-                inventory_id,
-
-                jsonb_agg(
-                    jsonb_build_object(
-                        'listing_id', listing_id,
-                        'listing_title', listing_title,
-                        'listing_status', listing_status,
-                        'product_id', product_id,
-                        'product_title', product_title,
-                        'inventory_records', inventory_records,
-                        'quantity', quantity,
-                        'reserved', reserved,
-                        'available_quantity', available_quantity
-                    )
-                    ORDER BY listing_title
-                ) AS listings
-
-            FROM listing_details
-
-            GROUP BY inventory_id
-        )
-
-        SELECT
-            fi.*,
-
-            COALESCE(
-                la.listings,
-                '[]'::JSONB
-            ) AS listings
-
+        ${baseCtes}
+        SELECT fi.*
         FROM filtered_inventories fi
-
-        LEFT JOIN listing_aggregates la
-            ON la.inventory_id = fi.id
-
         ${stockCondition}
-
-        ORDER BY
-            ${orderColumn} ${orderDirection},
-            fi.id DESC
-
-        LIMIT ${limitParam}
-        OFFSET ${offsetParam};
+        ORDER BY ${orderColumn} ${orderDirection}, fi.id DESC
+        LIMIT ${limitParam} OFFSET ${offsetParam};
     `;
 
         const countQuery = `
         ${baseCtes}
-
         SELECT COUNT(*)::INTEGER AS total
-
         FROM filtered_inventories
-
         ${stockCondition};
     `;
 
@@ -2027,32 +2255,19 @@ class StoreDashboardModel {
 
         const data = dataResult.rows.map((row) => ({
             ...row,
-
             low_stock: Number(row.low_stock),
             out_of_stock: Number(row.out_of_stock),
             reserved: Number(row.reserved),
             items: Number(row.items),
             quantity: Number(row.quantity),
+            listing_count: Number(row.listing_count),
             available_records: Number(row.available_records),
-
-            listings: (row.listings ?? []).map((listing) => ({
-                ...listing,
-                inventory_records: Number(
-                    listing.inventory_records
-                ),
-                quantity: Number(listing.quantity),
-                reserved: Number(listing.reserved),
-                available_quantity: Number(
-                    listing.available_quantity
-                ),
-            })),
         }));
 
         const total = Number(countResult.rows[0].total);
 
         return {
             data,
-
             pagination: {
                 page: validPage,
                 limit: validLimit,
@@ -2062,7 +2277,156 @@ class StoreDashboardModel {
         };
     }
 
+    static async getListingsByInventoryId({
+        storeId,
+        inventoryId,
+        page = 1,
+        limit = 20,
+        search = "",
+        status,
+        sortBy = "listing_title",
+        sortOrder = "ASC",
+    }) {
+        const validPage = Math.max(1, Number.parseInt(page, 10) || 1);
+        const validLimit = Math.min(100, Math.max(1, Number.parseInt(limit, 10) || 20));
+        const offset = (validPage - 1) * validLimit;
 
+        const allowedSortColumns = {
+            listing_title: "l.title",
+            listing_status: "l.status",
+            product_title: "p.title",
+            inventory_records: "inventory_records",
+            quantity: "quantity",
+            reserved: "reserved",
+            available_quantity: "available_quantity",
+        };
+
+        const orderColumn = allowedSortColumns[sortBy] ?? "l.title";
+        const orderDirection =
+            String(sortOrder).toUpperCase() === "DESC" ? "DESC" : "ASC";
+
+        const values = [storeId, inventoryId];
+        const filters = ["i.store_id = $1", "i.id = $2"];
+        let paramIndex = 3;
+
+        if (search?.trim()) {
+            filters.push(
+                `(l.title ILIKE $${paramIndex} OR p.title ILIKE $${paramIndex})`
+            );
+            values.push(`%${search.trim()}%`);
+            paramIndex++;
+        }
+
+        if (status) {
+            filters.push(`l.status::TEXT = $${paramIndex}`);
+            values.push(status);
+            paramIndex++;
+        }
+
+        const whereClause = filters.join(" AND ");
+        const limitParam = `$${paramIndex++}`;
+        const offsetParam = `$${paramIndex++}`;
+
+        const dataValues = [...values, validLimit, offset];
+        const countValues = [...values];
+
+        const query = `
+        WITH unit_metrics AS (
+            SELECT
+                iu.inventory_item_id,
+                COUNT(*) FILTER (WHERE iu.status IN ('available','reserved'))::BIGINT AS total_units,
+                COUNT(*) FILTER (WHERE iu.status = 'reserved')::BIGINT AS reserved_units,
+                COUNT(*) FILTER (WHERE iu.status = 'available')::BIGINT AS available_units
+            FROM inventory_units iu
+            GROUP BY iu.inventory_item_id
+        ),
+
+        item_stock AS (
+            SELECT
+                ii.inventory_id,
+                ii.listing_variant_id,
+                ii.status::TEXT AS item_status,
+
+                CASE WHEN ii.tracking_mode = 'bulk'
+                     THEN ii.quantity::BIGINT
+                     ELSE COALESCE(um.total_units, 0) END AS quantity,
+
+                CASE WHEN ii.tracking_mode = 'bulk'
+                     THEN ii.reserved::BIGINT
+                     ELSE COALESCE(um.reserved_units, 0) END AS reserved,
+
+                CASE WHEN ii.tracking_mode = 'bulk'
+                     THEN GREATEST(ii.quantity - ii.reserved, 0)::BIGINT
+                     ELSE COALESCE(um.available_units, 0) END AS available_quantity
+            FROM inventory_items ii
+            LEFT JOIN unit_metrics um ON um.inventory_item_id = ii.id
+            WHERE ii.inventory_id = $2
+        )
+
+        SELECT
+            s.inventory_id,
+            l.id AS listing_id,
+            l.title AS listing_title,
+            l.status::TEXT AS listing_status,
+            p.id AS product_id,
+            p.title AS product_title,
+            COUNT(DISTINCT s.listing_variant_id) FILTER (
+                WHERE s.item_status NOT IN ('damaged','returned','discontinued')
+            )::INTEGER AS inventory_records,
+            COALESCE(SUM(s.quantity), 0)::BIGINT AS quantity,
+            COALESCE(SUM(s.reserved), 0)::BIGINT AS reserved,
+            COALESCE(SUM(s.available_quantity), 0)::BIGINT AS available_quantity
+        FROM item_stock s
+        JOIN listing_variants lv ON lv.id = s.listing_variant_id
+        JOIN listings l          ON l.id  = lv.listing_id
+        JOIN products p          ON p.id  = l.product_id
+        JOIN inventories i       ON i.id  = s.inventory_id
+        WHERE ${whereClause}
+        GROUP BY s.inventory_id, l.id, l.title, l.status, p.id, p.title
+        ORDER BY ${orderColumn} ${orderDirection}, l.id DESC
+        LIMIT ${limitParam} OFFSET ${offsetParam};
+    `;
+
+        const countQuery = `
+        WITH item_stock AS (
+            SELECT ii.inventory_id, ii.listing_variant_id
+            FROM inventory_items ii
+            WHERE ii.inventory_id = $2
+        )
+        SELECT COUNT(DISTINCT l.id)::INTEGER AS total
+        FROM item_stock s
+        JOIN listing_variants lv ON lv.id = s.listing_variant_id
+        JOIN listings l          ON l.id  = lv.listing_id
+        JOIN products p          ON p.id  = l.product_id
+        JOIN inventories i       ON i.id  = s.inventory_id
+        WHERE ${whereClause};
+    `;
+
+        const [dataResult, countResult] = await Promise.all([
+            db.query(query, dataValues),
+            db.query(countQuery, countValues),
+        ]);
+
+        const data = dataResult.rows.map((row) => ({
+            ...row,
+            inventory_records: Number(row.inventory_records),
+            quantity: Number(row.quantity),
+            reserved: Number(row.reserved),
+            available_quantity: Number(row.available_quantity),
+        }));
+
+        const total = Number(countResult.rows[0].total);
+
+        return {
+            data,
+            pagination: {
+                page: validPage,
+                limit: validLimit,
+                total,
+                totalPages: Math.ceil(total / validLimit),
+            },
+        };
+    }
 }
 
 module.exports = StoreDashboardModel;

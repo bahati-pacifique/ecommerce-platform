@@ -206,6 +206,7 @@ function initAdjustQuantityModal() {
     }
 
     function closeModal() {
+        
         if (fetchAbort) {
             fetchAbort.abort();
             fetchAbort = null;
@@ -315,7 +316,7 @@ function initAdjustQuantityModal() {
 
             let payload;
 
-            if (ctx.action === 'reserved') {
+            if (ctx.action === 'reserve') {
                 endpoint = 'reserve-quantity';
                 payload = { quantity: inputVal };
             } else if (ctx.action === 'release') {
@@ -325,7 +326,6 @@ function initAdjustQuantityModal() {
                 payload = { delta: inputVal };
                 endpoint = 'adjust-quantity';
             }
-
 
             const { data } = await axios.patch(
                 `/inventories/${ctx.inventoryId}/${ctx.storeId}/items/${ctx.itemId}/${endpoint}`,
