@@ -118,7 +118,7 @@
     border-radius: 12px;
     font-weight: 600;
     font-size: 15px;
-    border: 1.5px solid #E2E8F0;
+    border: 1.5px solid #1E293B;
     cursor: pointer;
     transition: all 0.25s ease;
     display: inline-flex;
@@ -128,8 +128,9 @@
 }
 
 .btn-outline-premium:hover {
-    border-color: red;
-    background: #F8FAFC;
+    border-color: #ED1B24;
+    background: #ED1B24;
+    color: #FFF;
     transform: translateY(-2px);
 }
 
