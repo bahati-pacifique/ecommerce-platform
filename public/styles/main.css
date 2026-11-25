@@ -825,6 +825,9 @@
   .mt-14 {
     margin-top: calc(var(--spacing) * 14);
   }
+  .mt-\[0\.5\] {
+    margin-top: 0.5;
+  }
   .mt-\[2\.5rem\] {
     margin-top: 2.5rem;
   }
