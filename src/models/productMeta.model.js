@@ -321,7 +321,7 @@ class ProductMetaModel {
             COALESCE(updated_at, created_at) 
             AS last_updates 
             FROM categories WHERE status = 'active' 
-            ORDER BY title ASC`);
+            ORDER BY title ASC LIMIT 100`);
 
         return rows;
     }

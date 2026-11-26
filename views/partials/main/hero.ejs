@@ -63,9 +63,9 @@
                role="tablist" aria-label="Hero slides"></div>
 
           <div id="hero-badge"
-               class="absolute bottom-10 left-5 z-20 hidden rounded-xl border border-white/20 bg-black/40 px-4 py-3 shadow-xl backdrop-blur sm:block lg:bottom-10 lg:left-6">
+               class="absolute top-10 left-5 z-20 hidden rounded-xl border border-white/20 bg-black/20 px-4 py-3 shadow-xl backdrop-blur sm:block lg:top-10 lg:left-6">
             <p class="text-[10px] font-semibold uppercase tracking-wider text-white/70">Featured</p>
-            <p id="hero-badge-text" class="mt-1 text-sm font-semibold text-white">Latest technology</p>
+            <a target="_blank" href="/shop?s=latest-arrival" id="hero-badge-text" class="mt-1 text-sm font-semibold text-white hover:underline flex items-center gap-1">Latest Arrivals<i data-lucide="move-right"></i></a>
           </div>
         </div>
       </div>
@@ -73,7 +73,6 @@
   </div>
 </section>
 
-<!-- Pass slides to the client for the carousel -->
 <script>
   window.__HERO_SLIDES__ = <%- JSON.stringify(slides) %>;
 </script>

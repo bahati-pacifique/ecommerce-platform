@@ -1,8 +1,6 @@
-<nav id="desktop-navigation" class="hidden border-b border-gray-200 bg-white md:block">
+<nav id="desktop-navigation" class="relative hidden border-b border-gray-200 bg-white md:block">
   <div class="mx-auto flex w-full max-w-cococe items-center px-4 sm:px-6 lg:px-8">
-
-    <button type="button"
-            class="flex h-12 shrink-0 items-center gap-2 border-r border-gray-200 pr-5 text-sm font-semibold transition hover:text-brand">
+    <button type="button" categories-trigger-panel class="flex h-12 shrink-0 items-center gap-2 border-r border-gray-200 pr-5 text-sm font-semibold transition hover:text-brand">
       <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
       </svg>
@@ -10,14 +8,114 @@
     </button>
 
     <div class="flex min-w-0 items-center overflow-x-auto scrollbar-hide">
-      <% navLinks.forEach(link => { %>
-        <a href="<%= link.href %>"
-           class="whitespace-nowrap px-4 py-4 text-sm font-medium transition hover:text-brand
-                  <%= link.active ? 'font-semibold text-brand' : '' %>">
-          <%= link.label %>
-        </a>
+      <% categories.forEach(cat => { %>
+      <a href="/shop-by-categories/<%= cat.title %>" target="_blank" class="whitespace-nowrap px-4 py-4 text-sm font-medium transition hover:text-brand">
+        <%= cat.title %>
+      </a>
       <% }) %>
     </div>
+  </div>
 
+  <div id="categoryPanel" class="invisible absolute left-0 right-0 top-full z-[1000] flex max-h-[70vh] flex-col overflow-y-auto rounded-b-lg bg-white opacity-0 shadow-lg transition-all duration-200">
+    <button type="button" categories-close-panel class="ml-auto p-3 hover:text-brand">
+      <i data-lucide="x"></i>
+    </button>
+
+    <div class="px-4 pb-6 sm:px-6 lg:px-8 mt-3">
+      <!-- Category list — grid, hidden until data arrives -->
+      <ul id="globalCategoryList" class="hidden grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5"></ul>
+
+      <!-- Error state -->
+      <div class="hidden text-2xl text-brand flex flex-col items-center justify-center gap-3 py-6" id="categoryPanelError">
+        <i data-lucide="triangle-alert" class="w-6 h-6"></i>
+        <span id="categoryPanelErrorMsg" class="text-sm"></span>
+      </div>
+
+      <!-- Loader -->
+      <div class="flex items-center justify-center p-3" id="categoryPanelLoader">
+        <%- include('../components/square-dots-loader')%>
+      </div>
+    </div>
   </div>
 </nav>
+
+<script type="module">
+  lucide?.createIcons();
+
+  const panel = document.getElementById('categoryPanel');
+  const trigger = document.querySelector('[categories-trigger-panel]');
+  const closeBtn = document.querySelector('[categories-close-panel]');
+  const listEl = document.getElementById('globalCategoryList');
+
+  let loaded = false; // cache so we don't refetch every open
+
+  const open = () => {
+    panel.classList.remove('invisible', 'opacity-0');
+    panel.classList.add('opacity-100');
+    if (!loaded) getGlobalCategory();
+  };
+
+  const close = () => {
+    panel.classList.add('invisible', 'opacity-0');
+    panel.classList.remove('opacity-100');
+  };
+  const toggle = () => panel.classList.contains('invisible') ? open() : close();
+
+  trigger.addEventListener('click', (e) => { e.stopPropagation(); toggle(); });
+  closeBtn.addEventListener('click', close);
+
+  document.addEventListener('click', (e) => {
+    if (!panel.contains(e.target) && !trigger.contains(e.target)) close();
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') close();
+  });
+
+  function renderCategories(items) {
+    listEl.innerHTML = '';
+
+    if (!items || items.length === 0) {
+      listEl.innerHTML = `<li class="col-span-full text-center text-sm text-gray-500">No categories found.</li>`;
+      return;
+    }
+
+    listEl.innerHTML = items.map(cat => `
+      <li>
+        <a href="/shop-by-categories/${encodeURIComponent(cat.title)}"
+           target="_blank"
+           class="group flex items-center justify-between rounded-lg border border-gray-100 bg-gray-50 px-4 py-3 text-sm font-medium text-gray-800 transition hover:border-brand hover:bg-white hover:text-brand">
+          <span class="truncate">${cat.title}</span>
+          <i data-lucide="chevron-right" class="h-4 w-4 shrink-0 text-gray-400 transition group-hover:translate-x-0.5 group-hover:text-brand"></i>
+        </a>
+      </li>
+    `).join('');
+  }
+
+  async function getGlobalCategory() {
+    try {
+      $('#categoryPanelError').addClass('hidden');
+      $('#globalCategoryList').addClass('hidden');
+      $('#categoryPanelLoader').removeClass('hidden');
+
+      const response = await axios.get('<%=protocal%>api.<%=domainName%>/categories', {
+        withCredentials: true
+      });
+
+      const items = response.data || [];
+      renderCategories(items);
+
+      $('#globalCategoryList').removeClass('hidden');
+      loaded = true;
+
+    } catch (error) {
+      console.error(error);
+      $('#categoryPanelErrorMsg').text(
+        error.response?.data?.message || 'Unable to load categories — Internal Server Error'
+      );
+      $('#categoryPanelError').removeClass('hidden');
+    } finally {
+      $('#categoryPanelLoader').addClass('hidden');
+      lucide?.createIcons();
+    }
+  }
+</script>

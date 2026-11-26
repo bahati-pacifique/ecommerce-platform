@@ -5,10 +5,12 @@ const { logout } = require('../../../src/services/auth.services');
 const { clearAuthentication, acceptsHtml } = require('../../../util/helpers');
 const authServices = require('../../../src/services/auth.services');
 
+const MainService = require('../service/main.services');
+
 const {
     navLinks,
     heroSlides,
-    categories,
+    categores,
     featuredProducts,
     dealProducts,
     brands,
@@ -51,6 +53,12 @@ function renderLaunchPage(req, res) {
 }
 
 async function renderMain(req, res) {
+
+    const categories = await MainService.getCategories();
+    const heroProducts = await MainService.getLatestHeroProductCatalog();
+
+    console.log("Products", heroProducts);
+
     return res.render('partials/main/home', {
         layout: 'main',
         title: 'COCOCE — Technology for the Way You Live',
@@ -59,6 +67,7 @@ async function renderMain(req, res) {
         cartCount: 0,
         heroSlides,
         categories,
+        heroProducts,
         featuredProducts,
         dealProducts,
         brands,
