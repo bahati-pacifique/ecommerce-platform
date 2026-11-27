@@ -1,40 +1,133 @@
-<article class="deal-card overflow-hidden rounded-xl border border-gray-200 bg-white
-                sm:w-[240px] sm:shrink-0 sm:snap-start">
-  <div class="relative aspect-square overflow-hidden bg-gray-100">
-    <img src="<%= product.image %>" alt="<%= product.name %>" class="h-full w-full object-cover transition duration-300 group-hover:scale-105" loading="lazy">
+<%
+  const price     = Number(listing.current_price);
+  const regular   = Number(listing.regular_price);
+  const onSale    = listing.is_on_sale === true && price < regular;
+  const discount  = listing.discount_percentage ? Math.round(Number(listing.discount_percentage)) : null;
+  const title     = listing.listing_title || listing.product_title;
+  const subtitle  = listing.product_title || '';
+  const imageSrc  = listing.product_image
+    ? (/^https?:\/\//i.test(listing.product_image)
+        ? listing.product_image
+        : 'https://cdn.cococe.rw/' + listing.product_image.replace(/^\//, ''))
+    : null;
+  const href      = '/shopping/listing/' + listing.listing_id;
+  const fmt       = (n) => Number(n).toLocaleString('en-RW');
 
-    <% if (product.badge) { %>
-    <span class="absolute left-2 top-2 rounded-full bg-brand px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-white">
-      <%= product.badge %>
-    </span>
+  const now   = Date.now();
+  const start = listing.promotion_starts_at ? new Date(listing.promotion_starts_at).getTime() : null;
+  const end   = listing.promotion_ends_at   ? new Date(listing.promotion_ends_at).getTime()   : null;
+  const promoActive = (!start || start <= now) && (!end || end > now);
+  const ctaHref   = `/l?l=${encodeURIComponent(listing.listing_id)}&v=${encodeURIComponent(listing.listing_variant_id)}`;
+%>
+
+<div class="deal-card group relative flex flex-col overflow-hidden rounded-xl border border-gray-200 bg-white transition duration-300 hover:-translate-y-0.5 hover:border-gray-300 hover:shadow-md">
+
+  <div class="relative aspect-square overflow-hidden bg-gray-100">
+    <% if (imageSrc) { %>
+      <img src="<%= imageSrc %>" alt="<%= title %>" class="h-full w-full object-contain transition duration-500 group-hover:scale-105" loading="lazy" decoding="async">
+    <% } else { %>
+      <div class="flex h-full w-full items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200 text-3xl text-gray-300">🖼️</div>
     <% } %>
 
-    <% if (product.originalPrice && product.originalPrice > product.price) { %>
-    <span class="absolute right-2 top-2 rounded-full bg-brand-dark px-2.5 py-1 text-[10px] font-bold text-white">
-      -<%= Math.round((1 - product.price / product.originalPrice) * 100) %>%
-    </span>
+    <% if (listing.family_title) { %>
+      <span class="absolute left-2 top-2 rounded-full bg-white/90 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-gray-700 shadow-sm backdrop-blur"><%= listing.family_title %></span>
+    <% } %>
+
+    <% if (onSale && discount) { %>
+      <span class="absolute right-2 top-2 rounded-full bg-brand px-2.5 py-1 text-[10px] font-bold text-white shadow-sm">−<%= discount %>%</span>
+    <% } else if (listing.condition === 'new') { %>
+      <span class="absolute right-2 top-2 rounded-full bg-gray-900 px-2.5 py-1 text-[10px] font-bold uppercase text-white shadow-sm">New</span>
     <% } %>
   </div>
 
   <div class="flex flex-1 flex-col p-3 sm:p-4">
-    <h3 class="line-clamp-2 text-sm font-semibold text-gray-900 sm:text-base">
-      <%= product.name %>
-    </h3>
+    <h3 class="line-clamp-2 min-h-[2.5rem] text-sm font-semibold leading-snug text-gray-900 sm:text-base" title="<%= title %>"><%= title %></h3>
 
-    <div class="mt-1.5 flex items-center gap-1">
-      <%- include('star-rating', { rating: product.rating }) %>
-      <span class="text-xs text-gray-400">(<%= product.reviews %>)</span>
-    </div>
+    <% if (subtitle && subtitle !== title) { %>
+      <p class="mt-1 truncate text-[11px] font-medium text-gray-400"><%= subtitle %></p>
+    <% } %>
 
-    <div class="mt-2 flex items-baseline gap-2">
-      <span class="text-lg font-bold text-gray-900">Rwfr <%= product.price.toFixed(2) %></span>
-      <% if (product.originalPrice) { %>
-      <span class="text-sm text-gray-400 line-through">Rwfr <%= product.originalPrice.toFixed(2) %></span>
+    <div class="mt-2 flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
+      <span class="text-lg font-bold text-gray-900"><%= listing.currency_symbol %><%= fmt(price) %></span>
+      <% if (onSale) { %>
+        <span class="text-xs text-gray-400 line-through"><%= listing.currency_symbol %><%= fmt(regular) %></span>
       <% } %>
     </div>
 
-    <button class="add-to-cart mt-3 w-full rounded-lg bg-brand py-2 text-xs font-bold text-white transition hover:bg-brand-dark sm:text-sm" data-id="<%= product.id %>">
-      Add to Cart
-    </button>
+    <% if (onSale) { %>
+      <p class="mt-0.5 text-[11px] font-semibold text-emerald-600">You save <%= listing.currency_symbol %><%= fmt(regular - price) %></p>
+    <% } %>
+
+    <% if (end && promoActive) { %>
+      <div class="countdown mt-2 flex items-center justify-center gap-1.5 rounded-lg bg-red-50 px-2 py-1.5 text-[11px] font-bold text-brand" data-ends-at="<%= listing.promotion_ends_at %>">
+        <i class="bi bi-clock-history text-xs"></i>
+        <span class="countdown-text">Ends in —</span>
+      </div>
+    <% } %>
+
+    <div class="mt-auto pt-3">
+      <a href="<%= ctaHref %>"
+         class="flex w-full items-center justify-center rounded-lg bg-brand py-2 text-xs font-bold text-white transition hover:bg-brand-dark active:scale-[.98] sm:text-sm"
+         data-listing-id="<%= listing.listing_id %>"
+         data-variant-id="<%= listing.listing_variant_id %>"
+         data-price="<%= price %>"
+         data-currency="<%= listing.currency_code %>"
+         data-sku="<%= listing.sku %>">
+        View item offer
+      </a>
+    </div>
   </div>
-</article>
+</div>
+
+<script type="module">
+  (function() {
+    const els = document.querySelectorAll('.countdown');
+
+    function pad(n) {
+      return String(n).padStart(2, '0');
+    }
+
+    function format(ms) {
+      const totalSec = Math.max(0, Math.floor(ms / 1000));
+      const d = Math.floor(totalSec / 86400);
+      const h = Math.floor((totalSec % 86400) / 3600);
+      const m = Math.floor((totalSec % 3600) / 60);
+      const s = totalSec % 60;
+
+      if (d > 0) return `${d}d ${pad(h)}h ${pad(m)}m`;
+      if (h > 0) return `${pad(h)}h ${pad(m)}m ${pad(s)}s`;
+      return `${pad(m)}m ${pad(s)}s`;
+    }
+
+    function tick() {
+      const now = Date.now();
+      els.forEach(el => {
+        const ends = new Date(el.dataset.endsAt).getTime();
+        const diff = ends - now;
+        const textEl = el.querySelector('.countdown-text');
+
+        if (isNaN(ends)) {
+          el.style.display = 'none';
+          return;
+        }
+
+        if (diff <= 0) {
+          textEl.textContent = 'Offer ended';
+          el.classList.remove('text-brand', 'bg-red-50');
+          el.classList.add('text-gray-400', 'bg-gray-100');
+          el.dataset.expired = 'true';
+          return;
+        }
+        textEl.textContent = 'Ends in ' + format(diff);
+      });
+    }
+
+    tick();
+    const id = setInterval(tick, 1000);
+
+    // Optional: stop the interval when the tab is hidden to save CPU
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) clearInterval(id);
+    });
+  })();
+</script>

@@ -54,29 +54,29 @@ function renderLaunchPage(req, res) {
 
 async function renderMain(req, res) {
 
-    const { page = 1, limit = 100 } = req.query;
+    const { listingPage = 1, listingLimit = 100, brandsPage = 1, brandsLimit = 21, onSalePage= 1, onSaleLimit= 35 } = req.query;
     
     const categories = await MainService.getCategories();
     const heroProducts = await MainService.getLatestHeroProductCatalog();
     const productCategoriesImages = await MainService.getProductCategoryImages();
-    const homeListings = await MainService.getLandingListingsPaginated({page, limit});
+    const homeListings = await MainService.getLandingListingsPaginated({page: listingPage, limit: listingLimit});
+    const homeBrands = await MainService.getLandingPaginatedBrands({page: brandsPage, limit: brandsLimit});
+    const homeListingsOnSale = await MainService.getHomeListingsOnSale({page: onSalePage, limit: onSaleLimit});
 
-    console.log(homeListings);
+    console.log(homeListingsOnSale);
 
     return res.render('partials/main/home', {
         layout: 'main',
         title: 'COCOCE — Technology for the Way You Live',
         description: 'Shop laptops, computers, gaming products, accessories and more at COCOCE.',
-        navLinks,
         cartCount: 0,
-        heroSlides,
         categories,
         productCategoriesImages,
         heroProducts,
         homeListings,
-        featuredProducts,
+        homeListingsOnSale,
         dealProducts,
-        brands,
+        homeBrands,
         benefits,
         pageScripts: ['/scripts/main/hero.js', '/scripts/main/products.js', '/scripts/main/deals.js'],
         protocal,

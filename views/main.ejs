@@ -19,18 +19,14 @@
 
   <script src="/scripts/helper/utils.js"></script>
   <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-
-  <!-- Global behavior (cart, menu, smooth scroll, etc.) -->
   <script src="/scripts/main/app.js"></script>
 
-  <!-- Per-page scripts (only loaded if the page defines `pageScripts`) -->
   <% if (typeof pageScripts !== 'undefined') { %>
   <% pageScripts.forEach(src => { %>
   <script src="<%= src %>"></script>
   <% }) %>
   <% } %>
 
-  <%- include('partials/main/notice-modal') %>
   <% if (typeof pageScripts !== 'undefined' && Array.isArray(pageScripts)) { %>
   <% pageScripts.forEach(src => { %><script src="<%= src %>" defer></script><% }) %>
   <% } %>

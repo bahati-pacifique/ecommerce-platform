@@ -316,6 +316,178 @@ class MainModel {
             }
         };
     }
+
+    /**
+    * Get active marketplace brands, ordered by active product count DESC.
+    */
+    static async getLandingPaginatedBrands({ page = 1, limit = 20 } = {}) {
+        page = Math.max(1, Number.parseInt(page, 10) || 1);
+        limit = Math.min(100, Math.max(1, Number.parseInt(limit, 10) || 20));
+
+        const offset = (page - 1) * limit;
+
+        const query = `
+            SELECT
+                b.id,
+                b.title,
+                b.slug,
+                b.logo_url,
+                b.website,
+                b.description,
+                COUNT(DISTINCT p.id)::INTEGER AS product_count
+            FROM brands b
+            LEFT JOIN products p
+                ON p.brand_id = b.id
+            AND p.status = 'active'
+            WHERE b.status = 'active'
+            GROUP BY b.id
+            ORDER BY
+                product_count DESC,
+                b.title ASC,
+                b.id ASC
+            LIMIT $1
+            OFFSET $2;
+        `;
+
+        const { rows } = await db.query(query, [limit + 1, offset]);
+
+        const hasNextPage = rows.length > limit;
+        if (hasNextPage) rows.pop();
+
+        return {
+            brands: rows,
+            pagination: {
+                page,
+                limit,
+                hasNextPage,
+                hasPrevPage: page > 1
+            }
+        };
+    }
+
+    /**
+     * Get paginated listings on sale.
+     * If no active sale listings exist in the base currency,
+     * return the lowest-priced active listings instead.
+     */
+    static async getPaginatedListingsOnSale({ page = 1, limit = 20 } = {}) {
+        page = Math.max(1, Number.parseInt(page, 10) || 1);
+        limit = Math.min(100, Math.max(1, Number.parseInt(limit, 10) || 20));
+
+        const offset = (page - 1) * limit;
+
+        const query = `
+            WITH base_currency AS (
+                SELECT id, code, symbol
+                FROM currencies
+                WHERE is_base = TRUE
+                AND status = 'active'
+                LIMIT 1
+            ),
+            priced_listings AS (
+                SELECT
+                    l.id AS listing_id,
+                    COALESCE(l.title, p.title) AS listing_title,
+                    l.description AS listing_description,
+                    l.condition,
+
+                    p.id AS product_id,
+                    p.title AS product_title,
+
+                    f.id AS family_id,
+                    f.title AS family_title,
+
+                    lv.id AS listing_variant_id,
+                    lv.sku,
+                    lv.options AS variant_options,
+
+                    c.id AS currency_id,
+                    c.code AS currency_code,
+                    c.symbol AS currency_symbol,
+
+                    cp.regular_price,
+                    cp.sale_price,
+                    cp.current_price,
+                    cp.is_on_sale,
+                    cp.discount_percentage,
+
+                    cp.regular_price_starts_at,
+                    cp.regular_price_ends_at,
+                    cp.promotion_starts_at,
+                    cp.promotion_ends_at,
+
+                    media.storage_key AS product_image
+
+                FROM listings l
+                JOIN products p
+                    ON p.id = l.product_id
+                JOIN families f
+                    ON f.id = p.family_id
+                JOIN listing_variants lv
+                    ON lv.listing_id = l.id
+                JOIN base_currency c
+                    ON TRUE
+                JOIN listing_variant_current_prices cp
+                    ON cp.listing_variant_id = lv.id
+                AND cp.currency_id = c.id
+
+                LEFT JOIN LATERAL (
+                    SELECT m.storage_key
+                    FROM listing_variants_media m
+                    WHERE m.listing_variant_id = lv.id
+                    AND m.media_type = 'image'
+                    AND m.is_primary = TRUE
+                    ORDER BY m.created_at DESC, m.id DESC
+                    LIMIT 1
+                ) media ON TRUE
+
+                WHERE l.status = 'active'
+                AND lv.status = 'active'
+                AND p.status = 'active'
+            ),
+            sale_listings AS (
+                SELECT *
+                FROM priced_listings
+                WHERE is_on_sale = TRUE
+            ),
+            candidates AS (
+                SELECT *
+                FROM sale_listings
+
+                UNION ALL
+
+                SELECT *
+                FROM priced_listings
+                WHERE NOT EXISTS (
+                    SELECT 1
+                    FROM sale_listings
+                )
+            )
+            SELECT *
+            FROM candidates
+            ORDER BY
+                current_price ASC,
+                product_title ASC,
+                listing_variant_id ASC
+            LIMIT $1
+            OFFSET $2;
+        `;
+
+        const { rows } = await db.query(query, [limit + 1, offset]);
+
+        const hasNextPage = rows.length > limit;
+        if (hasNextPage) rows.pop();
+
+        return {
+            listings: rows,
+            pagination: {
+                page,
+                limit,
+                hasNextPage,
+                hasPrevPage: page > 1
+            }
+        };
+    }
 }
 
 module.exports = MainModel;

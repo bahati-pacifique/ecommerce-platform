@@ -54,6 +54,26 @@ class MainService {
         }
     }
 
+    static async getLandingPaginatedBrands({page, limit}) {
+        try {
+            const homeBrands = await MainModel.getLandingPaginatedBrands({page, limit});
+            return homeBrands;
+        } catch (error) {
+            console.log('[getLandingPaginatedBrands]', error);
+            return [];
+        }
+    }
+
+    static async getHomeListingsOnSale({page, limit}){
+        try {
+            const onSaleListings = await MainModel.getPaginatedListingsOnSale({page, limit});
+            return onSaleListings;
+        } catch (error) {
+            console.log('[getHomeListingsOnSale]', error);
+            return [];
+        }
+    }
+
 }
 
 module.exports = MainService;

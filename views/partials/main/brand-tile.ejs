@@ -1,6 +1,48 @@
-<a href="/brand/<%= brand.toLowerCase() %>"
-   class="group flex min-h-24 items-center justify-center rounded-xl border border-gray-200 bg-white px-4 py-6 transition hover:-translate-y-0.5 hover:border-gray-300 hover:shadow-md">
-  <span class="text-lg font-bold tracking-tight text-gray-800 transition group-hover:text-brand">
-    <%= brand %>
-  </span>
+<a href="/shopping/brand/?i=<%= brand.id %>&t=<%= encodeURIComponent(brand.title) %>"
+   class="brand-card group relative flex flex-col items-center justify-between gap-3 overflow-hidden rounded-2xl border border-slate-200 bg-white p-5 min-h-[180px] text-center no-underline transition-all duration-300 hover:-translate-y-1 hover:border-slate-300 hover:shadow-[0_12px_32px_rgba(15,23,42,.08)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2"
+   aria-label="Browse <%= brand.title %> products (<%= brand.product_count || 0 %> available)">
+
+  <span class="pointer-events-none absolute inset-x-0 -top-16 h-32 bg-gradient-to-b from-brand/10 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100"></span>
+
+  <% if (brand.product_count > 0) { %>
+    <span class="absolute right-2.5 top-2.5 z-10 inline-flex items-center gap-1 rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-bold text-slate-600 transition group-hover:bg-brand/10 group-hover:text-brand">
+      <%= brand.product_count %>
+      <span class="font-medium text-slate-400 group-hover:text-brand/70 flex items-center gap-1">
+        <%= brand.product_count === 1 ? 'item' : 'items+' %> registered
+      </span>
+    </span>
+  <% } else { %>
+    <span class="absolute right-2.5 top-2.5 z-10 inline-flex items-center rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-slate-400">
+      Soon
+    </span>
+  <% } %>
+
+  <div class="relative z-[1] flex h-16 w-full items-center justify-center">
+    <% if (brand.logo_url) { %>
+      <img
+        src="<%= brand.logo_url %>"
+        alt="<%= brand.title %> logo"
+        loading="lazy"
+        decoding="async"
+        class="max-h-16 max-w-[80%] object-contain opacity-90 grayscale transition duration-300 group-hover:opacity-100 group-hover:grayscale-0"
+        onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" >
+      <span class="hidden h-14 w-14 items-center justify-center rounded-xl bg-slate-100 text-xl font-black text-slate-400">
+        <%= brand.title.charAt(0).toUpperCase() %>
+      </span>
+    <% } else { %>
+      <span class="flex h-14 w-14 items-center justify-center rounded-xl bg-gradient-to-br from-slate-100 to-slate-200 text-xl font-black text-slate-500">
+        <%= brand.title.charAt(0).toUpperCase() %>
+      </span>
+    <% } %>
+  </div>
+
+  <div class="relative z-[1] min-w-0">
+    <span class="block truncate text-base font-bold tracking-tight text-slate-800 transition group-hover:text-brand">
+      <%= brand.title %>
+    </span>
+    <span class="mt-0.5 block truncate text-[11px] font-medium text-slate-400">
+      <%= brand.description ? brand.description.slice(0, 40) + (brand.description.length > 40 ? '…' : '') : 'View products' %>
+    </span>
+  </div>
+
 </a>
