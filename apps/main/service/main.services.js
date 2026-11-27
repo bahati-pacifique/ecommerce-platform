@@ -19,7 +19,37 @@ class MainService {
             const heroProducts = await MainModel.getLatestHeroProductCatalog();
             return heroProducts;
         } catch (error) {
-            console.log('[getCategories]', error);
+            console.log('[getLatestHeroProductCatalog]', error);
+            return [];
+        }
+    }
+
+    static async getProductCategoryImages() {
+        try {
+            const heroProductsCategories = await MainModel.getProductCategoryImages();
+            return heroProductsCategories;
+        } catch (error) {
+            console.log('[getProductCategoryImages]', error);
+            return [];
+        }
+    }
+
+    static async getLandingListings() {
+        try {
+            const currentHomeListings = await MainModel.getLandingListings();
+            return currentHomeListings;
+        } catch (error) {
+            console.log('[getLandingListings]', error);
+            return [];
+        }
+    }
+
+    static async getLandingListingsPaginated({page, limit}) {
+        try {
+            const currentHomeListings = await MainModel.getLandingListingsPaginated({page, limit});
+            return currentHomeListings;
+        } catch (error) {
+            console.log('[getLandingListings]', error);
             return [];
         }
     }

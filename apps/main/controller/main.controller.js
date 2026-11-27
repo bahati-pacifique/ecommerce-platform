@@ -54,10 +54,14 @@ function renderLaunchPage(req, res) {
 
 async function renderMain(req, res) {
 
+    const { page = 1, limit = 100 } = req.query;
+    
     const categories = await MainService.getCategories();
     const heroProducts = await MainService.getLatestHeroProductCatalog();
+    const productCategoriesImages = await MainService.getProductCategoryImages();
+    const homeListings = await MainService.getLandingListingsPaginated({page, limit});
 
-    console.log("Products", heroProducts);
+    console.log(homeListings);
 
     return res.render('partials/main/home', {
         layout: 'main',
@@ -67,7 +71,9 @@ async function renderMain(req, res) {
         cartCount: 0,
         heroSlides,
         categories,
+        productCategoriesImages,
         heroProducts,
+        homeListings,
         featuredProducts,
         dealProducts,
         brands,

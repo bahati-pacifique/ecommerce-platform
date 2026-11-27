@@ -246,3 +246,15 @@ function toUTC(value) {
 
     return date.toISOString();
 }
+
+function formatMoney(amount, currencyCode = 'USD') {
+    const numericAmount = Number(amount);
+    if (amount == null || Number.isNaN(numericAmount)) return '';
+
+    return new Intl.NumberFormat('en-RW', {
+        style: 'currency',
+        currency: currencyCode,
+        currencyDisplay: 'code',
+        maximumFractionDigits: 0,
+    }).format(numericAmount);
+}

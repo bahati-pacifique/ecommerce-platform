@@ -1,12 +1,12 @@
-<a href="/category/<%= category.slug %>"
+<a href="/shop?category=<%= p.category_title %>"
    class="category-card group overflow-hidden rounded-xl border border-gray-200 bg-white transition duration-200 hover:-translate-y-0.5 hover:border-gray-300 hover:shadow-md">
   <div class="relative aspect-square overflow-hidden">
-    <img src="<%= category.image %>" alt="<%= category.name %>"
-         class="category-card-img h-full w-full object-cover" loading="lazy">
+    <img src="https://cdn.cococe.rw/<%= p.product_image %>" alt="<%= p.category_title %>"
+         class="category-card-img h-full w-full object-contain" loading="lazy">
     <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
   </div>
   <div class="p-4 sm:p-5">
-    <h3 class="text-sm font-bold text-gray-900"><%= category.name %></h3>
-    <p class="mt-1 text-xs text-gray-500"><%= category.subtitle %></p>
+    <h1 class="text-sm font-bold text-gray-900"><%= p.product_title %></h1>
+    <h3 class="text-sm font-bold text-gray-400"><%= p.category_title %></h3>
   </div>
 </a>

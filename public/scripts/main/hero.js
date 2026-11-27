@@ -1,7 +1,6 @@
 (function () {
     const slides = window.__HERO_SLIDES__ || [];
 
-    console.log(slides)
     if (!slides.length) return;
 
     const $slider = $('#hero-slider');
